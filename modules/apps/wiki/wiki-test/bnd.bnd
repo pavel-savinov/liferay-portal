@@ -5,5 +5,7 @@ Import-Package:\
 	!org.junit.experimental.theories,\
 	*
 Include-Resource:\
-	classes,\
 	test-classes/integration
+Liferay-Releng-Module-Group-Description:
+Liferay-Releng-Module-Group-Title: Wiki
+-include: ../../../../marketplace/collaboration/bnd.bnd

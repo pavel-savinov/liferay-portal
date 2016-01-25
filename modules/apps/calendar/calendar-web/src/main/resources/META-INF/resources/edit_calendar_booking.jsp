@@ -134,7 +134,7 @@ if (calendarBooking != null) {
 		recurring = true;
 	}
 
-	recurrence = calendarBooking.getRecurrenceObj();
+	recurrence = RecurrenceUtil.inTimeZone(calendarBooking.getRecurrenceObj(), startTimeJCalendar, calendarBookingTimeZone);
 
 	approved = calendarBooking.isApproved();
 
@@ -182,6 +182,16 @@ for (long otherCalendarId : otherCalendarIds) {
 
 	if (otherCalendarResource.isActive() && !manageableCalendars.contains(otherCalendar) && CalendarPermission.contains(themeDisplay.getPermissionChecker(), otherCalendar, CalendarActionKeys.MANAGE_BOOKINGS)) {
 		manageableCalendars.add(otherCalendar);
+	}
+}
+
+Iterator<Calendar> manageableCalendarsIterator = manageableCalendars.iterator();
+
+while (manageableCalendarsIterator.hasNext()) {
+	Calendar curCalendar = manageableCalendarsIterator.next();
+
+	if (!CalendarServiceUtil.isManageableFromGroup(curCalendar.getCalendarId(), themeDisplay.getScopeGroupId())) {
+		manageableCalendarsIterator.remove();
 	}
 }
 %>
@@ -638,7 +648,7 @@ for (long otherCalendarId : otherCalendarIds) {
 			borderStyle: 'dashed',
 			borderWidth: '2px',
 			color: '#F8F8F8',
-			content: '&nbsp;',
+			content: '',
 			editingEvent: true,
 			endDate: Liferay.CalendarUtil.toLocalTime(new Date(<%= endTime %>)),
 			on: {

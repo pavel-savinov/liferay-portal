@@ -62,15 +62,13 @@ AssetEntry assetEntry = (AssetEntry)request.getAttribute("view_entry_content.jsp
 				%>
 
 				<c:if test="<%= Validator.isNotNull(coverImageURL) %>">
-					<div class="row">
-						<div class="cover-image-container" style="background-image: url(<%= coverImageURL %>)"></div>
+					<div class="cover-image-container" style="background-image: url(<%= coverImageURL %>)"></div>
 
-						<c:if test="<%= viewSingleEntry %>">
-							<div class="cover-image-caption">
-								<small><%= entry.getCoverImageCaption() %></small>
-							</div>
-						</c:if>
-					</div>
+					<c:if test="<%= viewSingleEntry %>">
+						<div class="cover-image-caption">
+							<small><%= entry.getCoverImageCaption() %></small>
+						</div>
+					</c:if>
 				</c:if>
 
 				<c:if test="<%= !viewSingleEntry %>">
@@ -110,7 +108,6 @@ AssetEntry assetEntry = (AssetEntry)request.getAttribute("view_entry_content.jsp
 													</portlet:renderURL>
 
 													<liferay-ui:icon
-														iconCssClass="icon-edit"
 														label="<%= true %>"
 														message="edit"
 														url="<%= editEntryURL %>"
@@ -128,7 +125,6 @@ AssetEntry assetEntry = (AssetEntry)request.getAttribute("view_entry_content.jsp
 													/>
 
 													<liferay-ui:icon
-														iconCssClass="icon-lock"
 														label="<%= true %>"
 														message="permissions"
 														method="get"
@@ -227,7 +223,6 @@ AssetEntry assetEntry = (AssetEntry)request.getAttribute("view_entry_content.jsp
 								label="<%= true %>"
 							/>
 						</liferay-ui:custom-attributes-available>
-
 					</c:when>
 				</c:choose>
 			</div>

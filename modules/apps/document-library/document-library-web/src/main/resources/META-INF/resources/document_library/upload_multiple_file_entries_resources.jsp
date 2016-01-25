@@ -128,8 +128,7 @@ else {
 							for (DLFileEntryType curFileEntryType : fileEntryTypes) {
 							%>
 
-								<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" var="viewFileEntryTypeURL">
-									<portlet:param name="mvcRenderCommandName" value="/document_library/upload_multiple_file_entries" />
+								<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/document_library/upload_multiple_file_entries" var="viewFileEntryTypeURL">
 									<portlet:param name="repositoryId" value="<%= String.valueOf(repositoryId) %>" />
 									<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
 									<portlet:param name="fileEntryTypeId" value="<%= String.valueOf(curFileEntryType.getFileEntryTypeId()) %>" />
@@ -137,7 +136,6 @@ else {
 
 								<liferay-ui:icon
 									cssClass="upload-multiple-document-types"
-									iconCssClass="icon-file-alt"
 									id='<%= "fileEntryType_" + String.valueOf(curFileEntryType.getFileEntryTypeId()) %>'
 									message="<%= HtmlUtil.escape(curFileEntryType.getName(locale)) %>"
 									method="get"
