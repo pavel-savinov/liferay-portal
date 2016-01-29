@@ -42,12 +42,16 @@ LPS-30525.
 <#macro breadcrumbs
 	default_preferences = ""
 >
-	${theme.runtime("com.liferay.portal.kernel.servlet.taglib.ui.BreadcrumbEntry", portletProviderAction.VIEW, "", default_preferences)}
+	<@liferay_portlet["runtime"]
+		defaultPreferences=default_preferences
+		portletProviderAction=portletProviderAction.VIEW
+		portletProviderClassName="com.liferay.portal.kernel.servlet.taglib.ui.BreadcrumbEntry"
+	/>
 </#macro>
 
 <#macro control_menu>
-	<#if is_setup_complete && is_signed_in>
-		${theme.runtime("com.liferay.portlet.admin.util.PortalControlMenuApplicationType$ControlMenu", portletProviderAction.VIEW)}
+	<#if themeDisplay.isImpersonated() || (is_setup_complete && is_signed_in)>
+		<@liferay_control_menu["control-menu"] />
 	</#if>
 </#macro>
 
@@ -90,44 +94,34 @@ ${languageUtil.format(locale, key, arguments)}</#macro>
 <#macro languages
 	default_preferences = ""
 >
-	${theme.runtime("com.liferay.portal.kernel.servlet.taglib.ui.LanguageEntry", portletProviderAction.VIEW, "", default_preferences)}
+	<@liferay_portlet["runtime"]
+		defaultPreferences=default_preferences
+		portletProviderAction=portletProviderAction.VIEW
+		portletProviderClassName="com.liferay.portal.kernel.servlet.taglib.ui.LanguageEntry"
+	/>
 </#macro>
 
 <#macro navigation_menu
 	default_preferences = ""
+	instance_id = ""
 >
-	${theme.runtime("com.liferay.portal.theme.NavItem", portletProviderAction.VIEW, "", default_preferences)}
-</#macro>
-
-<#macro product_menu>
-	<#if is_setup_complete && is_signed_in>
-		${theme.runtime("com.liferay.portlet.admin.util.PortalProductMenuApplicationType$ProductMenu", portletProviderAction.VIEW)}
-	</#if>
-</#macro>
-
-<#macro product_menu_sidebar
-	state
->
-	<#if is_setup_complete && is_signed_in>
-		<div class="${state} lfr-product-menu-panel sidenav-fixed sidenav-menu-slider" id="sidenavSliderId">
-			<div class="product-menu sidebar sidenav-menu">
-				<@liferay.product_menu />
-			</div>
-		</div>
-	</#if>
-</#macro>
-
-<#macro quick_access
-	content_id
->
-	${theme.quickAccess(content_id)}
+	<@liferay_portlet["runtime"]
+		defaultPreferences=default_preferences
+		instanceId=instance_id
+		portletProviderAction=portletProviderAction.VIEW
+		portletProviderClassName="com.liferay.portal.theme.NavItem"
+	/>
 </#macro>
 
 <#macro search
 	default_preferences = ""
 >
 	<#if is_setup_complete>
-		${theme.runtime("com.liferay.portlet.admin.util.PortalSearchApplicationType$Search", portletProviderAction.VIEW, "", default_preferences)}
+		<@liferay_portlet["runtime"]
+			defaultPreferences=default_preferences
+			portletProviderAction=portletProviderAction.VIEW
+			portletProviderClassName="com.liferay.admin.kernel.util.PortalSearchApplicationType$Search"
+		/>
 	</#if>
 </#macro>
 
@@ -138,5 +132,10 @@ ${languageUtil.format(locale, key, arguments)}</#macro>
 </#macro>
 
 <#macro user_personal_bar>
-	${theme.runtime("com.liferay.portlet.admin.util.PortalUserPersonalBarApplicationType$UserPersonalBar", portletProviderAction.VIEW)}
+	<#if themeDisplay.isImpersonated() || is_setup_complete || !is_signed_in>
+		<@liferay_portlet["runtime"]
+			portletProviderAction=portletProviderAction.VIEW
+			portletProviderClassName="com.liferay.admin.kernel.util.PortalUserPersonalBarApplicationType$UserPersonalBar"
+		/>
+	</#if>
 </#macro>

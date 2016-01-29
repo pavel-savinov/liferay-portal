@@ -14,9 +14,14 @@
 
 package com.liferay.portal.dao.jdbc;
 
+import com.liferay.portal.dao.jdbc.pool.metrics.C3P0ConnectionPoolMetrics;
+import com.liferay.portal.dao.jdbc.pool.metrics.DBCPConnectionPoolMetrics;
+import com.liferay.portal.dao.jdbc.pool.metrics.HikariConnectionPoolMetrics;
+import com.liferay.portal.dao.jdbc.pool.metrics.TomcatConnectionPoolMetrics;
 import com.liferay.portal.dao.jdbc.util.DataSourceWrapper;
 import com.liferay.portal.kernel.configuration.Filter;
 import com.liferay.portal.kernel.dao.jdbc.DataSourceFactory;
+import com.liferay.portal.kernel.dao.jdbc.pool.metrics.ConnectionPoolMetrics;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jndi.JNDIUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -58,6 +63,7 @@ import javax.sql.DataSource;
 
 import jodd.bean.BeanUtil;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.dbcp.BasicDataSourceFactory;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.apache.tomcat.jdbc.pool.jmx.ConnectionPool;
@@ -97,6 +103,8 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 
 	@Override
 	public DataSource initDataSource(Properties properties) throws Exception {
+		Class.forName(DataSourceWrapper.class.getName());
+
 		Properties defaultProperties = PropsUtil.getProperties(
 			"jdbc.default.", true);
 
@@ -263,13 +271,22 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 			}
 		}
 
+		registerConnectionPoolMetrics(
+			new C3P0ConnectionPoolMetrics(comboPooledDataSource));
+
 		return comboPooledDataSource;
 	}
 
 	protected DataSource initDataSourceDBCP(Properties properties)
 		throws Exception {
 
-		return BasicDataSourceFactory.createDataSource(properties);
+		DataSource dataSource = BasicDataSourceFactory.createDataSource(
+			properties);
+
+		registerConnectionPoolMetrics(
+			new DBCPConnectionPoolMetrics((BasicDataSource)dataSource));
+
+		return dataSource;
 	}
 
 	protected DataSource initDataSourceHikariCP(Properties properties)
@@ -333,6 +350,9 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 			}
 		}
 
+		registerConnectionPoolMetrics(
+			new HikariConnectionPoolMetrics(hikariDataSource));
+
 		return (DataSource)hikariDataSource;
 	}
 
@@ -393,6 +413,9 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 
 			_serviceTracker.open();
 		}
+
+		registerConnectionPoolMetrics(
+			new TomcatConnectionPoolMetrics(dataSource));
 
 		return dataSource;
 	}
@@ -466,6 +489,15 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 		}
 
 		return false;
+	}
+
+	protected void registerConnectionPoolMetrics(
+		ConnectionPoolMetrics connectionPoolMetrics) {
+
+		Registry registry = RegistryUtil.getRegistry();
+
+		registry.registerService(
+			ConnectionPoolMetrics.class, connectionPoolMetrics);
 	}
 
 	protected void testDatabaseClass(Properties properties) throws Exception {

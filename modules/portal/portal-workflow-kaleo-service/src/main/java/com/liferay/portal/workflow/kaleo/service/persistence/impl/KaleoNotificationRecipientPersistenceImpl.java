@@ -31,6 +31,8 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
+import com.liferay.portal.service.persistence.CompanyProvider;
+import com.liferay.portal.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.portal.workflow.kaleo.exception.NoSuchNotificationRecipientException;
@@ -217,7 +219,7 @@ public class KaleoNotificationRecipientPersistenceImpl
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -285,7 +287,7 @@ public class KaleoNotificationRecipientPersistenceImpl
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching kaleo notification recipient
-	 * @throws com.liferay.portal.workflow.kaleo.NoSuchNotificationRecipientException if a matching kaleo notification recipient could not be found
+	 * @throws NoSuchNotificationRecipientException if a matching kaleo notification recipient could not be found
 	 */
 	@Override
 	public KaleoNotificationRecipient findByCompanyId_First(long companyId,
@@ -336,7 +338,7 @@ public class KaleoNotificationRecipientPersistenceImpl
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching kaleo notification recipient
-	 * @throws com.liferay.portal.workflow.kaleo.NoSuchNotificationRecipientException if a matching kaleo notification recipient could not be found
+	 * @throws NoSuchNotificationRecipientException if a matching kaleo notification recipient could not be found
 	 */
 	@Override
 	public KaleoNotificationRecipient findByCompanyId_Last(long companyId,
@@ -394,7 +396,7 @@ public class KaleoNotificationRecipientPersistenceImpl
 	 * @param companyId the company ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next kaleo notification recipient
-	 * @throws com.liferay.portal.workflow.kaleo.NoSuchNotificationRecipientException if a kaleo notification recipient with the primary key could not be found
+	 * @throws NoSuchNotificationRecipientException if a kaleo notification recipient with the primary key could not be found
 	 */
 	@Override
 	public KaleoNotificationRecipient[] findByCompanyId_PrevAndNext(
@@ -438,8 +440,9 @@ public class KaleoNotificationRecipientPersistenceImpl
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -737,7 +740,7 @@ public class KaleoNotificationRecipientPersistenceImpl
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -805,7 +808,7 @@ public class KaleoNotificationRecipientPersistenceImpl
 	 * @param kaleoDefinitionId the kaleo definition ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching kaleo notification recipient
-	 * @throws com.liferay.portal.workflow.kaleo.NoSuchNotificationRecipientException if a matching kaleo notification recipient could not be found
+	 * @throws NoSuchNotificationRecipientException if a matching kaleo notification recipient could not be found
 	 */
 	@Override
 	public KaleoNotificationRecipient findByKaleoDefinitionId_First(
@@ -858,7 +861,7 @@ public class KaleoNotificationRecipientPersistenceImpl
 	 * @param kaleoDefinitionId the kaleo definition ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching kaleo notification recipient
-	 * @throws com.liferay.portal.workflow.kaleo.NoSuchNotificationRecipientException if a matching kaleo notification recipient could not be found
+	 * @throws NoSuchNotificationRecipientException if a matching kaleo notification recipient could not be found
 	 */
 	@Override
 	public KaleoNotificationRecipient findByKaleoDefinitionId_Last(
@@ -918,7 +921,7 @@ public class KaleoNotificationRecipientPersistenceImpl
 	 * @param kaleoDefinitionId the kaleo definition ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next kaleo notification recipient
-	 * @throws com.liferay.portal.workflow.kaleo.NoSuchNotificationRecipientException if a kaleo notification recipient with the primary key could not be found
+	 * @throws NoSuchNotificationRecipientException if a kaleo notification recipient with the primary key could not be found
 	 */
 	@Override
 	public KaleoNotificationRecipient[] findByKaleoDefinitionId_PrevAndNext(
@@ -962,8 +965,9 @@ public class KaleoNotificationRecipientPersistenceImpl
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -1263,7 +1267,7 @@ public class KaleoNotificationRecipientPersistenceImpl
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -1331,7 +1335,7 @@ public class KaleoNotificationRecipientPersistenceImpl
 	 * @param kaleoNotificationId the kaleo notification ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching kaleo notification recipient
-	 * @throws com.liferay.portal.workflow.kaleo.NoSuchNotificationRecipientException if a matching kaleo notification recipient could not be found
+	 * @throws NoSuchNotificationRecipientException if a matching kaleo notification recipient could not be found
 	 */
 	@Override
 	public KaleoNotificationRecipient findByKaleoNotificationId_First(
@@ -1384,7 +1388,7 @@ public class KaleoNotificationRecipientPersistenceImpl
 	 * @param kaleoNotificationId the kaleo notification ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching kaleo notification recipient
-	 * @throws com.liferay.portal.workflow.kaleo.NoSuchNotificationRecipientException if a matching kaleo notification recipient could not be found
+	 * @throws NoSuchNotificationRecipientException if a matching kaleo notification recipient could not be found
 	 */
 	@Override
 	public KaleoNotificationRecipient findByKaleoNotificationId_Last(
@@ -1444,7 +1448,7 @@ public class KaleoNotificationRecipientPersistenceImpl
 	 * @param kaleoNotificationId the kaleo notification ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next kaleo notification recipient
-	 * @throws com.liferay.portal.workflow.kaleo.NoSuchNotificationRecipientException if a kaleo notification recipient with the primary key could not be found
+	 * @throws NoSuchNotificationRecipientException if a kaleo notification recipient with the primary key could not be found
 	 */
 	@Override
 	public KaleoNotificationRecipient[] findByKaleoNotificationId_PrevAndNext(
@@ -1488,8 +1492,9 @@ public class KaleoNotificationRecipientPersistenceImpl
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -1755,6 +1760,8 @@ public class KaleoNotificationRecipientPersistenceImpl
 		kaleoNotificationRecipient.setNew(true);
 		kaleoNotificationRecipient.setPrimaryKey(kaleoNotificationRecipientId);
 
+		kaleoNotificationRecipient.setCompanyId(companyProvider.getCompanyId());
+
 		return kaleoNotificationRecipient;
 	}
 
@@ -1763,7 +1770,7 @@ public class KaleoNotificationRecipientPersistenceImpl
 	 *
 	 * @param kaleoNotificationRecipientId the primary key of the kaleo notification recipient
 	 * @return the kaleo notification recipient that was removed
-	 * @throws com.liferay.portal.workflow.kaleo.NoSuchNotificationRecipientException if a kaleo notification recipient with the primary key could not be found
+	 * @throws NoSuchNotificationRecipientException if a kaleo notification recipient with the primary key could not be found
 	 */
 	@Override
 	public KaleoNotificationRecipient remove(long kaleoNotificationRecipientId)
@@ -1776,7 +1783,7 @@ public class KaleoNotificationRecipientPersistenceImpl
 	 *
 	 * @param primaryKey the primary key of the kaleo notification recipient
 	 * @return the kaleo notification recipient that was removed
-	 * @throws com.liferay.portal.workflow.kaleo.NoSuchNotificationRecipientException if a kaleo notification recipient with the primary key could not be found
+	 * @throws NoSuchNotificationRecipientException if a kaleo notification recipient with the primary key could not be found
 	 */
 	@Override
 	public KaleoNotificationRecipient remove(Serializable primaryKey)
@@ -2011,11 +2018,11 @@ public class KaleoNotificationRecipientPersistenceImpl
 	}
 
 	/**
-	 * Returns the kaleo notification recipient with the primary key or throws a {@link com.liferay.portal.NoSuchModelException} if it could not be found.
+	 * Returns the kaleo notification recipient with the primary key or throws a {@link com.liferay.portal.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the kaleo notification recipient
 	 * @return the kaleo notification recipient
-	 * @throws com.liferay.portal.workflow.kaleo.NoSuchNotificationRecipientException if a kaleo notification recipient with the primary key could not be found
+	 * @throws NoSuchNotificationRecipientException if a kaleo notification recipient with the primary key could not be found
 	 */
 	@Override
 	public KaleoNotificationRecipient findByPrimaryKey(Serializable primaryKey)
@@ -2035,11 +2042,11 @@ public class KaleoNotificationRecipientPersistenceImpl
 	}
 
 	/**
-	 * Returns the kaleo notification recipient with the primary key or throws a {@link com.liferay.portal.workflow.kaleo.NoSuchNotificationRecipientException} if it could not be found.
+	 * Returns the kaleo notification recipient with the primary key or throws a {@link NoSuchNotificationRecipientException} if it could not be found.
 	 *
 	 * @param kaleoNotificationRecipientId the primary key of the kaleo notification recipient
 	 * @return the kaleo notification recipient
-	 * @throws com.liferay.portal.workflow.kaleo.NoSuchNotificationRecipientException if a kaleo notification recipient with the primary key could not be found
+	 * @throws NoSuchNotificationRecipientException if a kaleo notification recipient with the primary key could not be found
 	 */
 	@Override
 	public KaleoNotificationRecipient findByPrimaryKey(
@@ -2290,7 +2297,7 @@ public class KaleoNotificationRecipientPersistenceImpl
 
 			if (orderByComparator != null) {
 				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_KALEONOTIFICATIONRECIPIENT);
 
@@ -2410,6 +2417,8 @@ public class KaleoNotificationRecipientPersistenceImpl
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
+	@ServiceReference(type = CompanyProviderWrapper.class)
+	protected CompanyProvider companyProvider;
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
 	@ServiceReference(type = FinderCache.class)

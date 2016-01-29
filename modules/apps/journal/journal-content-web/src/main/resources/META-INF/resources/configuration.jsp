@@ -118,10 +118,10 @@ String ddmTemplateKey = journalContentDisplayContext.getDDMTemplateKey();
 		</aui:fieldset>
 	</div>
 
-	<aui:button-row cssClass="dialog-footer">
-		<aui:button name="saveButton" type="submit" />
+	<aui:button-row>
+		<aui:button cssClass="btn-lg" name="saveButton" type="submit" />
 
-		<aui:button href="<%= redirect %>" type="cancel" />
+		<aui:button cssClass="btn-lg" href="<%= redirect %>" type="cancel" />
 	</aui:button-row>
 </aui:form>
 
@@ -169,7 +169,7 @@ String ddmTemplateKey = journalContentDisplayContext.getDDMTemplateKey();
 			PortletURL selectWebContentURL = PortletProviderUtil.getPortletURL(request, JournalArticle.class.getName(), PortletProvider.Action.BROWSE);
 
 			selectWebContentURL.setParameter("groupId", String.valueOf(scopeGroupId));
-			selectWebContentURL.setParameter("selectedGroupIds", StringUtil.merge(PortalUtil.getSharedContentSiteGroupIds(company.getCompanyId(), scopeGroupId, user.getUserId())));
+			selectWebContentURL.setParameter("selectedGroupIds", StringUtil.merge(journalContentDisplayContext.getSelectedGroupIds()));
 			selectWebContentURL.setParameter("refererAssetEntryId", "[$ARTICLE_REFERER_ASSET_ENTRY_ID$]");
 			selectWebContentURL.setParameter("typeSelection", JournalArticle.class.getName());
 			selectWebContentURL.setParameter("showNonindexable", String.valueOf(Boolean.TRUE));
