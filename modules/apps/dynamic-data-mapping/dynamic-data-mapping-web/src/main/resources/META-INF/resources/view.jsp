@@ -19,7 +19,11 @@
 <%
 String tabs1 = ParamUtil.getString(request, "tabs1", "structures");
 
+String redirect = ParamUtil.getString(request, "redirect");
+
 long groupId = ParamUtil.getLong(request, "groupId", themeDisplay.getSiteGroupId());
+
+boolean showBackURL = ParamUtil.getBoolean(request, "showBackURL", true);
 
 PortletURL portletURL = renderResponse.createRenderURL();
 
@@ -27,6 +31,17 @@ portletURL.setParameter("mvcPath", "/view.jsp");
 portletURL.setParameter("tabs1", tabs1);
 portletURL.setParameter("groupId", String.valueOf(groupId));
 %>
+
+<c:if test="<%= showBackURL && ddmDisplay.isShowBackURLInTitleBar() %>">
+
+	<%
+	portletDisplay.setShowBackIcon(true);
+	portletDisplay.setURLBack(redirect);
+
+	renderResponse.setTitle(LanguageUtil.get(request, "structures"));
+	%>
+
+</c:if>
 
 <liferay-ui:error exception="<%= RequiredStructureException.MustNotDeleteStructureReferencedByStructureLinks.class %>" message="the-structure-cannot-be-deleted-because-it-is-required-by-one-or-more-structure-links" />
 <liferay-ui:error exception="<%= RequiredStructureException.MustNotDeleteStructureReferencedByTemplates.class %>" message="the-structure-cannot-be-deleted-because-it-is-required-by-one-or-more-templates" />
@@ -83,14 +98,18 @@ portletURL.setParameter("groupId", String.valueOf(groupId));
 			>
 
 				<%
-				PortletURL rowURL = renderResponse.createRenderURL();
+				String rowHREF = StringPool.BLANK;
 
-				rowURL.setParameter("mvcPath", "/edit_structure.jsp");
-				rowURL.setParameter("redirect", currentURL);
-				rowURL.setParameter("classNameId", String.valueOf(PortalUtil.getClassNameId(DDMStructure.class)));
-				rowURL.setParameter("classPK", String.valueOf(structure.getStructureId()));
+				if (DDMStructurePermission.contains(permissionChecker, structure, refererPortletName, ActionKeys.UPDATE)) {
+					PortletURL rowURL = renderResponse.createRenderURL();
 
-				String rowHREF = rowURL.toString();
+					rowURL.setParameter("mvcPath", "/edit_structure.jsp");
+					rowURL.setParameter("redirect", currentURL);
+					rowURL.setParameter("classNameId", String.valueOf(PortalUtil.getClassNameId(DDMStructure.class)));
+					rowURL.setParameter("classPK", String.valueOf(structure.getStructureId()));
+
+					rowHREF = rowURL.toString();
+				}
 				%>
 
 				<liferay-ui:search-container-column-text
