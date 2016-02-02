@@ -14,7 +14,7 @@
 
 package com.liferay.exportimport.lar;
 
-import com.liferay.portal.NoSuchTeamException;
+import com.liferay.portal.exception.NoSuchTeamException;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.LocalizationUtil;
@@ -36,6 +36,7 @@ import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.permission.PortletPermissionUtil;
 import com.liferay.portlet.exportimport.lar.ExportImportPathUtil;
 import com.liferay.portlet.exportimport.lar.PortletDataContext;
+import com.liferay.portlet.exportimport.staging.MergeLayoutPrototypesThreadLocal;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -180,7 +181,7 @@ public class PermissionImporter {
 			role = layoutCache.getNameRole(companyId, name);
 		}
 
-		if (role != null) {
+		if ((role != null) || MergeLayoutPrototypesThreadLocal.isInProgress()) {
 			return role;
 		}
 
@@ -233,6 +234,10 @@ public class PermissionImporter {
 		for (Element roleElement : roleElements) {
 			Role role = checkRole(
 				layoutCache, companyId, groupId, userId, roleElement);
+
+			if (role == null) {
+				continue;
+			}
 
 			Group group = GroupLocalServiceUtil.getGroup(groupId);
 

@@ -85,11 +85,25 @@ TemplateSearchTerms templateSearchTerms = (TemplateSearchTerms)templateSearch.ge
 	%>
 
 	<c:if test="<%= showHeader %>">
-		<liferay-ui:header
-			backURL="<%= ddmDisplay.getViewTemplatesBackURL(liferayPortletRequest, liferayPortletResponse, classPK) %>"
-			cssClass="container-fluid-1280"
-			title="<%= ddmDisplay.getViewTemplatesTitle(structure, controlPanel, templateSearchTerms.isSearch(), locale) %>"
-		/>
+		<c:choose>
+			<c:when test="<%= ddmDisplay.isShowBackURLInTitleBar() %>">
+
+				<%
+				portletDisplay.setShowBackIcon(true);
+				portletDisplay.setURLBack(ddmDisplay.getViewTemplatesBackURL(liferayPortletRequest, liferayPortletResponse, classPK));
+
+				renderResponse.setTitle(ddmDisplay.getViewTemplatesTitle(structure, controlPanel, templateSearchTerms.isSearch(), locale));
+				%>
+
+			</c:when>
+			<c:otherwise>
+				<liferay-ui:header
+					backURL="<%= ddmDisplay.getViewTemplatesBackURL(liferayPortletRequest, liferayPortletResponse, classPK) %>"
+					cssClass="container-fluid-1280"
+					title="<%= ddmDisplay.getViewTemplatesTitle(structure, controlPanel, templateSearchTerms.isSearch(), locale) %>"
+				/>
+			</c:otherwise>
+		</c:choose>
 	</c:if>
 
 	<liferay-util:include page="/template_toolbar.jsp" servletContext="<%= application %>">
@@ -117,18 +131,22 @@ TemplateSearchTerms templateSearchTerms = (TemplateSearchTerms)templateSearch.ge
 			>
 
 				<%
-				PortletURL rowURL = renderResponse.createRenderURL();
+				String rowHREF = StringPool.BLANK;
 
-				rowURL.setParameter("mvcPath", "/edit_template.jsp");
-				rowURL.setParameter("redirect", currentURL);
-				rowURL.setParameter("groupId", String.valueOf(template.getGroupId()));
-				rowURL.setParameter("templateId", String.valueOf(template.getTemplateId()));
-				rowURL.setParameter("classNameId", String.valueOf(classNameId));
-				rowURL.setParameter("classPK", String.valueOf(template.getClassPK()));
-				rowURL.setParameter("type", template.getType());
-				rowURL.setParameter("structureAvailableFields", renderResponse.getNamespace() + "getAvailableFields");
+				if (DDMTemplatePermission.contains(permissionChecker, scopeGroupId, template, refererPortletName, ActionKeys.UPDATE)) {
+					PortletURL rowURL = renderResponse.createRenderURL();
 
-				String rowHREF = rowURL.toString();
+					rowURL.setParameter("mvcPath", "/edit_template.jsp");
+					rowURL.setParameter("redirect", currentURL);
+					rowURL.setParameter("groupId", String.valueOf(template.getGroupId()));
+					rowURL.setParameter("templateId", String.valueOf(template.getTemplateId()));
+					rowURL.setParameter("classNameId", String.valueOf(classNameId));
+					rowURL.setParameter("classPK", String.valueOf(template.getClassPK()));
+					rowURL.setParameter("type", template.getType());
+					rowURL.setParameter("structureAvailableFields", renderResponse.getNamespace() + "getAvailableFields");
+
+					rowHREF = rowURL.toString();
+				}
 				%>
 
 				<liferay-ui:search-container-row-parameter
