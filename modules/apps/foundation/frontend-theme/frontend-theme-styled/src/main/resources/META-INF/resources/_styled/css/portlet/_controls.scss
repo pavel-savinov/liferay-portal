@@ -77,4 +77,10 @@ body.portlet {
 			display: inherit;
 		}
 	}
+
+	.icon-monospaced-border {
+		border: 2px solid $navbar-default-border;
+		border-radius: 4px;
+		padding: 6px;
+	}
 }
