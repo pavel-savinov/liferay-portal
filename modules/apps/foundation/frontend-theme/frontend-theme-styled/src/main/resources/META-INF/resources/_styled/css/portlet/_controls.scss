@@ -69,12 +69,16 @@ body.portlet {
 
 .portlet {
 	.visible-interaction {
-		display: none;
+		@include sm() {
+			display: none;
+		}
 	}
 
 	&:active, &:hover, &:focus, &.active {
 		.visible-interaction {
-			display: inherit;
+			@include sm() {
+				display: inherit;
+			}
 		}
 	}
 }
