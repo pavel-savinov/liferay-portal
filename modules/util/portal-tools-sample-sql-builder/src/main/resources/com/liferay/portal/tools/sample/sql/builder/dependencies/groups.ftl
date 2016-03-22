@@ -1,4 +1,4 @@
-<#assign layoutModel = dataFactory.newLayoutModel(dataFactory.guestGroupModel.groupId, "welcome", "com_liferay_login_web_portlet_LoginPortlet,", "47,")>
+<#assign layoutModel = dataFactory.newLayoutModel(dataFactory.guestGroupModel.groupId, "welcome", "com_liferay_login_web_portlet_LoginPortlet,", "com_liferay_hello_world_web_portlet_HelloWorldPortlet,")>
 
 <@insertLayout
 	_layoutModel = layoutModel
@@ -40,7 +40,7 @@
 
 	<#assign publicLayoutModels = dataFactory.newPublicLayoutModels(groupId)>
 
-	<#list publicLayoutModels as publicLayoutModel >
+	<#list publicLayoutModels as publicLayoutModel>
 		<@insertLayout
 			_layoutModel = publicLayoutModel
 		/>

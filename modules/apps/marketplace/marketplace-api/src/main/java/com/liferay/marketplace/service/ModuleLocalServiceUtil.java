@@ -16,8 +16,7 @@ package com.liferay.marketplace.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -101,8 +100,8 @@ public class ModuleLocalServiceUtil {
 	/**
 	* @throws PortalException
 	*/
-	public static com.liferay.portal.model.PersistedModel deletePersistedModel(
-		com.liferay.portal.model.PersistedModel persistedModel)
+	public static com.liferay.portal.kernel.model.PersistedModel deletePersistedModel(
+		com.liferay.portal.kernel.model.PersistedModel persistedModel)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().deletePersistedModel(persistedModel);
 	}
@@ -257,7 +256,7 @@ public class ModuleLocalServiceUtil {
 		return getService().getOSGiServiceIdentifier();
 	}
 
-	public static com.liferay.portal.model.PersistedModel getPersistedModel(
+	public static com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 		java.io.Serializable primaryKeyObj)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getPersistedModel(primaryKeyObj);
@@ -278,21 +277,6 @@ public class ModuleLocalServiceUtil {
 		return _serviceTracker.getService();
 	}
 
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(ModuleLocalService service) {
-	}
-
-	private static ServiceTracker<ModuleLocalService, ModuleLocalService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(ModuleLocalServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<ModuleLocalService, ModuleLocalService>(bundle.getBundleContext(),
-				ModuleLocalService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<ModuleLocalService, ModuleLocalService> _serviceTracker =
+		ServiceTrackerFactory.open(ModuleLocalService.class);
 }

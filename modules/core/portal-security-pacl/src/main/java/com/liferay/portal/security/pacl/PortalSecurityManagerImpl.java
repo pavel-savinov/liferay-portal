@@ -128,6 +128,7 @@ import org.osgi.framework.BundleReference;
 
 import org.springframework.aop.framework.AdvisedSupport;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 /**
  * This is the portal's implementation of a security manager. The goal is to
@@ -639,7 +640,15 @@ public class PortalSecurityManagerImpl
 		public Object getNewReferencedBean(
 			String referencedBeanName, BeanFactory beanFactory) {
 
-			Object newReferencedBean = beanFactory.getBean(referencedBeanName);
+			Object newReferencedBean = null;
+
+			try {
+				newReferencedBean = beanFactory.getBean(referencedBeanName);
+			}
+			catch (NoSuchBeanDefinitionException nsbde) {
+				newReferencedBean = PortalBeanLocatorUtil.locate(
+					referencedBeanName);
+			}
 
 			Object doPrivilegedBean = _doPrivilegedBeans.get(newReferencedBean);
 
@@ -679,8 +688,7 @@ public class PortalSecurityManagerImpl
 							servletContextNames, addContextClassLoader);
 					}
 
-				}
-			);
+				});
 		}
 
 		@Override
@@ -693,8 +701,7 @@ public class PortalSecurityManagerImpl
 						return _noPacl.getClassLoader(clazz);
 					}
 
-				}
-			);
+				});
 		}
 
 		@Override
@@ -707,8 +714,7 @@ public class PortalSecurityManagerImpl
 						return _noPacl.getContextClassLoader();
 					}
 
-				}
-			);
+				});
 		}
 
 		@Override
@@ -723,8 +729,7 @@ public class PortalSecurityManagerImpl
 						return _noPacl.getPluginClassLoader(servletContextName);
 					}
 
-				}
-			);
+				});
 		}
 
 		@Override
@@ -737,8 +742,7 @@ public class PortalSecurityManagerImpl
 						return _noPacl.getPortalClassLoader();
 					}
 
-				}
-			);
+				});
 		}
 
 		@Override
@@ -753,8 +757,7 @@ public class PortalSecurityManagerImpl
 						return null;
 					}
 
-				}
-			);
+				});
 		}
 
 		private final ClassLoaderUtil.PACL _noPacl =
@@ -774,8 +777,7 @@ public class PortalSecurityManagerImpl
 						return InfrastructureUtil.getDataSource();
 					}
 
-				}
-			);
+				});
 		}
 
 		@Override
@@ -797,11 +799,10 @@ public class PortalSecurityManagerImpl
 								context, location);
 						}
 
-					}
-				);
+					});
 			}
-			catch (PrivilegedActionException pe) {
-				throw (NamingException)pe.getException();
+			catch (PrivilegedActionException pae) {
+				throw (NamingException)pae.getException();
 			}
 		}
 
@@ -895,8 +896,7 @@ public class PortalSecurityManagerImpl
 						return beanLocator.getClassLoader();
 					}
 
-				}
-			);
+				});
 		}
 
 		@Override
@@ -909,8 +909,7 @@ public class PortalSecurityManagerImpl
 						return currentThread.getContextClassLoader();
 					}
 
-				}
-			);
+				});
 		}
 
 		@Override
@@ -927,8 +926,7 @@ public class PortalSecurityManagerImpl
 						return null;
 					}
 
-				}
-			);
+				});
 		}
 
 	}
@@ -1364,8 +1362,7 @@ public class PortalSecurityManagerImpl
 							return new ReferenceEntry(object, field);
 						}
 
-					}
-				);
+					});
 			}
 			catch (PrivilegedActionException pae) {
 				Exception exception = pae.getException();

@@ -1,14 +1,13 @@
-package ${packagePath}.model;
+package ${apiPackagePath}.model;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.expando.kernel.model.ExpandoBridge;
+import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
+import com.liferay.exportimport.kernel.lar.StagedModelType;
+import com.liferay.portal.kernel.model.ModelWrapper;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.ModelWrapper;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portlet.expando.model.ExpandoBridge;
-import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
-
-import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.io.Serializable;
 
@@ -205,14 +204,6 @@ public class ${entity.name}Wrapper implements ${entity.name}, ModelWrapper<${ent
 			return _${entity.varName}.getStagedModelType();
 		}
 	</#if>
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedModel}
-	 */
-	@Deprecated
-	public ${entity.name} getWrapped${entity.name}() {
-		return _${entity.varName};
-	}
 
 	@Override
 	public ${entity.name} getWrappedModel() {

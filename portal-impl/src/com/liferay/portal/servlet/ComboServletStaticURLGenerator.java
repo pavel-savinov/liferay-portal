@@ -14,14 +14,15 @@
 
 package com.liferay.portal.servlet;
 
+import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PredicateFilter;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.model.Portlet;
-import com.liferay.portal.util.comparator.PortletNameComparator;
+import com.liferay.portal.kernel.util.comparator.PortletNameComparator;
 import com.liferay.portlet.PortletResourceAccessor;
 
 import java.util.ArrayList;
@@ -54,18 +55,12 @@ public class ComboServletStaticURLGenerator {
 						continue;
 					}
 
-					if (portletResource.endsWith(".css") && _rtl) {
-						int pos = portletResource.lastIndexOf(
-							StringPool.PERIOD);
-
-						portletResource = portletResource.substring(
-							0, pos) + "_rtl" + portletResource.substring(pos);
-					}
-
 					String url = portletResource;
 
 					if (!HttpUtil.hasProtocol(portletResource)) {
-						url = portlet.getContextPath() + portletResource;
+						url =
+							PortalUtil.getPathProxy() +
+								portlet.getContextPath() + portletResource;
 					}
 
 					if (_visitedURLs.contains(url)) {
@@ -114,10 +109,6 @@ public class ComboServletStaticURLGenerator {
 		_predicateFilter = predicateFilter;
 	}
 
-	public void setRtl(boolean rtl) {
-		_rtl = rtl;
-	}
-
 	public void setTimestamp(long timestamp) {
 		_timestamp = timestamp;
 	}
@@ -135,7 +126,6 @@ public class ComboServletStaticURLGenerator {
 
 	private PortletResourceAccessor[] _portletResourceAccessors;
 	private PredicateFilter<String> _predicateFilter = PredicateFilter.ALL;
-	private boolean _rtl = false;
 	private long _timestamp;
 	private String _urlPrefix;
 	private Set<String> _visitedURLs;
