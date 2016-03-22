@@ -2,23 +2,15 @@ import com.liferay.gradle.util.StringUtil
 import com.liferay.gradle.util.copy.RenameDependencyClosure
 
 buildscript {
-	repositories {
-		mavenLocal()
-
-		maven {
-			url System.properties["repository.url"] ?: "http://cdn.repository.liferay.com/nexus/content/groups/public"
-		}
-	}
-
-	dependencies {
-		classpath group: "com.liferay", name: "com.liferay.gradle.util", version: "1.0.23"
-	}
+	apply from: rootProject.file("build-buildscript.gradle"), to: buildscript
 }
 
+task printLeafProjects
 task setUpPortalTools
 task wrapper(type: Wrapper)
 
 File portalToolsDir = rootProject.file("../tools/sdk/tmp/portal-tools")
+Properties portalToolVersions = _getPortalToolVersions()
 
 configurations {
 	all {
@@ -26,15 +18,14 @@ configurations {
 			eachDependency {
 				DependencyResolveDetails dependencyResolveDetails ->
 
-				if ((dependencyResolveDetails.requested.version == "default") && project.hasProperty(dependencyResolveDetails.requested.name + ".version")) {
-					dependencyResolveDetails.useVersion project.properties[dependencyResolveDetails.requested.name + ".version"]
+				if (dependencyResolveDetails.requested.version == "default") {
+					dependencyResolveDetails.useVersion portalToolVersions[dependencyResolveDetails.requested.name]
 				}
 			}
 		}
 	}
 
 	portalToolsCssBuilder
-	portalToolsJasperJspc
 	portalToolsJavadocFormatter
 	portalToolsLangBuilder
 	portalToolsPortalToolsServiceBuilder
@@ -48,7 +39,6 @@ configurations {
 
 dependencies {
 	portalToolsCssBuilder group: "com.liferay", name: "com.liferay.css.builder", version: "default"
-	portalToolsJasperJspc group: "com.liferay", name: "com.liferay.jasper.jspc", version: "default"
 	portalToolsJavadocFormatter group: "com.liferay", name: "com.liferay.javadoc.formatter", version: "default"
 	portalToolsLangBuilder group: "com.liferay", name: "com.liferay.lang.builder", version: "default"
 	portalToolsPortalToolsServiceBuilder group: "com.liferay", name: "com.liferay.portal.tools.service.builder", version: "default"
@@ -58,6 +48,16 @@ dependencies {
 	portalToolsSourceFormatter group: "com.liferay", name: "com.liferay.source.formatter", version: "default"
 	portalToolsTldFormatter group: "com.liferay", name: "com.liferay.tld.formatter", version: "default"
 	portalToolsWhip group: "com.liferay", name: "com.liferay.whip", version: "default"
+}
+
+printLeafProjects << {
+	FileTree buildGradleFileTree = fileTree(dir: rootDir, include: "*/**/build.gradle")
+
+	buildGradleFileTree.each {
+		if (!it.text.contains("provided project(")) {
+			println it.parentFile
+		}
+	}
 }
 
 repositories {
@@ -71,7 +71,7 @@ repositories {
 wrapper {
 	File wrapperDir = rootDir.parentFile
 
-	distributionUrl = "../../tools/gradle-${gradle.gradleVersion}.LIFERAY-PATCHED-2-bin.zip"
+	distributionUrl = "../../tools/gradle-${gradle.gradleVersion}.LIFERAY-PATCHED-3-bin.zip"
 
 	doLast {
 		ant.replace(file: new File(wrapperDir, "gradlew")) {
@@ -119,4 +119,24 @@ portalToolsConfigurations.each {
 	}
 
 	setUpPortalTools.dependsOn configurationTask
+}
+
+private Properties _getPortalToolVersions() {
+	Properties properties = new Properties()
+
+	InputStream inputStream = buildscript.classLoader.getResourceAsStream("com/liferay/gradle/plugins/dependencies/portal-tools.properties")
+
+	inputStream.withCloseable {
+		properties.load it
+	}
+
+	for (String name in properties.stringPropertyNames()) {
+		String version = project.properties[name + ".version"]
+
+		if (version) {
+			properties.setProperty name, version
+		}
+	}
+
+	return properties
 }
