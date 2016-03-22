@@ -14,14 +14,13 @@
 
 package com.liferay.marketplace.upgrade;
 
+import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
+import com.liferay.expando.kernel.service.ExpandoTableLocalService;
+import com.liferay.expando.kernel.service.ExpandoValueLocalService;
 import com.liferay.marketplace.upgrade.v1_0_0.UpgradeCompanyId;
 import com.liferay.marketplace.upgrade.v1_0_0.UpgradeExpando;
 import com.liferay.marketplace.upgrade.v1_0_0.UpgradeModule;
-import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
-import com.liferay.portlet.expando.service.ExpandoColumnLocalService;
-import com.liferay.portlet.expando.service.ExpandoTableLocalService;
-import com.liferay.portlet.expando.service.ExpandoValueLocalService;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -37,11 +36,17 @@ public class MarketplaceServiceUpgrade implements UpgradeStepRegistrator {
 	public void register(Registry registry) {
 		registry.register(
 			"com.liferay.marketplace.service", "0.0.1", "1.0.0",
-			new UpgradeCompanyId(),
 			new UpgradeExpando(
 				_expandoColumnLocalService, _expandoTableLocalService,
-				_expandoValueLocalService),
+				_expandoValueLocalService));
+
+		registry.register(
+			"com.liferay.marketplace.service", "1.0.0", "1.0.1",
 			new UpgradeModule());
+
+		registry.register(
+			"com.liferay.marketplace.service", "1.0.1", "1.0.2",
+			new UpgradeCompanyId());
 	}
 
 	@Reference(unbind = "-")
@@ -65,13 +70,8 @@ public class MarketplaceServiceUpgrade implements UpgradeStepRegistrator {
 		_expandoValueLocalService = expandoValueLocalService;
 	}
 
-	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
-	protected void setModuleServiceLifecycle(
-		ModuleServiceLifecycle moduleServiceLifecycle) {
-	}
-
-	private volatile ExpandoColumnLocalService _expandoColumnLocalService;
-	private volatile ExpandoTableLocalService _expandoTableLocalService;
-	private volatile ExpandoValueLocalService _expandoValueLocalService;
+	private ExpandoColumnLocalService _expandoColumnLocalService;
+	private ExpandoTableLocalService _expandoTableLocalService;
+	private ExpandoValueLocalService _expandoValueLocalService;
 
 }

@@ -2,14 +2,7 @@
 	<property name="testray.main.component.name" value="Permissions" />
 
 	<set-up>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
-
-		<if>
-			<equals arg1="${testPortalInstance}" arg2="true" />
-			<then>
-				<execute macro="SignIn#signInPortalInstanceSetUp" />
-			</then>
-		</if>
+		<execute macro="TestCase#setUpPortalInstance" />
 
 		<execute macro="User#firstLoginPG" />
 	</set-up>
@@ -42,7 +35,9 @@
 		</if>
 	</tear-down>
 
-	<command name="AddDMDocumentRegRole" priority="4">
+	<command name="AddDMDocumentRegRole" priority="5">
+		<property name="portal.acceptance" value="true" />
+
 		<execute macro="Permissions#setUpRegRoleLoginUserPG">
 			<var name="pageName" value="Documents and Media Page" />
 			<var name="portletName" value="Documents and Media" />
@@ -55,7 +50,7 @@
 			<var name="userScreenName" value="usersn" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="Documents and Media Page" />
 		</execute>
 
@@ -69,7 +64,7 @@
 			<var name="userLoginFullName" value="userfn userln" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="Documents and Media Page" />
 		</execute>
 
@@ -86,7 +81,7 @@
 			<var name="userLoginFullName" value="userfn userln" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="Documents and Media Page" />
 		</execute>
 
@@ -99,7 +94,6 @@
 			<var name="pageName" value="Documents and Media Page" />
 			<var name="portletName" value="Documents and Media" />
 			<var name="siteName" value="Site Name" />
-			<var name="sitePageName" value="Documents and Media Page" />
 			<var name="siteURLTemp" value="true" />
 			<var name="userEmailAddress" value="userea@liferay.com" />
 			<var name="userFirstName" value="userfn" />
@@ -109,10 +103,9 @@
 			<var name="userScreenName" value="usersn" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoSitePage">
 			<var name="pageName" value="Documents and Media Page" />
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="DMDocument#addPG">
@@ -130,7 +123,7 @@
 			<var name="siteScopeName" value="Site Name" />
 		</execute>
 
-		<execute macro="PermissionsInline#gotoDocumentsAndMediaPG">
+		<execute macro="PermissionsInline#gotoDocumentsAndMediaHomeFolderPG">
 			<var name="pageName" value="Documents and Media Page" />
 			<var name="siteName" value="Site Name" />
 			<var name="siteURLTemp" value="true" />
@@ -146,10 +139,9 @@
 			<var name="userLoginFullName" value="userfn userln" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoSitePage">
 			<var name="pageName" value="Documents and Media Page" />
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute function="Click#makeVisibleClickAt" locator1="Portlet#ICON_PLUS_SIGN" />
@@ -161,7 +153,7 @@
 			<var name="userLoginFullName" value="Test Test" />
 		</execute>
 
-		<execute macro="PermissionsInline#gotoDocumentsAndMediaPG">
+		<execute macro="PermissionsInline#gotoDocumentsAndMediaHomeFolderPG">
 			<var name="pageName" value="Documents and Media Page" />
 			<var name="siteName" value="Site Name" />
 			<var name="siteURLTemp" value="true" />
@@ -177,10 +169,9 @@
 			<var name="userLoginFullName" value="userfn userln" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoSitePage">
 			<var name="pageName" value="Documents and Media Page" />
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="DMDocument#addPG">
@@ -197,7 +188,6 @@
 			<var name="roleName" value="Roles Siterole Name" />
 			<var name="roleType" value="Site" />
 			<var name="siteName" value="Site Name" />
-			<var name="sitePageName" value="Documents and Media Page" />
 			<var name="userEmailAddress" value="userea@liferay.com" />
 			<var name="userFirstName" value="userfn" />
 			<var name="userLastName" value="userln" />
@@ -206,7 +196,7 @@
 			<var name="userScreenName" value="usersn" />
 		</execute>
 
-		<execute macro="PermissionsInline#gotoDocumentsAndMediaPG">
+		<execute macro="PermissionsInline#gotoDocumentsAndMediaHomeFolderPG">
 			<var name="pageName" value="Documents and Media Page" />
 			<var name="siteName" value="Site Name" />
 			<var name="siteURLTemp" value="true" />
@@ -222,10 +212,9 @@
 			<var name="userLoginFullName" value="userfn userln" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoSitePage">
 			<var name="pageName" value="Documents and Media Page" />
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute function="Click#makeVisibleClickAt" locator1="Portlet#ICON_PLUS_SIGN" />
@@ -236,14 +225,14 @@
 			<var name="permissionDefinitionKey" value="SITE_ADMIN_CONTENT_DOCUMENTS_AND_MEDIA_RESOURCE_PERMISSIONS_DOCUMENTS_ADD_DOCUMENT_CHECKBOX" />
 			<var name="permissionDefinitionValue" value="Add Document" />
 			<var name="roleName" value="Roles Siterole Name" />
+			<var name="roleType" value="Site" />
 			<var name="userLoginEmailAddress" value="userea@liferay.com" />
 			<var name="userLoginFullName" value="userfn userln" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoSitePage">
 			<var name="pageName" value="Documents and Media Page" />
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute macro="DMDocument#addPG">
@@ -255,14 +244,14 @@
 			<var name="permissionDefinitionKey" value="SITE_ADMIN_CONTENT_DOCUMENTS_AND_MEDIA_RESOURCE_PERMISSIONS_DOCUMENTS_ADD_DOCUMENT_CHECKBOX" />
 			<var name="permissionDefinitionValue" value="Add Document" />
 			<var name="roleName" value="Roles Siterole Name" />
+			<var name="roleType" value="Site" />
 			<var name="userLoginEmailAddress" value="userea@liferay.com" />
 			<var name="userLoginFullName" value="userfn userln" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoSitePage">
 			<var name="pageName" value="Documents and Media Page" />
 			<var name="siteName" value="Site Name" />
-			<var name="siteURL" value="true" />
 		</execute>
 
 		<execute function="Click#makeVisibleClickAt" locator1="Portlet#ICON_PLUS_SIGN" />
@@ -291,7 +280,7 @@
 			<var name="userLoginFullName" value="userfn userln" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="Documents and Media Page" />
 		</execute>
 
@@ -319,7 +308,7 @@
 			<var name="userLoginFullName" value="userfn userln" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="Documents and Media Page" />
 		</execute>
 
@@ -355,7 +344,7 @@
 			<var name="userLoginFullName" value="userfn userln" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="Documents and Media Page" />
 		</execute>
 
@@ -365,7 +354,7 @@
 	</command>
 
 	<command name="ViewDMFolderGuestInline" priority="4">
-		<execute macro="Page#addPG">
+		<execute macro="Page#add">
 			<var name="pageName" value="Documents and Media Page" />
 		</execute>
 
@@ -384,7 +373,7 @@
 
 		<execute macro="User#logoutPG" />
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="Documents and Media Page" />
 		</execute>
 
@@ -414,7 +403,7 @@
 
 		<execute macro="User#logoutPG" />
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="Documents and Media Page" />
 		</execute>
 
@@ -438,7 +427,7 @@
 
 		<execute macro="User#logoutPG" />
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="Documents and Media Page" />
 		</execute>
 

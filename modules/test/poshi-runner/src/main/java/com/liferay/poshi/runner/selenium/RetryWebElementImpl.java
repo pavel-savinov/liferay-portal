@@ -14,6 +14,8 @@
 
 package com.liferay.poshi.runner.selenium;
 
+import com.liferay.poshi.runner.util.PropsValues;
+
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -464,12 +466,23 @@ public class RetryWebElementImpl
 
 		WebDriver webDriver = WebDriverUtil.getWebDriver();
 
-		_webElement = webDriver.findElement(WebDriverHelper.getBy(_locator));
+		WebElement webElement = webDriver.findElement(
+			WebDriverHelper.getBy(_locator));
+
+		if (webElement == _webElement) {
+			System.out.println("Unable to find a new web element");
+		}
+		else {
+			System.out.println("Found a new web element");
+		}
+
+		_webElement = webElement;
 
 		_remoteWebElement = (RemoteWebElement)_webElement;
 	}
 
-	private static final int _RETRY_WAIT_TIME = 3;
+	private static final int _RETRY_WAIT_TIME =
+		PropsValues.TEST_RETRY_COMMAND_WAIT_TIME;
 
 	private final String _locator;
 	private RemoteWebElement _remoteWebElement;

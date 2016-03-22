@@ -42,6 +42,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -58,27 +59,40 @@ import org.slf4j.LoggerFactory;
  */
 public class FileUtil {
 
-	public static void checkFilePath(Path filePath) {
+	public static boolean checkFilePath(Path filePath) {
 
 		// Check to see if the file or folder is still being written to. If
 		// it is, wait until the process is finished before making any future
 		// modifications. This is used to prevent file system interruptions.
 
 		try {
+			if (_checkInProgressFilePathNames.contains(filePath.toString())) {
+				return false;
+			}
+
+			_checkInProgressFilePathNames.add(filePath.toString());
+
 			while (true) {
 				long size1 = FileUtils.sizeOf(filePath.toFile());
 
-				Thread.sleep(1000);
+				if (size1 == 0) {
+					Thread.sleep(50);
+				}
+				else {
+					Thread.sleep(size1 / 1048576);
+				}
 
 				long size2 = FileUtils.sizeOf(filePath.toFile());
 
 				if (size1 == size2) {
-					break;
+					_checkInProgressFilePathNames.remove(filePath.toString());
+
+					return true;
 				}
 			}
 		}
 		catch (Exception e) {
-			_logger.error(e.getMessage(), e);
+			return true;
 		}
 	}
 
@@ -102,6 +116,10 @@ public class FileUtil {
 
 	public static void deleteFile(final Path filePath, boolean retry)
 		throws IOException {
+
+		if ((filePath == null) || Files.notExists(filePath)) {
+			return;
+		}
 
 		try {
 			Files.deleteIfExists(filePath);
@@ -196,8 +214,7 @@ public class FileUtil {
 					return FileVisitResult.CONTINUE;
 				}
 
-			}
-		);
+			});
 
 		List<SyncFile> deletedSyncFiles = SyncFileService.findSyncFiles(
 			filePath.toString(), startTime);
@@ -374,7 +391,7 @@ public class FileUtil {
 	}
 
 	public static boolean isHidden(Path filePath) {
-		if (!Files.exists(filePath)) {
+		if (!PropsValues.SYNC_FILE_IGNORE_HIDDEN || !Files.exists(filePath)) {
 			return false;
 		}
 
@@ -386,14 +403,16 @@ public class FileUtil {
 		}
 	}
 
+	public static boolean isIgnoredFileName(String fileName) {
+		return _syncFileIgnoreNames.contains(
+			StringEscapeUtils.escapeJava(fileName));
+	}
+
 	public static boolean isIgnoredFilePath(Path filePath) {
 		String fileName = String.valueOf(filePath.getFileName());
 
-		if (_syncFileIgnoreNames.contains(
-				StringEscapeUtils.escapeJava(fileName)) ||
-			MSOfficeFileUtil.isTempCreatedFile(filePath) ||
-			(PropsValues.SYNC_FILE_IGNORE_HIDDEN && isHidden(filePath)) ||
-			Files.isSymbolicLink(filePath) || fileName.endsWith(".lnk")) {
+		if (isIgnoredFileName(fileName) || isTempFile(filePath) ||
+			isHidden(filePath) || isShortcut(filePath)) {
 
 			return true;
 		}
@@ -494,6 +513,28 @@ public class FileUtil {
 		}
 	}
 
+	public static boolean isShortcut(Path filePath) {
+		if (Files.isSymbolicLink(filePath)) {
+			return true;
+		}
+
+		String fileName = String.valueOf(filePath.getFileName());
+
+		if (fileName.endsWith(".lnk")) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public static boolean isTempFile(Path filePath) {
+		if (MSOfficeFileUtil.isTempCreatedFile(filePath)) {
+			return true;
+		}
+
+		return false;
+	}
+
 	public static boolean isValidChecksum(Path filePath) throws IOException {
 		if (Files.notExists(filePath) ||
 			(Files.size(filePath) >
@@ -542,9 +583,16 @@ public class FileUtil {
 
 	public static void moveFile(Path sourceFilePath, Path targetFilePath) {
 		try {
+			if (Files.isDirectory(sourceFilePath)) {
+				moveFolder(sourceFilePath, targetFilePath);
+
+				return;
+			}
+
 			moveFile(sourceFilePath, targetFilePath, true);
 		}
 		catch (Exception e) {
+			_logger.error(e.getMessage(), e);
 		}
 	}
 
@@ -588,6 +636,72 @@ public class FileUtil {
 		}
 	}
 
+	public static void moveFolder(
+			final Path sourceParentFilePath, final Path targetParentFilePath)
+		throws IOException {
+
+		try {
+			Files.move(
+				sourceParentFilePath, targetParentFilePath,
+				StandardCopyOption.ATOMIC_MOVE,
+				StandardCopyOption.REPLACE_EXISTING);
+		}
+		catch (Exception e) {
+			Files.walkFileTree(
+				sourceParentFilePath,
+				new SimpleFileVisitor<Path>() {
+
+					@Override
+					public FileVisitResult preVisitDirectory(
+						Path filePath,
+						BasicFileAttributes basicFileAttributes) {
+
+						return moveFilePath(filePath);
+					}
+
+					@Override
+					public FileVisitResult visitFile(
+						Path filePath,
+						BasicFileAttributes basicFileAttributes) {
+
+						return moveFilePath(filePath);
+					}
+
+					@Override
+					public FileVisitResult visitFileFailed(
+						Path filePath, IOException ioe) {
+
+						return FileVisitResult.CONTINUE;
+					}
+
+					protected FileVisitResult moveFilePath(Path filePath) {
+						Path targetFilePath = targetParentFilePath.resolve(
+							sourceParentFilePath.relativize(filePath));
+
+						try {
+							Files.move(
+								filePath, targetFilePath,
+								StandardCopyOption.ATOMIC_MOVE,
+								StandardCopyOption.REPLACE_EXISTING);
+						}
+						catch (Exception e1) {
+							try {
+								Files.copy(
+									filePath, targetFilePath,
+									StandardCopyOption.COPY_ATTRIBUTES);
+							}
+							catch (Exception e2) {
+								_logger.error(e2.getMessage(), e2);
+							}
+						}
+
+						return FileVisitResult.CONTINUE;
+					}
+
+				});
+		}
+	}
+
 	public static void releaseFileLock(FileLock fileLock) {
 		try {
 			if (fileLock != null) {
@@ -616,6 +730,8 @@ public class FileUtil {
 	private static final Logger _logger = LoggerFactory.getLogger(
 		FileUtil.class);
 
+	private static final List<String> _checkInProgressFilePathNames =
+		new CopyOnWriteArrayList<>();
 	private static final Set<String> _syncFileIgnoreNames = new HashSet<>(
 		Arrays.asList(PropsValues.SYNC_FILE_IGNORE_NAMES));
 

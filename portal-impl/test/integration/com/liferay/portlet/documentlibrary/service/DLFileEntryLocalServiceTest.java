@@ -14,13 +14,46 @@
 
 package com.liferay.portlet.documentlibrary.service;
 
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
+import com.liferay.document.library.kernel.exception.DuplicateFileEntryException;
+import com.liferay.document.library.kernel.model.DLFileEntry;
+import com.liferay.document.library.kernel.model.DLFileEntryMetadata;
+import com.liferay.document.library.kernel.model.DLFileEntryType;
+import com.liferay.document.library.kernel.model.DLFileEntryTypeConstants;
+import com.liferay.document.library.kernel.model.DLFileVersion;
+import com.liferay.document.library.kernel.model.DLFolder;
+import com.liferay.document.library.kernel.model.DLFolderConstants;
+import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
+import com.liferay.document.library.kernel.service.DLAppServiceUtil;
+import com.liferay.document.library.kernel.service.DLFileEntryLocalServiceUtil;
+import com.liferay.document.library.kernel.service.DLFileEntryMetadataLocalServiceUtil;
+import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalServiceUtil;
+import com.liferay.document.library.kernel.service.DLFileVersionLocalServiceUtil;
+import com.liferay.document.library.kernel.service.DLTrashLocalServiceUtil;
+import com.liferay.document.library.kernel.store.DLStoreUtil;
+import com.liferay.dynamic.data.mapping.kernel.DDMForm;
+import com.liferay.dynamic.data.mapping.kernel.DDMFormField;
+import com.liferay.dynamic.data.mapping.kernel.DDMFormFieldValue;
+import com.liferay.dynamic.data.mapping.kernel.DDMFormValues;
+import com.liferay.dynamic.data.mapping.kernel.DDMStructure;
+import com.liferay.dynamic.data.mapping.kernel.LocalizedValue;
+import com.liferay.dynamic.data.mapping.kernel.StorageEngineManagerUtil;
+import com.liferay.dynamic.data.mapping.kernel.UnlocalizedValue;
+import com.liferay.dynamic.data.mapping.kernel.Value;
+import com.liferay.expando.kernel.model.ExpandoBridge;
+import com.liferay.expando.kernel.model.ExpandoColumnConstants;
+import com.liferay.expando.kernel.model.ExpandoTable;
+import com.liferay.expando.kernel.service.ExpandoColumnLocalServiceUtil;
+import com.liferay.expando.kernel.service.ExpandoTableLocalServiceUtil;
 import com.liferay.portal.kernel.interval.IntervalActionProcessor;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.repository.LocalRepository;
 import com.liferay.portal.kernel.repository.RepositoryProviderUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
-import com.liferay.portal.kernel.repository.util.RepositoryTrashUtil;
-import com.liferay.portal.kernel.search.SearchEngineUtil;
+import com.liferay.portal.kernel.search.IndexWriterHelperUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.rule.Sync;
@@ -32,42 +65,14 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.test.randomizerbumpers.TikaSafeRandomizerBumper;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.test.rule.MainServletTestRule;
-import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.asset.model.AssetEntry;
-import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
-import com.liferay.portlet.documentlibrary.DuplicateFileEntryException;
-import com.liferay.portlet.documentlibrary.model.DLFileEntry;
-import com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata;
-import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
-import com.liferay.portlet.documentlibrary.model.DLFileEntryTypeConstants;
-import com.liferay.portlet.documentlibrary.model.DLFileVersion;
-import com.liferay.portlet.documentlibrary.model.DLFolder;
-import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
-import com.liferay.portlet.documentlibrary.store.DLStoreUtil;
 import com.liferay.portlet.documentlibrary.util.test.DLTestUtil;
-import com.liferay.portlet.dynamicdatamapping.DDMForm;
-import com.liferay.portlet.dynamicdatamapping.DDMFormField;
-import com.liferay.portlet.dynamicdatamapping.DDMFormFieldValue;
-import com.liferay.portlet.dynamicdatamapping.DDMFormValues;
-import com.liferay.portlet.dynamicdatamapping.DDMStructure;
-import com.liferay.portlet.dynamicdatamapping.LocalizedValue;
-import com.liferay.portlet.dynamicdatamapping.StorageEngineManagerUtil;
-import com.liferay.portlet.dynamicdatamapping.UnlocalizedValue;
-import com.liferay.portlet.dynamicdatamapping.Value;
 import com.liferay.portlet.dynamicdatamapping.util.test.DDMStructureTestUtil;
-import com.liferay.portlet.expando.model.ExpandoBridge;
-import com.liferay.portlet.expando.model.ExpandoColumnConstants;
-import com.liferay.portlet.expando.model.ExpandoTable;
-import com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil;
-import com.liferay.portlet.expando.service.ExpandoTableLocalServiceUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -95,7 +100,7 @@ public class DLFileEntryLocalServiceTest {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
+			new LiferayIntegrationTestRule(),
 			SynchronousDestinationTestRule.INSTANCE);
 
 	@Before
@@ -217,7 +222,7 @@ public class DLFileEntryLocalServiceTest {
 				RepositoryProviderUtil.getFileEntryLocalRepository(
 					fileEntry.getFileEntryId());
 
-			RepositoryTrashUtil.moveFileEntryToTrash(
+			DLTrashLocalServiceUtil.moveFileEntryToTrash(
 				TestPropsValues.getUserId(), localRepository.getRepositoryId(),
 				fileEntry.getFileEntryId());
 		}
@@ -410,12 +415,12 @@ public class DLFileEntryLocalServiceTest {
 			StringPool.BLANK, StringPool.BLANK, is, bytes.length,
 			serviceContext);
 
-		boolean indexReadOnly = SearchEngineUtil.isIndexReadOnly();
+		boolean indexReadOnly = IndexWriterHelperUtil.isIndexReadOnly();
 
 		DLFileEntry dlFileEntry = null;
 
 		try {
-			SearchEngineUtil.setIndexReadOnly(true);
+			IndexWriterHelperUtil.setIndexReadOnly(true);
 
 			dlFileEntry = DLFileEntryLocalServiceUtil.getFileEntry(
 				fileEntry.getFileEntryId());
@@ -436,7 +441,7 @@ public class DLFileEntryLocalServiceTest {
 					dlFileEntry.getFileEntryId());
 			}
 
-			SearchEngineUtil.setIndexReadOnly(indexReadOnly);
+			IndexWriterHelperUtil.setIndexReadOnly(indexReadOnly);
 		}
 	}
 
