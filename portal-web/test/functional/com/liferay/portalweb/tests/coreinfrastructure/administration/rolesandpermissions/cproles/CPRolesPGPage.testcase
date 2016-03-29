@@ -2,14 +2,7 @@
 	<property name="testray.main.component.name" value="Permissions" />
 
 	<set-up>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
-
-		<if>
-			<equals arg1="${testPortalInstance}" arg2="true" />
-			<then>
-				<execute macro="SignIn#signInPortalInstanceSetUp" />
-			</then>
-		</if>
+		<execute macro="TestCase#setUpPortalInstance" />
 
 		<execute macro="User#firstLoginPG" />
 	</set-up>
@@ -25,7 +18,9 @@
 		</if>
 	</tear-down>
 
-	<command name="RemoveNoGuestInlineView" priority="4">
+	<command name="RemoveNoGuestInlineView" priority="5">
+		<property name="portal.acceptance" value="true" />
+
 		<execute macro="PermissionsInline#gotoPagePG">
 			<var name="pageName" value="Welcome" />
 		</execute>

@@ -29,6 +29,7 @@ import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.plugins.PluginContainer;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetOutput;
 import org.gradle.api.tasks.TaskContainer;
@@ -40,8 +41,9 @@ public class JSModuleConfigGeneratorPlugin implements Plugin<Project> {
 
 	public static final String CONFIG_JS_MODULES_TASK_NAME = "configJSModules";
 
-	public static final String DOWNLOAD_LFR_MODULE_CONFIG_GENERATOR_TASK_NAME =
-		"downloadLfrModuleConfigGenerator";
+	public static final String
+		DOWNLOAD_LIFERAY_MODULE_CONFIG_GENERATOR_TASK_NAME =
+			"downloadLiferayModuleConfigGenerator";
 
 	public static final String EXTENSION_NAME = "jsModuleConfigGenerator";
 
@@ -54,7 +56,7 @@ public class JSModuleConfigGeneratorPlugin implements Plugin<Project> {
 				project, EXTENSION_NAME,
 				JSModuleConfigGeneratorExtension.class);
 
-		addTaskDownloadLfrModuleConfigGenerator(
+		addTaskDownloadLiferayModuleConfigGenerator(
 			project, jsModuleConfigGeneratorExtension);
 		addTaskConfigJSModules(project);
 
@@ -72,53 +74,59 @@ public class JSModuleConfigGeneratorPlugin implements Plugin<Project> {
 	protected ConfigJSModulesTask addTaskConfigJSModules(
 		final Project project) {
 
-		ConfigJSModulesTask configJSModulesTask = GradleUtil.addTask(
+		final ConfigJSModulesTask configJSModulesTask = GradleUtil.addTask(
 			project, CONFIG_JS_MODULES_TASK_NAME, ConfigJSModulesTask.class);
+
+		configJSModulesTask.mustRunAfter(
+			new Callable<Task>() {
+
+				@Override
+				public Task call() throws Exception {
+					TaskContainer taskContainer = project.getTasks();
+
+					return taskContainer.findByName(_TRANSPILE_JS_TASK_NAME);
+				}
+
+			});
 
 		configJSModulesTask.setDescription(
 			"Generates the config file needed to load AMD files via " +
 				"combo loader in Liferay.");
 		configJSModulesTask.setGroup(BasePlugin.BUILD_GROUP);
-		configJSModulesTask.setModuleConfigFile(project.file("bower.json"));
+		configJSModulesTask.setModuleConfigFile(project.file("package.json"));
 
-		configJSModulesTask.setOutputFile(
-			new Callable<File>() {
+		PluginContainer pluginContainer = project.getPlugins();
+
+		pluginContainer.withType(
+			JavaPlugin.class,
+			new Action<JavaPlugin>() {
 
 				@Override
-				public File call() throws Exception {
-					SourceSet sourceSet = GradleUtil.getSourceSet(
-						project, SourceSet.MAIN_SOURCE_SET_NAME);
-
-					SourceSetOutput sourceSetOutput = sourceSet.getOutput();
-
-					return new File(
-						sourceSetOutput.getResourcesDir(),
-						"META-INF/config.json");
+				public void execute(JavaPlugin javaPlugin) {
+					configureTaskConfigJSModulesForJavaPlugin(
+						configJSModulesTask);
 				}
 
 			});
 
-		Task classesTask = GradleUtil.getTask(
-			project, JavaPlugin.CLASSES_TASK_NAME);
-
-		classesTask.dependsOn(configJSModulesTask);
-
 		return configJSModulesTask;
 	}
 
-	protected DownloadNodeModuleTask addTaskDownloadLfrModuleConfigGenerator(
-		Project project, final JSModuleConfigGeneratorExtension
-			jsModuleConfigGeneratorExtension) {
+	protected DownloadNodeModuleTask
+		addTaskDownloadLiferayModuleConfigGenerator(
+			Project project,
+			final JSModuleConfigGeneratorExtension
+				jsModuleConfigGeneratorExtension) {
 
-		DownloadNodeModuleTask downloadLfrModuleConfigGeneratorTask =
+		DownloadNodeModuleTask downloadLiferayModuleConfigGeneratorTask =
 			GradleUtil.addTask(
-				project, DOWNLOAD_LFR_MODULE_CONFIG_GENERATOR_TASK_NAME,
+				project, DOWNLOAD_LIFERAY_MODULE_CONFIG_GENERATOR_TASK_NAME,
 				DownloadNodeModuleTask.class);
 
-		downloadLfrModuleConfigGeneratorTask.setModuleName(
-			"lfr-module-config-generator");
+		downloadLiferayModuleConfigGeneratorTask.setModuleName(
+			"liferay-module-config-generator");
 
-		downloadLfrModuleConfigGeneratorTask.setModuleVersion(
+		downloadLiferayModuleConfigGeneratorTask.setModuleVersion(
 			new Callable<String>() {
 
 				@Override
@@ -128,7 +136,7 @@ public class JSModuleConfigGeneratorPlugin implements Plugin<Project> {
 
 			});
 
-		return downloadLfrModuleConfigGeneratorTask;
+		return downloadLiferayModuleConfigGeneratorTask;
 	}
 
 	protected void configureTaskConfigJSModulesEnabled(
@@ -140,6 +148,49 @@ public class JSModuleConfigGeneratorPlugin implements Plugin<Project> {
 			configJSModulesTask.setDependsOn(Collections.emptySet());
 			configJSModulesTask.setEnabled(false);
 		}
+	}
+
+	protected void configureTaskConfigJSModulesForJavaPlugin(
+		ConfigJSModulesTask configJSModulesTask) {
+
+		configJSModulesTask.mustRunAfter(
+			JavaPlugin.PROCESS_RESOURCES_TASK_NAME);
+
+		Project project = configJSModulesTask.getProject();
+
+		SourceSet sourceSet = GradleUtil.getSourceSet(
+			project, SourceSet.MAIN_SOURCE_SET_NAME);
+
+		final SourceSetOutput sourceSetOutput = sourceSet.getOutput();
+
+		configJSModulesTask.setOutputFile(
+			new Callable<File>() {
+
+				@Override
+				public File call() throws Exception {
+					return new File(
+						sourceSetOutput.getResourcesDir(),
+						"META-INF/config.json");
+				}
+
+			});
+
+		configJSModulesTask.setSourceDir(
+			new Callable<File>() {
+
+				@Override
+				public File call() throws Exception {
+					return new File(
+						sourceSetOutput.getResourcesDir(),
+						"META-INF/resources");
+				}
+
+			});
+
+		Task classesTask = GradleUtil.getTask(
+			project, JavaPlugin.CLASSES_TASK_NAME);
+
+		classesTask.dependsOn(configJSModulesTask);
 	}
 
 	protected void configureTasksConfigJSModules(Project project) {
@@ -156,5 +207,7 @@ public class JSModuleConfigGeneratorPlugin implements Plugin<Project> {
 
 			});
 	}
+
+	private static final String _TRANSPILE_JS_TASK_NAME = "transpileJS";
 
 }

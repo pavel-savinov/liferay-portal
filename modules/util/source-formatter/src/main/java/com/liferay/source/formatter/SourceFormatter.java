@@ -140,9 +140,12 @@ public class SourceFormatter {
 	public void format() throws Exception {
 		List<SourceProcessor> sourceProcessors = new ArrayList<>();
 
+		sourceProcessors.add(new BNDSourceProcessor());
 		sourceProcessors.add(new CSSSourceProcessor());
 		sourceProcessors.add(new FTLSourceProcessor());
+		sourceProcessors.add(new GradleSourceProcessor());
 		sourceProcessors.add(new JavaSourceProcessor());
+		sourceProcessors.add(new JSONSourceProcessor());
 		sourceProcessors.add(new JSPSourceProcessor());
 		sourceProcessors.add(new JSSourceProcessor());
 		sourceProcessors.add(new PropertiesSourceProcessor());

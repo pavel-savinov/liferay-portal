@@ -14,35 +14,36 @@
 
 package com.liferay.portal.service.impl;
 
-import com.liferay.portal.NoSuchResourcePermissionException;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.Type;
+import com.liferay.portal.kernel.exception.NoSuchResourcePermissionException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.search.SearchEngineUtil;
+import com.liferay.portal.kernel.model.Resource;
+import com.liferay.portal.kernel.model.ResourceAction;
+import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.ResourcePermission;
+import com.liferay.portal.kernel.model.ResourcePermissionConstants;
+import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.RoleConstants;
+import com.liferay.portal.kernel.search.IndexWriterHelperUtil;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.security.permission.PermissionUpdateHandler;
+import com.liferay.portal.kernel.security.permission.PermissionUpdateHandlerRegistryUtil;
+import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
+import com.liferay.portal.kernel.service.ExceptionRetryAcceptor;
 import com.liferay.portal.kernel.spring.aop.Property;
 import com.liferay.portal.kernel.spring.aop.Retry;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.model.Resource;
-import com.liferay.portal.model.ResourceAction;
-import com.liferay.portal.model.ResourceConstants;
-import com.liferay.portal.model.ResourcePermission;
-import com.liferay.portal.model.ResourcePermissionConstants;
-import com.liferay.portal.model.Role;
-import com.liferay.portal.model.RoleConstants;
-import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.PermissionCacheUtil;
-import com.liferay.portal.security.permission.PermissionThreadLocal;
-import com.liferay.portal.security.permission.PermissionUpdateHandler;
-import com.liferay.portal.security.permission.PermissionUpdateHandlerRegistryUtil;
-import com.liferay.portal.security.permission.ResourceActionsUtil;
-import com.liferay.portal.service.ExceptionRetryAcceptor;
 import com.liferay.portal.service.base.ResourcePermissionLocalServiceBaseImpl;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.ResourcePermissionsThreadLocal;
@@ -362,6 +363,10 @@ public class ResourcePermissionLocalServiceImpl
 
 		for (ResourcePermission resourcePermission : resourcePermissions) {
 			if (resourcePermission.getActionIds() == 0) {
+				roleIdsToActionIds.put(
+					resourcePermission.getRoleId(),
+					Collections.<String>emptySet());
+
 				continue;
 			}
 
@@ -690,7 +695,19 @@ public class ResourcePermissionLocalServiceImpl
 				individualResource.getScope(),
 				individualResource.getPrimKey()) < 1) {
 
-			return false;
+			StringBundler sb = new StringBundler(9);
+
+			sb.append("{companyId=");
+			sb.append(individualResource.getCompanyId());
+			sb.append(", name=");
+			sb.append(individualResource.getName());
+			sb.append(", primKey=");
+			sb.append(individualResource.getPrimKey());
+			sb.append(", scope=");
+			sb.append(individualResource.getScope());
+			sb.append("}");
+
+			throw new NoSuchResourcePermissionException(sb.toString());
 		}
 
 		// Iterate the list of resources in reverse order to test permissions
@@ -1284,7 +1301,7 @@ public class ResourcePermissionLocalServiceImpl
 
 		resourcePermissionPersistence.update(resourcePermission);
 
-		SearchEngineUtil.updatePermissionFields(name, primKey);
+		IndexWriterHelperUtil.updatePermissionFields(name, primKey);
 	}
 
 	protected boolean isGuestRoleId(long companyId, long roleId)
@@ -1408,7 +1425,7 @@ public class ResourcePermissionLocalServiceImpl
 			PermissionCacheUtil.clearResourcePermissionCache(
 				scope, name, primKey);
 
-			SearchEngineUtil.updatePermissionFields(name, primKey);
+			IndexWriterHelperUtil.updatePermissionFields(name, primKey);
 		}
 	}
 
@@ -1419,7 +1436,8 @@ public class ResourcePermissionLocalServiceImpl
 	private static final String _UPDATE_ACTION_IDS =
 		ResourcePermissionLocalServiceImpl.class.getName() + ".updateActionIds";
 
-	private class UpdateResourcePermissionCallable implements Callable<Void> {
+	private static class UpdateResourcePermissionCallable
+		implements Callable<Void> {
 
 		public UpdateResourcePermissionCallable(String name, String primKey) {
 			_name = name;

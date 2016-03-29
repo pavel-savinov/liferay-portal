@@ -5,14 +5,7 @@
 	<property name="testray.main.component.name" value="Documents Management" />
 
 	<set-up>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
-
-		<if>
-			<equals arg1="${testPortalInstance}" arg2="true" />
-			<then>
-				<execute macro="SignIn#signInPortalInstanceSetUp" />
-			</then>
-		</if>
+		<execute macro="TestCase#setUpPortalInstance" />
 
 		<execute macro="User#loginPG">
 			<var name="authenticationMethod" value="By Screen Name" />
@@ -50,11 +43,10 @@
 			<var name="portlet" value="Documents and Media" />
 		</execute>
 
-		<execute macro="DMRepository#gotoAdd" />
+		<execute macro="DMNavigator#gotoAddRepositoryCP" />
 
-		<execute macro="DMRepository#select">
+		<execute macro="DMRepository#edit">
 			<var name="dmRepositoryName" value="Documentum Repository Name" />
-			<var name="dmRepositoryType" value="Documentum" />
 		</execute>
 
 		<execute macro="DMRepository#addDocumentum">
@@ -62,7 +54,7 @@
 			<var name="dmRepositoryFieldName" value="documentum" />
 		</execute>
 
-		<execute macro="DMRepository#save" />
+		<execute macro="PortletEntry#save" />
 
 		<execute macro="DMRepository#gotoCP">
 			<var name="dmRepositoryName" value="Documentum Repository Name" />
@@ -168,7 +160,7 @@
 			<var name="dmSubFolderName" value="DM Folder2 Name" />
 		</execute>
 
-		<execute macro="DMFolder#gotoPG">
+		<execute macro="DMNavigator#gotoFolderPG">
 			<var name="dmFolderName" value="DM Folder2 Name" />
 		</execute>
 
@@ -187,7 +179,7 @@
 			<var name="dmRepositoryName" value="Documentum Repository Name" />
 		</execute>
 
-		<execute macro="DMFolder#gotoPG">
+		<execute macro="DMNavigator#gotoFolderPG">
 			<var name="dmFolderName" value="DM Folder2 Name" />
 		</execute>
 
@@ -349,7 +341,7 @@
 			<var name="dmSubFolderName" value="DM Folder3 Name" />
 		</execute>
 
-		<execute macro="DMFolder#gotoPG">
+		<execute macro="DMNavigator#gotoFolderPG">
 			<var name="dmFolderName" value="DM Folder3 Name" />
 		</execute>
 
@@ -368,7 +360,7 @@
 			<var name="dmRepositoryName" value="Documentum Repository Name" />
 		</execute>
 
-		<execute macro="DMFolder#gotoPG">
+		<execute macro="DMNavigator#gotoFolderPG">
 			<var name="dmFolderName" value="DM Folder3 Name" />
 		</execute>
 
@@ -383,7 +375,7 @@
 			<var name="dmRepositoryName" value="Documentum Repository Name" />
 		</execute>
 
-		<execute macro="DMFolder#gotoPG">
+		<execute macro="DMNavigator#gotoFolderPG">
 			<var name="dmFolderName" value="DM Folder3 Name" />
 		</execute>
 

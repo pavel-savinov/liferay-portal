@@ -92,7 +92,7 @@ String modelName = (String)request.getAttribute("liferay-ui:input-permissions:mo
 					String guestRoleLabel = LanguageUtil.format(request, "x-role", guestRole.getTitle(themeDisplay.getLocale()), false);
 
 					if (PropsValues.PERMISSIONS_CHECK_GUEST_ENABLED) {
-						guestRoleLabel = LanguageUtil.get(request, "anyone") + StringPool.SPACE + StringPool.OPEN_PARENTHESIS + guestRoleLabel + StringPool.CLOSE_PARENTHESIS;
+						guestRoleLabel = LanguageUtil.get(resourceBundle, "anyone") + StringPool.SPACE + StringPool.OPEN_PARENTHESIS + guestRoleLabel + StringPool.CLOSE_PARENTHESIS;
 					}
 					%>
 
@@ -206,7 +206,7 @@ String modelName = (String)request.getAttribute("liferay-ui:input-permissions:mo
 						checkboxFieldId = checkboxFieldId + StringPool.UNDERLINE + action;
 					%>
 
-						<td <%= (action.equals(ActionKeys.VIEW)) ? "class=\"hide-accessible\"" : "" %>>
+						<td <%= (action.equals(ActionKeys.VIEW)) ? "class=\"hide\"" : "" %>>
 							<label class="hidden-label" for="<%= checkboxFieldId %>"><liferay-ui:message arguments="<%= new Object[] {ResourceActionsUtil.getAction(request, action), role.getTitle(themeDisplay.getLocale())} %>" key="give-x-permission-to-users-with-role-x" translateArguments="<%= false %>" /></label>
 
 							<input <%= checked ? "checked" : "" %> <%= disabled ? "disabled" : "" %> id="<%= checkboxFieldId %>" name="<%= checkboxFieldName %>" title='<%= LanguageUtil.format(request, "give-x-permission-to-users-with-role-x", new Object[] {ResourceActionsUtil.getAction(request, action), role.getTitle(themeDisplay.getLocale())}, false) %>' type="checkbox" value="<%= action %>" />
@@ -249,8 +249,8 @@ String modelName = (String)request.getAttribute("liferay-ui:input-permissions:mo
 
 				var viewableBy = $('#<%= uniqueNamespace %>inputPermissionsViewRole').val();
 
-				var checkGuestViewPermissions = false;
 				var checkGroupViewPermissions = false;
+				var checkGuestViewPermissions = false;
 
 				if (viewableBy == '<%= RoleConstants.GUEST %>') {
 					checkGuestViewPermissions = true;

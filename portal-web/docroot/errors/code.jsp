@@ -22,13 +22,13 @@
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
 <%@ page import="com.liferay.portal.kernel.log.Log" %>
 <%@ page import="com.liferay.portal.kernel.log.LogFactoryUtil" %>
+<%@ page import="com.liferay.portal.kernel.model.LayoutSet" %>
 <%@ page import="com.liferay.portal.kernel.servlet.HttpHeaders" %>
 <%@ page import="com.liferay.portal.kernel.util.HtmlUtil" %>
 <%@ page import="com.liferay.portal.kernel.util.JavaConstants" %>
+<%@ page import="com.liferay.portal.kernel.util.PortalUtil" %>
 <%@ page import="com.liferay.portal.kernel.util.StringUtil" %>
 <%@ page import="com.liferay.portal.kernel.util.WebKeys" %>
-<%@ page import="com.liferay.portal.model.LayoutSet" %>
-<%@ page import="com.liferay.portal.util.PortalUtil" %>
 
 <%
 
@@ -80,10 +80,10 @@ String xRequestWith = request.getHeader(HttpHeaders.X_REQUESTED_WITH);
 
 		<head>
 			<title></title>
-			<meta content="1; url=<%= redirect %>" http-equiv="refresh" />
+			<meta content="1; url=<%= HtmlUtil.escapeAttribute(redirect) %>" http-equiv="refresh" />
 		</head>
 
-		<body onload="javascript:location.replace('<%= redirect %>')">
+		<body onload="javascript:location.replace('<%= HtmlUtil.escapeJS(redirect) %>')">
 
 		<!--
 		The numbers below are used to fill up space so that this works properly in IE.

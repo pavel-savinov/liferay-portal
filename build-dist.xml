@@ -653,10 +653,6 @@
 	<target name="build-dist-wildfly">
 		<app-server-properties-update>
 			app.server.type=wildfly
-			app.server.wildfly.version=9.0.1
-			app.server.wildfly.dir=${app.server.parent.dir}/wildfly-9.0.1
-			app.server.wildfly.zip.name=wildfly-9.0.1.Final.zip
-			app.server.wildfly.zip.url=http://download.jboss.org/wildfly/9.0.1.Final/wildfly-9.0.1.Final.zip
 		</app-server-properties-update>
 
 		<antcall target="update-sdk-properties" inheritAll="false" />
@@ -896,6 +892,7 @@
 
 		<copy file="copyright.txt" todir="tools/zip_tmpl/license" />
 		<copy file="lib/versions.html" todir="tools/zip_tmpl/license" />
+		<copy file="readme.markdown" todir="tools/zip_tmpl" />
 
 		<antcall target="zip-portal-war" />
 
@@ -986,7 +983,9 @@ release was successful.</echo>
 
 		<ant dir="portal-impl" inheritall="false" target="compile-test" />
 
-		<ant inheritall="false" target="format-javadoc" />
+		<ant inheritall="false" target="format-javadoc">
+			<property name="generate.xml" value="true" />
+		</ant>
 
 		<delete>
 			<fileset dir="${lp.plugins.dir}" includes="**/javadocs-all.xml,**/javadocs-rt.xml" />
@@ -996,7 +995,10 @@ release was successful.</echo>
 
 		<ant dir="${lp.plugins.dir}" inheritall="false" target="clean" />
 		<ant dir="${lp.plugins.dir}" inheritall="false" target="compile" />
-		<ant dir="${lp.plugins.dir}" inheritall="false" target="format-javadoc" />
+
+		<ant dir="${lp.plugins.dir}" inheritall="false" target="format-javadoc">
+			<property name="generate.xml" value="true" />
+		</ant>
 
 		<parallel>
 			<if>
@@ -1848,8 +1850,8 @@ this task.
 		</echo>
 
 		<replace file="${app.server.tomcat.dir}/conf/catalina.properties">
-			<replacetoken><![CDATA[common.loader=${catalina.base}/lib,${catalina.base}/lib/*.jar,${catalina.home}/lib,${catalina.home}/lib/*.jar]]></replacetoken>
-			<replacevalue><![CDATA[common.loader=${catalina.base}/lib,${catalina.base}/lib/*.jar,${catalina.home}/lib,${catalina.home}/lib/*.jar,${catalina.home}/lib/ext,${catalina.home}/lib/ext/*.jar]]></replacevalue>
+			<replacetoken><![CDATA[common.loader="${catalina.base}/lib","${catalina.base}/lib/*.jar","${catalina.home}/lib","${catalina.home}/lib/*.jar"]]></replacetoken>
+			<replacevalue><![CDATA[common.loader="${catalina.base}/lib","${catalina.base}/lib/*.jar","${catalina.home}/lib","${catalina.home}/lib/*.jar","${catalina.home}/lib/ext","${catalina.home}/lib/ext/*.jar"]]></replacevalue>
 		</replace>
 
 		<replace file="${app.server.tomcat.dir}/conf/server.xml">
@@ -2660,7 +2662,7 @@ and put it in ${app.server.parent.dir}. Then rerun this task.
 
 		<replace file="${app.server.wildfly.dir}/standalone/configuration/standalone.xml">
 			<replacetoken><![CDATA[<deployment-scanner ]]></replacetoken>
-			<replacevalue><![CDATA[<deployment-scanner deployment-timeout="120" ]]></replacevalue>
+			<replacevalue><![CDATA[<deployment-scanner deployment-timeout="360" ]]></replacevalue>
 		</replace>
 
 		<replace file="${app.server.wildfly.dir}/standalone/configuration/standalone.xml">
@@ -2684,7 +2686,7 @@ and put it in ${app.server.parent.dir}. Then rerun this task.
 		</echo>
 
 		<replace file="${app.server.wildfly.bin.dir}/standalone.conf">
-			<replacetoken><![CDATA[JAVA_OPTS="-Xms64m -Xmx512m -XX:MaxPermSize=256m ]]></replacetoken>
+			<replacetoken><![CDATA[JAVA_OPTS="-Xms64m -Xmx512m -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m ]]></replacetoken>
 			<replacevalue><![CDATA[JAVA_OPTS="]]></replacevalue>
 		</replace>
 
@@ -2700,7 +2702,7 @@ and put it in ${app.server.parent.dir}. Then rerun this task.
 
 		<echo file="${app.server.wildfly.bin.dir}/standalone.conf" append="true">
 			<![CDATA[
-				JAVA_OPTS="$JAVA_OPTS -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true ${java.security.config} -Duser.timezone=GMT -Xmx1024m -XX:MaxPermSize=384m"
+				JAVA_OPTS="$JAVA_OPTS -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true ${java.security.config} -Duser.timezone=GMT -Xmx1024m -XX:MaxMetaspaceSize=384m -XX:MetaspaceSize=200m"
 			]]>
 		</echo>
 
@@ -2714,7 +2716,7 @@ and put it in ${app.server.parent.dir}. Then rerun this task.
 			<replacetoken><![CDATA[:JAVA_OPTS_SET]]></replacetoken>
 			<replacevalue>
 				<![CDATA[
-					set "JAVA_OPTS=%JAVA_OPTS% -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true @java.security.config@ -Duser.timezone=GMT -Xmx1024m -XX:MaxPermSize=384m"
+					set "JAVA_OPTS=%JAVA_OPTS% -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true @java.security.config@ -Duser.timezone=GMT -Xmx1024m -XX:MaxMetaspaceSize=384m -XX:MetaspaceSize=200m"
 
 					:JAVA_OPTS_SET
 				]]>
@@ -2783,7 +2785,8 @@ and put it in ${app.server.parent.dir}. Then rerun this task.
 	</target>
 
 	<target name="update-plugins-includes">
-		<echo file="${lp.plugins.dir}/build.${user.name}.properties">
+		<echo file="${lp.plugins.dir}/build.${user.name}.properties">liferay.home=${liferay.home}
+
 plugins.includes=</echo>
 
 		<xmltask source="${lp.plugins.dir}/summary.xml">
@@ -2812,7 +2815,7 @@ plugins.includes=</echo>
 		<zip destfile="dist/liferay-portal-doc-${lp.version}.zip">
 			<zipfileset
 				dir="api"
-				includes="**/*.css,**/*.gif,**/*.html"
+				includes="**/*.css,**/*.gif,**/*.html,**/*.jpeg,**/*.jpg,**/*.png,**/*.svg"
 				prefix="liferay-portal-doc-${lp.version}"
 			/>
 		</zip>
@@ -2837,8 +2840,8 @@ plugins.includes=</echo>
 				includes="portal-impl.jar"
 			/>
 			<fileset
-				dir="portal-service"
-				includes="portal-service.jar"
+				dir="portal-kernel"
+				includes="portal-kernel.jar"
 			/>
 			<fileset
 				dir="lib/development"
@@ -2923,6 +2926,21 @@ plugins.includes=</echo>
 						prefix="liferay-portal-${lp.version}"
 					/>
 				</zip>
+
+				<if>
+					<available file="${zip.executable.dir}/../deploy" />
+					<then>
+						<zip
+							destfile="dist/${zip.executable.file}-${lp.version}.zip"
+							update="true"
+						>
+							<zipfileset
+								dir="${zip.executable.dir}/../deploy"
+								prefix="liferay-portal-${lp.version}/deploy"
+							/>
+						</zip>
+					</then>
+				</if>
 
 				<if>
 					<available file="${zip.executable.dir}/../osgi" />
@@ -3134,8 +3152,8 @@ plugins.includes=</echo>
 				prefix="liferay-portal-dependencies-${lp.version}"
 			/>
 			<zipfileset
-				dir="portal-service"
-				includes="portal-service.jar"
+				dir="portal-kernel"
+				includes="portal-kernel.jar"
 				prefix="liferay-portal-dependencies-${lp.version}"
 			/>
 		</zip>
@@ -3191,7 +3209,7 @@ plugins.includes=</echo>
 		<copy todir="${tstamp.value}/WEB-INF/lib">
 			<fileset
 				dir="${app.server.lib.global.dir}"
-				includes="annotations.jar,portal-service.jar,portlet.jar"
+				includes="annotations.jar,portal-kernel.jar,portlet.jar"
 			/>
 		</copy>
 
@@ -3252,7 +3270,7 @@ plugins.includes=</echo>
 		<copy todir="${tstamp.value}/WEB-INF/lib">
 			<fileset
 				dir="${app.server.lib.global.dir}"
-				includes="annotations.jar,portal-service.jar,portlet.jar"
+				includes="annotations.jar,portal-kernel.jar,portlet.jar"
 			/>
 		</copy>
 

@@ -19,10 +19,45 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Address;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.CompanyConstants;
+import com.liferay.portal.kernel.model.Contact;
+import com.liferay.portal.kernel.model.EmailAddress;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Organization;
+import com.liferay.portal.kernel.model.PasswordPolicy;
+import com.liferay.portal.kernel.model.Phone;
+import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.Team;
+import com.liferay.portal.kernel.model.UserConstants;
+import com.liferay.portal.kernel.model.UserGroup;
+import com.liferay.portal.kernel.model.Website;
+import com.liferay.portal.kernel.security.auth.EmailAddressGenerator;
+import com.liferay.portal.kernel.security.auth.FullNameGenerator;
+import com.liferay.portal.kernel.security.auth.FullNameGeneratorFactory;
+import com.liferay.portal.kernel.service.AddressLocalServiceUtil;
+import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
+import com.liferay.portal.kernel.service.ContactLocalServiceUtil;
+import com.liferay.portal.kernel.service.EmailAddressLocalServiceUtil;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
+import com.liferay.portal.kernel.service.GroupServiceUtil;
+import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
+import com.liferay.portal.kernel.service.OrganizationLocalServiceUtil;
+import com.liferay.portal.kernel.service.PasswordPolicyLocalServiceUtil;
+import com.liferay.portal.kernel.service.PhoneLocalServiceUtil;
+import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
+import com.liferay.portal.kernel.service.TeamLocalServiceUtil;
+import com.liferay.portal.kernel.service.UserGroupLocalServiceUtil;
+import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.service.WebsiteLocalServiceUtil;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Digester;
 import com.liferay.portal.kernel.util.DigesterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.RemotePreference;
 import com.liferay.portal.kernel.util.SetUtil;
@@ -32,42 +67,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TimeZoneUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.model.Address;
-import com.liferay.portal.model.Company;
-import com.liferay.portal.model.CompanyConstants;
-import com.liferay.portal.model.Contact;
-import com.liferay.portal.model.EmailAddress;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.model.Organization;
-import com.liferay.portal.model.PasswordPolicy;
-import com.liferay.portal.model.Phone;
-import com.liferay.portal.model.Role;
-import com.liferay.portal.model.Team;
-import com.liferay.portal.model.UserConstants;
-import com.liferay.portal.model.UserGroup;
-import com.liferay.portal.model.Website;
-import com.liferay.portal.security.auth.EmailAddressGenerator;
 import com.liferay.portal.security.auth.EmailAddressGeneratorFactory;
-import com.liferay.portal.security.auth.FullNameGenerator;
-import com.liferay.portal.security.auth.FullNameGeneratorFactory;
-import com.liferay.portal.service.AddressLocalServiceUtil;
-import com.liferay.portal.service.CompanyLocalServiceUtil;
-import com.liferay.portal.service.ContactLocalServiceUtil;
-import com.liferay.portal.service.EmailAddressLocalServiceUtil;
-import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.GroupServiceUtil;
-import com.liferay.portal.service.LayoutLocalServiceUtil;
-import com.liferay.portal.service.OrganizationLocalServiceUtil;
-import com.liferay.portal.service.PasswordPolicyLocalServiceUtil;
-import com.liferay.portal.service.PhoneLocalServiceUtil;
-import com.liferay.portal.service.RoleLocalServiceUtil;
-import com.liferay.portal.service.TeamLocalServiceUtil;
-import com.liferay.portal.service.UserGroupLocalServiceUtil;
-import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.service.WebsiteLocalServiceUtil;
-import com.liferay.portal.theme.ThemeDisplay;
-import com.liferay.portal.util.Portal;
-import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
@@ -377,7 +377,7 @@ public class UserImpl extends UserBaseImpl {
 			ThemeDisplay themeDisplay, boolean privateLayout)
 		throws PortalException {
 
-		if (isDefaultUser()) {
+		if (isDefaultUser() || (themeDisplay == null)) {
 			return StringPool.BLANK;
 		}
 
@@ -491,9 +491,9 @@ public class UserImpl extends UserBaseImpl {
 
 	@Override
 	public String getInitials() {
-		String[] names = StringUtil.split(getFullName(), StringPool.SPACE);
+		StringBundler sb = new StringBundler(2);
 
-		StringBundler sb = new StringBundler(names.length);
+		String[] names = new String[] {getFirstName(), getLastName()};
 
 		for (String name : names) {
 			sb.append(StringUtil.toUpperCase(StringUtil.shorten(name, 1)));
@@ -554,60 +554,6 @@ public class UserImpl extends UserBaseImpl {
 
 		return GroupServiceUtil.getUserSitesGroups(
 			getUserId(), classNames, max);
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #getMySiteGroups}
-	 */
-	@Deprecated
-	@Override
-	public List<Group> getMySites() throws PortalException {
-		return getMySiteGroups();
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link User#getMySiteGroups(int)}
-	 */
-	@Deprecated
-	@Override
-	public List<Group> getMySites(boolean includeControlPanel, int max)
-		throws PortalException {
-
-		return getMySiteGroups(max);
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #getMySiteGroups(int)}
-	 */
-	@Deprecated
-	@Override
-	public List<Group> getMySites(int max) throws PortalException {
-		return getMySiteGroups(max);
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #getMySiteGroups(String[],
-	 *             int)}
-	 */
-	@Deprecated
-	@Override
-	public List<Group> getMySites(
-			String[] classNames, boolean includeControlPanel, int max)
-		throws PortalException {
-
-		return getMySiteGroups(classNames, max);
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #getMySiteGroups(String[],
-	 *             int)}
-	 */
-	@Deprecated
-	@Override
-	public List<Group> getMySites(String[] classNames, int max)
-		throws PortalException {
-
-		return getMySiteGroups(classNames, max);
 	}
 
 	@Override
@@ -874,6 +820,10 @@ public class UserImpl extends UserBaseImpl {
 
 	@Override
 	public boolean isEmailAddressComplete() {
+		if (isDefaultUser()) {
+			return true;
+		}
+
 		if (Validator.isNull(getEmailAddress()) ||
 			(PropsValues.USERS_EMAIL_ADDRESS_REQUIRED &&
 			 Validator.isNull(getDisplayEmailAddress()))) {
@@ -886,6 +836,10 @@ public class UserImpl extends UserBaseImpl {
 
 	@Override
 	public boolean isEmailAddressVerificationComplete() {
+		if (isDefaultUser()) {
+			return true;
+		}
+
 		boolean emailAddressVerificationRequired = false;
 
 		try {
@@ -939,6 +893,10 @@ public class UserImpl extends UserBaseImpl {
 
 	@Override
 	public boolean isSetupComplete() {
+		if (isDefaultUser()) {
+			return true;
+		}
+
 		if (isEmailAddressComplete() && isEmailAddressVerificationComplete() &&
 			!isPasswordReset() && isReminderQueryComplete() &&
 			isTermsOfUseComplete()) {
@@ -951,6 +909,10 @@ public class UserImpl extends UserBaseImpl {
 
 	@Override
 	public boolean isTermsOfUseComplete() {
+		if (isDefaultUser()) {
+			return true;
+		}
+
 		boolean termsOfUseRequired = PrefsPropsUtil.getBoolean(
 			getCompanyId(), PropsKeys.TERMS_OF_USE_REQUIRED,
 			PropsValues.TERMS_OF_USE_REQUIRED);

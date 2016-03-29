@@ -40,15 +40,21 @@ import org.jruby.embed.internal.LocalContextProvider;
 public class RubySassCompiler implements AutoCloseable, SassCompiler {
 
 	public RubySassCompiler() throws Exception {
+		this(_PRECISION_DEFAULT);
+	}
+
+	public RubySassCompiler(int precision) throws Exception {
 		this(
-			_COMPILE_MODE_JIT, _COMPILE_THRESHOLD_DEFAULT,
+			_COMPILE_MODE_JIT, _COMPILE_THRESHOLD_DEFAULT, precision,
 			System.getProperty("java.io.tmpdir"));
 	}
 
 	public RubySassCompiler(
-			String compileMode, int compilerThreshold, String tmpDirName)
+			String compileMode, int compilerThreshold, int precision,
+			String tmpDirName)
 		throws Exception {
 
+		_precision = precision;
 		_tmpDirName = tmpDirName;
 
 		_scriptingContainer = new ScriptingContainer(
@@ -147,8 +153,9 @@ public class RubySassCompiler implements AutoCloseable, SassCompiler {
 
 			String[] results = _scriptingContainer.callMethod(
 				_scriptObject, "process",
-				new Object[] {inputFileName, includeDirNames, _tmpDirName,
-					false, outputFileName, generateSourceMap,
+				new Object[] {
+					inputFileName, includeDirNames, _tmpDirName, false,
+					outputFileName, _precision, generateSourceMap,
 					sourceMapFileName
 				},
 				String[].class);
@@ -179,8 +186,9 @@ public class RubySassCompiler implements AutoCloseable, SassCompiler {
 
 	@Override
 	public String compileString(
-		String input, String inputFileName, String includeDirName,
-		boolean generateSourceMap) throws RubySassCompilerException {
+			String input, String inputFileName, String includeDirName,
+			boolean generateSourceMap)
+		throws RubySassCompilerException {
 
 		return compileString(
 			input, inputFileName, includeDirName, generateSourceMap, "");
@@ -194,7 +202,7 @@ public class RubySassCompiler implements AutoCloseable, SassCompiler {
 
 		try {
 			if ((inputFileName == null) || inputFileName.equals("")) {
-				inputFileName = _tmpDirName + "tmp.scss";
+				inputFileName = _tmpDirName + File.separator + "tmp.scss";
 
 				if (generateSourceMap) {
 					System.out.println("Source maps require a valid fileName");
@@ -203,7 +211,13 @@ public class RubySassCompiler implements AutoCloseable, SassCompiler {
 				}
 			}
 
-			int index = inputFileName.lastIndexOf("/") + 1;
+			int index = inputFileName.lastIndexOf(File.separatorChar);
+
+			if ((index == -1) && (File.separatorChar != '/')) {
+				index = inputFileName.lastIndexOf('/');
+			}
+
+			index += 1;
 
 			String path = inputFileName.substring(0, index);
 			String fileName = inputFileName.substring(index);
@@ -259,7 +273,7 @@ public class RubySassCompiler implements AutoCloseable, SassCompiler {
 		}
 
 		try (Writer writer = new OutputStreamWriter(
-			new FileOutputStream(file, false), "UTF-8")) {
+				new FileOutputStream(file, false), "UTF-8")) {
 
 			writer.write(string);
 		}
@@ -271,6 +285,9 @@ public class RubySassCompiler implements AutoCloseable, SassCompiler {
 
 	private static final int _COMPILE_THRESHOLD_DEFAULT = 5;
 
+	private static final int _PRECISION_DEFAULT = 5;
+
+	private final int _precision;
 	private final ScriptingContainer _scriptingContainer;
 	private final Object _scriptObject;
 	private final String _tmpDirName;

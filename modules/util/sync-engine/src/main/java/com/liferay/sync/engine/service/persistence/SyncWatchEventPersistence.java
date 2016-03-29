@@ -35,16 +35,6 @@ public class SyncWatchEventPersistence
 		super(SyncWatchEvent.class);
 	}
 
-	public long countBySyncAccountId(long syncAccountId) throws SQLException {
-		QueryBuilder<SyncWatchEvent, Long> queryBuilder = queryBuilder();
-
-		Where<SyncWatchEvent, Long> where = queryBuilder.where();
-
-		where.eq("syncAccountId", syncAccountId);
-
-		return where.countOf();
-	}
-
 	public void deleteBySyncAccountId(long syncAccountId) throws SQLException {
 		DeleteBuilder<SyncWatchEvent, Long> deleteBuilder = deleteBuilder();
 
@@ -55,7 +45,40 @@ public class SyncWatchEventPersistence
 		deleteBuilder.delete();
 	}
 
-	public SyncWatchEvent fetchByE_F_T(
+	public SyncWatchEvent fetchBySyncAccountId_First(long syncAccountId)
+		throws SQLException {
+
+		QueryBuilder<SyncWatchEvent, Long> queryBuilder = queryBuilder();
+
+		queryBuilder.limit(1L);
+
+		Where<SyncWatchEvent, Long> where = queryBuilder.where();
+
+		where.eq("syncAccountId", syncAccountId);
+
+		return where.queryForFirst();
+	}
+
+	public SyncWatchEvent fetchByE_F_NotT_First(
+			String eventType, String filePathName, long timestamp)
+		throws SQLException {
+
+		QueryBuilder<SyncWatchEvent, Long> queryBuilder = queryBuilder();
+
+		queryBuilder.limit(1L);
+
+		Where<SyncWatchEvent, Long> where = queryBuilder.where();
+
+		where.eq("eventType", eventType);
+		where.eq("filePathName", new SelectArg(filePathName));
+		where.ne("timestamp", timestamp);
+
+		where.and(3);
+
+		return where.queryForFirst();
+	}
+
+	public SyncWatchEvent fetchByE_F_T_First(
 			String eventType, String filePathName, long timestamp)
 		throws SQLException {
 

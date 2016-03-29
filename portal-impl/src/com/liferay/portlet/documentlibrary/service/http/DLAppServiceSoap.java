@@ -16,11 +16,11 @@ package com.liferay.portlet.documentlibrary.service.http;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.document.library.kernel.service.DLAppServiceUtil;
+
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
-
-import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 
 import java.rmi.RemoteException;
 
@@ -89,7 +89,7 @@ public class DLAppServiceSoap {
 		long repositoryId, long folderId, java.lang.String sourceFileName,
 		java.lang.String mimeType, java.lang.String title,
 		java.lang.String description, java.lang.String changeLog, byte[] bytes,
-		com.liferay.portal.service.ServiceContext serviceContext)
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
 		try {
 			com.liferay.portal.kernel.repository.model.FileEntry returnValue = DLAppServiceUtil.addFileEntry(repositoryId,
@@ -120,7 +120,7 @@ public class DLAppServiceSoap {
 	public static com.liferay.portal.kernel.repository.model.FolderSoap addFolder(
 		long repositoryId, long parentFolderId, java.lang.String name,
 		java.lang.String description,
-		com.liferay.portal.service.ServiceContext serviceContext)
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
 		try {
 			com.liferay.portal.kernel.repository.model.Folder returnValue = DLAppServiceUtil.addFolder(repositoryId,
@@ -191,28 +191,11 @@ public class DLAppServiceSoap {
 	*/
 	public static void checkInFileEntry(long fileEntryId, boolean majorVersion,
 		java.lang.String changeLog,
-		com.liferay.portal.service.ServiceContext serviceContext)
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
 		try {
 			DLAppServiceUtil.checkInFileEntry(fileEntryId, majorVersion,
 				changeLog, serviceContext);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	* @deprecated As of 6.2.0, replaced by {@link #checkInFileEntry(long,
-	String, ServiceContext)}
-	*/
-	@Deprecated
-	public static void checkInFileEntry(long fileEntryId,
-		java.lang.String lockUuid) throws RemoteException {
-		try {
-			DLAppServiceUtil.checkInFileEntry(fileEntryId, lockUuid);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -245,7 +228,7 @@ public class DLAppServiceSoap {
 	*/
 	public static void checkInFileEntry(long fileEntryId,
 		java.lang.String lockUuid,
-		com.liferay.portal.service.ServiceContext serviceContext)
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
 		try {
 			DLAppServiceUtil.checkInFileEntry(fileEntryId, lockUuid,
@@ -278,7 +261,7 @@ public class DLAppServiceSoap {
 	* @see #checkInFileEntry(long, boolean, String, ServiceContext)
 	*/
 	public static void checkOutFileEntry(long fileEntryId,
-		com.liferay.portal.service.ServiceContext serviceContext)
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
 		try {
 			DLAppServiceUtil.checkOutFileEntry(fileEntryId, serviceContext);
@@ -317,7 +300,7 @@ public class DLAppServiceSoap {
 	*/
 	public static com.liferay.portal.kernel.repository.model.FileEntrySoap checkOutFileEntry(
 		long fileEntryId, java.lang.String owner, long expirationTime,
-		com.liferay.portal.service.ServiceContext serviceContext)
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
 		try {
 			com.liferay.portal.kernel.repository.model.FileEntry returnValue = DLAppServiceUtil.checkOutFileEntry(fileEntryId,
@@ -346,7 +329,7 @@ public class DLAppServiceSoap {
 	public static com.liferay.portal.kernel.repository.model.FolderSoap copyFolder(
 		long repositoryId, long sourceFolderId, long parentFolderId,
 		java.lang.String name, java.lang.String description,
-		com.liferay.portal.service.ServiceContext serviceContext)
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
 		try {
 			com.liferay.portal.kernel.repository.model.Folder returnValue = DLAppServiceUtil.copyFolder(repositoryId,
@@ -1865,56 +1848,11 @@ public class DLAppServiceSoap {
 	*/
 	public static com.liferay.portal.kernel.repository.model.FileEntrySoap moveFileEntry(
 		long fileEntryId, long newFolderId,
-		com.liferay.portal.service.ServiceContext serviceContext)
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
 		try {
 			com.liferay.portal.kernel.repository.model.FileEntry returnValue = DLAppServiceUtil.moveFileEntry(fileEntryId,
 					newFolderId, serviceContext);
-
-			return com.liferay.portal.kernel.repository.model.FileEntrySoap.toSoapModel(returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	* Moves the file entry from a trashed folder to the new folder.
-	*
-	* @param fileEntryId the primary key of the file entry
-	* @param newFolderId the primary key of the new folder
-	* @param serviceContext the service context to be applied
-	* @return the file entry
-	*/
-	public static com.liferay.portal.kernel.repository.model.FileEntrySoap moveFileEntryFromTrash(
-		long fileEntryId, long newFolderId,
-		com.liferay.portal.service.ServiceContext serviceContext)
-		throws RemoteException {
-		try {
-			com.liferay.portal.kernel.repository.model.FileEntry returnValue = DLAppServiceUtil.moveFileEntryFromTrash(fileEntryId,
-					newFolderId, serviceContext);
-
-			return com.liferay.portal.kernel.repository.model.FileEntrySoap.toSoapModel(returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	* Moves the file entry with the primary key to the trash portlet.
-	*
-	* @param fileEntryId the primary key of the file entry
-	* @return the file entry
-	*/
-	public static com.liferay.portal.kernel.repository.model.FileEntrySoap moveFileEntryToTrash(
-		long fileEntryId) throws RemoteException {
-		try {
-			com.liferay.portal.kernel.repository.model.FileEntry returnValue = DLAppServiceUtil.moveFileEntryToTrash(fileEntryId);
 
 			return com.liferay.portal.kernel.repository.model.FileEntrySoap.toSoapModel(returnValue);
 		}
@@ -1935,57 +1873,11 @@ public class DLAppServiceSoap {
 	*/
 	public static com.liferay.portal.kernel.repository.model.FolderSoap moveFolder(
 		long folderId, long parentFolderId,
-		com.liferay.portal.service.ServiceContext serviceContext)
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
 		try {
 			com.liferay.portal.kernel.repository.model.Folder returnValue = DLAppServiceUtil.moveFolder(folderId,
 					parentFolderId, serviceContext);
-
-			return com.liferay.portal.kernel.repository.model.FolderSoap.toSoapModel(returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	* Moves the folder with the primary key from the trash portlet to the new
-	* parent folder with the primary key.
-	*
-	* @param folderId the primary key of the folder
-	* @param parentFolderId the primary key of the new parent folder
-	* @param serviceContext the service context to be applied
-	* @return the file entry
-	*/
-	public static com.liferay.portal.kernel.repository.model.FolderSoap moveFolderFromTrash(
-		long folderId, long parentFolderId,
-		com.liferay.portal.service.ServiceContext serviceContext)
-		throws RemoteException {
-		try {
-			com.liferay.portal.kernel.repository.model.Folder returnValue = DLAppServiceUtil.moveFolderFromTrash(folderId,
-					parentFolderId, serviceContext);
-
-			return com.liferay.portal.kernel.repository.model.FolderSoap.toSoapModel(returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	* Moves the folder with the primary key to the trash portlet.
-	*
-	* @param folderId the primary key of the folder
-	* @return the file entry
-	*/
-	public static com.liferay.portal.kernel.repository.model.FolderSoap moveFolderToTrash(
-		long folderId) throws RemoteException {
-		try {
-			com.liferay.portal.kernel.repository.model.Folder returnValue = DLAppServiceUtil.moveFolderToTrash(folderId);
 
 			return com.liferay.portal.kernel.repository.model.FolderSoap.toSoapModel(returnValue);
 		}
@@ -2051,57 +1943,6 @@ public class DLAppServiceSoap {
 	}
 
 	/**
-	* Restores the file entry with the primary key from the trash portlet.
-	*
-	* @param fileEntryId the primary key of the file entry
-	*/
-	public static void restoreFileEntryFromTrash(long fileEntryId)
-		throws RemoteException {
-		try {
-			DLAppServiceUtil.restoreFileEntryFromTrash(fileEntryId);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	* Restores the file shortcut with the primary key from the trash portlet.
-	*
-	* @param fileShortcutId the primary key of the file shortcut
-	*/
-	public static void restoreFileShortcutFromTrash(long fileShortcutId)
-		throws RemoteException {
-		try {
-			DLAppServiceUtil.restoreFileShortcutFromTrash(fileShortcutId);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	* Restores the folder with the primary key from the trash portlet.
-	*
-	* @param folderId the primary key of the folder
-	*/
-	public static void restoreFolderFromTrash(long folderId)
-		throws RemoteException {
-		try {
-			DLAppServiceUtil.restoreFolderFromTrash(folderId);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
 	* Reverts the file entry to a previous version. A new version will be
 	* created based on the previous version and metadata.
 	*
@@ -2111,7 +1952,7 @@ public class DLAppServiceSoap {
 	*/
 	public static void revertFileEntry(long fileEntryId,
 		java.lang.String version,
-		com.liferay.portal.service.ServiceContext serviceContext)
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
 		try {
 			DLAppServiceUtil.revertFileEntry(fileEntryId, version,
@@ -2154,40 +1995,6 @@ public class DLAppServiceSoap {
 		throws RemoteException {
 		try {
 			DLAppServiceUtil.subscribeFolder(groupId, folderId);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	* @deprecated As of 6.2.0, replaced by {@link #checkInFileEntry(long,
-	boolean, String, ServiceContext)}.
-	*/
-	@Deprecated
-	public static void unlockFileEntry(long fileEntryId)
-		throws RemoteException {
-		try {
-			DLAppServiceUtil.unlockFileEntry(fileEntryId);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	* @deprecated As of 6.2.0, replaced by {@link #checkInFileEntry(long,
-	String)}.
-	*/
-	@Deprecated
-	public static void unlockFileEntry(long fileEntryId,
-		java.lang.String lockUuid) throws RemoteException {
-		try {
-			DLAppServiceUtil.unlockFileEntry(fileEntryId, lockUuid);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -2313,7 +2120,7 @@ public class DLAppServiceSoap {
 		java.lang.String mimeType, java.lang.String title,
 		java.lang.String description, java.lang.String changeLog,
 		boolean majorVersion, byte[] bytes,
-		com.liferay.portal.service.ServiceContext serviceContext)
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
 		try {
 			com.liferay.portal.kernel.repository.model.FileEntry returnValue = DLAppServiceUtil.updateFileEntry(fileEntryId,
@@ -2351,7 +2158,7 @@ public class DLAppServiceSoap {
 	*/
 	public static com.liferay.portal.kernel.repository.model.FolderSoap updateFolder(
 		long folderId, java.lang.String name, java.lang.String description,
-		com.liferay.portal.service.ServiceContext serviceContext)
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
 		try {
 			com.liferay.portal.kernel.repository.model.Folder returnValue = DLAppServiceUtil.updateFolder(folderId,

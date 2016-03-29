@@ -15,7 +15,6 @@
 package com.liferay.portal.test.rule;
 
 import com.liferay.portal.deploy.hot.HookHotDeployListener;
-import com.liferay.portal.deploy.hot.IndexerPostProcessorRegistry;
 import com.liferay.portal.deploy.hot.ServiceWrapperRegistry;
 import com.liferay.portal.kernel.deploy.hot.DependencyManagementThreadLocal;
 import com.liferay.portal.kernel.deploy.hot.HotDeployEvent;
@@ -27,13 +26,13 @@ import com.liferay.portal.kernel.template.TemplateManagerUtil;
 import com.liferay.portal.kernel.util.ClassLoaderPool;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PortalLifecycleUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.service.test.ServiceTestUtil;
 import com.liferay.portal.spring.context.PortletContextLoaderListener;
 import com.liferay.portal.test.mock.AutoDeployMockServletContext;
 import com.liferay.portal.util.InitUtil;
-import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsUtil;
 
 import java.lang.reflect.Method;
@@ -238,14 +237,13 @@ public class PACLTestRule implements TestRule {
 		List<String> configLocations = ListUtil.fromArray(
 			PropsUtil.getArray(PropsKeys.SPRING_CONFIGS));
 
-		InitUtil.initWithSpring(configLocations, true);
+		InitUtil.initWithSpring(configLocations, true, true);
 
 		ServiceTestUtil.initMainServletServices();
 		ServiceTestUtil.initStaticServices();
 		ServiceTestUtil.initServices();
 		ServiceTestUtil.initPermissions();
 
-		new IndexerPostProcessorRegistry();
 		new ServiceWrapperRegistry();
 
 		try {

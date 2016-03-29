@@ -36,10 +36,15 @@ import java.nio.file.Files;
 public class JniSassCompiler implements SassCompiler {
 
 	public JniSassCompiler() {
-		this(System.getProperty("java.io.tmpdir"));
+		this(_PRECISION_DEFAULT);
 	}
 
-	public JniSassCompiler(String tmpDirName) {
+	public JniSassCompiler(int precision) {
+		this(precision, System.getProperty("java.io.tmpdir"));
+	}
+
+	public JniSassCompiler(int precision, String tmpDirName) {
+		_precision = precision;
 		_tmpDirName = tmpDirName;
 	}
 
@@ -159,7 +164,7 @@ public class JniSassCompiler implements SassCompiler {
 
 		try {
 			if ((inputFileName == null) || inputFileName.equals("")) {
-				inputFileName = _tmpDirName + "tmp.scss";
+				inputFileName = _tmpDirName + File.separator + "tmp.scss";
 
 				if (generateSourceMap) {
 					System.out.println("Source maps require a valid file name");
@@ -168,7 +173,13 @@ public class JniSassCompiler implements SassCompiler {
 				}
 			}
 
-			int index = inputFileName.lastIndexOf("/") + 1;
+			int index = inputFileName.lastIndexOf(File.separatorChar);
+
+			if ((index == -1) && (File.separatorChar != '/')) {
+				index = inputFileName.lastIndexOf('/');
+			}
+
+			index += 1;
 
 			String dirName = inputFileName.substring(0, index);
 			String fileName = inputFileName.substring(index);
@@ -226,6 +237,7 @@ public class JniSassCompiler implements SassCompiler {
 		_liferaysassLibrary.sass_option_set_output_path(sassOptions, "");
 		_liferaysassLibrary.sass_option_set_output_style(
 			sassOptions, Sass_Output_Style.SASS_STYLE_NESTED);
+		_liferaysassLibrary.sass_option_set_precision(sassOptions, _precision);
 		_liferaysassLibrary.sass_option_set_source_comments(
 			sassOptions, (byte)0);
 
@@ -268,9 +280,12 @@ public class JniSassCompiler implements SassCompiler {
 		}
 	}
 
+	private static final int _PRECISION_DEFAULT = 5;
+
 	private static final LiferaysassLibrary _liferaysassLibrary =
 		LiferaysassLibrary.INSTANCE;
 
+	private final int _precision;
 	private final String _tmpDirName;
 
 }
