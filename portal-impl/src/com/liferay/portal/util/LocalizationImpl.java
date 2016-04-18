@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
+import com.liferay.portal.kernel.security.xml.SecureXMLFactoryProviderUtil;
 import com.liferay.portal.kernel.settings.LocalizedValuesMap;
 import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -38,7 +39,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.language.LanguageResources;
-import com.liferay.portal.security.xml.SecureXMLFactoryProviderUtil;
 import com.liferay.util.ContentUtil;
 
 import java.util.Collection;
@@ -397,9 +397,11 @@ public class LocalizationImpl implements Localization {
 			defaultPropertyValue = PropsUtil.get(propertyName);
 		}
 
+		Class<?> clazz = getClass();
+
 		return getLocalizationMap(
 			preferences, preferenceName, propertyName, defaultPropertyValue,
-			getClass().getClassLoader());
+			clazz.getClassLoader());
 	}
 
 	@Override
@@ -611,17 +613,6 @@ public class LocalizationImpl implements Localization {
 	@Override
 	public String getLocalizedName(String name, String languageId) {
 		return name.concat(StringPool.UNDERLINE).concat(languageId);
-	}
-
-	/**
-	 * @deprecated As of 7.0.0
-	 */
-	@Deprecated
-	@Override
-	public Map<Locale, String> getLocalizedParameter(
-		PortletRequest portletRequest, String parameter) {
-
-		return getLocalizationMap(portletRequest, parameter);
 	}
 
 	@Override

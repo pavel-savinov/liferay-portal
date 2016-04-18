@@ -6,15 +6,25 @@
 
 		<execute function="AssertClick" locator1="KaleoFormsAdminEditProcess#ADD_FIELD_SET_BUTTON" value1="Add Field Set" />
 
-		<execute function="AssertTextEquals" locator1="DDMEditStructure#HEADER_TITLE" value1="New Field Set" />
-		<execute function="Type" locator1="TextInput#NAME" value1="${kfFieldSetName}" />
+		<var name="key_iframeTitle" value="Field Set" />
+
+		<execute function="AssertTextEquals" locator1="IFrame#IFRAME_TITLE" value1="Field Set" />
+
+		<execute function="SelectFrame" locator1="DDMSelectStructure#DDM_STRUCTURES_IFRAME" />
+
+		<execute function="Click" locator1="Button#PLUS" />
+
+		<execute function="Type" locator1="DDMEditStructure#NAME_FIELD" value1="${kfFieldSetName}" />
 	</command>
 
 	<command name="addForm">
 		<execute function="AssertClick" locator1="KaleoFormsAdminEditProcessForm#ADD_FORM_BUTTON" value1="Add Form" />
 
 		<execute function="SelectFrame" locator1="DDMEditStructure#IFRAME" />
-		<execute function="Type" locator1="TextInput#NAME" value1="${kfFormName}" />
+
+		<execute function="Click" locator1="Button#PLUS" />
+
+		<execute function="Type" locator1="DDMEditStructure#NAME_FIELD" value1="${kfFormName}" />
 
 		<execute function="SelectFrame" value1="relative=top" />
 	</command>
@@ -27,8 +37,15 @@
 		<execute macro="KaleoFormsAdmin#viewDetailsStepCmd" />
 
 		<execute function="AssertTextEquals" locator1="KaleoFormsAdminEditProcess#NEXT_BUTTON_INACTIVE" value1="Next" />
-		<execute function="Type" locator1="KaleoFormsAdminEditProcess#DETAILS_NAME_FIELD" value1="${kfProcessName}" />
-		<execute function="Type" locator1="KaleoFormsAdminEditProcess#DETAILS_DESCRIPTION_FIELD" value1="${kfProcessDescription}" />
+
+		<var name="key_fieldName" value="name" />
+
+		<execute function="Type" locator1="FormFields#TEXT_FIELD" value1="${kfProcessName}" />
+
+		<execute macro="FormFields#editTextMultiline">
+			<var name="fieldName" value="description" />
+			<var name="fieldValue" value="${kfProcessDescription}" />
+		</execute>
 	</command>
 
 	<command name="addWorkflow">
@@ -76,17 +93,18 @@
 			</then>
 		</if>
 
-		<execute function="AssertClick" locator1="KaleoFormsAdminEditProcess#FIELD_SET_TABLE_NAME" value1="${kfFieldSetName}" />
 		<execute function="Click" locator1="KaleoFormsAdminEditProcess#FIELD_SET_TABLE_ACTIONS" />
+
 		<execute function="AssertClick" locator1="KaleoFormsAdminEditProcess#FIELD_SET_MENULIST_CHOOSE" value1="Choose" />
+
 		<execute function="AssertTextEquals" locator1="KaleoFormsAdminEditProcess#SELECTED_FIELD_SET" value1="${kfFieldSetName}" />
 	</command>
 
 	<command name="chooseForm">
 		<var name="key_kfFormName" value="${kfFormName}" />
 
-		<execute function="AssertClick" locator1="KaleoFormsAdminEditProcessForm#FORM_TABLE_NAME" value1="${kfFormName}" />
 		<execute function="Click" locator1="KaleoFormsAdminEditProcessForm#FORM_TABLE_ACTIONS" />
+
 		<execute function="AssertClick" locator1="KaleoFormsAdminEditProcessForm#FORM_MENULIST_CHOOSE" value1="Choose" />
 	</command>
 
@@ -131,7 +149,7 @@
 		<execute function="AssertClick" locator1="KaleoFormsAdminEditProcess#WORKFLOW_TABLE_ACTIONS" value1="Actions" />
 		<execute function="AssertClickNoError" locator1="KaleoFormsAdminEditProcess#WORKFLOW_MENULIST_DEACTIVATE" value1="Deactivate" />
 		<execute function="Confirm" value1="Are you sure you want to deactivate this?" />
-		<execute function="AssertTextEquals" locator1="Message#SUCCESS" value1="Your request completed successfully." />
+		<execute macro="Alert#viewSuccessMessage" />
 	</command>
 
 	<command name="deleteForm">
@@ -179,7 +197,7 @@
 		<execute function="Click" locator1="KaleoFormsAdminViewProcessRecords#RECORD_TABLE_ACTIONS" />
 		<execute function="AssertClickNoError" locator1="KaleoFormsAdminViewProcessRecords#RECORD_TABLE_MENULIST_DELETE" value1="Delete" />
 		<execute function="Confirm" value1="Are you sure you want to delete this? It will be deleted immediately." />
-		<execute function="AssertTextEquals" locator1="Message#SUCCESS" value1="Your request completed successfully." />
+		<execute macro="Alert#viewSuccessMessage" />
 
 		<execute macro="KaleoFormsAdmin#viewProcessRecordTableRecordNotPresent">
 			<var name="kfProcessFieldData" value="${kfProcessFieldData}" />
@@ -192,7 +210,7 @@
 		<execute function="Click" locator1="KaleoFormsAdminEditProcess#WORKFLOW_UNPUBLISHED_TABLE_ACTIONS" />
 		<execute function="AssertClickNoError" locator1="KaleoFormsAdminEditProcess#WORKFLOW_UNPUBLISHED_MENULIST_DELETE" value1="Delete" />
 		<execute function="Confirm" value1="Are you sure you want to delete this? It will be deleted immediately." />
-		<execute function="AssertTextEquals" locator1="Message#SUCCESS" value1="Your request completed successfully." />
+		<execute macro="Alert#viewSuccessMessage" />
 	</command>
 
 	<command name="editFieldSet">
@@ -224,7 +242,7 @@
 		<execute function="AssertClick" locator1="KaleoFormsAdminEditProcessForm#FORM_TABLE_ACTIONS" value1="Actions" />
 		<execute function="AssertClick" locator1="KaleoFormsAdminEditProcessForm#FORM_MENULIST_EDIT" value1="Edit" />
 		<execute function="SelectFrame" locator1="DDMEditStructure#IFRAME" />
-		<execute function="Type" locator1="TextInput#NAME" value1="${kfFormNameEdit}" />
+		<execute function="Type" locator1="DDMEditStructure#NAME_FIELD" value1="${kfFormNameEdit}" />
 		<execute function="SelectFrame" value1="relative=top" />
 	</command>
 
@@ -241,14 +259,19 @@
 		<if>
 			<isset var="kfProcessNameEdit" />
 			<then>
-				<execute function="Type" locator1="CPKaleoformsadminEditprocess#DETAILS_NAME_FIELD" value1="${kfProcessNameEdit}" />
+				<var name="key_fieldName" value="name" />
+
+				<execute function="Type" locator1="FormFields#TEXT_FIELD" value1="${kfProcessNameEdit}" />
 			</then>
 		</if>
 
 		<if>
 			<isset var="kfProcessDescriptionEdit" />
 			<then>
-				<execute function="Type" locator1="CPKaleoformsadminEditprocess#DETAILS_DESCRIPTION_FIELD" value1="${kfProcessDescriptionEdit}" />
+				<execute macro="FormFields#editTextMultiline">
+					<var name="fieldName" value="description" />
+					<var name="fieldValue" value="${kfProcessDescriptionEdit}" />
+				</execute>
 			</then>
 		</if>
 
@@ -300,7 +323,6 @@
 	<command name="next">
 		<execute function="AssertElementNotPresent" locator1="KaleoFormsAdminEditProcess#NEXT_BUTTON_INACTIVE" />
 		<execute function="AssertClick" locator1="KaleoFormsAdminEditProcess#NEXT_BUTTON" value1="Next" />
-		<execute function="AssertTextNotPresent" locator1="Message#SUCCESS" value1="Your request completed successfully." />
 	</command>
 
 	<command name="populateFieldBoolean">
@@ -356,9 +378,22 @@
 	</command>
 
 	<command name="populateFieldLinkToPage">
+		<var name="key_ddlRecordFieldData" value="${ddlRecordFieldData}" />
 		<var name="key_fieldName" value="${fieldName}" />
 
-		<execute function="Select" locator1="DDLEditRecord#LINK_TO_PAGE_SELECT" value1="regexp:–\s+${kfProcessFieldData}" />
+		<execute function="AssertClick" locator1="DDLEditRecord#LINK_TO_PAGE_SELECT_PAGE_BUTTON" value1="Select Page" />
+
+		<var name="key_navItem" value="${pagePrivacy} Pages" />
+
+		<execute function="AssertClick" locator1="DDLEditRecord#LINK_TO_PAGE_NAV_ITEM" value1="${pagePrivacy} Pages" />
+
+		<var name="key_pageName" value="${ddlRecordFieldData}" />
+
+		<execute function="Click" locator1="DDLEditRecord#LINK_TO_PAGE_PAGE_RADIO" />
+
+		<execute function="AssertClick" locator1="DDLEditRecord#LINK_TO_PAGE_SELECT_BUTTON" value1="Select" />
+
+		<execute function="AssertTextEquals" locator1="DDLEditRecord#LINK_TO_PAGE_PAGE_SELECT" value1="${ddlRecordFieldData}" />
 	</command>
 
 	<command name="populateFieldRadio">
@@ -388,9 +423,7 @@
 	</command>
 
 	<command name="publishWorkflow">
-		<execute function="AssertClick" locator1="Button#PUBLISH" value1="Publish" />
-
-		<execute function="AssertTextEquals" locator1="Message#SUCCESS" value1="Your request completed successfully." />
+		<execute macro="PortletEntry#publish" />
 
 		<execute macro="KaleoFormsAdmin#viewSelectedWorkflow">
 			<var name="workflowDefinitionTitle" value="${workflowDefinitionTitle}" />
@@ -401,32 +434,36 @@
 	<command name="saveAndContinueForm">
 		<execute function="SelectFrame" locator1="DDMEditStructure#IFRAME" />
 		<execute function="AssertClick" locator1="Button#SAVE_AND_CONTINUE" value1="Save and Continue" />
-		<execute function="AssertTextEquals" locator1="Message#SUCCESS" value1="Your request completed successfully." />
+		<execute macro="Alert#viewSuccessMessage" />
 		<execute function="SelectFrame" value1="relative=top" />
 	</command>
 
 	<command name="saveAsDraftWorkflow">
 		<execute function="AssertClick" locator1="Button#SAVE_AS_DRAFT" value1="Save as Draft" />
 
-		<execute function="AssertTextEquals" locator1="Message#SUCCESS" value1="Your request completed successfully." />
+		<execute macro="Alert#viewSuccessMessage" />
 	</command>
 
 	<command name="saveFieldSet">
-		<execute macro="KaleoFormsAdmin#saveFieldSetAfterEdit" />
+		<execute function="AssertClick" locator1="KaleoFormsAdminEditProcess#SAVE_BUTTON" value1="Save" />
 
-		<execute function="AssertTextEquals" locator1="KaleoFormsAdminEditProcess#SELECTED_FIELD_SET" value1="${kfFieldSetName}" />
-	</command>
+		<execute macro="Alert#viewSuccessMessage" />
 
-	<command name="saveFieldSetAfterEdit">
-		<execute function="AssertClick" locator1="Button#SAVE" value1="Save" />
+		<execute function="SelectFrame" value1="relative=top" />
 
-		<execute function="AssertTextEquals" locator1="Message#SUCCESS" value1="Your request completed successfully." />
+		<execute function="Click" locator1="Icon#CLOSE" />
 	</command>
 
 	<command name="saveForm">
 		<execute function="SelectFrame" locator1="DDMEditStructure#IFRAME" />
-		<execute function="AssertClick" locator1="Button#SAVE" value1="Save" />
+
+		<execute macro="Button#clickSave" />
+
+		<execute macro="Alert#viewSuccessMessage" />
+
 		<execute function="SelectFrame" value1="relative=top" />
+
+		<execute function="Click" locator1="Icon#CLOSE" />
 	</command>
 
 	<command name="saveProcess">
@@ -435,13 +472,11 @@
 		</execute>
 
 		<execute function="AssertElementNotPresent" locator1="Button#SAVE_INACTIVE" />
-		<execute function="AssertClick" locator1="Button#SAVE" value1="Save" />
+		<execute macro="Button#clickSave" />
 	</command>
 
 	<command name="saveProcessRecord">
-		<execute function="AssertClick" locator1="Button#SAVE" value1="Save" />
-
-		<execute function="AssertTextEquals" locator1="Message#SUCCESS" value1="Your request completed successfully." />
+		<execute macro="PortletEntry#save" />
 	</command>
 
 	<command name="searchProcessRecords">
@@ -460,8 +495,10 @@
 	</command>
 
 	<command name="tearDownProcess">
-		<execute macro="Page#gotoContentCP">
-			<var name="portletName" value="Kaleo Forms Admin" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Kaleo Forms Admin" />
 		</execute>
 
 		<while>
@@ -505,14 +542,17 @@
 				<execute function="AssertTextEquals" locator1="DDMEditStructure#HEADER_TITLE" value1="${kfFieldsDefinitionName}" />
 			</then>
 			<else>
+				<var name="key_iframeTitle" value="New Field Set" />
+
 				<execute function="AssertTextEquals" locator1="DDMEditStructure#HEADER_TITLE" value1="New Field Set" />
 			</else>
 		</if>
 	</command>
 
 	<command name="viewInvalidDefinitionMessage">
-		<execute function="AssertTextEquals" locator1="Message#ERROR_1" value1="Your request failed to complete." />
-		<execute function="AssertTextEquals" locator1="Message#ERROR_2" value1="Please enter a valid XML schema definition." />
+		<execute macro="Alert#viewRequestFailedToComplete" />
+
+		<execute function="AssertTextEquals#assertPartialText" locator1="Message#ERROR_2" value1="Please enter a valid XML schema definition." />
 	</command>
 
 	<command name="viewNextFieldSetPage">
@@ -547,8 +587,13 @@
 
 		<execute macro="KaleoFormsAdmin#viewDetailsStepCmd" />
 
-		<execute function="AssertTextEquals" locator1="CPKaleoformsadminEditprocess#DETAILS_NAME_FIELD" value1="${kfProcessName}" />
-		<execute function="AssertTextEquals" locator1="CPKaleoformsadminEditprocess#DETAILS_DESCRIPTION_FIELD" value1="${kfProcessDescription}" />
+		<var name="key_fieldName" value="name" />
+
+		<execute function="AssertTextEquals" locator1="FormFields#TEXT_FIELD" value1="${kfProcessName}" />
+
+		<var name="key_fieldName" value="description" />
+
+		<execute function="AssertTextEquals" locator1="FormFields#TEXT_MULTILINE_FIELD" value1="${kfProcessDescription}" />
 
 		<execute macro="KaleoFormsAdmin#next" />
 	</command>
@@ -598,7 +643,7 @@
 	<command name="viewProcessRecord">
 		<var name="key_kfProcessName" value="${kfProcessName}" />
 
-		<execute function="AssertClick" locator1="KaleoFormsAdmin#PROCESS_TABLE_ACTIONS" value1="Actions" />
+		<execute function="Click" locator1="KaleoFormsAdmin#PROCESS_TABLE_ACTIONS" />
 		<execute function="AssertClick" locator1="KaleoFormsAdmin#PROCESS_MENULIST_VIEW" value1="View" />
 	</command>
 

@@ -15,7 +15,7 @@
 package com.liferay.sync.engine.filesystem.listener;
 
 import com.liferay.sync.engine.filesystem.Watcher;
-import com.liferay.sync.engine.filesystem.util.WatcherRegistry;
+import com.liferay.sync.engine.filesystem.util.WatcherManager;
 import com.liferay.sync.engine.model.SyncAccount;
 import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.model.SyncSite;
@@ -24,6 +24,7 @@ import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncFileService;
 import com.liferay.sync.engine.service.SyncSiteService;
 import com.liferay.sync.engine.service.SyncWatchEventService;
+import com.liferay.sync.engine.util.FileKeyUtil;
 import com.liferay.sync.engine.util.FileUtil;
 import com.liferay.sync.engine.util.MSOfficeFileUtil;
 
@@ -32,7 +33,7 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import java.util.Set;
+import java.util.Collections;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,21 +58,43 @@ public class SyncSiteWatchEventListener extends BaseWatchEventListener {
 		try {
 			String filePathName = filePath.toString();
 
-			Path parentFilePath = filePath.getParent();
-
-			String parentFilePathName = parentFilePath.toString();
+			if (isDuplicateEvent(eventType, filePathName, getSyncAccountId())) {
+				return;
+			}
 
 			SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
 				getSyncAccountId());
 
-			if (isDuplicateEvent(
-					eventType, filePath.toString(), getSyncAccountId())) {
-
+			if (filePathName.equals(syncAccount.getFilePathName())) {
 				return;
 			}
 
-			if (filePathName.equals(syncAccount.getFilePathName()) ||
-				parentFilePathName.equals(syncAccount.getFilePathName())) {
+			Path parentFilePath = filePath.getParent();
+
+			String parentFilePathName = parentFilePath.toString();
+
+			if (parentFilePathName.equals(syncAccount.getFilePathName())) {
+				SyncSite syncSite = SyncSiteService.fetchSyncSite(
+					filePathName, getSyncAccountId());
+
+				if ((syncSite == null) || syncSite.isActive()) {
+					return;
+				}
+
+				SyncFile syncFile = SyncFileService.fetchSyncFile(filePathName);
+
+				if (FileKeyUtil.hasFileKey(
+						filePath, syncFile.getSyncFileId())) {
+
+					if (_logger.isDebugEnabled()) {
+						_logger.debug(
+							"Sync site {} reactivated.", syncSite.getName());
+					}
+
+					SyncSiteService.activateSyncSite(
+						syncSite.getSyncSiteId(),
+						Collections.<SyncFile>emptyList(), false);
+				}
 
 				return;
 			}
@@ -85,10 +108,7 @@ public class SyncSiteWatchEventListener extends BaseWatchEventListener {
 			SyncSite syncSite = SyncSiteService.fetchSyncSite(
 				repositoryId, getSyncAccountId());
 
-			Set<Long> activeSyncSiteIds = SyncSiteService.getActiveSyncSiteIds(
-				getSyncAccountId());
-
-			if (!activeSyncSiteIds.contains(syncSite.getSyncSiteId())) {
+			if (!syncSite.isActive()) {
 				return;
 			}
 
@@ -135,15 +155,21 @@ public class SyncSiteWatchEventListener extends BaseWatchEventListener {
 						FileUtil.fireDeleteEvents(Paths.get(filePathName));
 					}
 
-					Watcher watcher = WatcherRegistry.getWatcher(
+					Watcher watcher = WatcherManager.getWatcher(
 						getSyncAccountId());
 
 					watcher.walkFileTree(Paths.get(filePathName));
 				}
 			}
+			else if (filePath.equals(previousFilePath)) {
+				lastSyncWatchEvent.setEventType(
+					SyncWatchEvent.EVENT_TYPE_MODIFY);
+
+				SyncWatchEventService.update(lastSyncWatchEvent);
+			}
 			else if (parentFilePath.equals(previousFilePath.getParent())) {
-				if (MSOfficeFileUtil.isTempRenamedFile(filePath) &&
-					MSOfficeFileUtil.isExcelFile(previousFilePath)) {
+				if (MSOfficeFileUtil.isTempRenamedFile(
+						previousFilePath, filePath)) {
 
 					SyncWatchEventService.deleteSyncWatchEvent(
 						lastSyncWatchEvent.getSyncWatchEventId());
@@ -160,7 +186,7 @@ public class SyncSiteWatchEventListener extends BaseWatchEventListener {
 				SyncWatchEventService.update(lastSyncWatchEvent);
 
 				if (fileType.equals(SyncFile.TYPE_FOLDER)) {
-					Watcher watcher = WatcherRegistry.getWatcher(
+					Watcher watcher = WatcherManager.getWatcher(
 						getSyncAccountId());
 
 					watcher.walkFileTree(Paths.get(filePathName));
@@ -174,7 +200,7 @@ public class SyncSiteWatchEventListener extends BaseWatchEventListener {
 
 					FileUtil.fireDeleteEvents(Paths.get(filePathName));
 
-					Watcher watcher = WatcherRegistry.getWatcher(
+					Watcher watcher = WatcherManager.getWatcher(
 						getSyncAccountId());
 
 					watcher.walkFileTree(Paths.get(filePathName));
@@ -191,7 +217,7 @@ public class SyncSiteWatchEventListener extends BaseWatchEventListener {
 					SyncWatchEventService.update(lastSyncWatchEvent);
 
 					if (fileType.equals(SyncFile.TYPE_FOLDER)) {
-						Watcher watcher = WatcherRegistry.getWatcher(
+						Watcher watcher = WatcherManager.getWatcher(
 							getSyncAccountId());
 
 						watcher.walkFileTree(Paths.get(filePathName));

@@ -14,7 +14,6 @@
 
 package com.liferay.portal.template;
 
-import com.liferay.portal.deploy.sandbox.SandboxHandler;
 import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.SingleVMPoolUtil;
@@ -88,15 +87,11 @@ public abstract class AbstractSingleResourceTemplate extends AbstractTemplate {
 			}
 		}
 
-		_write(writer);
+		write(writer);
 	}
 
 	protected void cacheTemplateResource(String templateManagerName) {
-		String templateId = templateResource.getTemplateId();
-
-		if (templateManagerName.equals(TemplateConstants.LANG_TYPE_VM) &&
-			templateId.contains(SandboxHandler.SANDBOX_MARKER)) {
-
+		if (templateManagerName.equals(TemplateConstants.LANG_TYPE_VM)) {
 			return;
 		}
 
@@ -124,11 +119,7 @@ public abstract class AbstractSingleResourceTemplate extends AbstractTemplate {
 			return;
 		}
 
-		String errorTemplateId = errorTemplateResource.getTemplateId();
-
-		if (templateManagerName.equals(TemplateConstants.LANG_TYPE_VM) &&
-			errorTemplateId.contains(SandboxHandler.SANDBOX_MARKER)) {
-
+		if (templateManagerName.equals(TemplateConstants.LANG_TYPE_VM)) {
 			return;
 		}
 

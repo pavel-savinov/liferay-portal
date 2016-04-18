@@ -16,6 +16,7 @@ package com.liferay.jenkins.results.parser;
 
 import java.io.File;
 
+import java.net.URI;
 import java.net.URL;
 
 import org.json.JSONObject;
@@ -53,8 +54,8 @@ public class JenkinsResultsParserUtilTest
 		Assert.assertEquals(
 			"cloud-10-50-0-47,cloud-10-50-0-0,cloud-10-50-0-1," +
 				"cloud-10-50-0-2,cloud-10-50-0-49,cloud-10-50-0-50",
-				JenkinsResultsParserUtil.expandSlaveRange(
-					"cloud-10-50-0-47, cloud-10-50-0-0..2, " +
+			JenkinsResultsParserUtil.expandSlaveRange(
+				"cloud-10-50-0-47, cloud-10-50-0-0..2, " +
 					"cloud-10-50-0-49..50"));
 	}
 
@@ -172,7 +173,7 @@ public class JenkinsResultsParserUtilTest
 		urlString = replaceToken(urlString, "hostName", hostName);
 		urlString = replaceToken(urlString, "jobName", jobName);
 
-		URL url = createURL(urlString);
+		URL url = JenkinsResultsParserUtil.createURL(urlString);
 
 		downloadSample(sampleKey, url);
 	}
@@ -199,6 +200,15 @@ public class JenkinsResultsParserUtilTest
 		Assert.assertEquals(
 			expectedJSONString.replace("\n", ""),
 			actualJSONString.replace("\n", ""));
+	}
+
+	@Override
+	protected String toURLString(File file) throws Exception {
+		URI uri = file.toURI();
+
+		URL url = uri.toURL();
+
+		return url.toString();
 	}
 
 	@Override

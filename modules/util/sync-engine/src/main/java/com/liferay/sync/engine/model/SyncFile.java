@@ -65,6 +65,8 @@ public class SyncFile extends StateAwareModel {
 
 	public static final String TYPE_SYSTEM = "system";
 
+	public static final int UI_EVENT_ACCESS_DENIED_LOCAL = 28;
+
 	public static final int UI_EVENT_ADDED_LOCAL = 1;
 
 	public static final int UI_EVENT_ADDED_REMOTE = 2;
@@ -104,6 +106,8 @@ public class SyncFile extends StateAwareModel {
 	public static final int UI_EVENT_RESTORED_LOCAL = 26;
 
 	public static final int UI_EVENT_RESTORED_REMOTE = 27;
+
+	public static final int UI_EVENT_RESYNCING = 28;
 
 	public static final int UI_EVENT_TRASHED_LOCAL = 15;
 
@@ -180,6 +184,10 @@ public class SyncFile extends StateAwareModel {
 	}
 
 	public String getLocalExtraSettingValue(String key) {
+		if (localExtraSettings == null) {
+			return null;
+		}
+
 		try {
 			JsonNode jsonNode = JSONUtil.readTree(localExtraSettings);
 
@@ -295,6 +303,14 @@ public class SyncFile extends StateAwareModel {
 
 	public boolean isSystem() {
 		return type.equals(TYPE_SYSTEM);
+	}
+
+	public boolean isUnsynced() {
+		if (state == STATE_UNSYNCED) {
+			return true;
+		}
+
+		return false;
 	}
 
 	public void setChangeLog(String changeLog) {

@@ -15,14 +15,14 @@
 package com.liferay.sync.security.service.access.policy;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.model.Company;
-import com.liferay.portal.service.CompanyLocalService;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.UserLocalService;
-import com.liferay.service.access.policy.model.SAPEntry;
-import com.liferay.service.access.policy.service.SAPEntryLocalService;
+import com.liferay.portal.security.service.access.policy.model.SAPEntry;
+import com.liferay.portal.security.service.access.policy.service.SAPEntryLocalService;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -72,11 +72,11 @@ public class SyncPolicies {
 						allowedServiceSignatures, defaultSAPEntry, true, name,
 						map, new ServiceContext());
 				}
-				catch (PortalException e) {
+				catch (PortalException pe) {
 					throw new Exception(
 						"Unable to add default SAP entry for company " +
 							company.getCompanyId(),
-						e);
+						pe);
 				}
 			}
 		}
@@ -101,8 +101,8 @@ public class SyncPolicies {
 		_userLocalService = userLocalService;
 	}
 
-	private volatile CompanyLocalService _companyLocalService;
-	private volatile SAPEntryLocalService _sapEntryLocalService;
-	private volatile UserLocalService _userLocalService;
+	private CompanyLocalService _companyLocalService;
+	private SAPEntryLocalService _sapEntryLocalService;
+	private UserLocalService _userLocalService;
 
 }

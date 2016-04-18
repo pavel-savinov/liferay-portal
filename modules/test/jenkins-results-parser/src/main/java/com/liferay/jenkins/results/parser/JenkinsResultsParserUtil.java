@@ -15,20 +15,30 @@
 package com.liferay.jenkins.results.parser;
 
 import java.io.BufferedReader;
+import java.io.CharArrayWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Writer;
 
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.dom4j.Element;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -37,6 +47,56 @@ import org.json.JSONObject;
  * @author Peter Yoo
  */
 public class JenkinsResultsParserUtil {
+
+	public static JSONObject createJSONObject(String jsonString)
+		throws Exception {
+
+		JSONObject jsonObject = new JSONObject(jsonString);
+
+		if (jsonObject.isNull("duration") ||
+			jsonObject.isNull("result") || jsonObject.isNull("url")) {
+
+			return jsonObject;
+		}
+
+		String url = jsonObject.getString("url");
+
+		if (!url.contains("AXIS_VARIABLE")) {
+			return jsonObject;
+		}
+
+		Object result = jsonObject.get("result");
+
+		if (result instanceof JSONObject) {
+			return jsonObject;
+		}
+
+		if ((jsonObject.getInt("duration") == 0) && result.equals("FAILURE")) {
+			String actualResult = getActualResult(url);
+
+			System.out.println("Actual Result: " + actualResult);
+
+			jsonObject.putOpt("result", actualResult);
+		}
+
+		return jsonObject;
+	}
+
+	public static URL createURL(String urlString) throws Exception {
+		URL url = new URL(urlString);
+
+		return encode(url);
+	}
+
+	public static URL encode(URL url) throws Exception {
+		URI uri = new URI(
+			url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(),
+			url.getPath(), url.getQuery(), url.getRef());
+
+		String uriASCIIString = uri.toASCIIString();
+
+		return new URL(uriASCIIString.replace("#", "%23"));
+	}
 
 	public static String expandSlaveRange(String value) {
 		StringBuilder sb = new StringBuilder();
@@ -76,6 +136,24 @@ public class JenkinsResultsParserUtil {
 		return sb.toString();
 	}
 
+	public static String fixFileName(String fileName) {
+		String prefix = "";
+
+		if (fileName.startsWith("file:")) {
+			prefix = "file:";
+
+			fileName = fileName.substring(prefix.length());
+		}
+
+		fileName = fileName.replace(">", "[gt]");
+		fileName = fileName.replace("<", "[lt]");
+		fileName = fileName.replace("|", "[pi]");
+		fileName = fileName.replace("?", "[qt]");
+		fileName = fileName.replace(":", "[sc]");
+
+		return prefix + fileName;
+	}
+
 	public static String fixJSON(String json) {
 		json = json.replaceAll("'", "&#39;");
 		json = json.replaceAll("<", "&#60;");
@@ -95,6 +173,26 @@ public class JenkinsResultsParserUtil {
 		return json;
 	}
 
+	public static String fixMarkdown(String markdown) {
+		markdown = markdown.replace("\\", "\\\\");
+		markdown = markdown.replace("`", "\\`");
+		markdown = markdown.replace("*", "\\*");
+		markdown = markdown.replace("_", "\\_");
+		markdown = markdown.replace("{", "\\{");
+		markdown = markdown.replace("}", "\\}");
+		markdown = markdown.replace("[", "\\[");
+		markdown = markdown.replace("]", "\\]");
+		markdown = markdown.replace("(", "\\(");
+		markdown = markdown.replace(")", "\\)");
+		markdown = markdown.replace("#", "\\#");
+		markdown = markdown.replace("+", "\\+");
+		markdown = markdown.replace("-", "\\-");
+		markdown = markdown.replace(".", "\\.");
+		markdown = markdown.replace("!", "\\!");
+
+		return markdown;
+	}
+
 	public static String fixURL(String url) {
 		url = url.replace("(", "%28");
 		url = url.replace(")", "%29");
@@ -102,6 +200,38 @@ public class JenkinsResultsParserUtil {
 		url = url.replace("]", "%5D");
 
 		return url;
+	}
+
+	public static String format(Element element) throws IOException {
+		Writer writer = new CharArrayWriter();
+
+		XMLWriter xmlWriter = new XMLWriter(
+			writer, OutputFormat.createPrettyPrint());
+
+		xmlWriter.write(element);
+
+		return writer.toString();
+	}
+
+	public static String getActualResult(String buildURL) throws Exception {
+		String progressiveText = toString(
+			getLocalURL(buildURL + "/logText/progressiveText"), false);
+
+		if (progressiveText.contains("Finished:")) {
+			if (progressiveText.contains("Finished: SUCCESS")) {
+				return "SUCCESS";
+			}
+
+			if (progressiveText.contains("Finished: UNSTABLE")) {
+				return "FAILURE";
+			}
+
+			if (progressiveText.contains("Finished: FAILURE")) {
+				return "FAILURE";
+			}
+		}
+
+		return null;
 	}
 
 	public static String getAxisVariable(JSONObject jsonObject)
@@ -177,8 +307,26 @@ public class JenkinsResultsParserUtil {
 	}
 
 	public static String getLocalURL(String remoteURL) {
-		remoteURL = remoteURL.replace(
-			"${user.dir}", System.getProperty("user.dir"));
+		if (remoteURL.contains("${dependencies.url}")) {
+			remoteURL = fixFileName(remoteURL);
+
+			String fileURL = remoteURL.replace(
+				"${dependencies.url}", DEPENDENCIES_URL_FILE);
+
+			File file = new File(fileURL.substring("file:".length()));
+
+			if (file.exists()) {
+				remoteURL = fileURL;
+			}
+			else {
+				remoteURL = remoteURL.replace(
+					"${dependencies.url}", DEPENDENCIES_URL_HTTP);
+			}
+		}
+
+		if (remoteURL.startsWith("file")) {
+			remoteURL = fixFileName(remoteURL);
+		}
 
 		Matcher matcher = _localURLPattern1.matcher(remoteURL);
 
@@ -214,20 +362,33 @@ public class JenkinsResultsParserUtil {
 	}
 
 	public static JSONObject toJSONObject(String url) throws Exception {
-		return toJSONObject(url, true);
+		return toJSONObject(url, true, 0);
 	}
 
 	public static JSONObject toJSONObject(String url, boolean checkCache)
 		throws Exception {
 
-		return new JSONObject(toString(url, checkCache));
+		return createJSONObject(toString(url, checkCache, 0));
+	}
+
+	public static JSONObject toJSONObject(
+			String url, boolean checkCache, int timeout)
+		throws Exception {
+
+		return createJSONObject(toString(url, checkCache, timeout));
 	}
 
 	public static String toString(String url) throws Exception {
-		return toString(url, true);
+		return toString(url, true, 0);
 	}
 
 	public static String toString(String url, boolean checkCache)
+		throws Exception {
+
+		return toString(url, checkCache, 0);
+	}
+
+	public static String toString(String url, boolean checkCache, int timeout)
 		throws Exception {
 
 		url = fixURL(url);
@@ -242,7 +403,7 @@ public class JenkinsResultsParserUtil {
 			return _toStringCache.get(key);
 		}
 
-		int retries = 0;
+		int retryCount = 0;
 
 		while (true) {
 			try {
@@ -252,8 +413,15 @@ public class JenkinsResultsParserUtil {
 
 				URL urlObject = new URL(url);
 
+				URLConnection urlConnection = urlObject.openConnection();
+
+				if (timeout != 0) {
+					urlConnection.setConnectTimeout(timeout);
+					urlConnection.setReadTimeout(timeout);
+				}
+
 				InputStreamReader inputStreamReader = new InputStreamReader(
-					urlObject.openStream());
+					urlConnection.getInputStream());
 
 				BufferedReader bufferedReader = new BufferedReader(
 					inputStreamReader);
@@ -267,16 +435,22 @@ public class JenkinsResultsParserUtil {
 
 				bufferedReader.close();
 
-				if (!url.startsWith("file:")) {
-					_toStringCache.put(key, sb.toString());
+				String string = sb.toString();
+
+				byte[] bytes = string.getBytes();
+
+				if (!url.startsWith("file:") &&
+					(bytes.length < (3 * 1024 * 1024))) {
+
+					_toStringCache.put(key, string);
 				}
 
-				return sb.toString();
+				return string;
 			}
 			catch (FileNotFoundException fnfe) {
-				retries++;
+				retryCount++;
 
-				if (retries > 3) {
+				if (retryCount > 3) {
 					throw fnfe;
 				}
 
@@ -287,10 +461,59 @@ public class JenkinsResultsParserUtil {
 		}
 	}
 
+	public static void write(File file, String content) throws IOException {
+		System.out.println(
+			"Write file " + file + " with length " + content.length());
+
+		File parentDir = file.getParentFile();
+
+		if (!parentDir.exists()) {
+			System.out.println("Make parent directories for " + file);
+
+			parentDir.mkdirs();
+		}
+
+		Files.write(Paths.get(file.toURI()), content.getBytes());
+	}
+
+	protected static final String DEPENDENCIES_URL_FILE;
+
+	protected static final String DEPENDENCIES_URL_HTTP =
+		"http://mirrors-no-cache.lax.liferay.com/github.com/liferay" +
+			"/liferay-jenkins-results-parser-samples-ee/1/";
+
+	static {
+		File dependenciesDir = new File("src/test/resources/dependencies/");
+
+		try {
+			URI uri = dependenciesDir.toURI();
+
+			URL url = uri.toURL();
+
+			DEPENDENCIES_URL_FILE = url.toString();
+		}
+		catch (MalformedURLException murle) {
+			throw new RuntimeException(murle);
+		}
+	}
+
 	private static final Pattern _localURLPattern1 = Pattern.compile(
 		"https://test.liferay.com/([0-9]+)/");
 	private static final Pattern _localURLPattern2 = Pattern.compile(
 		"https://(test-[0-9]+-[0-9]+).liferay.com/");
-	private static final Map<String, String> _toStringCache = new HashMap<>();
+
+	private static final Map<String, String> _toStringCache =
+		new LinkedHashMap<String, String>(50) {
+
+			@Override
+			protected boolean removeEldestEntry(Entry<String, String> entry) {
+				if (size() > 50) {
+					return true;
+				}
+
+				return false;
+			}
+
+		};
 
 }

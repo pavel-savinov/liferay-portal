@@ -17,13 +17,13 @@ package com.liferay.sync.engine.service;
 import com.liferay.sync.engine.documentlibrary.event.Event;
 import com.liferay.sync.engine.documentlibrary.util.FileEventManager;
 import com.liferay.sync.engine.filesystem.Watcher;
-import com.liferay.sync.engine.filesystem.util.WatcherRegistry;
+import com.liferay.sync.engine.filesystem.util.WatcherManager;
 import com.liferay.sync.engine.model.ModelListener;
-import com.liferay.sync.engine.model.SyncAccount;
 import com.liferay.sync.engine.model.SyncFile;
 import com.liferay.sync.engine.model.SyncSite;
 import com.liferay.sync.engine.model.SyncSiteModelListener;
 import com.liferay.sync.engine.service.persistence.SyncSitePersistence;
+import com.liferay.sync.engine.util.FileKeyUtil;
 import com.liferay.sync.engine.util.FileUtil;
 
 import java.io.IOException;
@@ -52,7 +52,8 @@ import org.slf4j.LoggerFactory;
  */
 public class SyncSiteService {
 
-	public static SyncSite activateSyncSite(long syncSiteId, boolean reset)
+	public static SyncSite activateSyncSite(
+			long syncSiteId, List<SyncFile> ignoredSyncFiles, boolean reset)
 		throws Exception {
 
 		// Sync site
@@ -64,11 +65,11 @@ public class SyncSiteService {
 		}
 
 		syncSite.setActive(true);
+		syncSite.setState(SyncSite.STATE_SYNCED);
+		syncSite.setUiEvent(SyncSite.UI_EVENT_NONE);
 
 		if (reset) {
 			syncSite.setRemoteSyncTime(-1);
-			syncSite.setState(SyncSite.STATE_SYNCED);
-			syncSite.setUiEvent(SyncSite.UI_EVENT_NONE);
 
 			deleteSyncFiles(syncSite);
 		}
@@ -81,6 +82,22 @@ public class SyncSiteService {
 
 		if (!Files.exists(Paths.get(filePathName))) {
 			Files.createDirectories(Paths.get(filePathName));
+
+			SyncFile syncFile = SyncFileService.fetchSyncFile(filePathName);
+
+			FileKeyUtil.writeFileKey(
+				Paths.get(filePathName),
+				String.valueOf(syncFile.getSyncFileId()), true);
+		}
+
+		// Sync files
+
+		for (SyncFile syncFile : ignoredSyncFiles) {
+			syncFile.setModifiedTime(0);
+			syncFile.setState(SyncFile.STATE_UNSYNCED);
+			syncFile.setSyncAccountId(syncSite.getSyncAccountId());
+
+			SyncFileService.update(syncFile);
 		}
 
 		return syncSite;
@@ -103,7 +120,30 @@ public class SyncSiteService {
 
 			SyncSite syncSite = fetchSyncSite(syncSiteId);
 
+			List<SyncFile> syncFiles = SyncFileService.findSyncFiles(
+				syncSite.getGroupId(), SyncFile.STATE_IN_PROGRESS,
+				syncSite.getSyncAccountId());
+
+			syncFiles.add(
+				SyncFileService.fetchSyncFile(syncSite.getFilePathName()));
+
+			for (SyncFile syncFile : syncFiles) {
+				Set<Event> events = FileEventManager.getEvents(
+					syncFile.getSyncFileId());
+
+				for (Event event : events) {
+					event.cancel();
+				}
+			}
+
 			_syncSitePersistence.deleteById(syncSiteId);
+
+			// Sync file
+
+			SyncFile syncFile = SyncFileService.fetchSyncFile(
+				syncSite.getFilePathName());
+
+			SyncFileService.deleteSyncFile(syncFile);
 
 			// Sync files
 
@@ -226,27 +266,31 @@ public class SyncSiteService {
 		_syncSitePersistence.registerModelListener(modelListener);
 	}
 
-	public static SyncSite setFilePathName(long syncSiteId, String name) {
+	public static SyncSite setFilePathName(
+		long syncSiteId, String targetFilePathName) {
 
 		// Sync site
 
 		SyncSite syncSite = fetchSyncSite(syncSiteId);
 
-		String filePathName = syncSite.getFilePathName();
+		String sourceFilePathName = syncSite.getFilePathName();
 
-		SyncAccount syncAccount = SyncAccountService.fetchSyncAccount(
-			syncSite.getSyncAccountId());
-
-		syncSite.setFilePathName(
-			FileUtil.getFilePathName(syncAccount.getFilePathName(), name));
+		syncSite.setFilePathName(targetFilePathName);
 
 		update(syncSite);
 
+		// Sync file
+
+		SyncFile syncFile = SyncFileService.fetchSyncFile(sourceFilePathName);
+
+		syncFile.setName(syncSite.getName());
+		syncFile.setFilePathName(targetFilePathName);
+
+		SyncFileService.update(syncFile);
+
 		// Sync files
 
-		SyncFileService.renameSyncFiles(
-			filePathName,
-			FileUtil.getFilePathName(syncAccount.getFilePathName(), name));
+		SyncFileService.renameSyncFiles(sourceFilePathName, targetFilePathName);
 
 		return syncSite;
 	}
@@ -280,11 +324,12 @@ public class SyncSiteService {
 
 		syncSite = update(syncSite);
 
-		// Sync files
-
 		List<SyncFile> syncFiles = SyncFileService.findSyncFiles(
 			syncSite.getGroupId(), SyncFile.STATE_IN_PROGRESS,
 			syncSite.getSyncAccountId());
+
+		syncFiles.add(
+			SyncFileService.fetchSyncFile(syncSite.getFilePathName()));
 
 		for (SyncFile syncFile : syncFiles) {
 			Set<Event> events = FileEventManager.getEvents(
@@ -294,6 +339,8 @@ public class SyncSiteService {
 				event.cancel();
 			}
 		}
+
+		// Sync files
 
 		try {
 			deleteSyncFiles(syncSite);
@@ -312,13 +359,11 @@ public class SyncSiteService {
 	protected static void deleteSyncFiles(SyncSite syncSite)
 		throws IOException {
 
-		List<SyncFile> syncFiles = SyncFileService.findSyncFilesByRepositoryId(
-			syncSite.getGroupId(), syncSite.getSyncAccountId());
+		SyncFile syncFile = SyncFileService.fetchSyncFile(
+			syncSite.getFilePathName());
 
-		for (SyncFile syncFile : syncFiles) {
-			if (!syncFile.isSystem()) {
-				SyncFileService.deleteSyncFile(syncFile, false);
-			}
+		if (syncFile != null) {
+			SyncFileService.deleteSyncFiles(syncFile, true);
 		}
 
 		Path filePath = Paths.get(syncSite.getFilePathName());
@@ -327,11 +372,8 @@ public class SyncSiteService {
 			return;
 		}
 
-		final Watcher watcher = WatcherRegistry.getWatcher(
+		final Watcher watcher = WatcherManager.getWatcher(
 			syncSite.getSyncAccountId());
-
-		final List<String> deletedFilePathNames =
-			watcher.getDeletedFilePathNames();
 
 		Files.walkFileTree(
 			filePath,
@@ -346,7 +388,7 @@ public class SyncSiteService {
 						return super.postVisitDirectory(filePath, ioe);
 					}
 
-					deletedFilePathNames.add(filePath.toString());
+					watcher.addDeletedFilePathName(filePath.toString());
 
 					FileUtil.deleteFile(filePath);
 
@@ -358,7 +400,7 @@ public class SyncSiteService {
 						Path filePath, BasicFileAttributes basicFileAttributes)
 					throws IOException {
 
-					deletedFilePathNames.add(filePath.toString());
+					watcher.addDeletedFilePathName(filePath.toString());
 
 					FileUtil.deleteFile(filePath);
 

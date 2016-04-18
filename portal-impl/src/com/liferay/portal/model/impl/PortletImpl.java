@@ -14,29 +14,52 @@
 
 package com.liferay.portal.model.impl;
 
+import com.liferay.asset.kernel.model.AssetRendererFactory;
+import com.liferay.expando.kernel.model.CustomAttributesDisplay;
+import com.liferay.exportimport.kernel.lar.PortletDataHandler;
+import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.portal.kernel.application.type.ApplicationType;
 import com.liferay.portal.kernel.atom.AtomCollectionAdapter;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Plugin;
+import com.liferay.portal.kernel.model.PluginSetting;
+import com.liferay.portal.kernel.model.Portlet;
+import com.liferay.portal.kernel.model.PortletApp;
+import com.liferay.portal.kernel.model.PortletConstants;
+import com.liferay.portal.kernel.model.PortletFilter;
+import com.liferay.portal.kernel.model.PortletInfo;
+import com.liferay.portal.kernel.model.PublicRenderParameter;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.notifications.UserNotificationHandler;
 import com.liferay.portal.kernel.plugin.PluginPackage;
 import com.liferay.portal.kernel.poller.PollerProcessor;
 import com.liferay.portal.kernel.pop.MessageListener;
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
+import com.liferay.portal.kernel.portlet.ControlPanelEntry;
 import com.liferay.portal.kernel.portlet.FriendlyURLMapper;
 import com.liferay.portal.kernel.portlet.FriendlyURLMapperTracker;
 import com.liferay.portal.kernel.portlet.PortletBag;
 import com.liferay.portal.kernel.portlet.PortletBagPool;
 import com.liferay.portal.kernel.portlet.PortletLayoutListener;
+import com.liferay.portal.kernel.portlet.PortletQNameUtil;
 import com.liferay.portal.kernel.scheduler.SchedulerEntry;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.OpenSearch;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
+import com.liferay.portal.kernel.security.permission.PermissionPropagator;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.servlet.ServletContextUtil;
 import com.liferay.portal.kernel.servlet.URLEncoder;
 import com.liferay.portal.kernel.template.TemplateHandler;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -44,36 +67,13 @@ import com.liferay.portal.kernel.webdav.WebDAVStorage;
 import com.liferay.portal.kernel.workflow.WorkflowHandler;
 import com.liferay.portal.kernel.xml.QName;
 import com.liferay.portal.kernel.xmlrpc.Method;
-import com.liferay.portal.model.Plugin;
-import com.liferay.portal.model.PluginSetting;
-import com.liferay.portal.model.Portlet;
-import com.liferay.portal.model.PortletApp;
-import com.liferay.portal.model.PortletConstants;
-import com.liferay.portal.model.PortletFilter;
-import com.liferay.portal.model.PortletInfo;
-import com.liferay.portal.model.PublicRenderParameter;
-import com.liferay.portal.model.User;
-import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
-import com.liferay.portal.security.permission.PermissionPropagator;
-import com.liferay.portal.security.permission.PermissionThreadLocal;
-import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.service.permission.PortletPermissionUtil;
-import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portlet.ControlPanelEntry;
 import com.liferay.portlet.DefaultControlPanelEntryFactory;
-import com.liferay.portlet.PortletQNameUtil;
-import com.liferay.portlet.asset.model.AssetRendererFactory;
-import com.liferay.portlet.expando.model.CustomAttributesDisplay;
-import com.liferay.portlet.exportimport.lar.PortletDataHandler;
-import com.liferay.portlet.exportimport.lar.StagedModelDataHandler;
-import com.liferay.portlet.social.model.SocialActivityInterpreter;
-import com.liferay.portlet.social.model.SocialRequestInterpreter;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceRegistrar;
+import com.liferay.social.kernel.model.SocialActivityInterpreter;
+import com.liferay.social.kernel.model.SocialRequestInterpreter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,6 +86,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.portlet.PortletMode;
 import javax.portlet.WindowState;
@@ -1292,21 +1295,7 @@ public class PortletImpl extends PortletBaseImpl {
 	 */
 	@Override
 	public String getPortletDataHandlerClass() {
-		PortletBag portletBag = PortletBagPool.get(getRootPortletId());
-
-		if (portletBag == null) {
-			return _portletDataHandlerClass;
-		}
-
-		PortletDataHandler portletDataHandler = getPortletDataHandlerInstance();
-
-		if (portletDataHandler == null) {
-			return _portletDataHandlerClass;
-		}
-
-		Class<?> clazz = portletDataHandler.getClass();
-
-		return clazz.getName();
+		return _portletDataHandlerClass;
 	}
 
 	/**
@@ -1373,7 +1362,7 @@ public class PortletImpl extends PortletBaseImpl {
 	public PortletLayoutListener getPortletLayoutListenerInstance() {
 		PortletBag portletBag = PortletBagPool.get(getRootPortletId());
 
-		if ( portletBag == null) {
+		if (portletBag == null) {
 			return null;
 		}
 
@@ -3515,11 +3504,33 @@ public class PortletImpl extends PortletBaseImpl {
 	 */
 	@Override
 	public void setReady(boolean ready) {
-		_readyMap.put(getRootPortletId(), ready);
+		Lock lock = _readyLock.get(getRootPortletId());
 
-		Registry registry = RegistryUtil.getRegistry();
+		if (lock == null) {
+			Lock newLock = new ReentrantLock();
 
-		synchronized (_serviceRegistrars) {
+			lock = _readyLock.putIfAbsent(getRootPortletId(), newLock);
+
+			if (lock == null) {
+				lock = newLock;
+			}
+		}
+
+		try {
+			lock.lock();
+
+			if (lock != _readyLock.get(getRootPortletId())) {
+				return;
+			}
+
+			Boolean readyMapValue = _readyMap.get(getRootPortletId());
+
+			if ((readyMapValue != null) && (ready == readyMapValue)) {
+				return;
+			}
+
+			Registry registry = RegistryUtil.getRegistry();
+
 			if (ready) {
 				ServiceRegistrar<Portlet> serviceRegistrar =
 					registry.getServiceRegistrar(Portlet.class);
@@ -3539,6 +3550,11 @@ public class PortletImpl extends PortletBaseImpl {
 
 				serviceRegistrar.destroy();
 			}
+
+			_readyMap.put(getRootPortletId(), ready);
+		}
+		finally {
+			lock.unlock();
 		}
 	}
 
@@ -3979,13 +3995,24 @@ public class PortletImpl extends PortletBaseImpl {
 
 	@Override
 	public void unsetReady() {
-		_readyMap.remove(getRootPortletId());
+		Lock lock = _readyLock.get(getRootPortletId());
 
-		synchronized (_serviceRegistrars) {
-			ServiceRegistrar<Portlet> serviceRegistrar =
-				_serviceRegistrars.remove(getRootPortletId());
+		if (lock != null) {
+			try {
+				lock.lock();
 
-			serviceRegistrar.destroy();
+				_readyMap.remove(getRootPortletId());
+
+				ServiceRegistrar<Portlet> serviceRegistrar =
+					_serviceRegistrars.remove(getRootPortletId());
+
+				serviceRegistrar.destroy();
+
+				_readyLock.remove(getRootPortletId(), lock);
+			}
+			finally {
+				lock.unlock();
+			}
 		}
 	}
 
@@ -3994,11 +4021,13 @@ public class PortletImpl extends PortletBaseImpl {
 	 */
 	private static final Log _log = LogFactoryUtil.getLog(PortletImpl.class);
 
+	private static final ConcurrentMap<String, Lock> _readyLock =
+		new ConcurrentHashMap<>();
+
 	/**
 	 * Map of the ready states of all portlets keyed by their root portlet ID.
 	 */
-	private static final Map<String, Boolean> _readyMap =
-		new ConcurrentHashMap<>();
+	private static final Map<String, Boolean> _readyMap = new HashMap<>();
 
 	private static final Map<String, ServiceRegistrar<Portlet>>
 		_serviceRegistrars = new HashMap<>();

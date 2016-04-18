@@ -23,16 +23,17 @@ import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.PortalWebResourcesUtil;
 import com.liferay.portal.kernel.servlet.PortletResourcesUtil;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.URLUtil;
 import com.liferay.portal.servlet.filters.IgnoreModuleRequestFilter;
-import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsUtil;
 
 import java.io.File;
@@ -275,8 +276,8 @@ public class DynamicCSSFilter extends IgnoreModuleRequestFilter {
 
 	protected String sterilizeQueryString(String queryString) {
 		return StringUtil.replace(
-			queryString, new String[] {StringPool.SLASH, StringPool.BACK_SLASH},
-			new String[] {StringPool.UNDERLINE, StringPool.UNDERLINE});
+			queryString, new char[] {CharPool.SLASH, CharPool.BACK_SLASH},
+			new char[] {CharPool.UNDERLINE, CharPool.UNDERLINE});
 	}
 
 	private static final String _CSS_EXTENSION = ".css";

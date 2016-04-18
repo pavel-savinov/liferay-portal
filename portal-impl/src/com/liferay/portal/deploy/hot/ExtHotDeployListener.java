@@ -14,6 +14,8 @@
 
 package com.liferay.portal.deploy.hot;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.deploy.hot.BaseHotDeployListener;
 import com.liferay.portal.kernel.deploy.hot.HotDeployEvent;
 import com.liferay.portal.kernel.deploy.hot.HotDeployException;
@@ -22,13 +24,13 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.WebDirDetector;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.tools.WebXMLBuilder;
 import com.liferay.portal.util.ExtRegistry;
-import com.liferay.portal.util.PortalUtil;
 import com.liferay.taglib.FileAvailabilityUtil;
 import com.liferay.util.ant.CopyTask;
 
@@ -49,6 +51,7 @@ import javax.servlet.ServletContext;
 /**
  * @author Brian Wing Shun Chan
  */
+@ProviderType
 public class ExtHotDeployListener extends BaseHotDeployListener {
 
 	@Override
@@ -139,9 +142,9 @@ public class ExtHotDeployListener extends BaseHotDeployListener {
 		if (!conflicts.isEmpty()) {
 			StringBundler sb = new StringBundler();
 
-			sb.append(
-				"Extension environment for " + servletContextName +
-					" cannot be applied because of detected conflicts:");
+			sb.append("Extension environment for ");
+			sb.append(servletContextName);
+			sb.append(" cannot be applied because of detected conflicts:");
 
 			for (Map.Entry<String, Set<String>> entry : conflicts.entrySet()) {
 				String conflictServletContextName = entry.getKey();
@@ -195,9 +198,14 @@ public class ExtHotDeployListener extends BaseHotDeployListener {
 
 		if (_log.isInfoEnabled()) {
 			_log.info(
-				"Extension environment for " +
-					servletContextName + " will not be undeployed");
+				"Extension environment for " + servletContextName +
+					" will not be undeployed");
 		}
+	}
+
+	@Deprecated
+	protected void installExt(ServletContext servletContext) throws Exception {
+		installExt(servletContext, servletContext.getClassLoader());
 	}
 
 	protected void installExt(

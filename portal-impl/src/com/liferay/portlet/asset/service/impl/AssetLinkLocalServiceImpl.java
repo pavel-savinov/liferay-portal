@@ -14,6 +14,14 @@
 
 package com.liferay.portlet.asset.service.impl;
 
+import com.liferay.asset.kernel.exception.NoSuchLinkException;
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.model.AssetLink;
+import com.liferay.asset.kernel.model.AssetLinkConstants;
+import com.liferay.asset.kernel.model.adapter.StagedAssetLink;
+import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.Disjunction;
@@ -23,22 +31,18 @@ import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.SQLQuery;
+import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.adapter.ModelAdapterUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.model.User;
-import com.liferay.portal.model.adapter.ModelAdapterUtil;
-import com.liferay.portlet.asset.NoSuchLinkException;
-import com.liferay.portlet.asset.model.AssetEntry;
-import com.liferay.portlet.asset.model.AssetLink;
-import com.liferay.portlet.asset.model.AssetLinkConstants;
-import com.liferay.portlet.asset.model.adapter.StagedAssetLink;
 import com.liferay.portlet.asset.service.base.AssetLinkLocalServiceBaseImpl;
-import com.liferay.portlet.exportimport.lar.PortletDataContext;
-import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
-import com.liferay.portlet.exportimport.lar.StagedModelType;
+import com.liferay.util.dao.orm.CustomSQLUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -115,6 +119,29 @@ public class AssetLinkLocalServiceImpl extends AssetLinkLocalServiceBaseImpl {
 		return link;
 	}
 
+	@Override
+	public void deleteGroupLinks(long groupId) {
+		Session session = assetLinkPersistence.openSession();
+
+		try {
+			String sql = CustomSQLUtil.get(_DELETE_BY_ASSET_ENTRY_GROUP_ID);
+
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
+
+			QueryPos qPos = QueryPos.getInstance(sqlQuery);
+
+			qPos.add(groupId);
+			qPos.add(groupId);
+
+			sqlQuery.executeUpdate();
+		}
+		finally {
+			assetLinkPersistence.closeSession(session);
+
+			assetLinkPersistence.clearCache();
+		}
+	}
+
 	/**
 	 * Deletes the asset link.
 	 *
@@ -189,25 +216,16 @@ public class AssetLinkLocalServiceImpl extends AssetLinkLocalServiceBaseImpl {
 	 */
 	@Override
 	public List<AssetLink> getDirectLinks(long entryId) {
+		return getDirectLinks(entryId, true);
+	}
+
+	@Override
+	public List<AssetLink> getDirectLinks(
+		long entryId, boolean excludeInvisibleLinks) {
+
 		List<AssetLink> assetLinks = assetLinkPersistence.findByE1(entryId);
 
-		if (!assetLinks.isEmpty()) {
-			List<AssetLink> filteredAssetLinks = new ArrayList<>(
-				assetLinks.size());
-
-			for (AssetLink assetLink : assetLinks) {
-				AssetEntry assetEntry = assetEntryPersistence.fetchByPrimaryKey(
-					assetLink.getEntryId2());
-
-				if ((assetEntry != null) && assetEntry.isVisible()) {
-					filteredAssetLinks.add(assetLink);
-				}
-			}
-
-			assetLinks = Collections.unmodifiableList(filteredAssetLinks);
-		}
-
-		return assetLinks;
+		return filterAssetLinks(assetLinks, excludeInvisibleLinks);
 	}
 
 	/**
@@ -225,26 +243,17 @@ public class AssetLinkLocalServiceImpl extends AssetLinkLocalServiceBaseImpl {
 	 */
 	@Override
 	public List<AssetLink> getDirectLinks(long entryId, int typeId) {
+		return getDirectLinks(entryId, typeId, true);
+	}
+
+	@Override
+	public List<AssetLink> getDirectLinks(
+		long entryId, int typeId, boolean excludeInvisibleLinks) {
+
 		List<AssetLink> assetLinks = assetLinkPersistence.findByE1_T(
 			entryId, typeId);
 
-		if (!assetLinks.isEmpty()) {
-			List<AssetLink> filteredAssetLinks = new ArrayList<>(
-				assetLinks.size());
-
-			for (AssetLink assetLink : assetLinks) {
-				AssetEntry assetEntry = assetEntryPersistence.fetchByPrimaryKey(
-					assetLink.getEntryId2());
-
-				if ((assetEntry != null) && assetEntry.isVisible()) {
-					filteredAssetLinks.add(assetLink);
-				}
-			}
-
-			assetLinks = Collections.unmodifiableList(filteredAssetLinks);
-		}
-
-		return assetLinks;
+		return filterAssetLinks(assetLinks, excludeInvisibleLinks);
 	}
 
 	@Override
@@ -470,6 +479,33 @@ public class AssetLinkLocalServiceImpl extends AssetLinkLocalServiceBaseImpl {
 			}
 		}
 	}
+
+	protected List<AssetLink> filterAssetLinks(
+		List<AssetLink> assetLinks, boolean excludeInvisibleLinks) {
+
+		if (assetLinks.isEmpty() || !excludeInvisibleLinks) {
+			return assetLinks;
+		}
+
+		List<AssetLink> filteredAssetLinks = new ArrayList<>(assetLinks.size());
+
+		for (AssetLink assetLink : assetLinks) {
+			AssetEntry assetEntry = assetEntryPersistence.fetchByPrimaryKey(
+				assetLink.getEntryId2());
+
+			if ((assetEntry != null) && assetEntry.isVisible()) {
+				filteredAssetLinks.add(assetLink);
+			}
+		}
+
+		assetLinks = Collections.unmodifiableList(filteredAssetLinks);
+
+		return assetLinks;
+	}
+
+	private static final String _DELETE_BY_ASSET_ENTRY_GROUP_ID =
+		AssetLinkLocalServiceImpl.class.getName() +
+			".deleteByAssetEntryGroupId";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		AssetLinkLocalServiceImpl.class);

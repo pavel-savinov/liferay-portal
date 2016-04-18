@@ -14,9 +14,13 @@
 
 package com.liferay.sync.engine.upgrade.v3_0_10;
 
+import com.liferay.sync.engine.model.SyncAccount;
+import com.liferay.sync.engine.model.SyncFile;
+import com.liferay.sync.engine.model.SyncSite;
+import com.liferay.sync.engine.service.SyncAccountService;
 import com.liferay.sync.engine.service.SyncFileService;
-import com.liferay.sync.engine.service.persistence.SyncFilePersistence;
-import com.liferay.sync.engine.upgrade.UpgradeProcess;
+import com.liferay.sync.engine.service.SyncSiteService;
+import com.liferay.sync.engine.upgrade.BaseUpgradeProcess;
 import com.liferay.sync.engine.upgrade.util.UpgradeUtil;
 import com.liferay.sync.engine.util.PropsValues;
 import com.liferay.sync.engine.util.StreamUtil;
@@ -32,6 +36,7 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -39,7 +44,7 @@ import java.util.zip.ZipOutputStream;
  * @author Dennis Ju
  * @author Shinn Lok
  */
-public class UpgradeProcess_3_0_10 extends UpgradeProcess {
+public class UpgradeProcess_3_0_10 extends BaseUpgradeProcess {
 
 	@Override
 	public int getThreshold() {
@@ -49,7 +54,24 @@ public class UpgradeProcess_3_0_10 extends UpgradeProcess {
 	@Override
 	public void upgrade() throws Exception {
 		upgradeLogger();
-		upgradeTable();
+		upgradeSyncSites();
+	}
+
+	@Override
+	public void upgradeSchema() throws Exception {
+		runSQL(
+			"ALTER TABLE SyncAccount ADD COLUMN oAuthToken VARCHAR(16777216) " +
+				"BEFORE password;");
+		runSQL(
+			"ALTER TABLE SyncAccount ADD COLUMN oAuthTokenSecret " +
+				"VARCHAR(16777216) BEFORE password;");
+		runSQL(
+			"ALTER TABLE SyncAccount ADD COLUMN pluginVersion VARCHAR BEFORE " +
+				"pollInterval;");
+
+		runSQL(
+			"ALTER TABLE SyncFile ADD COLUMN localExtraSettings " +
+				"VARCHAR(16777216) BEFORE localSyncTime;");
 	}
 
 	protected void upgradeLogger() throws Exception {
@@ -114,23 +136,35 @@ public class UpgradeProcess_3_0_10 extends UpgradeProcess {
 		UpgradeUtil.copyLoggerConfiguration();
 	}
 
-	protected void upgradeTable() throws Exception {
-		SyncFilePersistence syncFilePersistence =
-			SyncFileService.getSyncFilePersistence();
+	protected void upgradeSyncSites() throws Exception {
+		List<SyncAccount> syncAccounts = SyncAccountService.findAll();
 
-		syncFilePersistence.executeRaw(
-			"ALTER TABLE `SyncAccount` ADD COLUMN oAuthToken " +
-				"VARCHAR(16777216) BEFORE password;");
-		syncFilePersistence.executeRaw(
-			"ALTER TABLE `SyncAccount` ADD COLUMN oAuthTokenSecret " +
-				"VARCHAR(16777216) BEFORE password;");
-		syncFilePersistence.executeRaw(
-			"ALTER TABLE `SyncAccount` ADD COLUMN pluginVersion VARCHAR " +
-				"BEFORE pollInterval;");
+		for (SyncAccount syncAccount : syncAccounts) {
+			List<SyncSite> syncSites = SyncSiteService.findSyncSites(
+				syncAccount.getSyncAccountId());
 
-		syncFilePersistence.executeRaw(
-			"ALTER TABLE `SyncFile` ADD COLUMN localExtraSettings " +
-				"VARCHAR(16777216) BEFORE localSyncTime;");
+			for (SyncSite syncSite : syncSites) {
+				if (syncSite.isActive() &&
+					!Files.exists(Paths.get(syncSite.getFilePathName()))) {
+
+					Files.createDirectories(
+						Paths.get(syncSite.getFilePathName()));
+				}
+
+				SyncFile syncFile = SyncFileService.fetchSyncFile(
+					syncSite.getFilePathName());
+
+				if (syncFile != null) {
+					continue;
+				}
+
+				SyncFileService.addSyncFile(
+					null, null, false, null, syncSite.getFilePathName(), null,
+					syncSite.getName(), 0, syncSite.getGroupId(), 0,
+					SyncFile.STATE_SYNCED, syncSite.getSyncAccountId(),
+					SyncFile.TYPE_SYSTEM);
+			}
+		}
 	}
 
 }

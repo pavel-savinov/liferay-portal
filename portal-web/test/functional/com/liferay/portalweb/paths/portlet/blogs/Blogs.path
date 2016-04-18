@@ -24,13 +24,23 @@
 	<td></td>
 </tr>
 <tr>
-	<td>PERMISSIONS</td>
-	<td>//a[contains(.,'Permissions')]</td>
+	<td>ENTRY_CHECKBOX</td>
+	<td>//ul[contains(@id,'blogEntriesSearchContainer') and contains(.,'${key_entryTitle}')]//input[@type='checkbox']</td>
 	<td></td>
 </tr>
 <tr>
-	<td>ENTRY_CHECKBOX</td>
-	<td>//ul[contains(@id,'blogEntriesSearchContainer') and contains(.,'${key_entryTitle}')]//input[@type='checkbox']</td>
+	<td>ENTRY_COMMENTS_COUNT</td>
+	<td>//a[contains(.,'${key_entryTitle}')]/../../../../../div[contains(@class,'entry-footer')]//a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PERMISSIONS</td>
+	<td>//a[@data-title='Permissions']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PERMISSIONS_ERROR_MESSAGE</td>
+	<td>//div[contains(@class,'alert') and contains(@class, 'alert-danger') and contains(.,'You do not have the required permissions')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -41,11 +51,6 @@
 <tr>
 	<td>UNSUBSCRIBE_LINK</td>
 	<td>//div[contains(@class,'subscribe')]/span/a/span[contains(.,'Unsubscribe')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>PERMISSIONS_ERROR_MESSAGE</td>
-	<td>//div[contains(@class,'alert') and contains(@class, 'alert-danger') and contains(.,'You do not have the required permissions')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -61,28 +66,12 @@
 </tr>
 <tr>
 	<td>ICON_VIEW_ENTRY_OPTIONS_DROPDOWN</td>
-	<td>//div[contains(@class,'card-footer') and contains(.,'${key_entryTitle}')]//span[contains(@class,'icon-ellipsis-vertical')]</td>
+	<td>//div[contains(@class,'card-footer') and contains(.,'${key_entryTitle}')]//span/*[name()='svg'][contains(@class,'icon-ellipsis-v')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>ICON_VIEW_ENTRY_STATUS</td>
-	<td>//div[contains(@id,'blogEntriesSearchContainer')]//li[contains(.,'${key_entryTitle}')]//div[@class='status']</td>
-	<td></td>
-</tr>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
-<!--LIST_VIEW-->
-<tr>
-	<td>LIST_VIEW_ENTRY_TITLE</td>
-	<td>//div[contains(@class,'list-group-item-content')]//a[contains(.,'${key_entryTitle}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>LIST_VIEW_ENTRY_OPTIONS_DROPDOWN</td>
-	<td>//div[contains(@class,'container') and contains(.,'${key_entryTitle}')]//span[contains(@class,'icon-ellipsis-vertical')]</td>
+	<td>//div[contains(@id,'blogEntriesSearchContainer')]//li[contains(.,'${key_entryTitle}')]//span[contains(@class,'status')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -124,7 +113,7 @@
 </tr>
 <tr>
 	<td>ENTRY_TABLE_TITLE</td>
-	<td>//tr[contains(.,'${key_entryTitle}')]/td[2]/a</td>
+	<td>//tr[contains(.,'${key_entryTitle}')]/td[2]//a</td>
 	<td></td>
 </tr>
 <tr>
@@ -134,7 +123,7 @@
 </tr>
 <tr>
 	<td>ENTRY_TABLE_CREATE_DATE</td>
-	<td>//tr[contains(.,'${key_entryTitle}')]/td[4]/span</td>
+	<td>//tr[contains(.,'${key_entryTitle}')]/td[4]//span</td>
 	<td></td>
 </tr>
 <tr>
@@ -144,7 +133,7 @@
 </tr>
 <tr>
 	<td>ENTRY_TABLE_ACTIONS</td>
-	<td>//tr[contains(.,'${key_entryTitle}')]/td/div/a</td>
+	<td>//tr[contains(.,'${key_entryTitle}')]/td//div/a</td>
 	<td></td>
 </tr>
 <tr>
@@ -204,6 +193,27 @@
 	<td></td>
 	<td></td>
 </tr>
+<!--SCHEDULED_ENTRY-->
+<tr>
+	<td>SCHEDULED_ENTRY_STATUS</td>
+	<td>//span[contains(@class,'workflow-status')]/strong[contains(.,'Scheduled')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SCHEDULED_ENTRY_TITLE</td>
+	<td>//tr[contains(@data-qa-id,'row')]//a[contains(.,'${key_entryTitle}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SCHEDULED_ENTRY_VERTICAL_ELLIPSIS</td>
+	<td>//tr[contains(.,'${key_entryTitle}')]/.//td//div/a[contains(@class,'dropdown-toggle')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
 <!--SEARCH_RESULTS-->
 <tr>
 	<td>SEARCH_RESULTS_ENTRY_TITLE</td>
@@ -213,6 +223,16 @@
 <tr>
 	<td>SEARCH_RESULTS_ENTRY_DESCRIPTION</td>
 	<td>//a[@class='entry-link']/div/span[@class='entry-description' and contains(.,'${key_entryContent}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SEARCH_RESULTS_ENTRY_COMMENT</td>
+	<td>//span[@class='entry-title' and contains(.,'${key_entryTitle}')]//..//..//..//div[@class='entry-discussion']/a/span[@class='body']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SEARCH_RESULTS_HIGHLIGHTED</td>
+	<td>//span[@class='entry-title' and contains(.,'${key_entryTitle}')]//..//..//..//span[@class='highlight']</td>
 	<td></td>
 </tr>
 </tbody>

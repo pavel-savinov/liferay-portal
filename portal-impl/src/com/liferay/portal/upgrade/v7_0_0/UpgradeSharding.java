@@ -21,7 +21,9 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.upgrade.util.UpgradeTable;
 import com.liferay.portal.kernel.upgrade.util.UpgradeTableFactoryUtil;
-import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.upgrade.v7_0_0.util.ClassNameTable;
 import com.liferay.portal.upgrade.v7_0_0.util.ClusterGroupTable;
 import com.liferay.portal.upgrade.v7_0_0.util.CounterTable;
@@ -62,25 +64,31 @@ public class UpgradeSharding extends UpgradeProcess {
 	}
 
 	protected void copyControlTables(List<String> shardNames) throws Exception {
-		String defaultShardName = PropsUtil.get("shard.default.name");
+		try (LoggingTimer loggingTimer = new LoggingTimer()) {
+			List<String> uniqueShardNames = ListUtil.unique(shardNames);
 
-		if (Validator.isNull(defaultShardName)) {
-			throw new RuntimeException(
-				"The property \"shard.default.name\" is not set in " +
-					"portal.properties");
-		}
+			if (uniqueShardNames.size() == 1) {
+				if (_log.isInfoEnabled()) {
+					_log.info(
+						"Skip copying of control tables because all " +
+							"companies are located in the same shard");
+				}
 
-		for (String shardName : shardNames) {
-			if (!shardName.equals(defaultShardName)) {
-				copyControlTables(shardName);
+				return;
+			}
+
+			String defaultShardName = GetterUtil.getString(
+				PropsUtil.get("shard.default.name"), "default");
+
+			for (String uniqueShardName : uniqueShardNames) {
+				if (!uniqueShardName.equals(defaultShardName)) {
+					copyControlTables(uniqueShardName);
+				}
 			}
 		}
 	}
 
 	protected void copyControlTables(String shardName) throws Exception {
-		Connection sourceConnection =
-			DataAccess.getUpgradeOptimizedConnection();
-
 		DataSourceFactoryBean dataSourceFactoryBean =
 			new DataSourceFactoryBean();
 
@@ -88,9 +96,10 @@ public class UpgradeSharding extends UpgradeProcess {
 
 		DataSource dataSource = dataSourceFactoryBean.createInstance();
 
-		Connection targetConnection = dataSource.getConnection();
+		try (Connection sourceConnection =
+				DataAccess.getUpgradeOptimizedConnection();
+			Connection targetConnection = dataSource.getConnection()) {
 
-		try {
 			copyControlTable(
 				sourceConnection, targetConnection, ClassNameTable.TABLE_NAME,
 				ClassNameTable.TABLE_COLUMNS, ClassNameTable.TABLE_SQL_CREATE);
@@ -133,11 +142,6 @@ public class UpgradeSharding extends UpgradeProcess {
 		catch (Exception e) {
 			_log.error("Unable to copy control tables", e);
 		}
-		finally {
-			DataAccess.cleanUp(sourceConnection);
-
-			DataAccess.cleanUp(targetConnection);
-		}
 	}
 
 	@Override
@@ -152,28 +156,19 @@ public class UpgradeSharding extends UpgradeProcess {
 	}
 
 	protected List<String> getShardNames() throws Exception {
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		try (LoggingTimer loggingTimer = new LoggingTimer();
+			PreparedStatement ps = connection.prepareStatement(
+				"select name from Shard");
+			ResultSet rs = ps.executeQuery()) {
 
-		List<String> shardNames = new ArrayList<>();
-
-		try {
-			con = DataAccess.getUpgradeOptimizedConnection();
-
-			ps = con.prepareStatement("select name from Shard");
-
-			rs = ps.executeQuery();
+			List<String> shardNames = new ArrayList<>();
 
 			while (rs.next()) {
 				shardNames.add(rs.getString("name"));
 			}
-		}
-		finally {
-			DataAccess.cleanUp(con, ps, rs);
-		}
 
-		return shardNames;
+			return shardNames;
+		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

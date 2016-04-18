@@ -5,14 +5,7 @@
 	<property name="testray.main.component.name" value="Documents Management" />
 
 	<set-up>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
-
-		<if>
-			<equals arg1="${testPortalInstance}" arg2="true" />
-			<then>
-				<execute macro="SignIn#signInPortalInstanceSetUp" />
-			</then>
-		</if>
+		<execute macro="TestCase#setUpPortalInstance" />
 
 		<var method="TestPropsUtil#get('cmis.repository.vm.host.name')" name="sharepointVMHostName" />
 
@@ -54,11 +47,10 @@
 			<var name="portlet" value="Documents and Media" />
 		</execute>
 
-		<execute macro="DMRepository#gotoAdd" />
+		<execute macro="DMNavigator#gotoAddRepositoryCP" />
 
-		<execute macro="DMRepository#select">
+		<execute macro="DMRepository#edit">
 			<var name="dmRepositoryName" value="Sharepoint Repository Name" />
-			<var name="dmRepositoryType" value="Sharepoint" />
 		</execute>
 
 		<execute macro="DMRepository#addSharepoint">
@@ -66,7 +58,7 @@
 			<var name="dmRepositorySiteURL" value="http://${sharepointVMHostName}" />
 		</execute>
 
-		<execute macro="DMRepository#save" />
+		<execute macro="PortletEntry#save" />
 	</set-up>
 
 	<tear-down>
@@ -140,11 +132,11 @@
 			<var name="dmRepositoryName" value="Sharepoint Repository Name" />
 		</execute>
 
-		<execute macro="DMFolder#addSubfolderPG">
+		<execute macro="DMFolder#addSubfolderCP">
 			<var name="dmSubFolderName" value="DM Folder2 Name" />
 		</execute>
 
-		<execute macro="DMFolder#gotoPG">
+		<execute macro="DMNavigator#gotoFolderPG">
 			<var name="dmFolderName" value="DM Folder2 Name" />
 		</execute>
 
@@ -163,7 +155,7 @@
 			<var name="dmRepositoryName" value="Sharepoint Repository Name" />
 		</execute>
 
-		<execute macro="DMFolder#gotoPG">
+		<execute macro="DMNavigator#gotoFolderPG">
 			<var name="dmFolderName" value="DM Folder2 Name" />
 		</execute>
 
@@ -181,7 +173,7 @@
 			<var name="dmRepositoryName" value="Sharepoint Repository Name" />
 		</execute>
 
-		<execute macro="DMFolder#addSubfolderPG">
+		<execute macro="DMFolder#addSubfolderCP">
 			<var name="dmSubFolderName" value="DM Folder Name" />
 		</execute>
 
@@ -321,11 +313,11 @@
 			<var name="dmRepositoryName" value="Sharepoint Repository Name" />
 		</execute>
 
-		<execute macro="DMFolder#addSubfolderPG">
+		<execute macro="DMFolder#addSubfolderCP">
 			<var name="dmSubFolderName" value="DM Folder3 Name" />
 		</execute>
 
-		<execute macro="DMFolder#gotoPG">
+		<execute macro="DMNavigator#gotoFolderPG">
 			<var name="dmFolderName" value="DM Folder3 Name" />
 		</execute>
 
@@ -344,7 +336,7 @@
 			<var name="dmRepositoryName" value="Sharepoint Repository Name" />
 		</execute>
 
-		<execute macro="DMFolder#gotoPG">
+		<execute macro="DMNavigator#gotoFolderPG">
 			<var name="dmFolderName" value="DM Folder3 Name" />
 		</execute>
 
@@ -359,7 +351,7 @@
 			<var name="dmRepositoryName" value="Sharepoint Repository Name" />
 		</execute>
 
-		<execute macro="DMFolder#gotoPG">
+		<execute macro="DMNavigator#gotoFolderPG">
 			<var name="dmFolderName" value="DM Folder3 Name" />
 		</execute>
 
@@ -375,7 +367,7 @@
 			<var name="dmRepositoryName" value="Sharepoint Repository Name" />
 		</execute>
 
-		<execute macro="DMFolder#addSubfolderPG">
+		<execute macro="DMFolder#addSubfolderCP">
 			<var name="dmSubFolderName" value="DM Folder Name" />
 		</execute>
 
@@ -548,7 +540,7 @@
 			<var name="dmRepositoryName" value="Sharepoint Repository Name" />
 		</execute>
 
-		<execute macro="DMFolder#addSubfolderPG">
+		<execute macro="DMFolder#addSubfolderCP">
 			<var name="dmSubFolderName" value="Sharepoint Folder" />
 		</execute>
 
@@ -792,7 +784,7 @@
 		</execute>
 
 		<execute macro="DMRepository#viewCP">
-			<var name="dmRepositoryName" value="Sharepoint Repository Name" />
+			<var name="dmRepositoryName" value="SHAREPOINT REPOSITORY NAME" />
 		</execute>
 	</command>
 </definition>

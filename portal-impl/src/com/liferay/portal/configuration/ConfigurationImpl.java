@@ -22,13 +22,13 @@ import com.liferay.portal.configuration.easyconf.ClassLoaderComponentConfigurati
 import com.liferay.portal.kernel.configuration.Filter;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.CompanyConstants;
+import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.Company;
-import com.liferay.portal.model.CompanyConstants;
-import com.liferay.portal.service.CompanyLocalServiceUtil;
 
 import java.lang.reflect.Field;
 
@@ -442,6 +442,10 @@ public class ConfigurationImpl
 			}
 
 			_printedSources.add(source);
+
+			if (source.startsWith("bundleresource://")) {
+				continue;
+			}
 
 			String info = "Loading " + source;
 

@@ -71,28 +71,30 @@ public class GetSyncContextHandler extends BaseJSONHandler {
 			return syncContext;
 		}
 
-		String login = syncAccount.getLogin();
+		if (!syncAccount.isOAuthEnabled()) {
+			String login = syncAccount.getLogin();
 
-		if (login == null) {
-			login = "";
-		}
-
-		String authType = syncContext.getAuthType();
-
-		if (authType.equals(SyncContext.AUTH_TYPE_EMAIL_ADDRESS)) {
-			if (!login.equals(remoteSyncUser.getEmailAddress())) {
-				syncAccount.setLogin(remoteSyncUser.getEmailAddress());
+			if (login == null) {
+				login = "";
 			}
-		}
-		else if (authType.equals(SyncContext.AUTH_TYPE_SCREEN_NAME)) {
-			if (!login.equals(remoteSyncUser.getScreenName())) {
-				syncAccount.setLogin(remoteSyncUser.getScreenName());
+
+			String authType = syncContext.getAuthType();
+
+			if (authType.equals(SyncContext.AUTH_TYPE_EMAIL_ADDRESS)) {
+				if (!login.equals(remoteSyncUser.getEmailAddress())) {
+					syncAccount.setLogin(remoteSyncUser.getEmailAddress());
+				}
 			}
-		}
-		else if (authType.equals(SyncContext.AUTH_TYPE_USER_ID)) {
-			if (!login.equals(String.valueOf(remoteSyncUser.getUserId()))) {
-				syncAccount.setLogin(
-					String.valueOf(remoteSyncUser.getUserId()));
+			else if (authType.equals(SyncContext.AUTH_TYPE_SCREEN_NAME)) {
+				if (!login.equals(remoteSyncUser.getScreenName())) {
+					syncAccount.setLogin(remoteSyncUser.getScreenName());
+				}
+			}
+			else if (authType.equals(SyncContext.AUTH_TYPE_USER_ID)) {
+				if (!login.equals(String.valueOf(remoteSyncUser.getUserId()))) {
+					syncAccount.setLogin(
+						String.valueOf(remoteSyncUser.getUserId()));
+				}
 			}
 		}
 
@@ -103,6 +105,13 @@ public class GetSyncContextHandler extends BaseJSONHandler {
 
 		Map<String, String> portletPreferencesMap =
 			syncContext.getPortletPreferencesMap();
+
+		int authenticationRetryInterval = GetterUtil.getInteger(
+			portletPreferencesMap.get(
+				SyncContext.PREFERENCE_KEY_AUTHENTICATION_RETRY_INTERVAL),
+			60);
+
+		syncAccount.setAuthenticationRetryInterval(authenticationRetryInterval);
 
 		int batchFileMaxSize = GetterUtil.getInteger(
 			portletPreferencesMap.get(

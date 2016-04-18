@@ -24,6 +24,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>GENERIC_HORIZONTAL_DETAILS</td>
+	<td>//div[contains(@class,'card-horizontal')]//div[@class='card-dm-details']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SPECIFIC_CHECKBOX</td>
 	<td>//div[contains(@class,'vertical-card') and contains(.,'${key_cardText}')]//input[@type='checkbox']</td>
 	<td></td>
@@ -41,6 +46,11 @@
 <tr>
 	<td>SPECIFIC_SMALL_TEXT</td>
 	<td>//div[contains(@class,'vertical-card') and contains(.,'${key_cardText}')]//div[@class='card-dm-text-small']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SPECIFIC_SMALL_TEXT_2</td>
+	<td>xpath=(//div[contains(@class,'vertical-card') and contains(.,'${key_cardText}')]//div[@class='card-dm-text-small'])[2]</td>
 	<td></td>
 </tr>
 </tbody>

@@ -14,43 +14,43 @@
 
 package com.liferay.portal.service.impl;
 
-import com.liferay.portal.NoSuchLayoutException;
+import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationConstants;
+import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationSettingsMapFactory;
+import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
+import com.liferay.exportimport.kernel.lar.MissingReferences;
+import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCachable;
+import com.liferay.portal.kernel.exception.NoSuchLayoutException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.messaging.DestinationNames;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
+import com.liferay.portal.kernel.model.LayoutReference;
+import com.liferay.portal.kernel.model.LayoutTypePortlet;
+import com.liferay.portal.kernel.model.Plugin;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelperUtil;
 import com.liferay.portal.kernel.scheduler.StorageType;
 import com.liferay.portal.kernel.scheduler.Trigger;
 import com.liferay.portal.kernel.scheduler.TriggerFactoryUtil;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
+import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
+import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.util.Digester;
 import com.liferay.portal.kernel.util.DigesterUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.model.Layout;
-import com.liferay.portal.model.LayoutConstants;
-import com.liferay.portal.model.LayoutReference;
-import com.liferay.portal.model.LayoutTypePortlet;
-import com.liferay.portal.model.Plugin;
-import com.liferay.portal.model.User;
-import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.base.LayoutServiceBaseImpl;
-import com.liferay.portal.service.permission.GroupPermissionUtil;
-import com.liferay.portal.service.permission.LayoutPermissionUtil;
-import com.liferay.portal.service.permission.PortletPermissionUtil;
-import com.liferay.portal.util.PortletKeys;
-import com.liferay.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.portlet.exportimport.configuration.ExportImportConfigurationConstants;
-import com.liferay.portlet.exportimport.configuration.ExportImportConfigurationSettingsMapFactory;
-import com.liferay.portlet.exportimport.lar.ExportImportHelperUtil;
-import com.liferay.portlet.exportimport.lar.MissingReferences;
-import com.liferay.portlet.exportimport.model.ExportImportConfiguration;
 
 import java.io.File;
 import java.io.InputStream;
@@ -72,75 +72,6 @@ import java.util.Map;
  * @author Tibor Lipusz
  */
 public class LayoutServiceImpl extends LayoutServiceBaseImpl {
-
-	/**
-	 * Adds a layout with additional parameters.
-	 *
-	 * <p>
-	 * This method handles the creation of the layout including its resources,
-	 * metadata, and internal data structures. It is not necessary to make
-	 * subsequent calls to any methods to setup default groups, resources, ...
-	 * etc.
-	 * </p>
-	 *
-	 * @param      groupId the primary key of the group
-	 * @param      privateLayout whether the layout is private to the group
-	 * @param      parentLayoutId the primary key of the parent layout
-	 *             (optionally {@link LayoutConstants#DEFAULT_PARENT_LAYOUT_ID})
-	 * @param      localeNamesMap the layout's locales and localized names
-	 * @param      localeTitlesMap the layout's locales and localized titles
-	 * @param      descriptionMap the layout's locales and localized
-	 *             descriptions
-	 * @param      keywordsMap the layout's locales and localized keywords
-	 * @param      robotsMap the layout's locales and localized robots
-	 * @param      type the layout's type (optionally {@link
-	 *             LayoutConstants#TYPE_PORTLET}). The possible types can be
-	 *             found in {@link LayoutConstants}.
-	 * @param      hidden whether the layout is hidden
-	 * @param      friendlyURL the layout's locales and localized friendly URLs.
-	 *             To see how the URL is normalized when accessed, see {@link
-	 *             com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil#normalize(
-	 *             String)}.
-	 * @param      serviceContext the service context to be applied. Must set
-	 *             the UUID for the layout. Can set the creation date,
-	 *             modification date, and expando bridge attributes for the
-	 *             layout. For layouts that belong to a layout set prototype, an
-	 *             attribute named <code>layoutUpdateable</code> can be used to
-	 *             specify whether site administrators can modify this page
-	 *             within their site.
-	 * @return     the layout
-	 * @deprecated As of 6.2.0, replaced by {@link #addLayout(long, boolean,
-	 *             long, Map, Map, Map, Map, Map, String, String, boolean, Map,
-	 *             ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public Layout addLayout(
-			long groupId, boolean privateLayout, long parentLayoutId,
-			Map<Locale, String> localeNamesMap,
-			Map<Locale, String> localeTitlesMap,
-			Map<Locale, String> descriptionMap, Map<Locale, String> keywordsMap,
-			Map<Locale, String> robotsMap, String type, boolean hidden,
-			String friendlyURL, ServiceContext serviceContext)
-		throws PortalException {
-
-		PermissionChecker permissionChecker = getPermissionChecker();
-
-		if (parentLayoutId == LayoutConstants.DEFAULT_PARENT_LAYOUT_ID) {
-			GroupPermissionUtil.check(
-				permissionChecker, groupId, ActionKeys.ADD_LAYOUT);
-		}
-		else {
-			LayoutPermissionUtil.check(
-				permissionChecker, groupId, privateLayout, parentLayoutId,
-				ActionKeys.ADD_LAYOUT);
-		}
-
-		return layoutLocalService.addLayout(
-			getUserId(), groupId, privateLayout, parentLayoutId, localeNamesMap,
-			localeTitlesMap, descriptionMap, keywordsMap, robotsMap, type,
-			hidden, friendlyURL, serviceContext);
-	}
 
 	/**
 	 * Adds a layout with additional parameters.
@@ -345,7 +276,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 	 * @param      parameterMap the mapping of parameters indicating which
 	 *             information to export. For information on the keys used in
 	 *             the map see {@link
-	 *             com.liferay.portlet.exportimport.lar.PortletDataHandlerKeys}.
+	 *             com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys}.
 	 * @param      startDate the export's start date
 	 * @param      endDate the export's end date
 	 * @return     the layouts as a byte array
@@ -374,7 +305,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 	 * @param      parameterMap the mapping of parameters indicating which
 	 *             information to export. For information on the keys used in
 	 *             the map see {@link
-	 *             com.liferay.portlet.exportimport.lar.PortletDataHandlerKeys}.
+	 *             com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys}.
 	 * @param      startDate the export's start date
 	 * @param      endDate the export's end date
 	 * @return     the layout as a byte array
@@ -396,7 +327,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             com.liferay.portlet.exportimport.service.ExportImportService#exportLayoutsAsFile(
+	 *             com.liferay.exportimport.kernel.service.ExportImportService#exportLayoutsAsFile(
 	 *             ExportImportConfiguration)}
 	 */
 	@Deprecated
@@ -428,7 +359,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 	 * @param      parameterMap the mapping of parameters indicating which
 	 *             information to export. For information on the keys used in
 	 *             the map see {@link
-	 *             com.liferay.portlet.exportimport.lar.PortletDataHandlerKeys}.
+	 *             com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys}.
 	 * @param      startDate the export's start date
 	 * @param      endDate the export's end date
 	 * @return     the layouts as a File
@@ -451,7 +382,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             com.liferay.portlet.exportimport.service.ExportImportService#exportLayoutsAsFileInBackground(
+	 *             com.liferay.exportimport.kernel.service.ExportImportService#exportLayoutsAsFileInBackground(
 	 *             ExportImportConfiguration)}
 	 */
 	@Deprecated
@@ -470,7 +401,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             com.liferay.portlet.exportimport.service.ExportImportService#exportLayoutsAsFileInBackground(
+	 *             com.liferay.exportimport.kernel.service.ExportImportService#exportLayoutsAsFileInBackground(
 	 *             long)}
 	 */
 	@Deprecated
@@ -539,7 +470,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 	 * @param      parameterMap the mapping of parameters indicating which
 	 *             information to export. For information on the keys used in
 	 *             the map see {@link
-	 *             com.liferay.portlet.exportimport.lar.PortletDataHandlerKeys}.
+	 *             com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys}.
 	 * @param      startDate the export's start date
 	 * @param      endDate the export's end date
 	 * @return     the portlet information as a byte array
@@ -584,7 +515,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             com.liferay.portlet.exportimport.service.ExportImportService#exportPortletInfoAsFile(
+	 *             com.liferay.exportimport.kernel.service.ExportImportService#exportPortletInfoAsFile(
 	 *             ExportImportConfiguration)}
 	 */
 	@Deprecated
@@ -618,7 +549,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 	 * @param      parameterMap the mapping of parameters indicating which
 	 *             information to export. For information on the keys used in
 	 *             the map see {@link
-	 *             com.liferay.portlet.exportimport.lar.PortletDataHandlerKeys}.
+	 *             com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys}.
 	 * @param      startDate the export's start date
 	 * @param      endDate the export's end date
 	 * @return     the portlet information as a file
@@ -887,6 +818,9 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 		Layout layout = layoutLocalService.getLayout(
 			groupId, privateLayout, layoutId);
 
+		LayoutPermissionUtil.check(
+			getPermissionChecker(), layout, ActionKeys.VIEW);
+
 		return layout.getName(languageId);
 	}
 
@@ -905,8 +839,29 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 		long companyId, String portletId, String preferencesKey,
 		String preferencesValue) {
 
-		return layoutLocalService.getLayouts(
+		LayoutReference[] layoutReferences = layoutLocalService.getLayouts(
 			companyId, portletId, preferencesKey, preferencesValue);
+
+		List<LayoutReference> filteredLayoutReferences = new ArrayList<>(
+			layoutReferences.length);
+
+		for (LayoutReference layoutReference : layoutReferences) {
+			try {
+				if (LayoutPermissionUtil.contains(
+						getPermissionChecker(),
+						layoutReference.getLayoutSoap().getPlid(),
+						ActionKeys.VIEW)) {
+
+					filteredLayoutReferences.add(layoutReference);
+				}
+			}
+			catch (PortalException pe) {
+				continue;
+			}
+		}
+
+		return filteredLayoutReferences.toArray(
+			new LayoutReference[filteredLayoutReferences.size()]);
 	}
 
 	@Override
@@ -959,7 +914,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             com.liferay.portlet.exportimport.service.ExportImportService#importLayouts(
+	 *             com.liferay.exportimport.kernel.service.ExportImportService#importLayouts(
 	 *             ExportImportConfiguration, File)}
 	 */
 	@Deprecated
@@ -982,7 +937,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             com.liferay.portlet.exportimport.service.ExportImportService#importLayouts(
+	 *             com.liferay.exportimport.kernel.service.ExportImportService#importLayouts(
 	 *             ExportImportConfiguration, InputStream)}
 	 */
 	@Deprecated
@@ -1011,9 +966,9 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 	 * @param      parameterMap the mapping of parameters indicating which
 	 *             information will be imported. For information on the keys
 	 *             used in the map see {@link
-	 *             com.liferay.portlet.exportimport.lar.PortletDataHandlerKeys}.
+	 *             com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys}.
 	 * @param      bytes the byte array with the data
-	 * @see        com.liferay.portlet.exportimport.lar.LayoutImporter
+	 * @see        com.liferay.exportimport.kernel.lar.LayoutImporter
 	 * @deprecated As of 7.0.0, with no direct replacement
 	 */
 	@Deprecated
@@ -1038,9 +993,9 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 	 * @param      parameterMap the mapping of parameters indicating which
 	 *             information will be imported. For information on the keys
 	 *             used in the map see {@link
-	 *             com.liferay.portlet.exportimport.lar.PortletDataHandlerKeys}.
+	 *             com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys}.
 	 * @param      file the LAR file with the data
-	 * @see        com.liferay.portlet.exportimport.lar.LayoutImporter
+	 * @see        com.liferay.exportimport.kernel.lar.LayoutImporter
 	 * @deprecated As of 7.0.0, with no direct replacement
 	 */
 	@Deprecated
@@ -1065,9 +1020,9 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 	 * @param      parameterMap the mapping of parameters indicating which
 	 *             information will be imported. For information on the keys
 	 *             used in the map see {@link
-	 *             com.liferay.portlet.exportimport.lar.PortletDataHandlerKeys}.
+	 *             com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys}.
 	 * @param      is the input stream
-	 * @see        com.liferay.portlet.exportimport.lar.LayoutImporter
+	 * @see        com.liferay.exportimport.kernel.lar.LayoutImporter
 	 * @deprecated As of 7.0.0, with no direct replacement
 	 */
 	@Deprecated
@@ -1121,7 +1076,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             com.liferay.portlet.exportimport.service.ExportImportService#importPortletInfo(
+	 *             com.liferay.exportimport.kernel.service.ExportImportService#importPortletInfo(
 	 *             ExportImportConfiguration, File)} (
 	 */
 	@Deprecated
@@ -1144,7 +1099,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             com.liferay.portlet.exportimport.service.ExportImportService#importPortletInfo(
+	 *             com.liferay.exportimport.kernel.service.ExportImportService#importPortletInfo(
 	 *             ExportImportConfiguration, InputStream)} (
 	 */
 	@Deprecated
@@ -1175,7 +1130,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 	 * @param      parameterMap the mapping of parameters indicating which
 	 *             information will be imported. For information on the keys
 	 *             used in the map see {@link
-	 *             com.liferay.portlet.exportimport.lar.PortletDataHandlerKeys}.
+	 *             com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys}.
 	 * @param      file the LAR file with the data
 	 * @deprecated As of 7.0.0, with no direct replacement
 	 */
@@ -1204,7 +1159,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 	 * @param      parameterMap the mapping of parameters indicating which
 	 *             information will be imported. For information on the keys
 	 *             used in the map see {@link
-	 *             com.liferay.portlet.exportimport.lar.PortletDataHandlerKeys}.
+	 *             com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys}.
 	 * @param      is the input stream
 	 * @deprecated As of 7.0.0, with no direct replacement
 	 */
@@ -1361,7 +1316,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 	 *             the layout IDs
 	 * @param      parameterMap the mapping of parameters indicating which
 	 *             information will be used. See {@link
-	 *             com.liferay.portlet.exportimport.lar.PortletDataHandlerKeys}.
+	 *             com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys}.
 	 * @param      scope the scope of the pages. It can be
 	 *             <code>all-pages</code> or <code>selected-pages</code>.
 	 * @param      startDate the start date
@@ -1404,7 +1359,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 	 *        layout IDs
 	 * @param parameterMap the mapping of parameters indicating which
 	 *        information will be used. See {@link
-	 *        com.liferay.portlet.exportimport.lar.PortletDataHandlerKeys}.
+	 *        com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys}.
 	 * @param groupName the group name (optionally {@link
 	 *        DestinationNames#LAYOUTS_LOCAL_PUBLISHER}). See {@link
 	 *        DestinationNames}.
@@ -1440,7 +1395,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 		ExportImportConfiguration exportImportConfiguration =
 			exportImportConfigurationLocalService.
 				addDraftExportImportConfiguration(
-					getUserId(), trigger.getJobName(),
+					getUserId(), description,
 					ExportImportConfigurationConstants.
 						TYPE_SCHEDULED_PUBLISH_LAYOUT_LOCAL,
 					publishLayoutLocalSettingsMap);
@@ -1462,7 +1417,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 	 *             children
 	 * @param      parameterMap the mapping of parameters indicating which
 	 *             information will be used. See {@link
-	 *             com.liferay.portlet.exportimport.lar.PortletDataHandlerKeys}.
+	 *             com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys}.
 	 * @param      groupName the group name (optionally {@link
 	 *             DestinationNames#LAYOUTS_LOCAL_PUBLISHER}). See {@link
 	 *             DestinationNames}.
@@ -1502,7 +1457,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 	 *        the layout IDs and booleans indicating whether they have children
 	 * @param parameterMap the mapping of parameters indicating which
 	 *        information will be used. See {@link
-	 *        com.liferay.portlet.exportimport.lar.PortletDataHandlerKeys}.
+	 *        com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys}.
 	 * @param remoteAddress the remote address
 	 * @param remotePort the remote port
 	 * @param remotePathContext the remote path context
@@ -1551,7 +1506,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 		ExportImportConfiguration exportImportConfiguration =
 			exportImportConfigurationLocalService.
 				addDraftExportImportConfiguration(
-					getUserId(), trigger.getJobName(),
+					getUserId(), description,
 					ExportImportConfigurationConstants.
 						TYPE_SCHEDULED_PUBLISH_LAYOUT_REMOTE,
 					publishLayoutRemoteSettingsMap);
@@ -1687,61 +1642,6 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 	}
 
 	/**
-	 * Updates the layout with additional parameters.
-	 *
-	 * @param      groupId the primary key of the group
-	 * @param      privateLayout whether the layout is private to the group
-	 * @param      layoutId the primary key of the layout
-	 * @param      parentLayoutId the primary key of the layout's new parent
-	 *             layout
-	 * @param      localeNamesMap the layout's locales and localized names
-	 * @param      localeTitlesMap the layout's locales and localized titles
-	 * @param      descriptionMap the locales and localized descriptions to
-	 *             merge (optionally <code>null</code>)
-	 * @param      keywordsMap the locales and localized keywords to merge
-	 *             (optionally <code>null</code>)
-	 * @param      robotsMap the locales and localized robots to merge
-	 *             (optionally <code>null</code>)
-	 * @param      type the layout's new type (optionally {@link
-	 *             LayoutConstants#TYPE_PORTLET})
-	 * @param      hidden whether the layout is hidden
-	 * @param      friendlyURL the layout's locales and new friendly URLs. To
-	 *             see how the URL is normalized when accessed, see {@link
-	 *             com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil#normalize(
-	 *             String)}.
-	 * @param      iconImage whether the icon image will be updated
-	 * @param      iconBytes the byte array of the layout's new icon image
-	 * @param      serviceContext the service context to be applied. Can set the
-	 *             modification date and expando bridge attributes for the
-	 *             layout.
-	 * @return     the updated layout
-	 * @deprecated As of 6.2.0, replaced by {@link #updateLayout(long, boolean,
-	 *             long, long, Map, Map, Map, Map, Map, String, boolean, Map,
-	 *             boolean, byte[], ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public Layout updateLayout(
-			long groupId, boolean privateLayout, long layoutId,
-			long parentLayoutId, Map<Locale, String> localeNamesMap,
-			Map<Locale, String> localeTitlesMap,
-			Map<Locale, String> descriptionMap, Map<Locale, String> keywordsMap,
-			Map<Locale, String> robotsMap, String type, boolean hidden,
-			String friendlyURL, Boolean iconImage, byte[] iconBytes,
-			ServiceContext serviceContext)
-		throws PortalException {
-
-		LayoutPermissionUtil.check(
-			getPermissionChecker(), groupId, privateLayout, layoutId,
-			ActionKeys.UPDATE);
-
-		return layoutLocalService.updateLayout(
-			groupId, privateLayout, layoutId, parentLayoutId, localeNamesMap,
-			localeTitlesMap, descriptionMap, keywordsMap, robotsMap, type,
-			hidden, friendlyURL, iconImage, iconBytes, serviceContext);
-	}
-
-	/**
 	 * Updates the layout replacing its type settings.
 	 *
 	 * @param  groupId the primary key of the group
@@ -1775,13 +1675,12 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 	 * @param  themeId the primary key of the layout's new theme
 	 * @param  colorSchemeId the primary key of the layout's new color scheme
 	 * @param  css the layout's new CSS
-	 * @param  wapTheme whether the theme is for WAP browsers
 	 * @return the updated layout
 	 */
 	@Override
 	public Layout updateLookAndFeel(
 			long groupId, boolean privateLayout, long layoutId, String themeId,
-			String colorSchemeId, String css, boolean wapTheme)
+			String colorSchemeId, String css)
 		throws PortalException {
 
 		LayoutPermissionUtil.check(
@@ -1794,8 +1693,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 		}
 
 		return layoutLocalService.updateLookAndFeel(
-			groupId, privateLayout, layoutId, themeId, colorSchemeId, css,
-			wapTheme);
+			groupId, privateLayout, layoutId, themeId, colorSchemeId, css);
 	}
 
 	/**
@@ -1901,6 +1799,9 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 			long plid, long parentPlid, int priority)
 		throws PortalException {
 
+		LayoutPermissionUtil.check(
+			getPermissionChecker(), plid, ActionKeys.UPDATE);
+
 		return layoutLocalService.updateParentLayoutIdAndPriority(
 			plid, parentPlid, priority);
 	}
@@ -1973,7 +1874,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             com.liferay.portlet.exportimport.service.ExportImportService#validateImportLayoutsFile(
+	 *             com.liferay.exportimport.kernel.service.ExportImportService#validateImportLayoutsFile(
 	 *             ExportImportConfiguration, File)}
 	 */
 	@Deprecated
@@ -1997,7 +1898,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             com.liferay.portlet.exportimport.service.ExportImportService#validateImportLayoutsFile(
+	 *             com.liferay.exportimport.kernel.service.ExportImportService#validateImportLayoutsFile(
 	 *             ExportImportConfiguration, InputStream)}
 	 */
 	@Deprecated
@@ -2056,7 +1957,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             com.liferay.portlet.exportimport.service.ExportImportService#validateImportPortletInfo(
+	 *             com.liferay.exportimport.kernel.service.ExportImportService#validateImportPortletInfo(
 	 *             ExportImportConfiguration, File)}
 	 */
 	@Deprecated
@@ -2081,7 +1982,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             com.liferay.portlet.exportimport.service.ExportImportService#validateImportPortletInfo(
+	 *             com.liferay.exportimport.kernel.service.ExportImportService#validateImportPortletInfo(
 	 *             ExportImportConfiguration, InputStream)}
 	 */
 	@Deprecated

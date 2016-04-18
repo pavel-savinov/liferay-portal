@@ -14,10 +14,9 @@
 
 package com.liferay.portal.upgrade.v7_0_0;
 
-import com.liferay.portal.kernel.util.StringBundler;
-
 import java.io.IOException;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
@@ -53,8 +52,6 @@ public class UpgradeCompanyId
 					{"Layout", "iconImageId"},
 					{"LayoutRevision", "iconImageId"},
 					{"LayoutSetBranch", "logoId"}, {"Organization_", "logoId"},
-					{"SCProductScreenshot", "fullImageId"},
-					{"SCProductScreenshot", "thumbnailId"},
 					{"User_", "portraitId"}
 				}),
 			new TableUpdater("MBStatsUser", "Group_", "groupId"),
@@ -69,7 +66,6 @@ public class UpgradeCompanyId
 				new String[][] {
 					{"BookmarksEntry", "entryId"},
 					{"BookmarksFolder", "folderId"}, {"BlogsEntry", "entryId"},
-					{"CalendarBooking", "calendarBookingId"},
 					{"DDLRecord", "recordId"}, {"DLFileEntry", "fileEntryId"},
 					{"DLFolder", "folderId"},
 					{"JournalArticle", "resourcePrimKey"},
@@ -79,13 +75,6 @@ public class UpgradeCompanyId
 				}),
 			new TableUpdater(
 				"ResourceBlockPermission", "ResourceBlock", "resourceBlockId"),
-			new TableUpdater(
-				"SCFrameworkVersi_SCProductVers", "SCFrameworkVersion",
-				"frameworkVersionId"),
-			new SCLicenseTableUpdater("SCLicense"),
-			new TableUpdater(
-				"SCLicenses_SCProductEntries", "SCProductEntry",
-				"productEntryId"),
 			new TableUpdater("TrashVersion", "TrashEntry", "entryId"),
 			new TableUpdater("UserGroupGroupRole", "UserGroup", "userGroupId"),
 			new TableUpdater("UserGroupRole", "User_", "userId"),
@@ -107,7 +96,8 @@ public class UpgradeCompanyId
 		}
 
 		@Override
-		public void update() throws IOException, SQLException {
+		public void update(Connection connection)
+			throws IOException, SQLException {
 
 			// DLFileEntry
 
@@ -115,7 +105,7 @@ public class UpgradeCompanyId
 				"select companyId from DLFileEntry where DLSyncEvent.type_ = " +
 					"'file' and DLFileEntry.fileEntryId = DLSyncEvent.typePK";
 
-			runSQL(getUpdateSQL(selectSQL));
+			runSQL(connection, getUpdateSQL(selectSQL));
 
 			// DLFolder
 
@@ -123,7 +113,7 @@ public class UpgradeCompanyId
 				"select companyId from DLFolder where DLSyncEvent.type_ = " +
 					"'folder' and DLFolder.folderId = DLSyncEvent.typePK";
 
-			runSQL(getUpdateSQL(selectSQL));
+			runSQL(connection, getUpdateSQL(selectSQL));
 		}
 
 	}
@@ -135,7 +125,8 @@ public class UpgradeCompanyId
 		}
 
 		@Override
-		public void update() throws IOException, SQLException {
+		public void update(Connection connection)
+			throws IOException, SQLException {
 
 			// Company
 
@@ -143,7 +134,7 @@ public class UpgradeCompanyId
 				"select companyId from Company where Company.companyId = " +
 					"PortletPreferences.ownerId";
 
-			runSQL(getUpdateSQL(selectSQL));
+			runSQL(connection, getUpdateSQL(selectSQL));
 
 			// Group
 
@@ -151,7 +142,7 @@ public class UpgradeCompanyId
 				"select companyId from Group_ where Group_.groupId = " +
 					"PortletPreferences.ownerId";
 
-			runSQL(getUpdateSQL(selectSQL));
+			runSQL(connection, getUpdateSQL(selectSQL));
 
 			// Layout
 
@@ -159,7 +150,7 @@ public class UpgradeCompanyId
 				"select companyId from Layout where Layout.plid = " +
 					"PortletPreferences.ownerId";
 
-			runSQL(getUpdateSQL(selectSQL));
+			runSQL(connection, getUpdateSQL(selectSQL));
 
 			// Organization
 
@@ -167,7 +158,7 @@ public class UpgradeCompanyId
 				"select companyId from Organization_ where " +
 					"Organization_.organizationId = PortletPreferences.ownerId";
 
-			runSQL(getUpdateSQL(selectSQL));
+			runSQL(connection, getUpdateSQL(selectSQL));
 
 			// User_
 
@@ -175,31 +166,7 @@ public class UpgradeCompanyId
 				"select companyId from User_ where User_.userId = " +
 					"PortletPreferences.ownerId";
 
-			runSQL(getUpdateSQL(selectSQL));
-		}
-
-	}
-
-	protected class SCLicenseTableUpdater extends TableUpdater {
-
-		public SCLicenseTableUpdater(String tableName) {
-			super(tableName, "", "");
-		}
-
-		@Override
-		protected String getSelectSQL(
-			String foreignTableName, String foreignColumnName) {
-
-			StringBundler sb = new StringBundler(6);
-
-			sb.append("select SCProductEntry.companyId from ");
-			sb.append("SCLicenses_SCProductEntries, SCProductEntry where ");
-			sb.append("SCLicenses_SCProductEntries.licenseId = ");
-			sb.append("SCLicense.licenseId and ");
-			sb.append("SCLicenses_SCProductEntries.productEntryId = ");
-			sb.append("SCProductEntry.productEntryId");
-
-			return sb.toString();
+			runSQL(connection, getUpdateSQL(selectSQL));
 		}
 
 	}

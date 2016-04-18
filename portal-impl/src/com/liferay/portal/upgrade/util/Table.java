@@ -15,6 +15,10 @@
 package com.liferay.portal.upgrade.util;
 
 import com.liferay.portal.dao.jdbc.postgresql.PostgreSQLJDBCUtil;
+import com.liferay.portal.kernel.dao.db.DB;
+import com.liferay.portal.kernel.dao.db.DBManagerUtil;
+import com.liferay.portal.kernel.dao.db.DBType;
+import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedWriter;
@@ -32,7 +36,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
-import com.liferay.portal.upgrade.AutoBatchPreparedStatementUtil;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -195,8 +198,8 @@ public class Table {
 
 			if (_log.isInfoEnabled()) {
 				_log.info(
-					"Finished backup of " + _tableName + " to " +
-						tempFileName + " in " + stopWatch.getTime() + " ms");
+					"Finished backup of " + _tableName + " to " + tempFileName +
+						" in " + stopWatch.getTime() + " ms");
 			}
 		}
 		catch (Exception e) {
@@ -205,7 +208,7 @@ public class Table {
 			throw e;
 		}
 		finally {
-			DataAccess.cleanUp(null, ps, rs);
+			DataAccess.cleanUp(ps, rs);
 
 			unsyncBufferedWriter.close();
 		}
@@ -368,7 +371,13 @@ public class Table {
 			value = GetterUtil.getBoolean(rs.getBoolean(name));
 		}
 		else if ((t == Types.BLOB) || (t == Types.LONGVARBINARY)) {
-			if (PostgreSQLJDBCUtil.isPGStatement(rs.getStatement())) {
+			DB db = DBManagerUtil.getDB();
+
+			DBType dbType = db.getDBType();
+
+			if (dbType.equals(DBType.POSTGRESQL) &&
+				PostgreSQLJDBCUtil.isPGStatement(rs.getStatement())) {
+
 				value = PostgreSQLJDBCUtil.getLargeObject(rs, name);
 			}
 			else {
@@ -656,9 +665,7 @@ public class Table {
 			ps.executeUpdate();
 		}
 		catch (SQLException sqle) {
-			if (_log.isErrorEnabled()) {
-				_log.error(sqle, sqle);
-			}
+			_log.error(sqle, sqle);
 
 			throw new RuntimeException("Unable to execute " + sql, sqle);
 		}
