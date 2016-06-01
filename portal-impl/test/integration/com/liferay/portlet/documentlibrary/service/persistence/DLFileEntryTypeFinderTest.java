@@ -14,7 +14,19 @@
 
 package com.liferay.portlet.documentlibrary.service.persistence;
 
+import com.liferay.document.library.kernel.model.DLFileEntryMetadata;
+import com.liferay.document.library.kernel.model.DLFileEntryType;
+import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalServiceUtil;
+import com.liferay.document.library.kernel.service.persistence.DLFileEntryTypeFinderUtil;
+import com.liferay.dynamic.data.mapping.kernel.DDMStructure;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.RoleConstants;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.rule.TransactionalTestRule;
@@ -23,19 +35,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.model.RoleConstants;
-import com.liferay.portal.model.User;
-import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
-import com.liferay.portal.security.permission.PermissionThreadLocal;
-import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.test.rule.MainServletTestRule;
-import com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata;
-import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
-import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalServiceUtil;
-import com.liferay.portlet.dynamicdatamapping.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.util.test.DDMStructureTestUtil;
 
 import java.util.List;
@@ -55,8 +55,7 @@ public class DLFileEntryTypeFinderTest {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE,
-			TransactionalTestRule.INSTANCE);
+			new LiferayIntegrationTestRule(), TransactionalTestRule.INSTANCE);
 
 	@Before
 	public void setUp() throws Exception {
@@ -67,6 +66,11 @@ public class DLFileEntryTypeFinderTest {
 
 	@Test
 	public void testFilterCountByKeywords() throws Exception {
+		int initialFileEntryTypesCount =
+			DLFileEntryTypeFinderUtil.filterCountByKeywords(
+				_group.getCompanyId(), new long[] {_group.getGroupId()},
+				_DL_FILE_ENTRY_TYPE_NAME, true);
+
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
 				_group.getGroupId(), _user.getUserId());
@@ -74,10 +78,21 @@ public class DLFileEntryTypeFinderTest {
 		addFileEntryType(serviceContext);
 
 		Assert.assertEquals(
-			1,
+			initialFileEntryTypesCount + 1,
 			DLFileEntryTypeFinderUtil.filterCountByKeywords(
 				_group.getCompanyId(), new long[] {_group.getGroupId()},
 				_DL_FILE_ENTRY_TYPE_NAME, true));
+	}
+
+	@Test
+	public void testFilterCountByKeywordsAndBlankKeywordsBasicType()
+		throws Exception {
+
+		Assert.assertEquals(
+			1,
+			DLFileEntryTypeFinderUtil.filterCountByKeywords(
+				_group.getCompanyId(), new long[] {_group.getGroupId()},
+				StringPool.BLANK, true));
 	}
 
 	@Test
@@ -93,6 +108,11 @@ public class DLFileEntryTypeFinderTest {
 		PermissionThreadLocal.setPermissionChecker(permissionChecker);
 
 		try {
+			int initialFileEntryTypesCount =
+				DLFileEntryTypeFinderUtil.filterCountByKeywords(
+					_group.getCompanyId(), new long[] {_group.getGroupId()},
+					_DL_FILE_ENTRY_TYPE_NAME, true);
+
 			ServiceContext serviceContext =
 				ServiceContextTestUtil.getServiceContext(
 					_group.getGroupId(), _user.getUserId());
@@ -100,11 +120,10 @@ public class DLFileEntryTypeFinderTest {
 			addFileEntryType(serviceContext);
 
 			Assert.assertEquals(
-				1,
+				initialFileEntryTypesCount + 1,
 				DLFileEntryTypeFinderUtil.filterCountByKeywords(
 					_group.getCompanyId(), new long[] {_group.getGroupId()},
-					_DL_FILE_ENTRY_TYPE_NAME, true)
-			);
+					_DL_FILE_ENTRY_TYPE_NAME, true));
 		}
 		finally {
 			PermissionThreadLocal.setPermissionChecker(
@@ -127,6 +146,11 @@ public class DLFileEntryTypeFinderTest {
 		PermissionThreadLocal.setPermissionChecker(permissionChecker);
 
 		try {
+			int initialFileEntryTypesCount =
+				DLFileEntryTypeFinderUtil.filterCountByKeywords(
+					_group.getCompanyId(), new long[] {_group.getGroupId()},
+					_DL_FILE_ENTRY_TYPE_NAME, true);
+
 			ServiceContext serviceContext =
 				ServiceContextTestUtil.getServiceContext(
 					_group.getGroupId(), _user.getUserId());
@@ -137,11 +161,10 @@ public class DLFileEntryTypeFinderTest {
 			addFileEntryType(serviceContext);
 
 			Assert.assertEquals(
-				0,
+				initialFileEntryTypesCount,
 				DLFileEntryTypeFinderUtil.filterCountByKeywords(
 					_group.getCompanyId(), new long[] {_group.getGroupId()},
-					_DL_FILE_ENTRY_TYPE_NAME, true)
-			);
+					_DL_FILE_ENTRY_TYPE_NAME, true));
 		}
 		finally {
 			PermissionThreadLocal.setPermissionChecker(
@@ -151,6 +174,11 @@ public class DLFileEntryTypeFinderTest {
 
 	@Test
 	public void testFilterCountByKeywordsWithBlankKeywords() throws Exception {
+		int initialFileEntryTypesCount =
+			DLFileEntryTypeFinderUtil.filterCountByKeywords(
+				_group.getCompanyId(), new long[] {_group.getGroupId()},
+				StringPool.BLANK, true);
+
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
 				_group.getGroupId(), _user.getUserId());
@@ -158,17 +186,21 @@ public class DLFileEntryTypeFinderTest {
 		addFileEntryType(serviceContext);
 
 		Assert.assertEquals(
-			2,
+			initialFileEntryTypesCount + 1,
 			DLFileEntryTypeFinderUtil.filterCountByKeywords(
 				_group.getCompanyId(), new long[] {_group.getGroupId()},
-				StringPool.BLANK, true)
-		);
+				StringPool.BLANK, true));
 	}
 
 	@Test
 	public void testFilterCountByKeywordsWithBlankKeywordsExcludingBasicType()
 		throws Exception {
 
+		int initialFileEntryTypesCount =
+			DLFileEntryTypeFinderUtil.filterCountByKeywords(
+				_group.getCompanyId(), new long[] {_group.getGroupId()},
+				StringPool.BLANK, false);
+
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
 				_group.getGroupId(), _user.getUserId());
@@ -176,11 +208,10 @@ public class DLFileEntryTypeFinderTest {
 		addFileEntryType(serviceContext);
 
 		Assert.assertEquals(
-			1,
+			initialFileEntryTypesCount + 1,
 			DLFileEntryTypeFinderUtil.filterCountByKeywords(
 				_group.getCompanyId(), new long[] {_group.getGroupId()},
-				StringPool.BLANK, false)
-		);
+				StringPool.BLANK, false));
 	}
 
 	@Test
@@ -290,6 +321,25 @@ public class DLFileEntryTypeFinderTest {
 
 		Assert.assertEquals(2, fileEntryTypes.size());
 		Assert.assertTrue(fileEntryTypes.contains(fileEntryType));
+
+		DLFileEntryType basicFileEntryType =
+			DLFileEntryTypeLocalServiceUtil.getFileEntryType(
+				0, "BASIC-DOCUMENT");
+
+		Assert.assertTrue(fileEntryTypes.contains(basicFileEntryType));
+	}
+
+	@Test
+	public void testFilterFindByKeywordsWithBlankKeywordsBasicType()
+		throws Exception {
+
+		List<DLFileEntryType> fileEntryTypes =
+			DLFileEntryTypeFinderUtil.filterFindByKeywords(
+				_group.getCompanyId(), new long[] {_group.getGroupId()},
+				StringPool.BLANK, true, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				null);
+
+		Assert.assertEquals(1, fileEntryTypes.size());
 
 		DLFileEntryType basicFileEntryType =
 			DLFileEntryTypeLocalServiceUtil.getFileEntryType(

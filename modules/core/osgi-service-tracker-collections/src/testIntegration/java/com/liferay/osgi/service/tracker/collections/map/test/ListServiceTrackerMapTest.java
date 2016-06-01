@@ -14,6 +14,7 @@
 
 package com.liferay.osgi.service.tracker.collections.map.test;
 
+import com.liferay.arquillian.deploymentscenario.annotations.BndFile;
 import com.liferay.osgi.service.tracker.collections.internal.DefaultServiceTrackerCustomizer;
 import com.liferay.osgi.service.tracker.collections.internal.map.BundleContextWrapper;
 import com.liferay.osgi.service.tracker.collections.internal.map.TrackedOne;
@@ -35,8 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.arquillian.liferay.deploymentscenario.annotations.BndFile;
-
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 
@@ -49,7 +48,6 @@ import org.junit.runner.RunWith;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
@@ -156,17 +154,18 @@ public class ListServiceTrackerMapTest {
 	public void testGestServiceWithUnregisteringAndCustomComparator() {
 		ServiceTrackerMap<String, List<TrackedOne>> serviceTrackerMap =
 			createServiceTrackerMap(
-				_bundleContext, new Comparator<ServiceReference<TrackedOne>>() {
+				_bundleContext,
+				new Comparator<ServiceReference<TrackedOne>>() {
 
-				@Override
-				public int compare(
-					ServiceReference<TrackedOne> serviceReference1,
-					ServiceReference<TrackedOne> serviceReference2) {
+					@Override
+					public int compare(
+						ServiceReference<TrackedOne> serviceReference1,
+						ServiceReference<TrackedOne> serviceReference2) {
 
-					return 0;
-				}
+						return 0;
+					}
 
-			});
+				});
 
 		TrackedOne trackedOne1 = new TrackedOne();
 
@@ -247,9 +246,7 @@ public class ListServiceTrackerMapTest {
 	}
 
 	@Test
-	public void testGetServiceWithCustomComparatorReturningZero()
-		throws InvalidSyntaxException {
-
+	public void testGetServiceWithCustomComparatorReturningZero() {
 		_serviceTrackerMap = ServiceTrackerMapFactory.openMultiValueMap(
 			_bundleContext, TrackedOne.class, null,
 			new PropertyServiceReferenceMapper<String, TrackedOne>("target"),
@@ -263,8 +260,7 @@ public class ListServiceTrackerMapTest {
 					return 0;
 				}
 
-			}
-		);
+			});
 
 		registerService(new TrackedOne());
 		registerService(new TrackedOne());
@@ -340,9 +336,7 @@ public class ListServiceTrackerMapTest {
 	}
 
 	@Test
-	public void testServiceRegistrationInvokesServiceTrackerMapListener()
-		throws InvalidSyntaxException {
-
+	public void testServiceRegistrationInvokesServiceTrackerMapListener() {
 		final Collection<TrackedOne> trackedOnes = new ArrayList<>();
 
 		ServiceTrackerMapListener<String, TrackedOne, List<TrackedOne>>
@@ -352,11 +346,20 @@ public class ListServiceTrackerMapTest {
 
 					@Override
 					public void keyEmitted(
-						ServiceTrackerMap<String, List<TrackedOne>> map,
-						String key, TrackedOne service,
-						List<TrackedOne> content) {
+						ServiceTrackerMap<String, List<TrackedOne>>
+							serviceTrackerMap,
+						String key, TrackedOne serviceTrackedOne,
+						List<TrackedOne> contentTrackedOnes) {
 
-						trackedOnes.add(service);
+						trackedOnes.add(serviceTrackedOne);
+					}
+
+					@Override
+					public void keyRemoved(
+						ServiceTrackerMap<String, List<TrackedOne>>
+							serviceTrackerMap,
+						String key, TrackedOne serviceTrackedOne,
+						List<TrackedOne> contentTrackedOnes) {
 					}
 
 				};
@@ -381,9 +384,7 @@ public class ListServiceTrackerMapTest {
 	}
 
 	@Test
-	public void testServiceTrackerMapListenerCannotModifyContent()
-		throws InvalidSyntaxException {
-
+	public void testServiceTrackerMapListenerCannotModifyContent() {
 		ServiceTrackerMapListener<String, TrackedOne, List<TrackedOne>>
 			serviceTrackerMapListener =
 				new ServiceTrackerMapListener
@@ -391,15 +392,24 @@ public class ListServiceTrackerMapTest {
 
 					@Override
 					public void keyEmitted(
-						ServiceTrackerMap<String, List<TrackedOne>> map,
-						String key, TrackedOne service,
-						List<TrackedOne> content) {
+						ServiceTrackerMap<String, List<TrackedOne>>
+							serviceTrackerMap,
+						String key, TrackedOne serviceTrackedOne,
+						List<TrackedOne> contentTrackedOnes) {
 
 						try {
-							content.add(new TrackedOne("spurious"));
+							contentTrackedOnes.add(new TrackedOne("spurious"));
 						}
 						catch (Exception e) {
 						}
+					}
+
+					@Override
+					public void keyRemoved(
+						ServiceTrackerMap<String, List<TrackedOne>>
+							serviceTrackerMap,
+						String key, TrackedOne serviceTrackedOne,
+						List<TrackedOne> contentTrackedOnes) {
 					}
 
 				};
@@ -439,19 +449,28 @@ public class ListServiceTrackerMapTest {
 
 					@Override
 					public void keyEmitted(
-						ServiceTrackerMap<String, List<TrackedOne>> map,
-						String key, TrackedOne service,
-						List<TrackedOne> content) {
+						ServiceTrackerMap<String, List<TrackedOne>>
+							serviceTrackerMap,
+						String key, TrackedOne serviceTrackedOne,
+						List<TrackedOne> contentTrackedOnes) {
 
 						try {
 							Assert.assertEquals("aTarget", key);
-							Assert.assertEquals(trackedOne, service);
+							Assert.assertEquals(trackedOne, serviceTrackedOne);
 							Assert.assertEquals(
-								content, Arrays.asList(trackedOne));
+								contentTrackedOnes, Arrays.asList(trackedOne));
 						}
 						catch (Throwable t) {
 							throwables.add(t);
 						}
+					}
+
+					@Override
+					public void keyRemoved(
+						ServiceTrackerMap<String, List<TrackedOne>>
+							serviceTrackerMap,
+						String key, TrackedOne serviceTrackedOne,
+						List<TrackedOne> contentTrackedOnes) {
 					}
 
 				};
@@ -478,9 +497,7 @@ public class ListServiceTrackerMapTest {
 	}
 
 	@Test
-	public void testUnkeyedServiceReferencesBalanceReferenceCount()
-		throws InvalidSyntaxException {
-
+	public void testUnkeyedServiceReferencesBalanceReferenceCount() {
 		BundleContextWrapper bundleContextWrapper = wrapContext();
 
 		ServiceTrackerMap<TrackedOne, List<TrackedOne>> serviceTrackerMap =
@@ -520,13 +537,8 @@ public class ListServiceTrackerMapTest {
 	protected ServiceTrackerMap<String, List<TrackedOne>>
 		createServiceTrackerMap(BundleContext bundleContext) {
 
-		try {
-			return ServiceTrackerMapFactory.openMultiValueMap(
-				bundleContext, TrackedOne.class, "target");
-		}
-		catch (InvalidSyntaxException ise) {
-			throw new RuntimeException(ise);
-		}
+		return ServiceTrackerMapFactory.openMultiValueMap(
+			bundleContext, TrackedOne.class, "target");
 	}
 
 	protected ServiceTrackerMap<String, List<TrackedOne>>
@@ -534,33 +546,24 @@ public class ListServiceTrackerMapTest {
 			BundleContext bundleContext,
 			Comparator<ServiceReference<TrackedOne>> comparator) {
 
-		try {
-			return ServiceTrackerMapFactory.openMultiValueMap(
-				bundleContext, TrackedOne.class, null,
-				new PropertyServiceReferenceMapper<String, TrackedOne>(
-					"target"),
-				comparator);
-		}
-		catch (InvalidSyntaxException ise) {
-			throw new RuntimeException(ise);
-		}
+		return ServiceTrackerMapFactory.openMultiValueMap(
+			bundleContext, TrackedOne.class, null,
+			new PropertyServiceReferenceMapper<String, TrackedOne>("target"),
+			comparator);
 	}
 
 	protected ServiceTrackerMap<String, List<TrackedOne>>
 		createServiceTrackerMap(
-			ServiceTrackerMapListener
-				<String, TrackedOne,
-			List<TrackedOne>> serviceTrackerMapListener)
-		throws InvalidSyntaxException {
+			ServiceTrackerMapListener<String, TrackedOne, List<TrackedOne>>
+				serviceTrackerMapListener) {
 
 		return ServiceTrackerMapFactory.openMultiValueMap(
-				_bundleContext, TrackedOne.class, null,
-				new PropertyServiceReferenceMapper<String, TrackedOne>(
-					"target"),
-				new DefaultServiceTrackerCustomizer<TrackedOne>(_bundleContext),
-				new PropertyServiceReferenceComparator<TrackedOne>(
-					"service.ranking"),
-				serviceTrackerMapListener);
+			_bundleContext, TrackedOne.class, null,
+			new PropertyServiceReferenceMapper<String, TrackedOne>("target"),
+			new DefaultServiceTrackerCustomizer<TrackedOne>(_bundleContext),
+			new PropertyServiceReferenceComparator<TrackedOne>(
+				"service.ranking"),
+			serviceTrackerMapListener);
 	}
 
 	protected ServiceRegistration<TrackedOne> registerService(

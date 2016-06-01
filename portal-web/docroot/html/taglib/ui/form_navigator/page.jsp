@@ -26,7 +26,9 @@
 			</liferay-ui:panel-container>
 
 			<aui:button-row>
-				<aui:button cssClass="btn-primary" type="submit" />
+				<aui:button primary="<%= true %>" type="submit" />
+
+				<aui:button href="<%= backURL %>" type="cancel" />
 			</aui:button-row>
 		</c:when>
 		<c:otherwise>
@@ -81,7 +83,7 @@
 					<%
 					String[] modifiedSections = StringUtil.split(ParamUtil.getString(request, "modifiedSections"));
 
-					String errorSection = (String)request.getAttribute("errorSection");
+					String errorSection = (String)request.getAttribute(WebKeys.ERROR_SECTION);
 
 					if (Validator.isNull(errorSection)) {
 						modifiedSections = null;

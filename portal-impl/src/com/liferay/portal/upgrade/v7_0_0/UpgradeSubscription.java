@@ -14,26 +14,26 @@
 
 package com.liferay.portal.upgrade.v7_0_0;
 
-import com.liferay.portal.kernel.dao.jdbc.DataAccess;
+import com.liferay.blogs.kernel.model.BlogsEntry;
+import com.liferay.document.library.kernel.model.DLFileEntry;
+import com.liferay.document.library.kernel.model.DLFileEntryType;
+import com.liferay.document.library.kernel.model.DLFolder;
+import com.liferay.message.boards.kernel.model.MBCategory;
+import com.liferay.message.boards.kernel.model.MBThread;
+import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.PortletPreferences;
+import com.liferay.portal.kernel.model.WorkflowInstanceLink;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.LoggingTimer;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.workflow.WorkflowInstance;
-import com.liferay.portal.model.Layout;
-import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.blogs.model.BlogsEntry;
-import com.liferay.portlet.documentlibrary.model.DLFileEntry;
-import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
-import com.liferay.portlet.documentlibrary.model.DLFolder;
-import com.liferay.portlet.messageboards.model.MBCategory;
-import com.liferay.portlet.messageboards.model.MBThread;
-import com.liferay.portlet.softwarecatalog.model.SCProductEntry;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
@@ -50,15 +50,9 @@ public class UpgradeSubscription extends UpgradeProcess {
 	protected void addClassName(long classNameId, String className)
 		throws Exception {
 
-		Connection con = null;
-		PreparedStatement ps = null;
-
-		try {
-			con = DataAccess.getUpgradeOptimizedConnection();
-
-			ps = con.prepareStatement(
+		try (PreparedStatement ps = connection.prepareStatement(
 				"insert into ClassName_ (mvccVersion, classNameId, value) " +
-					"values (?, ?, ?)");
+					"values (?, ?, ?)")) {
 
 			ps.setLong(1, 0);
 			ps.setLong(2, classNameId);
@@ -66,13 +60,24 @@ public class UpgradeSubscription extends UpgradeProcess {
 
 			ps.executeUpdate();
 		}
-		finally {
-			DataAccess.cleanUp(con, ps);
+	}
+
+	protected void deleteOrphanedSubscriptions() throws Exception {
+		try (LoggingTimer loggingTimer = new LoggingTimer()) {
+			long classNameId = PortalUtil.getClassNameId(
+				PortletPreferences.class.getName());
+
+			runSQL(
+				"delete from Subscription where classNameId = " + classNameId +
+					" and classPK not in (select portletPreferencesId from " +
+						" PortletPreferences)");
 		}
 	}
 
 	@Override
 	protected void doUpgrade() throws Exception {
+		deleteOrphanedSubscriptions();
+
 		updateSubscriptionClassNames(
 			Folder.class.getName(), DLFolder.class.getName());
 		updateSubscriptionClassNames(
@@ -97,76 +102,55 @@ public class UpgradeSubscription extends UpgradeProcess {
 	}
 
 	protected long getGroupId(long classNameId, long classPK) throws Exception {
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+		String className = PortalUtil.getClassName(classNameId);
 
-		try {
-			con = DataAccess.getUpgradeOptimizedConnection();
+		String[] groupIdSQLParts = StringUtil.split(
+			_getGroupIdSQLPartsMap.get(className));
 
-			String className = PortalUtil.getClassName(classNameId);
-
-			String[] groupIdSQLParts = StringUtil.split(
-				_getGroupIdSQLPartsMap.get(className));
-
-			if (ArrayUtil.isEmpty(groupIdSQLParts)) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(
-						"Unable to determine the group ID for the class name " +
-							className);
-				}
-
-				return 0;
+		if (ArrayUtil.isEmpty(groupIdSQLParts)) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Unable to determine the group ID for the class name " +
+						className);
 			}
 
-			String sql =
-				"select " + groupIdSQLParts[1] + " from " + groupIdSQLParts[0] +
-					" where " + groupIdSQLParts[2] + " = ?";
+			return 0;
+		}
 
-			ps = con.prepareStatement(sql);
+		String sql =
+			"select " + groupIdSQLParts[1] + " from " + groupIdSQLParts[0] +
+				" where " + groupIdSQLParts[2] + " = ?";
 
+		try (PreparedStatement ps = connection.prepareStatement(sql)) {
 			ps.setLong(1, classPK);
 
-			rs = ps.executeQuery();
-
-			if (rs.next()) {
-				return rs.getLong("groupId");
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					return rs.getLong("groupId");
+				}
 			}
-		}
-		finally {
-			DataAccess.cleanUp(con, ps, rs);
 		}
 
 		return 0;
 	}
 
 	protected boolean hasGroup(long groupId) throws Exception {
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		try {
-			con = DataAccess.getUpgradeOptimizedConnection();
-
-			ps = con.prepareStatement(
-				"select count(*) from Group_ where groupId = ?");
+		try (PreparedStatement ps = connection.prepareStatement(
+				"select count(*) from Group_ where groupId = ?")) {
 
 			ps.setLong(1, groupId);
 
-			rs = ps.executeQuery();
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					int count = rs.getInt(1);
 
-			if (rs.next()) {
-				int count = rs.getInt(1);
-
-				if (count > 0) {
-					return true;
+					if (count > 0) {
+						return true;
+					}
 				}
 			}
 
 			return false;
-		}
-		finally {
-			DataAccess.cleanUp(con, ps, rs);
 		}
 	}
 
@@ -174,57 +158,59 @@ public class UpgradeSubscription extends UpgradeProcess {
 			String oldClassName, String newClassName)
 		throws Exception {
 
-		StringBundler sb = new StringBundler(4);
+		try (LoggingTimer loggingTimer = new LoggingTimer(oldClassName)) {
+			StringBundler sb = new StringBundler(4);
 
-		sb.append("update Subscription set classNameId = ");
-		sb.append(getClassNameId(newClassName));
-		sb.append(" where classNameId = ");
-		sb.append(PortalUtil.getClassNameId(oldClassName));
+			sb.append("update Subscription set classNameId = ");
+			sb.append(getClassNameId(newClassName));
+			sb.append(" where classNameId = ");
+			sb.append(PortalUtil.getClassNameId(oldClassName));
 
-		runSQL(sb.toString());
+			runSQL(sb.toString());
+		}
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	protected void updateSubscriptionGroupId(
 			long subscriptionId, long classNameId, long classPK)
 		throws Exception {
-
-		long groupId = getGroupId(classNameId, classPK);
-
-		if ((groupId == 0) && hasGroup(classPK)) {
-			groupId = classPK;
-		}
-
-		if (groupId != 0) {
-			runSQL(
-				"update Subscription set groupId = " + groupId + " where " +
-					"subscriptionId = " + subscriptionId);
-		}
 	}
 
 	protected void updateSubscriptionGroupIds() throws Exception {
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		try {
-			con = DataAccess.getUpgradeOptimizedConnection();
-
-			ps = con.prepareStatement(
+		try (LoggingTimer loggingTimer = new LoggingTimer();
+			PreparedStatement ps1 = connection.prepareStatement(
 				"select subscriptionId, classNameId, classPK from " +
 					"Subscription");
-
-			rs = ps.executeQuery();
+			PreparedStatement ps2 =
+				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
+					connection,
+					"update Subscription set groupId = ? where " +
+						"subscriptionId = ?");
+			ResultSet rs = ps1.executeQuery()) {
 
 			while (rs.next()) {
 				long subscriptionId = rs.getLong("subscriptionId");
 				long classNameId = rs.getLong("classNameId");
 				long classPK = rs.getLong("classPK");
 
-				updateSubscriptionGroupId(subscriptionId, classNameId, classPK);
+				long groupId = getGroupId(classNameId, classPK);
+
+				if ((groupId == 0) && hasGroup(classPK)) {
+					groupId = classPK;
+				}
+
+				if (groupId != 0) {
+					ps2.setLong(1, groupId);
+					ps2.setLong(2, subscriptionId);
+
+					ps2.addBatch();
+				}
 			}
-		}
-		finally {
-			DataAccess.cleanUp(con, ps, rs);
+
+			ps2.executeBatch();
 		}
 	}
 
@@ -251,11 +237,8 @@ public class UpgradeSubscription extends UpgradeProcess {
 		_getGroupIdSQLPartsMap.put(
 			MBThread.class.getName(), "MBThread,groupId,threadId");
 		_getGroupIdSQLPartsMap.put(
-			SCProductEntry.class.getName(),
-			"SCProductEntry,groupId,productEntryId");
-		_getGroupIdSQLPartsMap.put(
-			WorkflowInstance.class.getName(),
-			"WorkflowInstance,groupId,workflowInstanceId");
+			WorkflowInstanceLink.class.getName(),
+			"WorkflowInstanceLink,groupId,workflowInstanceId");
 		_getGroupIdSQLPartsMap.put(
 			"com.liferay.bookmarks.model.BookmarksEntry",
 			"BookmarksEntry,groupId,entryId");
@@ -263,16 +246,15 @@ public class UpgradeSubscription extends UpgradeProcess {
 			"com.liferay.bookmarks.model.BookmarksFolder",
 			"BookmarksFolder,groupId,folderId");
 		_getGroupIdSQLPartsMap.put(
-			"com.liferay.portlet.dynamicdatamapping.DDMStructure",
+			"com.liferay.dynamic.data.mapping.kernel.DDMStructure",
 			"DDMStructure,groupId,structureId");
 		_getGroupIdSQLPartsMap.put(
-			"com.liferay.portlet.journal.model.JournalFolder",
+			"com.liferay.journal.model.JournalFolder",
 			"JournalFolder,groupId,folderId");
 		_getGroupIdSQLPartsMap.put(
-			"com.liferay.portlet.wiki.model.WikiNode",
-			"WikiNode,groupId,nodeId");
+			"com.liferay.wiki.model.WikiNode", "WikiNode,groupId,nodeId");
 		_getGroupIdSQLPartsMap.put(
-			"com.liferay.portlet.wiki.model.WikiPage",
+			"com.liferay.wiki.model.WikiPage",
 			"WikiPage,groupId,resourcePrimKey");
 	}
 

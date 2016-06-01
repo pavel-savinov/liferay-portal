@@ -1,16 +1,10 @@
 <definition component-name="portal-user-interface">
+	<property name="portal.release" value="true" />
 	<property name="testray.component.names" value="Mobile Web" />
 	<property name="testray.main.component.name" value="User Interface" />
 
 	<set-up>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
-
-		<if>
-			<equals arg1="${testPortalInstance}" arg2="true" />
-			<then>
-				<execute macro="SignIn#signInPortalInstanceSetUp" />
-			</then>
-		</if>
+		<execute macro="TestCase#setUpPortalInstance" />
 
 		<execute macro="User#firstLoginPG" />
 	</set-up>

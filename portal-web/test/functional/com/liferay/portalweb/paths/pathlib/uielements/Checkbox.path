@@ -54,6 +54,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>DISPLAY_FACET</td>
+	<td>//div[@style='']//label[contains(.,'Display Facet')]/input[@type='checkbox']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>DISPLAY_IMMEDIATELY</td>
 	<td>//input[contains(@name,'displayImmediately')]</td>
 	<td></td>
@@ -105,7 +110,7 @@
 </tr>
 <tr>
 	<td>ENABLE_FULLSCREEN</td>
-	<td>//input[@id='_86_enableFullscreen']</td>
+	<td>//input[contains(@id,'enableFullscreen')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -140,7 +145,7 @@
 </tr>
 <tr>
 	<td>ENABLE_RECYCLE_BIN</td>
-	<td>//label[contains(.,'Enable Recycle Bin')]/input[@type='checkbox']</td>
+	<td>//input[contains(@id,'trashEnabled')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -156,6 +161,11 @@
 <tr>
 	<td>ENABLE_SOCIAL_BOOKMARKS</td>
 	<td>//label[contains(.,'Enable Social Bookmarks')]/input[@type='checkbox']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ENABLE_VIEW_COUNT</td>
+	<td>//label[contains(.,'Enable View Count')]/input[@type='checkbox']</td>
 	<td></td>
 </tr>
 <tr>
@@ -199,6 +209,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>LEXICON_SELECT_ALL</td>
+	<td>//*[@data-qa-id='selectAllCheckbox']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>MAILING</td>
 	<td>//label[contains(.,'Mailing')]/input[@type='checkbox']</td>
 	<td></td>
@@ -220,17 +235,17 @@
 </tr>
 <tr>
 	<td>MERGE_WITH_PARENT_FOLDER</td>
-	<td>//input[contains(@id,'mergeWithParentFolder')]</td>
+	<td>//label[contains(.,'Merge with Parent Folder')]/input[@type='checkbox']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>NEVER_EXPIRE</td>
-	<td>//input[contains(@name,'neverExpire')]</td>
+	<td>//input[contains(@name,'neverExpire') and @type='checkbox']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>NEVER_REVIEW</td>
-	<td>//input[contains(@name,'neverReview')]</td>
+	<td>//input[contains(@name,'neverReview') and @type='checkbox']</td>
 	<td></td>
 </tr>
 <tr>
@@ -250,7 +265,12 @@
 </tr>
 <tr>
 	<td>SELECT_ALL</td>
-	<td>//input[contains(@id,'allRowIds') or contains(@name,'allRowIds')]</td>
+	<td>//*[@data-qa-id='selectAllCheckbox'] | //input[contains(@id,'allRowIds') or contains(@name,'allRowIds') or contains(@class,'select-all-checkboxes')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SELECT_ALL_NOTIFICATIONS</td>
+	<td>//input[contains(@id,'notifications') and contains(@class,'select-all')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -295,12 +315,12 @@
 </tr>
 <tr>
 	<td>SITE_OWNER</td>
-	<td>xpath=(//input[contains(@name,'rowIds')])[2]</td>
+	<td>//tr[contains(.,'Site Owner')]//input[@type='checkbox']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>STAGED_CONTENT</td>
-	<td>//div[contains(@id,'stagedPortlets')]//label[contains(.,'${key_contentName}')]/input</td>
+	<td>//li[contains(.,'${key_contentName}')]//input</td>
 	<td></td>
 </tr>
 <tr>

@@ -16,6 +16,8 @@ package com.liferay.source.formatter.dependencies;
 
 import aQute.bnd.annotation.metatype.Meta;
 
+import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
+import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.provider.AddPortletProvider;
 import com.liferay.portal.kernel.provider.ViewPortletProvider;
 import com.liferay.portal.kernel.util.SetUtil;
@@ -48,14 +50,27 @@ public class CombineLines
 	public static final String
 		STRING_1;
 
+	public List<String>
+		getList() {
+
+		return new ArrayList<>();
+	}
+
 	@Meta.AD(
 		deflt = "false", required = false
 	)
-	public String getString(
+	public String getString1(
 		String test) {
 
 		return
 			test;
+	}
+
+	public String getString2(String test) {
+		return
+			StringUtil.replace(
+				test, "Hello World Hello World Hello",
+				"World Hello World Hello World");
 	}
 
 	public String[][] getStringArray() {
@@ -107,17 +122,7 @@ public class CombineLines
 			getString(
 				"test1", "test2", "test3", "test4", "test5", "test6", "test7",
 				"test8", "test9", "test10", "test11", "test12", "test13",
-				"test14", "test15", "test16", "test17", "test18", "test19);
-
-		String test6 =
-			getString(
-				"test1", "test2", "test3", "test4", "test5", "test6", "test7",
-				"test8", "test9", "test10", "test11", "test12", "test13",
-				"test14", "test15", "test16", "test17", "test18", "test19) +
-			getString(
-				"test1", "test2", "test3", "test4", "test5", "test6", "test7",
-				"test8", "test9", "test10", "test11", "test12", "test13",
-				"test14", "test15", "test16", "test17", "test18", "test19);
+				"test14", "test15", "test16", "test17", "test18", "test19");
 
 		List<String> testList =
 			new ArrayList<>();
@@ -172,6 +177,44 @@ public class CombineLines
 				StringPool.COMMA, StringPool.BACK_SLASH
 			});
 	}
+
+	public void method8(
+		String string1, List<String>
+			listWithAVeryLongNameThatThereforeByNoMeansFitsOnTheSameLine) {
+
+		String anotherStringWithAVeryLongName = "Hello World";
+
+		boolean b = StringUtil.contains(
+			anotherStringWithAVeryLongName, StringUtil.trim(
+				anotherStringWithAVeryLongName));
+
+		boolean b2 = StringUtil.contains(
+			test1, "Hello World" + "Hello World Hello" +
+				"Hello World Hello World Hello World Hello World");
+
+		boolean b3 = StringUtil.merge(
+			new String[] {"One", "Two"},
+			"Hello World");
+
+		String s =
+			"Hello World " +
+				"Hello World Hello" + "Hello World Hello World Hello";
+	}
+
+	public void method9(String s) {
+		try (UnsyncBufferedReader unsyncBufferedReader =
+				new UnsyncBufferedReader(
+					new UnsyncStringReader(s))) {
+
+			return;
+		}
+	}
+
+	protected final List<String>
+		listWithAMediumLongVariableName = new ArrayList<>();
+	protected final List<String>
+		listWithAnLongerNameThanTheMediumLongNameOne =
+			new ArrayList<>();
 
 	private class SubClass1 extends
 		SomeOtherClassWithALongNameThatDoesNotFitOnPreviousLine {

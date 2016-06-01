@@ -14,20 +14,39 @@
 
 package com.liferay.portal.service.impl;
 
-import com.liferay.portal.DuplicateRoleException;
-import com.liferay.portal.NoSuchRoleException;
-import com.liferay.portal.RequiredRoleException;
-import com.liferay.portal.RoleNameException;
+import com.liferay.admin.kernel.util.PortalMyAccountApplicationType;
+import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.cache.thread.local.Lifecycle;
 import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCachable;
 import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCache;
 import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCacheManager;
+import com.liferay.portal.kernel.exception.DuplicateRoleException;
+import com.liferay.portal.kernel.exception.NoSuchRoleException;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.RequiredRoleException;
+import com.liferay.portal.kernel.exception.RoleNameException;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.ResourceAction;
+import com.liferay.portal.kernel.model.ResourceBlockPermission;
+import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.ResourcePermission;
+import com.liferay.portal.kernel.model.ResourceTypePermission;
+import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.RoleConstants;
+import com.liferay.portal.kernel.model.SystemEventConstants;
+import com.liferay.portal.kernel.model.Team;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchException;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.spring.aop.Skip;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -38,34 +57,16 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.Company;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.model.Layout;
-import com.liferay.portal.model.ResourceAction;
-import com.liferay.portal.model.ResourceBlockPermission;
-import com.liferay.portal.model.ResourceConstants;
-import com.liferay.portal.model.ResourcePermission;
-import com.liferay.portal.model.ResourceTypePermission;
-import com.liferay.portal.model.Role;
-import com.liferay.portal.model.RoleConstants;
-import com.liferay.portal.model.SystemEventConstants;
-import com.liferay.portal.model.Team;
-import com.liferay.portal.model.User;
-import com.liferay.portal.security.auth.CompanyThreadLocal;
-import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionCacheUtil;
-import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.base.RoleLocalServiceBaseImpl;
-import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portlet.admin.util.PortalMyAccountApplicationType;
-import com.liferay.portlet.exportimport.lar.ExportImportThreadLocal;
-import com.liferay.portlet.usersadmin.util.UsersAdminUtil;
+import com.liferay.users.admin.kernel.util.UsersAdminUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,66 +87,6 @@ import java.util.Set;
  * @author Marcellus Tavares
  */
 public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
-
-	/**
-	 * Adds a role. The user is reindexed after role is added.
-	 *
-	 * @param      userId the primary key of the user
-	 * @param      companyId the primary key of the company
-	 * @param      name the role's name
-	 * @param      titleMap the role's localized titles (optionally
-	 *             <code>null</code>)
-	 * @param      descriptionMap the role's localized descriptions (optionally
-	 *             <code>null</code>)
-	 * @param      type the role's type (optionally <code>0</code>)
-	 * @return     the role
-	 * @deprecated As of 6.2.0, replaced by {@link #addRole(long, String, long,
-	 *             String, Map, Map, int, String, ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public Role addRole(
-			long userId, long companyId, String name,
-			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
-			int type)
-		throws PortalException {
-
-		return addRole(
-			userId, null, 0, name, titleMap, descriptionMap, type, null, null);
-	}
-
-	/**
-	 * Adds a role with additional parameters. The user is reindexed after role
-	 * is added.
-	 *
-	 * @param      userId the primary key of the user
-	 * @param      companyId the primary key of the company
-	 * @param      name the role's name
-	 * @param      titleMap the role's localized titles (optionally
-	 *             <code>null</code>)
-	 * @param      descriptionMap the role's localized descriptions (optionally
-	 *             <code>null</code>)
-	 * @param      type the role's type (optionally <code>0</code>)
-	 * @param      className the name of the class for which the role is created
-	 *             (optionally <code>null</code>)
-	 * @param      classPK the primary key of the class for which the role is
-	 *             created (optionally <code>0</code>)
-	 * @return     the role
-	 * @deprecated As of 6.2.0, replaced by {@link #addRole(long, String, long,
-	 *             String, Map, Map, int, String, ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public Role addRole(
-			long userId, long companyId, String name,
-			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
-			int type, String className, long classPK)
-		throws PortalException {
-
-		return addRole(
-			userId, className, classPK, name, titleMap, descriptionMap, type,
-			null, null);
-	}
 
 	/**
 	 * Adds a role with additional parameters. The user is reindexed after role
@@ -212,6 +153,16 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 
 		// Resources
 
+		long ownerId = userId;
+
+		if (user.isDefaultUser()) {
+			ownerId = 0;
+		}
+
+		resourceLocalService.addResources(
+			user.getCompanyId(), 0, ownerId, Role.class.getName(),
+			role.getRoleId(), false, false, false);
+
 		if (!user.isDefaultUser()) {
 			resourceLocalService.addResources(
 				user.getCompanyId(), 0, userId, Role.class.getName(),
@@ -226,12 +177,66 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	}
 
 	/**
+	 * Adds the role to the user. The user is reindexed after the role is added.
+	 *
+	 * @param userId the primary key of the user
+	 * @param roleId the primary key of the role
+	 * @see   com.liferay.portal.kernel.service.persistence.UserPersistence#addRole(
+	 *        long, long)
+	 */
+	@Override
+	public void addUserRole(long userId, long roleId) throws PortalException {
+		userPersistence.addRole(userId, roleId);
+
+		reindex(userId);
+
+		PermissionCacheUtil.clearCache(userId);
+	}
+
+	/**
+	 * Adds the role to the user. The user is reindexed after the role is added.
+	 *
+	 * @param userId the primary key of the user
+	 * @param role the role
+	 * @see   com.liferay.portal.kernel.service.persistence.UserPersistence#addRole(
+	 *        long, Role)
+	 */
+	@Override
+	public void addUserRole(long userId, Role role) throws PortalException {
+		userPersistence.addRole(userId, role);
+
+		reindex(userId);
+
+		PermissionCacheUtil.clearCache(userId);
+	}
+
+	/**
+	 * Adds the roles to the user. The user is reindexed after the roles are
+	 * added.
+	 *
+	 * @param userId the primary key of the user
+	 * @param roles the roles
+	 * @see   com.liferay.portal.kernel.service.persistence.UserPersistence#addRoles(
+	 *        long, List)
+	 */
+	@Override
+	public void addUserRoles(long userId, List<Role> roles)
+		throws PortalException {
+
+		userPersistence.addRoles(userId, roles);
+
+		reindex(userId);
+
+		PermissionCacheUtil.clearCache(userId);
+	}
+
+	/**
 	 * Adds the roles to the user. The user is reindexed after the roles are
 	 * added.
 	 *
 	 * @param userId the primary key of the user
 	 * @param roleIds the primary keys of the roles
-	 * @see   com.liferay.portal.service.persistence.UserPersistence#addRoles(
+	 * @see   com.liferay.portal.kernel.service.persistence.UserPersistence#addRoles(
 	 *        long, long[])
 	 */
 	@Override
@@ -350,14 +355,22 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 			checkSystemRole(companyId, name, descriptionMap, type);
 		}
 
+		String[] allSystemRoles = ArrayUtil.append(
+			systemRoles, systemOrganizationRoles, systemSiteRoles);
+
+		for (String roleName : allSystemRoles) {
+			Role role = getRole(companyId, roleName);
+
+			resourceLocalService.addResources(
+				companyId, 0, 0, Role.class.getName(), role.getRoleId(), false,
+				false, false);
+		}
+
 		// All users should be able to view all system roles
 
 		Role userRole = getRole(companyId, RoleConstants.USER);
 
-		String[] userViewableRoles = ArrayUtil.append(
-			systemRoles, systemOrganizationRoles, systemSiteRoles);
-
-		for (String roleName : userViewableRoles) {
+		for (String roleName : allSystemRoles) {
 			Role role = getRole(companyId, roleName);
 
 			resourcePermissionLocalService.setResourcePermissions(
@@ -366,6 +379,23 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 				String.valueOf(role.getRoleId()), userRole.getRoleId(),
 				new String[] {ActionKeys.VIEW});
 		}
+	}
+
+	/**
+	 * Removes every role from the user. The user is reindexed after the roles
+	 * are removed.
+	 *
+	 * @param userId the primary key of the user
+	 * @see   com.liferay.portal.kernel.service.persistence.UserPersistence#clearRoles(
+	 *        long)
+	 */
+	@Override
+	public void clearUserRoles(long userId) throws PortalException {
+		userPersistence.clearRoles(userId);
+
+		reindex(userId);
+
+		PermissionCacheUtil.clearCache(userId);
 	}
 
 	/**
@@ -459,6 +489,84 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 		PermissionCacheUtil.clearCache();
 
 		return role;
+	}
+
+	/**
+	 * Removes the role from the user. The user is reindexed after the role is
+	 * removed.
+	 *
+	 * @param userId the primary key of the user
+	 * @param roleId the primary key of the role
+	 * @see   com.liferay.portal.kernel.service.persistence.UserPersistence#removeRole(
+	 *        long, long)
+	 */
+	@Override
+	public void deleteUserRole(long userId, long roleId)
+		throws PortalException {
+
+		userPersistence.removeRole(userId, roleId);
+
+		reindex(userId);
+
+		PermissionCacheUtil.clearCache(userId);
+	}
+
+	/**
+	 * Removes the role from the user. The user is reindexed after the role is
+	 * removed.
+	 *
+	 * @param userId the primary key of the user
+	 * @param role the role
+	 * @see   com.liferay.portal.kernel.service.persistence.UserPersistence#removeRole(
+	 *        long, Role)
+	 */
+	@Override
+	public void deleteUserRole(long userId, Role role) throws PortalException {
+		userPersistence.removeRole(userId, role);
+
+		reindex(userId);
+
+		PermissionCacheUtil.clearCache(userId);
+	}
+
+	/**
+	 * Removes the roles from the user. The user is reindexed after the roles
+	 * are removed.
+	 *
+	 * @param userId the primary key of the user
+	 * @param roles the roles
+	 * @see   com.liferay.portal.kernel.service.persistence.UserPersistence#removeRoles(
+	 *        long, List)
+	 */
+	@Override
+	public void deleteUserRoles(long userId, List<Role> roles)
+		throws PortalException {
+
+		userPersistence.removeRoles(userId, roles);
+
+		reindex(userId);
+
+		PermissionCacheUtil.clearCache(userId);
+	}
+
+	/**
+	 * Removes the roles from the user. The user is reindexed after the roles
+	 * are removed.
+	 *
+	 * @param userId the primary key of the user
+	 * @param roleIds the primary keys of the roles
+	 * @see   com.liferay.portal.kernel.service.persistence.UserPersistence#removeRoles(
+	 *        long, long[])
+	 */
+	@Override
+	public void deleteUserRoles(long userId, long[] roleIds)
+		throws PortalException {
+
+		userPersistence.removeRoles(userId, roleIds);
+
+		reindex(userId);
+
+		PermissionCacheUtil.clearCache(userId);
 	}
 
 	/**
@@ -589,7 +697,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 * @param  scope the permission scope
 	 * @param  primKey the primary key of the resource's class
 	 * @return the role names and action IDs
-	 * @see    com.liferay.portal.service.persistence.RoleFinder#findByC_N_S_P(
+	 * @see    com.liferay.portal.kernel.service.persistence.RoleFinder#findByC_N_S_P(
 	 *         long, String, int, String)
 	 */
 	@Override
@@ -609,7 +717,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 * @param  primKey the primary key of the resource's class
 	 * @param  actionId the name of the resource action
 	 * @return the roles
-	 * @see    com.liferay.portal.service.persistence.RoleFinder#findByC_N_S_P_A(
+	 * @see    com.liferay.portal.kernel.service.persistence.RoleFinder#findByC_N_S_P_A(
 	 *         long, String, int, String, String)
 	 */
 	@Override
@@ -822,7 +930,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 * @param  userId the primary key of the user
 	 * @param  groupId the primary key of the group
 	 * @return the user's roles within the user group
-	 * @see    com.liferay.portal.service.persistence.RoleFinder#findByUserGroupGroupRole(
+	 * @see    com.liferay.portal.kernel.service.persistence.RoleFinder#findByUserGroupGroupRole(
 	 *         long, long)
 	 */
 	@Override
@@ -848,7 +956,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 * @param  userId the primary key of the user
 	 * @param  groupId the primary key of the group
 	 * @return the user's roles within the user group
-	 * @see    com.liferay.portal.service.persistence.RoleFinder#findByUserGroupRole(
+	 * @see    com.liferay.portal.kernel.service.persistence.RoleFinder#findByUserGroupRole(
 	 *         long, long)
 	 */
 	@Override
@@ -862,8 +970,8 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 * @param  userId the primary key of the user
 	 * @param  groups the groups (optionally <code>null</code>)
 	 * @return the union of all the user's roles within the groups
-	 * @see    com.liferay.portal.service.persistence.RoleFinder#findByU_G(long,
-	 *         List)
+	 * @see    com.liferay.portal.kernel.service.persistence.RoleFinder#findByU_G(
+	 *         long, List)
 	 */
 	@Override
 	public List<Role> getUserRelatedRoles(long userId, List<Group> groups) {
@@ -880,8 +988,8 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 * @param  userId the primary key of the user
 	 * @param  groupId the primary key of the group
 	 * @return the user's roles within the group
-	 * @see    com.liferay.portal.service.persistence.RoleFinder#findByU_G(long,
-	 *         long)
+	 * @see    com.liferay.portal.kernel.service.persistence.RoleFinder#findByU_G(
+	 *         long, long)
 	 */
 	@Override
 	public List<Role> getUserRelatedRoles(long userId, long groupId) {
@@ -894,8 +1002,8 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 * @param  userId the primary key of the user
 	 * @param  groupIds the primary keys of the groups
 	 * @return the union of all the user's roles within the groups
-	 * @see    com.liferay.portal.service.persistence.RoleFinder#findByU_G(long,
-	 *         long[])
+	 * @see    com.liferay.portal.kernel.service.persistence.RoleFinder#findByU_G(
+	 *         long, long[])
 	 */
 	@Override
 	public List<Role> getUserRelatedRoles(long userId, long[] groupIds) {
@@ -1061,7 +1169,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 *         <code>null</code>)
 	 * @return the ordered range of the matching roles, ordered by
 	 *         <code>obc</code>
-	 * @see    com.liferay.portal.service.persistence.RoleFinder
+	 * @see    com.liferay.portal.kernel.service.persistence.RoleFinder
 	 */
 	@Override
 	public List<Role> search(
@@ -1093,7 +1201,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 * @param  types the role types (optionally <code>null</code>)
 	 * @param  params the finder parameters. Can specify values for the
 	 *         "usersRoles" key. For more information, see {@link
-	 *         com.liferay.portal.service.persistence.RoleFinder}
+	 *         com.liferay.portal.kernel.service.persistence.RoleFinder}
 	 * @param  start the lower bound of the range of roles to return
 	 * @param  end the upper bound of the range of roles to return (not
 	 *         inclusive)
@@ -1101,7 +1209,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 *         <code>null</code>)
 	 * @return the ordered range of the matching roles, ordered by
 	 *         <code>obc</code>
-	 * @see    com.liferay.portal.service.persistence.RoleFinder
+	 * @see    com.liferay.portal.kernel.service.persistence.RoleFinder
 	 */
 	@Override
 	public List<Role> search(
@@ -1138,7 +1246,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 *         <code>null</code>)
 	 * @return the ordered range of the matching roles, ordered by
 	 *         <code>obc</code>
-	 * @see    com.liferay.portal.service.persistence.RoleFinder
+	 * @see    com.liferay.portal.kernel.service.persistence.RoleFinder
 	 */
 	@Override
 	public List<Role> search(
@@ -1170,7 +1278,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 * @param  types the role types (optionally <code>null</code>)
 	 * @param  params the finder's parameters. Can specify values for the
 	 *         "usersRoles" key. For more information, see {@link
-	 *         com.liferay.portal.service.persistence.RoleFinder}
+	 *         com.liferay.portal.kernel.service.persistence.RoleFinder}
 	 * @param  start the lower bound of the range of the roles to return
 	 * @param  end the upper bound of the range of the roles to return (not
 	 *         inclusive)
@@ -1178,7 +1286,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 *         <code>null</code>)
 	 * @return the ordered range of the matching roles, ordered by
 	 *         <code>obc</code>
-	 * @see    com.liferay.portal.service.persistence.RoleFinder
+	 * @see    com.liferay.portal.kernel.service.persistence.RoleFinder
 	 */
 	@Override
 	public List<Role> search(
@@ -1213,7 +1321,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 *         role's name or description (optionally <code>null</code>)
 	 * @param  types the role types (optionally <code>null</code>)
 	 * @param  params the finder parameters. For more information, see {@link
-	 *         com.liferay.portal.service.persistence.RoleFinder}
+	 *         com.liferay.portal.kernel.service.persistence.RoleFinder}
 	 * @return the number of matching roles
 	 */
 	@Override
@@ -1252,7 +1360,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 * @param  types the role types (optionally <code>null</code>)
 	 * @param  params the finder parameters. Can specify values for the
 	 *         "usersRoles" key. For more information, see {@link
-	 *         com.liferay.portal.service.persistence.RoleFinder}
+	 *         com.liferay.portal.kernel.service.persistence.RoleFinder}
 	 * @return the number of matching roles
 	 */
 	@Override
@@ -1371,9 +1479,16 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 		catch (NoSuchRoleException nsre) {
 			User user = userLocalService.getDefaultUser(companyId);
 
-			role = roleLocalService.addRole(
-				user.getUserId(), null, 0, name, null, descriptionMap, type,
-				null, null);
+			PermissionThreadLocal.setAddResource(false);
+
+			try {
+				role = roleLocalService.addRole(
+					user.getUserId(), null, 0, name, null, descriptionMap, type,
+					null, null);
+			}
+			finally {
+				PermissionThreadLocal.setAddResource(true);
+			}
 
 			if (name.equals(RoleConstants.USER)) {
 				initPersonalControlPanelPortletsPermissions(role);

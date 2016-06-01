@@ -84,7 +84,7 @@ public class LocalizationImplTest {
 	public void setUp() throws Exception {
 		StringBundler sb = new StringBundler();
 
-		sb.append("<?xml version='1.0' encoding='UTF-8'?>");
+		sb.append("<?xml version=\"1.0\"?>");
 
 		sb.append("<root available-locales=\"en_US,es_ES\" ");
 		sb.append("default-locale=\"en_US\">");
@@ -124,12 +124,12 @@ public class LocalizationImplTest {
 		String[] documentAvailableLanguageIds =
 			LocalizationUtil.getAvailableLanguageIds(document);
 
-		Assert.assertEquals(documentAvailableLanguageIds.length, 2);
+		Assert.assertEquals(2, documentAvailableLanguageIds.length);
 
 		String[] xmlAvailableLanguageIds =
 			LocalizationUtil.getAvailableLanguageIds(_xml);
 
-		Assert.assertEquals(xmlAvailableLanguageIds.length, 2);
+		Assert.assertEquals(2, xmlAvailableLanguageIds.length);
 
 		Arrays.sort(documentAvailableLanguageIds);
 		Arrays.sort(xmlAvailableLanguageIds);

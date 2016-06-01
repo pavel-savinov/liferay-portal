@@ -106,7 +106,12 @@
 </tr>
 <tr>
 	<td>DOCUMENTS_AND_MEDIA_CHOOSE_FROM_DOCUMENT_LIBRARY_BUTTON</td>
-	<td>//div[@data-fieldname='${key_fieldName}']//button[contains(.,'Choose from Document Library')]</td>
+	<td>//div[@data-fieldname='${key_fieldName}']//button[contains(.,'Select')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DOCUMENTS_AND_MEDIA_CHILD_FIELD_CHOOSE_FROM_DOCUMENT_LIBRARY_BUTTON_</td>
+	<td>xpath=(//div[@data-fieldname='${key_parentFieldName}'][2]/div/following-sibling::div//button/span)</td>
 	<td></td>
 </tr>
 <tr>
@@ -145,8 +150,33 @@
 	<td></td>
 </tr>
 <tr>
-	<td>LINK_TO_PAGE_SELECT</td>
-	<td>//div[@data-fieldname='${key_fieldName}']//select</td>
+	<td>LINK_TO_PAGE_PAGE_SELECT</td>
+	<td>//div[@data-fieldname='${key_fieldName}']//input</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LINK_TO_PAGE_LINK</td>
+	<td>//div[contains(@class,'ddm-container')]//a[contains(.,'${key_pageName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LINK_TO_PAGE_NAV_ITEM</td>
+	<td>//nav[contains(@class,'navbar-default')]//a[contains(.,'${key_navItem}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LINK_TO_PAGE_PAGE_RADIO</td>
+	<td>//label[@name='tree-node-check' and contains(.,'${key_pageName}')]/input[@type='radio']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LINK_TO_PAGE_SELECT_BUTTON</td>
+	<td>//button[contains(.,'Select')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LINK_TO_PAGE_SELECT_PAGE_BUTTON</td>
+	<td>//button[contains(.,'Select')]</td>
 	<td></td>
 </tr>
 <tr>

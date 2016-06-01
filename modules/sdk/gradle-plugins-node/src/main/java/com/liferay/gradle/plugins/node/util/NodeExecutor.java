@@ -48,7 +48,7 @@ public class NodeExecutor {
 		return this;
 	}
 
-	public NodeExecutor args(Object ... args) {
+	public NodeExecutor args(Object... args) {
 		return args(Arrays.asList(args));
 	}
 
@@ -96,7 +96,7 @@ public class NodeExecutor {
 		args(args);
 	}
 
-	public void setArgs(Object ... args) {
+	public void setArgs(Object... args) {
 		setArgs(Arrays.asList(args));
 	}
 
@@ -137,13 +137,7 @@ public class NodeExecutor {
 	}
 
 	protected File getExecutableDir() {
-		File executableDir = GradleUtil.toFile(_project, _nodeDir);
-
-		if (!OSDetector.isWindows()) {
-			executableDir = new File(executableDir, "bin");
-		}
-
-		return executableDir;
+		return new File(getNodeDir(), "bin");
 	}
 
 	protected List<String> getWindowsArgs() {

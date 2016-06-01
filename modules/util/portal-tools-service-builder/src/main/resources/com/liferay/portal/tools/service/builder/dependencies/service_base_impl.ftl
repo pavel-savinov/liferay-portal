@@ -2,11 +2,18 @@ package ${packagePath}.service.base;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
+import com.liferay.exportimport.kernel.lar.ManifestSummary;
+import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
+import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerRegistryUtil;
+import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 import ${beanLocatorUtil};
 import com.liferay.portal.kernel.dao.db.DB;
-import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
+import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
@@ -25,47 +32,39 @@ import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchException;
+import com.liferay.portal.kernel.service.Base${sessionTypeName}ServiceImpl;
+import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
+import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistryUtil;
 import com.liferay.portal.kernel.util.InfrastructureUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.model.PersistedModel;
-import com.liferay.portal.service.Base${sessionTypeName}ServiceImpl;
-import com.liferay.portal.service.PersistedModelLocalServiceRegistry;
-import com.liferay.portal.service.PersistedModelLocalServiceRegistryUtil;
-import com.liferay.portal.util.PortalUtil;
-
-import com.liferay.portlet.exportimport.lar.ExportImportHelperUtil;
-import com.liferay.portlet.exportimport.lar.ManifestSummary;
-import com.liferay.portlet.exportimport.lar.PortletDataContext;
-import com.liferay.portlet.exportimport.lar.StagedModelType;
-import com.liferay.portlet.exportimport.lar.StagedModelDataHandler;
-import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerRegistryUtil;
-import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
 import java.util.List;
 
 import javax.sql.DataSource;
-
-import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
+import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 
 <#if entity.hasColumns()>
 	<#if entity.hasCompoundPK()>
-		import ${packagePath}.service.persistence.${entity.name}PK;
+		import ${apiPackagePath}.service.persistence.${entity.name}PK;
 	</#if>
 
-	import ${packagePath}.model.${entity.name};
+	import ${apiPackagePath}.model.${entity.name};
 
 	<#list entity.blobList as column>
 		<#if column.lazy>
-			import ${packagePath}.model.${entity.name}${column.methodName}BlobModel;
+			import ${apiPackagePath}.model.${entity.name}${column.methodName}BlobModel;
 		</#if>
 	</#list>
 
@@ -73,14 +72,14 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 </#if>
 
 <#list referenceList as tempEntity>
-	<#if tempEntity.hasColumns() && (entity.name == "Counter" || tempEntity.name != "Counter")>
-		import ${tempEntity.packagePath}.service.persistence.${tempEntity.name}Persistence;
-		import ${tempEntity.packagePath}.service.persistence.${tempEntity.name}Util;
+	<#if tempEntity.hasColumns() && ((entity.name == "Counter") || (tempEntity.name != "Counter"))>
+		import ${tempEntity.apiPackagePath}.service.persistence.${tempEntity.name}Persistence;
+		import ${tempEntity.apiPackagePath}.service.persistence.${tempEntity.name}Util;
 	</#if>
 
-	<#if tempEntity.hasFinderClass() && (entity.name == "Counter" || tempEntity.name != "Counter")>
-		import ${tempEntity.packagePath}.service.persistence.${tempEntity.name}Finder;
-		import ${tempEntity.packagePath}.service.persistence.${tempEntity.name}FinderUtil;
+	<#if tempEntity.hasFinderClass() && ((entity.name == "Counter") || (tempEntity.name != "Counter"))>
+		import ${tempEntity.apiPackagePath}.service.persistence.${tempEntity.name}Finder;
+		import ${tempEntity.apiPackagePath}.service.persistence.${tempEntity.name}FinderUtil;
 	</#if>
 </#list>
 
@@ -94,7 +93,7 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
  *
  * @author ${author}
  * @see ${packagePath}.service.impl.${entity.name}LocalServiceImpl
- * @see ${packagePath}.service.${entity.name}LocalServiceUtil
+ * @see ${apiPackagePath}.service.${entity.name}LocalServiceUtil
 <#if classDeprecated>
  * @deprecated ${classDeprecatedComment}
 </#if>
@@ -111,7 +110,7 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 		/*
 		 * NOTE FOR DEVELOPERS:
 		 *
-		 * Never modify or reference this class directly. Always use {@link ${packagePath}.service.${entity.name}LocalServiceUtil} to access the ${entity.humanName} local service.
+		 * Never modify or reference this class directly. Always use {@link ${apiPackagePath}.service.${entity.name}LocalServiceUtil} to access the ${entity.humanName} local service.
 		 */
 <#else>
 /**
@@ -123,7 +122,7 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
  *
  * @author ${author}
  * @see ${packagePath}.service.impl.${entity.name}ServiceImpl
- * @see ${packagePath}.service.${entity.name}ServiceUtil
+ * @see ${apiPackagePath}.service.${entity.name}ServiceUtil
 <#if classDeprecated>
  * @deprecated ${classDeprecatedComment}
 </#if>
@@ -139,12 +138,12 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 		/*
 		 * NOTE FOR DEVELOPERS:
 		 *
-		 * Never modify or reference this class directly. Always use {@link ${packagePath}.service.${entity.name}ServiceUtil} to access the ${entity.humanName} remote service.
+		 * Never modify or reference this class directly. Always use {@link ${apiPackagePath}.service.${entity.name}ServiceUtil} to access the ${entity.humanName} remote service.
 		 */
 </#if>
 
 	<#if (sessionTypeName == "Local") && entity.hasColumns()>
-		<#assign serviceBaseExceptions = serviceBuilder.getServiceBaseExceptions(methods, "add" + entity.name, [packagePath + ".model." + entity.name], [])>
+		<#assign serviceBaseExceptions = serviceBuilder.getServiceBaseExceptions(methods, "add" + entity.name, [apiPackagePath + ".model." + entity.name], [])>
 
 		/**
 		 * Adds the ${entity.humanName} to the database. Also notifies the appropriate model listeners.
@@ -195,7 +194,7 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 			return ${entity.varName}Persistence.remove(${entity.PKVarName});
 		}
 
-		<#assign serviceBaseExceptions = serviceBuilder.getServiceBaseExceptions(methods, "delete" + entity.name, [packagePath + ".model." + entity.name], [])>
+		<#assign serviceBaseExceptions = serviceBuilder.getServiceBaseExceptions(methods, "delete" + entity.name, [apiPackagePath + ".model." + entity.name], [])>
 
 		/**
 		 * Deletes the ${entity.humanName} from the database. Also notifies the appropriate model listeners.
@@ -372,7 +371,7 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 			public ActionableDynamicQuery getActionableDynamicQuery() {
 				ActionableDynamicQuery actionableDynamicQuery = new DefaultActionableDynamicQuery();
 
-				actionableDynamicQuery.setBaseLocalService(${packagePath}.service.${entity.name}LocalServiceUtil.getService());
+				actionableDynamicQuery.setBaseLocalService(${entity.varName}LocalService);
 				actionableDynamicQuery.setClassLoader(getClassLoader());
 				actionableDynamicQuery.setModelClass(${entity.name}.class);
 
@@ -399,7 +398,7 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 			public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery() {
 				IndexableActionableDynamicQuery indexableActionableDynamicQuery = new IndexableActionableDynamicQuery();
 
-				indexableActionableDynamicQuery.setBaseLocalService(${packagePath}.service.${entity.name}LocalServiceUtil.getService());
+				indexableActionableDynamicQuery.setBaseLocalService(${entity.varName}LocalService);
 				indexableActionableDynamicQuery.setClassLoader(getClassLoader());
 				indexableActionableDynamicQuery.setModelClass(${entity.name}.class);
 
@@ -423,7 +422,7 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 			}
 
 			protected void initActionableDynamicQuery(ActionableDynamicQuery actionableDynamicQuery) {
-				actionableDynamicQuery.setBaseLocalService(${packagePath}.service.${entity.name}LocalServiceUtil.getService());
+				actionableDynamicQuery.setBaseLocalService(${entity.varName}LocalService);
 				actionableDynamicQuery.setClassLoader(getClassLoader());
 				actionableDynamicQuery.setModelClass(${entity.name}.class);
 
@@ -686,7 +685,7 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 			return ${entity.varName}Persistence.countAll();
 		}
 
-		<#assign serviceBaseExceptions = serviceBuilder.getServiceBaseExceptions(methods, "update" + entity.name, [packagePath + ".model." + entity.name], [])>
+		<#assign serviceBaseExceptions = serviceBuilder.getServiceBaseExceptions(methods, "update" + entity.name, [apiPackagePath + ".model." + entity.name], [])>
 
 		/**
 		 * Updates the ${entity.humanName} in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
@@ -712,7 +711,7 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 					try {
 						session = ${entity.varName}Persistence.openSession();
 
-						return (${packagePath}.model.${entity.name}${column.methodName}BlobModel)session.get(${entity.name}${column.methodName}BlobModel.class, primaryKey);
+						return (${apiPackagePath}.model.${entity.name}${column.methodName}BlobModel)session.get(${entity.name}${column.methodName}BlobModel.class, primaryKey);
 					}
 					catch (Exception e) {
 						throw ${entity.varName}Persistence.processException(e);
@@ -740,7 +739,7 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 					${tempEntity.varName}Persistence.add${entity.name}(${tempEntity.PKVarName}, ${entity.PKVarName});
 				}
 
-				<#assign serviceBaseExceptions = serviceBuilder.getServiceBaseExceptions(methods, "add" + tempEntity.name + entity.name, [tempEntity.PKClassName, packagePath + ".model." + entity.name], [])>
+				<#assign serviceBaseExceptions = serviceBuilder.getServiceBaseExceptions(methods, "add" + tempEntity.name + entity.name, [tempEntity.PKClassName, apiPackagePath + ".model." + entity.name], [])>
 
 				/**
 				<#list serviceBaseExceptions as exception>
@@ -772,8 +771,8 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 				</#list>
 				 */
 				@Override
-				public void add${tempEntity.name}${entity.names}(${tempEntity.PKClassName} ${tempEntity.PKVarName}, List<${entity.name}> ${entity.names}) <#if (serviceBaseExceptions?size gt 0)>throws ${stringUtil.merge(serviceBaseExceptions)} </#if>{
-					${tempEntity.varName}Persistence.add${entity.names}(${tempEntity.PKVarName}, ${entity.names});
+				public void add${tempEntity.name}${entity.names}(${tempEntity.PKClassName} ${tempEntity.PKVarName}, List<${entity.name}> ${entity.varNames}) <#if (serviceBaseExceptions?size gt 0)>throws ${stringUtil.merge(serviceBaseExceptions)} </#if>{
+					${tempEntity.varName}Persistence.add${entity.names}(${tempEntity.PKVarName}, ${entity.varNames});
 				}
 
 				<#assign serviceBaseExceptions = serviceBuilder.getServiceBaseExceptions(methods, "clear" + tempEntity.name + entity.names, [tempEntity.PKClassName], [])>
@@ -800,7 +799,7 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 					${tempEntity.varName}Persistence.remove${entity.name}(${tempEntity.PKVarName}, ${entity.PKVarName});
 				}
 
-				<#assign serviceBaseExceptions = serviceBuilder.getServiceBaseExceptions(methods, "delete" + tempEntity.name + entity.name, [tempEntity.PKClassName, packagePath + ".model." + entity.name], [])>
+				<#assign serviceBaseExceptions = serviceBuilder.getServiceBaseExceptions(methods, "delete" + tempEntity.name + entity.name, [tempEntity.PKClassName, apiPackagePath + ".model." + entity.name], [])>
 
 				/**
 				<#list serviceBaseExceptions as exception>
@@ -832,8 +831,8 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 				</#list>
 				 */
 				@Override
-				public void delete${tempEntity.name}${entity.names}(${tempEntity.PKClassName} ${tempEntity.PKVarName}, List<${entity.name}> ${entity.names}) <#if (serviceBaseExceptions?size gt 0)>throws ${stringUtil.merge(serviceBaseExceptions)} </#if>{
-					${tempEntity.varName}Persistence.remove${entity.names}(${tempEntity.PKVarName}, ${entity.names});
+				public void delete${tempEntity.name}${entity.names}(${tempEntity.PKClassName} ${tempEntity.PKVarName}, List<${entity.name}> ${entity.varNames}) <#if (serviceBaseExceptions?size gt 0)>throws ${stringUtil.merge(serviceBaseExceptions)} </#if>{
+					${tempEntity.varName}Persistence.remove${entity.names}(${tempEntity.PKVarName}, ${entity.varNames});
 				}
 
 				/**
@@ -946,7 +945,7 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 				@SuppressWarnings("deprecation")
 			</#if>
 
-			public ${tempEntity.packagePath}.service.${tempEntity.name}LocalService get${tempEntity.name}LocalService() {
+			public ${tempEntity.apiPackagePath}.service.${tempEntity.name}LocalService get${tempEntity.name}LocalService() {
 				return ${tempEntity.varName}LocalService;
 			}
 
@@ -960,7 +959,7 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 				@SuppressWarnings("deprecation")
 			</#if>
 
-			public void set${tempEntity.name}LocalService(${tempEntity.packagePath}.service.${tempEntity.name}LocalService ${tempEntity.varName}LocalService) {
+			public void set${tempEntity.name}LocalService(${tempEntity.apiPackagePath}.service.${tempEntity.name}LocalService ${tempEntity.varName}LocalService) {
 				this.${tempEntity.varName}LocalService = ${tempEntity.varName}LocalService;
 			}
 		</#if>
@@ -976,7 +975,7 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 				@SuppressWarnings("deprecation")
 			</#if>
 
-			public ${tempEntity.packagePath}.service.${tempEntity.name}Service get${tempEntity.name}Service() {
+			public ${tempEntity.apiPackagePath}.service.${tempEntity.name}Service get${tempEntity.name}Service() {
 				return ${tempEntity.varName}Service;
 			}
 
@@ -990,12 +989,12 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 				@SuppressWarnings("deprecation")
 			</#if>
 
-			public void set${tempEntity.name}Service(${tempEntity.packagePath}.service.${tempEntity.name}Service ${tempEntity.varName}Service) {
+			public void set${tempEntity.name}Service(${tempEntity.apiPackagePath}.service.${tempEntity.name}Service ${tempEntity.varName}Service) {
 				this.${tempEntity.varName}Service = ${tempEntity.varName}Service;
 			}
 		</#if>
 
-		<#if tempEntity.hasColumns() && (entity.name == "Counter" || tempEntity.name != "Counter")>
+		<#if tempEntity.hasColumns() && ((entity.name == "Counter") || (tempEntity.name != "Counter"))>
 			/**
 			 * Returns the ${tempEntity.humanName} persistence.
 			 *
@@ -1015,7 +1014,7 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 			}
 		</#if>
 
-		<#if tempEntity.hasFinderClass() && (entity.name == "Counter" || tempEntity.name != "Counter")>
+		<#if tempEntity.hasFinderClass() && ((entity.name == "Counter") || (tempEntity.name != "Counter"))>
 			/**
 			 * Returns the ${tempEntity.humanName} finder.
 			 *
@@ -1045,9 +1044,9 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 
 		<#if (sessionTypeName == "Local") && entity.hasColumns()>
 			<#if pluginName != "">
-				PersistedModelLocalServiceRegistryUtil.register("${packagePath}.model.${entity.name}", ${entity.varName}LocalService);
+				PersistedModelLocalServiceRegistryUtil.register("${apiPackagePath}.model.${entity.name}", ${entity.varName}LocalService);
 			<#else>
-				persistedModelLocalServiceRegistry.register("${packagePath}.model.${entity.name}", ${entity.varName}LocalService);
+				persistedModelLocalServiceRegistry.register("${apiPackagePath}.model.${entity.name}", ${entity.varName}LocalService);
 			</#if>
 		</#if>
 	}
@@ -1055,9 +1054,9 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 	public void destroy() {
 		<#if (sessionTypeName == "Local") && entity.hasColumns()>
 			<#if pluginName != "">
-				PersistedModelLocalServiceRegistryUtil.unregister("${packagePath}.model.${entity.name}");
+				PersistedModelLocalServiceRegistryUtil.unregister("${apiPackagePath}.model.${entity.name}");
 			<#else>
-				persistedModelLocalServiceRegistry.unregister("${packagePath}.model.${entity.name}");
+				persistedModelLocalServiceRegistry.unregister("${apiPackagePath}.model.${entity.name}");
 			</#if>
 		</#if>
 	}
@@ -1124,12 +1123,12 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 				DataSource dataSource = InfrastructureUtil.getDataSource();
 			</#if>
 
-			DB db = DBFactoryUtil.getDB();
+			DB db = DBManagerUtil.getDB();
 
 			sql = db.buildSQL(sql);
 			sql = PortalUtil.transformSQL(sql);
 
-			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource, sql, new int[0]);
+			SqlUpdate sqlUpdate = SqlUpdateFactoryUtil.getSqlUpdate(dataSource, sql);
 
 			sqlUpdate.update();
 		}
@@ -1140,39 +1139,62 @@ import ${packagePath}.service.${entity.name}${sessionTypeName}Service;
 
 	<#list referenceList as tempEntity>
 		<#if tempEntity.hasLocalService()>
-			@BeanReference(type = ${tempEntity.packagePath}.service.${tempEntity.name}LocalService.class)
+			<#if osgiModule && (tempEntity.apiPackagePath != apiPackagePath)>
+				@ServiceReference(type = ${tempEntity.apiPackagePath}.service.${tempEntity.name}LocalService.class)
+			<#else>
+				@BeanReference(type = ${tempEntity.apiPackagePath}.service.${tempEntity.name}LocalService.class)
+			</#if>
 
 			<#if !classDeprecated && tempEntity.isDeprecated()>
 				@SuppressWarnings("deprecation")
 			</#if>
 
-			protected ${tempEntity.packagePath}.service.${tempEntity.name}LocalService ${tempEntity.varName}LocalService;
+			protected ${tempEntity.apiPackagePath}.service.${tempEntity.name}LocalService ${tempEntity.varName}LocalService;
 		</#if>
 
 		<#if (sessionTypeName != "Local") && tempEntity.hasRemoteService()>
-			@BeanReference(type = ${tempEntity.packagePath}.service.${tempEntity.name}Service.class)
+			<#if osgiModule && (tempEntity.apiPackagePath != apiPackagePath)>
+				@ServiceReference(type = ${tempEntity.apiPackagePath}.service.${tempEntity.name}Service.class)
+			<#else>
+				@BeanReference(type = ${tempEntity.apiPackagePath}.service.${tempEntity.name}Service.class)
+			</#if>
 
 			<#if !classDeprecated && tempEntity.isDeprecated()>
 				@SuppressWarnings("deprecation")
 			</#if>
 
-			protected ${tempEntity.packagePath}.service.${tempEntity.name}Service ${tempEntity.varName}Service;
+			protected ${tempEntity.apiPackagePath}.service.${tempEntity.name}Service ${tempEntity.varName}Service;
 		</#if>
 
-		<#if tempEntity.hasColumns() && (entity.name == "Counter" || tempEntity.name != "Counter")>
-			@BeanReference(type = ${tempEntity.name}Persistence.class)
+		<#if tempEntity.hasColumns() && ((entity.name == "Counter") || (tempEntity.name != "Counter"))>
+			<#if osgiModule && (tempEntity.apiPackagePath != apiPackagePath)>
+				@ServiceReference(type = ${tempEntity.name}Persistence.class)
+			<#else>
+				@BeanReference(type = ${tempEntity.name}Persistence.class)
+			</#if>
+
 			protected ${tempEntity.name}Persistence ${tempEntity.varName}Persistence;
 		</#if>
 
-		<#if tempEntity.hasFinderClass() && (entity.name == "Counter" || tempEntity.name != "Counter")>
-			@BeanReference(type = ${tempEntity.name}Finder.class)
+		<#if tempEntity.hasFinderClass() && ((entity.name == "Counter") || (tempEntity.name != "Counter"))>
+			<#if osgiModule && (tempEntity.apiPackagePath != apiPackagePath)>
+				@ServiceReference(type = ${tempEntity.name}Finder.class)
+			<#else>
+				@BeanReference(type = ${tempEntity.name}Finder.class)
+			</#if>
+
 			protected ${tempEntity.name}Finder ${tempEntity.varName}Finder;
 		</#if>
 	</#list>
 
 	<#if (sessionTypeName == "Local") && entity.hasColumns()>
 		<#if pluginName == "">
-			@BeanReference(type = PersistedModelLocalServiceRegistry.class)
+			<#if osgiModule>
+				@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
+			<#else>
+				@BeanReference(type = PersistedModelLocalServiceRegistry.class)
+			</#if>
+
 			protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
 		</#if>
 	</#if>

@@ -16,12 +16,17 @@ package com.liferay.jenkins.results.parser;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 
 import java.net.URI;
 import java.net.URL;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.io.SAXReader;
 
 import org.junit.Assert;
 
@@ -37,7 +42,10 @@ public abstract class BaseJenkinsResultsParserTestCase {
 
 		String expectedMessage = read(expectedMessageFile);
 
-		String actualMessage = getMessage(toURLString(caseDir));
+		String actualMessage = fixMessage(
+			getMessage(
+				"${dependencies.url}/" + getSimpleClassName() + "/" +
+					caseDir.getName() + "/"));
 
 		boolean value = expectedMessage.equals(actualMessage);
 
@@ -61,12 +69,6 @@ public abstract class BaseJenkinsResultsParserTestCase {
 		}
 	}
 
-	protected URL createURL(String urlString) throws Exception {
-		URL url = new URL(urlString);
-
-		return encode(url);
-	}
-
 	protected void deleteFile(File file) {
 		if (!file.exists()) {
 			return;
@@ -86,6 +88,10 @@ public abstract class BaseJenkinsResultsParserTestCase {
 		}
 	}
 
+	protected void deleteFile(String fileName) {
+		deleteFile(new File(fileName));
+	}
+
 	protected abstract void downloadSample(File sampleDir, URL url)
 		throws Exception;
 
@@ -94,14 +100,18 @@ public abstract class BaseJenkinsResultsParserTestCase {
 
 		File sampleDir = new File(sampleDirName);
 
-		if (sampleDir.exists()) {
+		File expectedMessageFile = new File(sampleDir, "expected_message.html");
+
+		if (expectedMessageFile.exists()) {
 			return;
 		}
 
-		System.out.println("Downloading sample " + sampleKey);
-
 		try {
-			downloadSample(sampleDir, url);
+			if (!sampleDir.exists()) {
+				System.out.println("Downloading sample " + sampleKey);
+
+				downloadSample(sampleDir, url);
+			}
 
 			writeExpectedMessage(sampleDir);
 		}
@@ -121,20 +131,62 @@ public abstract class BaseJenkinsResultsParserTestCase {
 			urlString += "?pretty";
 		}
 
-		write(
+		urlSuffix = JenkinsResultsParserUtil.fixFileName(urlSuffix);
+
+		JenkinsResultsParserUtil.write(
 			new File(dir, urlSuffix),
 			JenkinsResultsParserUtil.toString(
 				JenkinsResultsParserUtil.getLocalURL(urlString)));
 	}
 
-	protected URL encode(URL url) throws Exception {
-		URI uri = new URI(
-			url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(),
-			url.getPath(), url.getQuery(), url.getRef());
+	protected String fixMessage(String message) {
+		if (message.contains(JenkinsResultsParserUtil.DEPENDENCIES_URL_FILE)) {
+			message = message.replace(
+				JenkinsResultsParserUtil.DEPENDENCIES_URL_FILE,
+				"${dependencies.url}");
+		}
 
-		String uriASCIIString = uri.toASCIIString();
+		if (message.contains(JenkinsResultsParserUtil.DEPENDENCIES_URL_HTTP)) {
+			message = message.replace(
+				JenkinsResultsParserUtil.DEPENDENCIES_URL_HTTP,
+				"${dependencies.url}");
+		}
 
-		return new URL(uriASCIIString.replace("#", "%23"));
+		return message.replaceAll("[^\\S\\r\\n]+\n", "\n");
+	}
+
+	protected String formatXML(String xml)
+		throws DocumentException, IOException {
+
+		SAXReader saxReader = new SAXReader();
+
+		for (int i = 0; i < _XML_REPLACEMENTS.length; i++) {
+			xml = xml.replace(_XML_REPLACEMENTS[i][0], _XML_REPLACEMENTS[i][1]);
+		}
+
+		Document document = null;
+
+		try {
+			document = saxReader.read(new StringReader(xml));
+		}
+		catch (DocumentException de) {
+			DocumentException newDE = new DocumentException(
+				de.getMessage() + "\n" + xml);
+
+			newDE.setStackTrace(de.getStackTrace());
+
+			throw newDE;
+		}
+
+		String formattedXML = JenkinsResultsParserUtil.format(
+			document.getRootElement());
+
+		for (int i = 0; i < _XML_REPLACEMENTS.length; i++) {
+			formattedXML = formattedXML.replace(
+				_XML_REPLACEMENTS[i][1], _XML_REPLACEMENTS[i][0]);
+		}
+
+		return formattedXML;
 	}
 
 	protected abstract String getMessage(String urlString) throws Exception;
@@ -168,33 +220,33 @@ public abstract class BaseJenkinsResultsParserTestCase {
 
 		String urlString = url.toString();
 
-		return urlString.replace(System.getProperty("user.dir"), "${user.dir}");
-	}
+		String path = dependenciesDir.getPath();
 
-	protected void write(File file, String content) throws Exception {
-		System.out.println(
-			"Write file " + file + " with length " + content.length());
+		int x =
+			path.indexOf("src/test/resources/dependencies/") +
+				"src/test/resources/dependencies/".length();
 
-		File parentDir = file.getParentFile();
+		path = path.substring(x);
 
-		if (!parentDir.exists()) {
-			System.out.println("Make parent directories for " + file);
-
-			parentDir.mkdirs();
-		}
-
-		Files.write(Paths.get(file.toURI()), content.getBytes());
+		return urlString.replace(
+			"file:" + dependenciesDir.getAbsolutePath(),
+			"${dependencies.url}/" + path);
 	}
 
 	protected void writeExpectedMessage(File sampleDir) throws Exception {
 		File expectedMessageFile = new File(sampleDir, "expected_message.html");
-		String expectedMessage = getMessage(toURLString(sampleDir));
 
-		write(expectedMessageFile, expectedMessage);
+		String expectedMessage = fixMessage(getMessage(toURLString(sampleDir)));
+
+		JenkinsResultsParserUtil.write(expectedMessageFile, expectedMessage);
 	}
 
 	protected File dependenciesDir = new File(
-		"src/test/resources/com/liferay/results/parser/dependencies/" +
-			getSimpleClassName());
+		"src/test/resources/dependencies/" + getSimpleClassName());
+
+	private static final String[][] _XML_REPLACEMENTS = new String[][] {
+		{"<pre>", "<pre><![CDATA["}, {"</pre>", "]]></pre>"},
+		{"&raquo;", "[raquo]"}
+	};
 
 }

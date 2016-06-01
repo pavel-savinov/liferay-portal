@@ -1,4 +1,5 @@
 <definition component-name="portal-plugins-osgi">
+	<property name="portal.release" value="true" />
 	<property name="plugins.deployment.type" value="osgi" />
 	<property name="testray.main.component.name" value="Message Boards" />
 
@@ -11,8 +12,10 @@
 
 		<var name="appName" value="Message Boards Subscription Manager" />
 
-		<execute macro="Page#gotoConfigurationCP">
-			<var name="portletName" value="Message Boards Subscription Manager" />
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesConfiguration">
+			<var name="portlet" value="Message Boards Subscription Manager" />
 		</execute>
 
 		<execute function="AntCommand#antCommand" locator1="build-test.xml" value1="remove-plugin -Dplugin.name=my-subscriptions-portlet" />

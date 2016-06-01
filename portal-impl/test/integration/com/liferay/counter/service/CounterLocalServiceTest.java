@@ -14,7 +14,8 @@
 
 package com.liferay.counter.service;
 
-import com.liferay.counter.model.Counter;
+import com.liferay.counter.kernel.model.Counter;
+import com.liferay.counter.kernel.service.CounterLocalServiceUtil;
 import com.liferay.portal.cache.key.SimpleCacheKeyGenerator;
 import com.liferay.portal.kernel.cache.key.CacheKeyGeneratorUtil;
 import com.liferay.portal.kernel.configuration.Filter;
@@ -36,7 +37,6 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.HypersonicServerTestRule;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.test.rule.MainServletTestRule;
 import com.liferay.portal.util.InitUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.registry.BasicRegistryImpl;
@@ -44,11 +44,16 @@ import com.liferay.registry.RegistryUtil;
 
 import java.io.File;
 
+import java.lang.management.ManagementFactory;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
+
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -66,7 +71,6 @@ public class CounterLocalServiceTest {
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
 			false, new LiferayIntegrationTestRule(),
-			MainServletTestRule.INSTANCE, HypersonicServerTestRule.INSTANCE,
 			new BaseTestRule<>(
 				new BaseTestCallback<Void, Void>() {
 
@@ -76,7 +80,9 @@ public class CounterLocalServiceTest {
 					}
 
 					@Override
-					public Void beforeClass(Description description) {
+					public Void beforeClass(Description description)
+						throws Exception {
+
 						CounterLocalServiceUtil.reset(_COUNTER_NAME);
 
 						Counter counter = CounterLocalServiceUtil.createCounter(
@@ -84,10 +90,38 @@ public class CounterLocalServiceTest {
 
 						CounterLocalServiceUtil.updateCounter(counter);
 
+						MBeanServer mBeanServer =
+							ManagementFactory.getPlatformMBeanServer();
+
+						// HikariCP
+
+						for (ObjectName objectName :
+								mBeanServer.queryNames(
+									null,
+									new ObjectName(
+										"com.zaxxer.hikari:type=Pool (*"))) {
+
+							mBeanServer.invoke(
+								objectName, "softEvictConnections", null, null);
+						}
+
+						// Tomcat
+
+						for (ObjectName objectName :
+								mBeanServer.queryNames(
+									null,
+									new ObjectName(
+										"TomcatJDBCPool:type=ConnectionPool," +
+											"name=*"))) {
+
+							mBeanServer.invoke(objectName, "purge", null, null);
+						}
+
 						return null;
 					}
 
-				}));
+				}),
+			HypersonicServerTestRule.INSTANCE);
 
 	@Test
 	public void testConcurrentIncrement() throws Exception {
@@ -195,10 +229,23 @@ public class CounterLocalServiceTest {
 
 			System.setProperty("catalina.base", ".");
 			System.setProperty("external-properties", "portal-test.properties");
+
+			// C3PO
+
 			System.setProperty("portal:jdbc.default.maxPoolSize", "1");
 			System.setProperty("portal:jdbc.default.minPoolSize", "0");
+
+			// HikariCP
+
 			System.setProperty("portal:jdbc.default.maximumPoolSize", "1");
 			System.setProperty("portal:jdbc.default.minimumIdle", "0");
+
+			// Tomcat
+
+			System.setProperty("portal:jdbc.default.initialSize", "0");
+			System.setProperty("portal:jdbc.default.maxActive", "1");
+			System.setProperty("portal:jdbc.default.maxIdle", "0");
+			System.setProperty("portal:jdbc.default.minIdle", "0");
 
 			CacheKeyGeneratorUtil cacheKeyGeneratorUtil =
 				new CacheKeyGeneratorUtil();
@@ -209,7 +256,7 @@ public class CounterLocalServiceTest {
 			InitUtil.initWithSpring(
 				Arrays.asList(
 					"META-INF/base-spring.xml", "META-INF/counter-spring.xml"),
-				false);
+				false, true);
 
 			List<Long> ids = new ArrayList<>();
 

@@ -26,6 +26,7 @@ import com.liferay.marketplace.store.web.util.MarketplaceLicenseUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.ReleaseInfo;
@@ -33,7 +34,6 @@ import com.liferay.portal.kernel.util.ServerDetector;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.theme.ThemeDisplay;
 
 import java.io.File;
 import java.io.IOException;
@@ -368,9 +368,8 @@ public class MarketplaceStorePortlet extends RemoteMVCPortlet {
 
 	@Override
 	protected String getServerPortletURL() {
-		return
-			MarketplaceStoreWebConfigurationValues.MARKETPLACE_URL +
-				"/osb-portlet/mp_server";
+		return MarketplaceStoreWebConfigurationValues.MARKETPLACE_URL +
+			"/osb-portlet/mp_server";
 	}
 
 	@Override
@@ -381,9 +380,13 @@ public class MarketplaceStorePortlet extends RemoteMVCPortlet {
 		parameterMap.put(
 			"clientBuild",
 			new String[] {String.valueOf(MarketplaceConstants.CLIENT_BUILD)});
-		parameterMap.put(
-			"compatibility",
-			new String[] {String.valueOf(ReleaseInfo.getBuildNumber())});
+
+		if (!parameterMap.containsKey("compatibility")) {
+			parameterMap.put(
+				"compatibility",
+				new String[] {String.valueOf(ReleaseInfo.getBuildNumber())});
+		}
+
 		parameterMap.put(
 			"supportsHotDeploy",
 			new String[] {
@@ -407,7 +410,7 @@ public class MarketplaceStorePortlet extends RemoteMVCPortlet {
 		super.setOAuthManager(oAuthManager);
 	}
 
-	private volatile AppLocalService _appLocalService;
-	private volatile AppService _appService;
+	private AppLocalService _appLocalService;
+	private AppService _appService;
 
 }

@@ -1,17 +1,11 @@
 <definition component-name="portal-workflow">
+	<property name="portal.release" value="true" />
 	<property name="testray.main.component.name" value="Workflow" />
 
 	<var name="workflowAssetType" value="Web Content Article" />
 
 	<set-up>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
-
-		<if>
-			<equals arg1="${testPortalInstance}" arg2="true" />
-			<then>
-				<execute macro="SignIn#signInPortalInstanceSetUp" />
-			</then>
-		</if>
+		<execute macro="TestCase#setUpPortalInstance" />
 
 		<execute macro="User#firstLoginPG" />
 
@@ -44,7 +38,9 @@
 		</if>
 	</tear-down>
 
-	<command name="WithdrawTaskAssignedToMeByActions" priority="4">
+	<command name="WithdrawTaskAssignedToMeByActions" priority="5">
+		<property name="portal.acceptance" value="true" />
+
 		<var name="webContentContent" value="WC WebContent Content" />
 		<var name="webContentTitle" value="WC WebContent Title" />
 

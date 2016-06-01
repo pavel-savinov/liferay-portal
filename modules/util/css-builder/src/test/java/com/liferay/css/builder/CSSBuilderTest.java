@@ -58,8 +58,8 @@ public class CSSBuilderTest {
 			new SimpleFileVisitor<Path>() {
 
 				@Override
-				public FileVisitResult visitFile(
-						Path path, BasicFileAttributes basicFileAttributes)
+				public FileVisitResult postVisitDirectory(
+						Path path, IOException ioe)
 					throws IOException {
 
 					Files.delete(path);
@@ -68,8 +68,8 @@ public class CSSBuilderTest {
 				}
 
 				@Override
-				public FileVisitResult postVisitDirectory(
-						Path path, IOException ioe)
+				public FileVisitResult visitFile(
+						Path path, BasicFileAttributes basicFileAttributes)
 					throws IOException {
 
 					Files.delete(path);
@@ -102,39 +102,51 @@ public class CSSBuilderTest {
 	private void _testSassToCssBuilder(String compiler) throws Exception {
 		CSSBuilder cssBuilder = new CSSBuilder(
 			_docrootDirName, false,
-			"../../frontend/frontend-common-css/tmp/META-INF/resources",
-			new String[0], compiler);
+			"../../apps/foundation/frontend-css/frontend-css-common/tmp" +
+				"/META-INF/resources",
+			6, new String[0], compiler);
 
 		cssBuilder.execute(Arrays.asList(new String[] {"/css"}));
 
-		String expectedCacheContent = _read(
+		String expectedTestContent = _read(
 			_docrootDirName + "/expected/test.css");
-		String actualTestCacheContent = _read(
+
+		String actualTestContent = _read(
 			_docrootDirName + "/css/.sass-cache/test.css");
 
-		Assert.assertEquals(expectedCacheContent, actualTestCacheContent);
+		Assert.assertEquals(expectedTestContent, actualTestContent);
 
-		String actualMainCacheContent = _read(
-			_docrootDirName + "/css/.sass-cache/main.css");
+		String actualTestPartialContent = _read(
+			_docrootDirName + "/css/.sass-cache/test_partial.css");
 
-		Assert.assertEquals(expectedCacheContent, actualMainCacheContent);
+		Assert.assertEquals(expectedTestContent, actualTestPartialContent);
 
-		File file = new File(
+		File partialCssFile = new File(
 			Paths.get("/css/.sass-cache/_partial.css").toString());
 
-		Assert.assertFalse(file.exists());
+		Assert.assertFalse(partialCssFile.exists());
 
-		String expectedRtlCacheContent = _read(
+		String expectedTestRtlContent = _read(
 			_docrootDirName + "/expected/test_rtl.css");
-		String actualTestRtlCacheContent = _read(
+
+		String actualTestRtlContent = _read(
 			_docrootDirName + "/css/.sass-cache/test_rtl.css");
 
-		Assert.assertEquals(expectedRtlCacheContent, actualTestRtlCacheContent);
+		Assert.assertEquals(expectedTestRtlContent, actualTestRtlContent);
 
-		String actualMainRtlCacheContent = _read(
-			_docrootDirName + "/css/.sass-cache/main_rtl.css");
+		String actualTestPartialRtlContent = _read(
+			_docrootDirName + "/css/.sass-cache/test_partial_rtl.css");
 
-		Assert.assertEquals(expectedRtlCacheContent, actualMainRtlCacheContent);
+		Assert.assertEquals(
+			expectedTestRtlContent, actualTestPartialRtlContent);
+
+		String expectedUnicodeContent = _read(
+			_docrootDirName + "/expected/test_unicode.css");
+
+		String actualTestUnicodeContent = _read(
+			_docrootDirName + "/css/.sass-cache/test_unicode.css");
+
+		Assert.assertEquals(expectedUnicodeContent, actualTestUnicodeContent);
 	}
 
 	private static String _docrootDirName;

@@ -2,19 +2,9 @@
 <!DOCTYPE project>
 
 <project name="build-module">
-	<dirname file="${ant.file.build-module}" property="modules.dir" />
+	<import file="build-common.xml" />
 
-	<taskdef classpath="${modules.dir}/../lib/development/ant-contrib.jar" resource="net/sf/antcontrib/antlib.xml" />
-
-	<property name="gradle.wrapper.path" relative="yes" value="${modules.dir}/../gradlew" />
-
-	<macrodef name="print-gradle-alternative">
-		<attribute name="args" />
-
-		<sequential>
-			<echo>Please run this command instead: ${gradle.wrapper.path} @{args}</echo>
-		</sequential>
-	</macrodef>
+	<import file="build-app.xml" />
 
 	<target name="all">
 		<print-gradle-alternative args="clean deploy" />
@@ -26,6 +16,39 @@
 
 	<target name="build-lang">
 		<print-gradle-alternative args="buildLang" />
+	</target>
+
+	<target name="build-module-availability-report">
+		<if>
+			<available file="bnd.bnd" />
+			<then>
+				<property file="bnd.bnd" />
+
+				<echo
+					append="true"
+					file="${nexus.reports.dir}/modules.symbolic.names.list"
+					message="${Bundle-SymbolicName}${line.separator}"
+				/>
+
+				<if>
+					<contains string="${repository.index}" substring="${Bundle-SymbolicName}" />
+					<then>
+						<echo
+							append="true"
+							file="${nexus.reports.dir}/available.modules.txt"
+							message="${line.separator}${Bundle-SymbolicName}"
+						/>
+					</then>
+					<else>
+						<echo
+							append="true"
+							file="${nexus.reports.dir}/unavailable.modules.txt"
+							message="${line.separator}${Bundle-SymbolicName}"
+						/>
+					</else>
+				</if>
+			</then>
+		</if>
 	</target>
 
 	<target name="build-service">

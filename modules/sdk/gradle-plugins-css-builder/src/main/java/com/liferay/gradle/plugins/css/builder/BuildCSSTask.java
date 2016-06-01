@@ -14,11 +14,14 @@
 
 package com.liferay.gradle.plugins.css.builder;
 
+import com.liferay.css.builder.CSSBuilderArgs;
 import com.liferay.gradle.util.FileUtil;
 import com.liferay.gradle.util.GradleUtil;
 import com.liferay.gradle.util.Validator;
 
 import java.io.File;
+
+import java.nio.charset.StandardCharsets;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,6 +51,7 @@ import org.gradle.util.GUtil;
 public class BuildCSSTask extends JavaExec {
 
 	public BuildCSSTask() {
+		setDefaultCharacterEncoding(StandardCharsets.UTF_8.toString());
 		setDirNames("/");
 		setMain("com.liferay.css.builder.CSSBuilder");
 	}
@@ -58,7 +62,7 @@ public class BuildCSSTask extends JavaExec {
 		return this;
 	}
 
-	public BuildCSSTask dirNames(Object ... dirNames) {
+	public BuildCSSTask dirNames(Object... dirNames) {
 		return dirNames(Arrays.asList(dirNames));
 	}
 
@@ -141,6 +145,11 @@ public class BuildCSSTask extends JavaExec {
 	}
 
 	@Input
+	public int getPrecision() {
+		return GradleUtil.toInteger(_precision);
+	}
+
+	@Input
 	public List<String> getRtlExcludedPathRegexps() {
 		return GradleUtil.toStringList(_rtlExcludedPathRegexps);
 	}
@@ -184,7 +193,7 @@ public class BuildCSSTask extends JavaExec {
 	}
 
 	public BuildCSSTask rtlExcludedPathRegexps(
-		Object ... rtlExcludedPathRegexps) {
+		Object... rtlExcludedPathRegexps) {
 
 		return rtlExcludedPathRegexps(Arrays.asList(rtlExcludedPathRegexps));
 	}
@@ -195,7 +204,7 @@ public class BuildCSSTask extends JavaExec {
 		dirNames(dirNames);
 	}
 
-	public void setDirNames(Object ... dirNames) {
+	public void setDirNames(Object... dirNames) {
 		setDirNames(Arrays.asList(dirNames));
 	}
 
@@ -211,6 +220,10 @@ public class BuildCSSTask extends JavaExec {
 		_portalCommonDir = portalCommonDir;
 	}
 
+	public void setPrecision(Object precision) {
+		_precision = precision;
+	}
+
 	public void setRtlExcludedPathRegexps(
 		Iterable<Object> rtlExcludedPathRegexps) {
 
@@ -219,7 +232,7 @@ public class BuildCSSTask extends JavaExec {
 		rtlExcludedPathRegexps(rtlExcludedPathRegexps);
 	}
 
-	public void setRtlExcludedPathRegexps(Object ... rtlExcludedPathRegexps) {
+	public void setRtlExcludedPathRegexps(Object... rtlExcludedPathRegexps) {
 		setRtlExcludedPathRegexps(Arrays.asList(rtlExcludedPathRegexps));
 	}
 
@@ -253,6 +266,8 @@ public class BuildCSSTask extends JavaExec {
 			getPortalCommonDir());
 
 		args.add("sass.portal.common.dir=" + portalCommonDirName);
+
+		args.add("sass.precision=" + getPrecision());
 
 		String rtlExcludedPathRegexps = CollectionUtils.join(
 			",", getRtlExcludedPathRegexps());
@@ -300,6 +315,7 @@ public class BuildCSSTask extends JavaExec {
 	private Object _docrootDir;
 	private boolean _generateSourceMap;
 	private Object _portalCommonDir;
+	private Object _precision = CSSBuilderArgs.PRECISION;
 	private final Set<Object> _rtlExcludedPathRegexps = new LinkedHashSet<>();
 	private Object _sassCompilerClassName;
 

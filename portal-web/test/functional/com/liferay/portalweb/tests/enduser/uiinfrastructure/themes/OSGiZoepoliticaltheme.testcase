@@ -1,4 +1,5 @@
 <definition component-name="portal-plugins-osgi">
+	<property name="portal.release" value="true" />
 	<property name="plugins.deployment.type" value="osgi" />
 	<property name="testray.main.component.name" value="User Interface" />
 
@@ -8,16 +9,13 @@
 
 	<command name="ZoePoliticalThemeSmoke" priority="4">
 		<property name="theme.plugins.includes" value="zoe-political-theme" />
-		<property name="web.plugins.includes" value="resources-importer-web" />
 
 		<var name="appName" value="Zoe Political" />
+		<var name="portletName" value="resources-importer-web" />
 
-		<execute macro="Page#gotoCP">
-			<var name="portletName" value="App Manager" />
+		<execute macro="OSGiSmoke#Smoke">
+			<var name="appName" value="${portletName}" />
+			<var name="portletName" value="${portletName}" />
 		</execute>
-
-		<execute function="AssertTextPresent#assertTextPresent" value1="${appName}" />
-
-		<execute function="AntCommand#antCommand" locator1="build-test.xml" value1="remove-plugin -Dplugin.name=zoe-political-theme" />
 	</command>
 </definition>

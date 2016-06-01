@@ -23,6 +23,7 @@ import java.security.AccessControlContext;
 import java.security.PrivilegedAction;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -38,12 +39,14 @@ public abstract class BaseTemplateManager implements TemplateManager {
 		Map<String, Object> contextObjects,
 		Map<String, Object> newContextObjects) {
 
-		for (String variableName : newContextObjects.keySet()) {
+		for (Entry<String, Object> entry : newContextObjects.entrySet()) {
+			String variableName = entry.getKey();
+
 			if (contextObjects.containsKey(variableName)) {
 				continue;
 			}
 
-			Object object = newContextObjects.get(variableName);
+			Object object = entry.getValue();
 
 			if (object instanceof Class) {
 				addStaticClassSupport(
@@ -77,6 +80,12 @@ public abstract class BaseTemplateManager implements TemplateManager {
 	public void addTaglibRequest(
 		Map<String, Object> contextObjects, String applicationName,
 		HttpServletRequest request, HttpServletResponse response) {
+	}
+
+	@Override
+	public void addTaglibSupport(
+		Map<String, Object> contextObjects, HttpServletRequest request,
+		HttpServletResponse response) {
 	}
 
 	@Override

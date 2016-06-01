@@ -20,14 +20,22 @@ import com.liferay.gradle.plugins.node.tasks.ExecuteNpmTask;
 import com.liferay.gradle.plugins.node.tasks.PublishNodeModuleTask;
 import com.liferay.gradle.util.GradleUtil;
 
+import groovy.json.JsonSlurper;
+
 import java.io.File;
 
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.Task;
+import org.gradle.api.internal.plugins.osgi.OsgiHelper;
+import org.gradle.api.specs.Spec;
 import org.gradle.api.tasks.TaskContainer;
+import org.gradle.api.tasks.TaskInputs;
+import org.gradle.api.tasks.TaskOutputs;
 
 /**
  * @author Andrea Di Giorgi
@@ -38,12 +46,15 @@ public class NodePlugin implements Plugin<Project> {
 
 	public static final String EXTENSION_NAME = "node";
 
+	public static final String NPM_INSTALL_TASK_NAME = "npmInstall";
+
 	@Override
 	public void apply(Project project) {
 		final NodeExtension nodeExtension = GradleUtil.addExtension(
 			project, EXTENSION_NAME, NodeExtension.class);
 
 		addTaskDownloadNode(project);
+		addTaskNpmInstall(project);
 
 		configureTasksDownloadNode(project, nodeExtension);
 		configureTasksExecuteNode(project, nodeExtension);
@@ -65,7 +76,73 @@ public class NodePlugin implements Plugin<Project> {
 			project, DOWNLOAD_NODE_TASK_NAME, DownloadNodeTask.class);
 	}
 
-	protected void configureTaskDownloadNodeDir(
+	protected ExecuteNpmTask addTaskNpmInstall(Project project) {
+		final ExecuteNpmTask executeNpmTask = GradleUtil.addTask(
+			project, NPM_INSTALL_TASK_NAME, ExecuteNpmTask.class);
+
+		executeNpmTask.onlyIf(
+			new Spec<Task>() {
+
+				@Override
+				public boolean isSatisfiedBy(Task task) {
+					Project project = task.getProject();
+
+					File packageJsonFile = project.file("package.json");
+
+					if (!packageJsonFile.exists()) {
+						return false;
+					}
+
+					JsonSlurper jsonSlurper = new JsonSlurper();
+
+					Map<String, Object> packageJson =
+						(Map<String, Object>)jsonSlurper.parse(packageJsonFile);
+
+					if (packageJson.containsKey("dependencies") ||
+						packageJson.containsKey("devDependencies")) {
+
+						return true;
+					}
+
+					return false;
+				}
+
+			});
+
+		executeNpmTask.setArgs("install");
+		executeNpmTask.setDescription(
+			"Install Node packages from package.json.");
+
+		TaskInputs taskInputs = executeNpmTask.getInputs();
+
+		taskInputs.file(
+			new Callable<File>() {
+
+				@Override
+				public File call() throws Exception {
+					return new File(
+						executeNpmTask.getWorkingDir(), "package.json");
+				}
+
+			});
+
+		TaskOutputs taskOutputs = executeNpmTask.getOutputs();
+
+		taskOutputs.dir(
+			new Callable<File>() {
+
+				@Override
+				public File call() throws Exception {
+					return new File(
+						executeNpmTask.getWorkingDir(), "node_modules");
+				}
+
+			});
+
+		return executeNpmTask;
+	}
+
+	protected void configureTaskDownloadNode(
 		DownloadNodeTask downloadNodeTask, final NodeExtension nodeExtension) {
 
 		downloadNodeTask.setNodeDir(
@@ -77,24 +154,16 @@ public class NodePlugin implements Plugin<Project> {
 				}
 
 			});
-	}
 
-	protected void configureTaskDownloadNodeNpmUrl(
-		DownloadNodeTask downloadNodeTask, final NodeExtension nodeExtension) {
-
-		downloadNodeTask.setNpmUrl(
+		downloadNodeTask.setNodeExeUrl(
 			new Callable<String>() {
 
 				@Override
 				public String call() throws Exception {
-					return nodeExtension.getNpmUrl();
+					return nodeExtension.getNodeExeUrl();
 				}
 
 			});
-	}
-
-	protected void configureTaskDownloadNodeUrl(
-		DownloadNodeTask downloadNodeTask, final NodeExtension nodeExtension) {
 
 		downloadNodeTask.setNodeUrl(
 			new Callable<String>() {
@@ -107,7 +176,7 @@ public class NodePlugin implements Plugin<Project> {
 			});
 	}
 
-	protected void configureTaskExecuteNodeDir(
+	protected void configureTaskExecuteNode(
 		ExecuteNodeTask executeNodeTask, final NodeExtension nodeExtension) {
 
 		executeNodeTask.setNodeDir(
@@ -121,13 +190,13 @@ public class NodePlugin implements Plugin<Project> {
 			});
 	}
 
-	protected void configureTaskExecuteNpmArgs(
+	protected void configureTaskExecuteNpm(
 		ExecuteNpmTask executeNpmTask, NodeExtension nodeExtension) {
 
 		executeNpmTask.args(nodeExtension.getNpmArgs());
 	}
 
-	protected void configureTaskPublishNodeModuleDescription(
+	protected void configureTaskPublishNodeModule(
 		PublishNodeModuleTask publishNodeModuleTask) {
 
 		final Project project = publishNodeModuleTask.getProject();
@@ -140,29 +209,28 @@ public class NodePlugin implements Plugin<Project> {
 					return project.getDescription();
 				}
 
-		});
-	}
-
-	protected void configureTaskPublishNodeModuleName(
-		PublishNodeModuleTask publishNodeModuleTask) {
-
-		final Project project = publishNodeModuleTask.getProject();
+			});
 
 		publishNodeModuleTask.setModuleName(
 			new Callable<String>() {
 
 				@Override
 				public String call() throws Exception {
-					return project.getName();
+					String moduleName = _osgiHelper.getBundleSymbolicName(
+						project);
+
+					int pos = moduleName.indexOf('.');
+
+					if (pos != -1) {
+						moduleName = moduleName.substring(pos + 1);
+
+						moduleName = moduleName.replace('.', '-');
+					}
+
+					return moduleName;
 				}
 
 			});
-	}
-
-	protected void configureTaskPublishNodeModuleVersion(
-		PublishNodeModuleTask publishNodeModuleTask) {
-
-		final Project project = publishNodeModuleTask.getProject();
 
 		publishNodeModuleTask.setModuleVersion(
 			new Callable<Object>() {
@@ -186,12 +254,7 @@ public class NodePlugin implements Plugin<Project> {
 
 				@Override
 				public void execute(DownloadNodeTask downloadNodeTask) {
-					configureTaskDownloadNodeDir(
-						downloadNodeTask, nodeExtension);
-					configureTaskDownloadNodeNpmUrl(
-						downloadNodeTask, nodeExtension);
-					configureTaskDownloadNodeUrl(
-						downloadNodeTask, nodeExtension);
+					configureTaskDownloadNode(downloadNodeTask, nodeExtension);
 				}
 
 			});
@@ -208,7 +271,7 @@ public class NodePlugin implements Plugin<Project> {
 
 				@Override
 				public void execute(ExecuteNodeTask executeNodeTask) {
-					configureTaskExecuteNodeDir(executeNodeTask, nodeExtension);
+					configureTaskExecuteNode(executeNodeTask, nodeExtension);
 				}
 
 			});
@@ -225,7 +288,7 @@ public class NodePlugin implements Plugin<Project> {
 
 				@Override
 				public void execute(ExecuteNpmTask executeNpmTask) {
-					configureTaskExecuteNpmArgs(executeNpmTask, nodeExtension);
+					configureTaskExecuteNpm(executeNpmTask, nodeExtension);
 				}
 
 			});
@@ -242,14 +305,12 @@ public class NodePlugin implements Plugin<Project> {
 				public void execute(
 					PublishNodeModuleTask publishNodeModuleTask) {
 
-					configureTaskPublishNodeModuleDescription(
-						publishNodeModuleTask);
-					configureTaskPublishNodeModuleName(publishNodeModuleTask);
-					configureTaskPublishNodeModuleVersion(
-						publishNodeModuleTask);
+					configureTaskPublishNodeModule(publishNodeModuleTask);
 				}
 
 			});
 	}
+
+	private static final OsgiHelper _osgiHelper = new OsgiHelper();
 
 }

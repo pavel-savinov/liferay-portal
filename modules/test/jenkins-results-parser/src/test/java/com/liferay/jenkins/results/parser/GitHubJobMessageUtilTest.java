@@ -46,7 +46,7 @@ public class GitHubJobMessageUtilTest extends BaseJenkinsResultsParserTestCase {
 	}
 
 	@Test
-	public void testGetFailedJobMessage() throws Exception {
+	public void testGetGitHubJobMessage() throws Exception {
 		assertSamples();
 	}
 
@@ -78,7 +78,7 @@ public class GitHubJobMessageUtilTest extends BaseJenkinsResultsParserTestCase {
 		urlString = replaceToken(urlString, "hostName", hostName);
 		urlString = replaceToken(urlString, "jobName", jobName);
 
-		URL url = createURL(urlString);
+		URL url = JenkinsResultsParserUtil.createURL(urlString);
 
 		downloadSample(sampleKey + "-" + jobName, url);
 	}
@@ -100,7 +100,7 @@ public class GitHubJobMessageUtilTest extends BaseJenkinsResultsParserTestCase {
 				continue;
 			}
 
-			URL runURL = createURL(
+			URL runURL = JenkinsResultsParserUtil.createURL(
 				URLDecoder.decode(runJSONObject.getString("url"), "UTF-8"));
 
 			File runDir = new File(sampleDir, "run-" + i + "/" + number + "/");
@@ -112,17 +112,18 @@ public class GitHubJobMessageUtilTest extends BaseJenkinsResultsParserTestCase {
 			runJSONObject.put("url", toURLString(runDir));
 		}
 
-		write(jobJSONFile, jobJSONObject.toString(4));
+		JenkinsResultsParserUtil.write(jobJSONFile, jobJSONObject.toString(4));
 	}
 
 	@Override
 	protected String getMessage(String urlString) throws Exception {
 		Project project = getProject(
-			urlString, urlString.substring("file:".length()));
+			urlString, urlString.substring("${dependencies.url}".length()));
 
 		GitHubJobMessageUtil.getGitHubJobMessage(project);
 
-		return project.getProperty("report.html.content");
+		return formatXML(
+			"<div>" + project.getProperty("report.html.content") + "</div>");
 	}
 
 	protected Project getProject(

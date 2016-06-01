@@ -21,6 +21,8 @@ import com.liferay.portal.tools.service.builder.ServiceBuilderArgs;
 
 import java.io.File;
 
+import java.nio.charset.StandardCharsets;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -48,6 +50,7 @@ public class BuildServiceTask extends JavaExec {
 			(Object[])ServiceBuilderArgs.RESOURCE_ACTION_CONFIGS);
 		setMain("com.liferay.portal.tools.service.builder.ServiceBuilder");
 		springNamespaces("beans");
+		systemProperty("file.encoding", StandardCharsets.UTF_8.name());
 	}
 
 	@Override
@@ -192,7 +195,7 @@ public class BuildServiceTask extends JavaExec {
 		return this;
 	}
 
-	public BuildServiceTask modelHintsConfigs(Object ... modelHintsConfigs) {
+	public BuildServiceTask modelHintsConfigs(Object... modelHintsConfigs) {
 		return modelHintsConfigs(Arrays.asList(modelHintsConfigs));
 	}
 
@@ -204,7 +207,7 @@ public class BuildServiceTask extends JavaExec {
 		return this;
 	}
 
-	public BuildServiceTask readOnlyPrefixes(Object ... readOnlyPrefixes) {
+	public BuildServiceTask readOnlyPrefixes(Object... readOnlyPrefixes) {
 		return readOnlyPrefixes(Arrays.asList(readOnlyPrefixes));
 	}
 
@@ -217,7 +220,7 @@ public class BuildServiceTask extends JavaExec {
 	}
 
 	public BuildServiceTask resourceActionsConfigs(
-		Object ... resourceActionsConfigs) {
+		Object... resourceActionsConfigs) {
 
 		return resourceActionsConfigs(Arrays.asList(resourceActionsConfigs));
 	}
@@ -266,7 +269,7 @@ public class BuildServiceTask extends JavaExec {
 		modelHintsConfigs(modelHintsConfigs);
 	}
 
-	public void setModelHintsConfigs(Object ... modelHintsConfigs) {
+	public void setModelHintsConfigs(Object... modelHintsConfigs) {
 		setModelHintsConfigs(Arrays.asList(modelHintsConfigs));
 	}
 
@@ -292,7 +295,7 @@ public class BuildServiceTask extends JavaExec {
 		readOnlyPrefixes(readOnlyPrefixes);
 	}
 
-	public void setReadOnlyPrefixes(Object ... readOnlyPrefixes) {
+	public void setReadOnlyPrefixes(Object... readOnlyPrefixes) {
 		setReadOnlyPrefixes(Arrays.asList(readOnlyPrefixes));
 	}
 
@@ -304,7 +307,7 @@ public class BuildServiceTask extends JavaExec {
 		resourceActionsConfigs(resourceActionsConfigs);
 	}
 
-	public void setResourceActionsConfigs(Object ... resourceActionsConfigs) {
+	public void setResourceActionsConfigs(Object... resourceActionsConfigs) {
 		setResourceActionsConfigs(Arrays.asList(resourceActionsConfigs));
 	}
 
@@ -322,7 +325,7 @@ public class BuildServiceTask extends JavaExec {
 		springNamespaces(springNamespaces);
 	}
 
-	public void setSpringNamespaces(Object ... springNamespaces) {
+	public void setSpringNamespaces(Object... springNamespaces) {
 		setSpringNamespaces(Arrays.asList(springNamespaces));
 	}
 
@@ -358,7 +361,7 @@ public class BuildServiceTask extends JavaExec {
 		return this;
 	}
 
-	public BuildServiceTask springNamespaces(Object ... springNamespaces) {
+	public BuildServiceTask springNamespaces(Object... springNamespaces) {
 		return springNamespaces(Arrays.asList(springNamespaces));
 	}
 
@@ -408,7 +411,11 @@ public class BuildServiceTask extends JavaExec {
 
 		args.add("service.target.entity.name=" + targetEntityName);
 
-		args.add("service.test.dir=" + _relativize(getTestDir()));
+		File testDir = getTestDir();
+
+		if (testDir != null) {
+			args.add("service.test.dir=" + _relativize(testDir));
+		}
 
 		return args;
 	}

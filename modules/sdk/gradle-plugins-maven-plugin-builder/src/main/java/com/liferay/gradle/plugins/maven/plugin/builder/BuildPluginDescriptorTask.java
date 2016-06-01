@@ -15,7 +15,8 @@
 package com.liferay.gradle.plugins.maven.plugin.builder;
 
 import com.liferay.gradle.plugins.maven.plugin.builder.util.XMLUtil;
-import com.liferay.gradle.util.OSDetector;
+import com.liferay.gradle.util.GradleUtil;
+import com.liferay.gradle.util.Validator;
 
 import com.thoughtworks.qdox.JavaDocBuilder;
 import com.thoughtworks.qdox.model.BeanProperty;
@@ -33,9 +34,14 @@ import java.net.URL;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -46,11 +52,22 @@ import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.artifacts.Dependency;
+import org.gradle.api.artifacts.ResolvedConfiguration;
+import org.gradle.api.artifacts.ResolvedDependency;
+import org.gradle.api.artifacts.maven.Conf2ScopeMappingContainer;
 import org.gradle.api.file.CopySpec;
+import org.gradle.api.file.FileCollection;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
+import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.specs.Spec;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputDirectory;
+import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.process.ExecSpec;
+import org.gradle.process.JavaExecSpec;
+import org.gradle.util.GUtil;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -61,19 +78,22 @@ import org.w3c.dom.Element;
 public class BuildPluginDescriptorTask extends DefaultTask {
 
 	public BuildPluginDescriptorTask() {
-		_project = getProject();
+		_configurationScopeMappings.put(
+			JavaPlugin.COMPILE_CONFIGURATION_NAME,
+			Conf2ScopeMappingContainer.COMPILE);
+		_configurationScopeMappings.put(
+			"provided", Conf2ScopeMappingContainer.PROVIDED);
 
-		if (OSDetector.isWindows()) {
-			_mavenExecutable = "mvn.cmd";
-		}
-		else {
-			_mavenExecutable = "mvn";
-		}
+		_pomRepositories.put(
+			"liferay-public",
+			"http://repository.liferay.com/nexus/content/groups/public");
 	}
 
 	@TaskAction
 	public void buildPluginDescriptor() {
-		File pomFile = _project.file(System.currentTimeMillis() + ".xml");
+		Project project = getProject();
+
+		File pomFile = project.file(System.currentTimeMillis() + ".xml");
 		File preparedSourceDir = null;
 
 		try {
@@ -87,16 +107,18 @@ public class BuildPluginDescriptorTask extends DefaultTask {
 			buildPomFile(pomFile, preparedSourceDir);
 
 			buildPluginDescriptor(pomFile);
+
+			readdForcedExclusions();
 		}
 		catch (Exception e) {
 			throw new GradleException(e.getMessage(), e);
 		}
 		finally {
 			if (preparedSourceDir != null) {
-				_project.delete(preparedSourceDir);
+				project.delete(preparedSourceDir);
 			}
 
-			_project.delete(pomFile);
+			project.delete(pomFile);
 		}
 	}
 
@@ -106,78 +128,161 @@ public class BuildPluginDescriptorTask extends DefaultTask {
 		_configurationScopeMappings.put(configurationName, scope);
 	}
 
+	@SuppressWarnings("unchecked")
+	public BuildPluginDescriptorTask forcedExclusions(
+		Iterable<String> forcedExclusions) {
+
+		GUtil.addToCollection(_forcedExclusions, forcedExclusions);
+
+		return this;
+	}
+
+	public BuildPluginDescriptorTask forcedExclusions(
+		String... forcedExclusions) {
+
+		return forcedExclusions(Arrays.asList(forcedExclusions));
+	}
+
 	@InputDirectory
 	public File getClassesDir() {
-		return _classesDir;
+		return GradleUtil.toFile(getProject(), _classesDir);
 	}
 
 	public Map<String, String> getConfigurationScopeMappings() {
 		return _configurationScopeMappings;
 	}
 
-	public String getMavenExecutable() {
-		return _mavenExecutable;
+	@Input
+	public Set<String> getForcedExclusions() {
+		return _forcedExclusions;
 	}
 
-	public String getMavenVersion() {
-		return _mavenVersion;
+	@Input
+	public String getGoalPrefix() {
+		return GradleUtil.toString(_goalPrefix);
+	}
+
+	@InputFiles
+	public FileCollection getMavenEmbedderClasspath() {
+		return _mavenEmbedderClasspath;
+	}
+
+	@Input
+	public String getMavenEmbedderMainClassName() {
+		return GradleUtil.toString(_mavenEmbedderMainClassName);
+	}
+
+	@Input
+	public String getMavenPluginPluginVersion() {
+		return GradleUtil.toString(_mavenPluginPluginVersion);
 	}
 
 	@OutputDirectory
 	public File getOutputDir() {
-		return _outputDir;
+		return GradleUtil.toFile(getProject(), _outputDir);
 	}
 
+	@Input
 	public String getPomArtifactId() {
-		return _pomArtifactId;
+		return GradleUtil.toString(_pomArtifactId);
 	}
 
+	@Input
 	public String getPomGroupId() {
-		return _pomGroupId;
+		return GradleUtil.toString(_pomGroupId);
 	}
 
+	@Input
+	public Map<String, Object> getPomRepositories() {
+		return _pomRepositories;
+	}
+
+	@Input
 	public String getPomVersion() {
-		return _pomVersion;
+		return GradleUtil.toString(_pomVersion);
 	}
 
 	@InputDirectory
 	public File getSourceDir() {
-		return _sourceDir;
+		return GradleUtil.toFile(getProject(), _sourceDir);
 	}
 
+	@Input
 	public boolean isUseSetterComments() {
 		return _useSetterComments;
 	}
 
-	public void setClassesDir(File classesDir) {
+	public BuildPluginDescriptorTask pomRepositories(
+		Map<String, ?> pomRepositories) {
+
+		_pomRepositories.putAll(pomRepositories);
+
+		return this;
+	}
+
+	public BuildPluginDescriptorTask pomRepository(String id, Object url) {
+		_pomRepositories.put(id, url);
+
+		return this;
+	}
+
+	public void setClassesDir(Object classesDir) {
 		_classesDir = classesDir;
 	}
 
-	public void setMavenExecutable(String mavenExecutable) {
-		_mavenExecutable = mavenExecutable;
+	public void setForcedExclusions(Iterable<String> forcedExclusions) {
+		_forcedExclusions.clear();
+
+		forcedExclusions(forcedExclusions);
 	}
 
-	public void setMavenVersion(String mavenVersion) {
-		_mavenVersion = mavenVersion;
+	public void setForcedExclusions(String... forcedExclusions) {
+		setForcedExclusions(Arrays.asList(forcedExclusions));
 	}
 
-	public void setOutputDir(File outputDir) {
+	public void setGoalPrefix(Object goalPrefix) {
+		_goalPrefix = goalPrefix;
+	}
+
+	public void setMavenEmbedderClasspath(
+		FileCollection mavenEmbedderClasspath) {
+
+		_mavenEmbedderClasspath = mavenEmbedderClasspath;
+	}
+
+	public void setMavenEmbedderMainClassName(
+		Object mavenEmbedderMainClassName) {
+
+		_mavenEmbedderMainClassName = mavenEmbedderMainClassName;
+	}
+
+	public void setMavenPluginPluginVersion(Object mavenPluginPluginVersion) {
+		_mavenPluginPluginVersion = mavenPluginPluginVersion;
+	}
+
+	public void setOutputDir(Object outputDir) {
 		_outputDir = outputDir;
 	}
 
-	public void setPomArtifactId(String pomArtifactId) {
+	public void setPomArtifactId(Object pomArtifactId) {
 		_pomArtifactId = pomArtifactId;
 	}
 
-	public void setPomGroupId(String pomGroupId) {
+	public void setPomGroupId(Object pomGroupId) {
 		_pomGroupId = pomGroupId;
 	}
 
-	public void setPomVersion(String pomVersion) {
+	public void setPomRepositories(Map<String, ?> pomRepositories) {
+		_pomRepositories.clear();
+
+		pomRepositories(pomRepositories);
+	}
+
+	public void setPomVersion(Object pomVersion) {
 		_pomVersion = pomVersion;
 	}
 
-	public void setSourceDir(File sourceDir) {
+	public void setSourceDir(Object sourceDir) {
 		_sourceDir = sourceDir;
 	}
 
@@ -186,11 +291,13 @@ public class BuildPluginDescriptorTask extends DefaultTask {
 	}
 
 	protected void appendDependencyElements(
-		Document doc, Element dependenciesEl, String configurationName,
-		String scope) {
+		Document document, Element dependenciesElement,
+		String configurationName, String scope) {
+
+		Project project = getProject();
 
 		ConfigurationContainer configurationContainer =
-			_project.getConfigurations();
+			project.getConfigurations();
 
 		Configuration configuration = configurationContainer.findByName(
 			configurationName);
@@ -199,44 +306,137 @@ public class BuildPluginDescriptorTask extends DefaultTask {
 			return;
 		}
 
-		Set<Dependency> dependencies = configuration.getDependencies();
+		Set<String> forcedExclusions = getForcedExclusions();
 
-		for (Dependency dependency : dependencies) {
-			Element dependencyEl = doc.createElement("dependency");
+		ResolvedConfiguration resolvedConfiguration =
+			configuration.getResolvedConfiguration();
 
-			dependenciesEl.appendChild(dependencyEl);
+		for (Dependency dependency : configuration.getDependencies()) {
+			Element dependencyElement = document.createElement("dependency");
+
+			dependenciesElement.appendChild(dependencyElement);
+
+			final String dependencyGroup = dependency.getGroup();
+			final String dependencyName = dependency.getName();
 
 			XMLUtil.appendElement(
-				doc, dependencyEl, "groupId", dependency.getGroup());
+				document, dependencyElement, "groupId", dependencyGroup);
 			XMLUtil.appendElement(
-				doc, dependencyEl, "artifactId", dependency.getName());
+				document, dependencyElement, "artifactId", dependencyName);
+
+			String dependencyVersion = dependency.getVersion();
+
+			Set<ResolvedDependency> resolvedDependencies =
+				resolvedConfiguration.getFirstLevelModuleDependencies(
+					new Spec<Dependency>() {
+
+						@Override
+						public boolean isSatisfiedBy(Dependency dependency) {
+							if (dependencyGroup.equals(dependency.getGroup()) &&
+								dependencyName.equals(dependency.getName())) {
+
+								return true;
+							}
+
+							return false;
+						}
+
+					});
+
+			if (!resolvedDependencies.isEmpty()) {
+				Iterator<ResolvedDependency> iterator =
+					resolvedDependencies.iterator();
+
+				ResolvedDependency resolvedDependency = iterator.next();
+
+				dependencyVersion = resolvedDependency.getModuleVersion();
+			}
+			else if (_logger.isWarnEnabled()) {
+				_logger.warn(
+					"Unable to find resolved module version for " + dependency);
+			}
+
 			XMLUtil.appendElement(
-				doc, dependencyEl, "version", dependency.getVersion());
-			XMLUtil.appendElement(doc, dependencyEl, "scope", scope);
+				document, dependencyElement, "version", dependencyVersion);
+
+			XMLUtil.appendElement(document, dependencyElement, "scope", scope);
+
+			if (!forcedExclusions.isEmpty()) {
+				Element exclusionsElement = document.createElement(
+					"exclusions");
+
+				dependencyElement.appendChild(exclusionsElement);
+
+				for (String dependencyNotation : forcedExclusions) {
+					appendDependencyExclusionElement(
+						document, exclusionsElement, dependencyNotation);
+				}
+			}
 		}
 	}
 
+	protected void appendDependencyExclusionElement(
+		Document document, Element exclusionsElement,
+		String dependencyNotation) {
+
+		String[] tokens = parseDependencyNotation(dependencyNotation);
+
+		String groupId = tokens[0];
+		String artifactId = tokens[1];
+
+		appendDependencyExclusionElement(
+			document, exclusionsElement, groupId, artifactId);
+	}
+
+	protected void appendDependencyExclusionElement(
+		Document document, Element exclusionsElement, String groupId,
+		String artifactId) {
+
+		Element exclusionElement = document.createElement("exclusion");
+
+		exclusionsElement.appendChild(exclusionElement);
+
+		XMLUtil.appendElement(
+			document, exclusionElement, "artifactId", artifactId);
+		XMLUtil.appendElement(document, exclusionElement, "groupId", groupId);
+	}
+
+	protected void appendRepositoryElement(
+		Document document, Element repositoriesElement, String id, String url) {
+
+		Element repositoryElement = document.createElement("repository");
+
+		repositoriesElement.appendChild(repositoryElement);
+
+		XMLUtil.appendElement(document, repositoryElement, "id", id);
+		XMLUtil.appendElement(document, repositoryElement, "url", url);
+	}
+
 	protected void buildPluginDescriptor(final File pomFile) throws Exception {
-		_project.exec(
-			new Action<ExecSpec>() {
+		final Project project = getProject();
+
+		project.javaexec(
+			new Action<JavaExecSpec>() {
 
 				@Override
-				public void execute(ExecSpec execSpec) {
-					execSpec.args("-B");
+				public void execute(JavaExecSpec javaExecSpec) {
+					javaExecSpec.args("-B");
 
-					execSpec.args("-e");
+					javaExecSpec.args("-e");
 
-					execSpec.args("-f");
-					execSpec.args(_project.relativePath(pomFile));
+					javaExecSpec.args("-f");
+					javaExecSpec.args(project.relativePath(pomFile));
 
-					execSpec.args("-Dencoding=UTF-8");
+					javaExecSpec.args("-Dencoding=UTF-8");
 
-					execSpec.args(
-						"org.apache.maven.plugins:maven-plugin-plugin:" +
-							getMavenVersion() + ":descriptor");
+					javaExecSpec.args("plugin:descriptor");
 
-					execSpec.setExecutable(getMavenExecutable());
-					execSpec.setWorkingDir(_project.getProjectDir());
+					javaExecSpec.setClasspath(getMavenEmbedderClasspath());
+					javaExecSpec.setMain(getMavenEmbedderMainClassName());
+
+					javaExecSpec.systemProperty(
+						"maven.multiModuleProjectDirectory",
+						project.getProjectDir());
 				}
 
 			});
@@ -244,12 +444,14 @@ public class BuildPluginDescriptorTask extends DefaultTask {
 		File dir = new File(getClassesDir(), "META-INF/maven");
 		File outputDir = getOutputDir();
 
-		_project.delete(outputDir);
+		project.delete(outputDir);
 
 		Files.move(dir.toPath(), outputDir.toPath());
 	}
 
 	protected void buildPomFile(File pomFile, File sourceDir) throws Exception {
+		Project project = getProject();
+
 		if (sourceDir == null) {
 			sourceDir = getSourceDir();
 		}
@@ -272,16 +474,47 @@ public class BuildPluginDescriptorTask extends DefaultTask {
 		XMLUtil.appendElement(
 			document, projectElement, "packaging", "maven-plugin");
 
+		// Build
+
 		Element buildElement = document.createElement("build");
 
 		projectElement.appendChild(buildElement);
 
 		XMLUtil.appendElement(
 			document, buildElement, "outputDirectory",
-			_project.relativePath(getClassesDir()));
+			project.relativePath(getClassesDir()));
 		XMLUtil.appendElement(
 			document, buildElement, "sourceDirectory",
-			_project.relativePath(sourceDir));
+			project.relativePath(sourceDir));
+
+		Element pluginsElement = document.createElement("plugins");
+
+		buildElement.appendChild(pluginsElement);
+
+		Element pluginElement = document.createElement("plugin");
+
+		pluginsElement.appendChild(pluginElement);
+
+		XMLUtil.appendElement(
+			document, pluginElement, "groupId", "org.apache.maven.plugins");
+		XMLUtil.appendElement(
+			document, pluginElement, "artifactId", "maven-plugin-plugin");
+		XMLUtil.appendElement(
+			document, pluginElement, "version", getMavenPluginPluginVersion());
+
+		String goalPrefix = getGoalPrefix();
+
+		if (Validator.isNotNull(goalPrefix)) {
+			Element configurationElement = document.createElement(
+				"configuration");
+
+			pluginElement.appendChild(configurationElement);
+
+			XMLUtil.appendElement(
+				document, configurationElement, "goalPrefix", goalPrefix);
+		}
+
+		// Dependencies
 
 		Element dependenciesElement = document.createElement("dependencies");
 
@@ -298,6 +531,24 @@ public class BuildPluginDescriptorTask extends DefaultTask {
 
 			appendDependencyElements(
 				document, dependenciesElement, configurationName, scope);
+		}
+
+		// Repositories
+
+		Map<String, Object> pomRepositories = getPomRepositories();
+
+		if (!pomRepositories.isEmpty()) {
+			Element repositoriesElement = document.createElement(
+				"repositories");
+
+			projectElement.appendChild(repositoriesElement);
+
+			for (Map.Entry<String, Object> entry : pomRepositories.entrySet()) {
+				String id = entry.getKey();
+				String url = GradleUtil.toString(entry.getValue());
+
+				appendRepositoryElement(document, repositoriesElement, id, url);
+			}
 		}
 
 		XMLUtil.write(document, pomFile);
@@ -319,6 +570,17 @@ public class BuildPluginDescriptorTask extends DefaultTask {
 		}
 
 		return code.substring(start, end + 2);
+	}
+
+	protected String[] parseDependencyNotation(String dependencyNotation) {
+		String[] tokens = dependencyNotation.split(":");
+
+		if (tokens.length != 3) {
+			throw new GradleException(
+				"Unable to parse dependency notation " + dependencyNotation);
+		}
+
+		return tokens;
 	}
 
 	protected void prepareSource(JavaClass javaClass) throws Exception {
@@ -368,6 +630,8 @@ public class BuildPluginDescriptorTask extends DefaultTask {
 	protected void prepareSources(final File preparedSourceDir)
 		throws Exception {
 
+		Project project = getProject();
+
 		Closure<Void> closure = new Closure<Void>(null) {
 
 			@SuppressWarnings("unused")
@@ -379,7 +643,7 @@ public class BuildPluginDescriptorTask extends DefaultTask {
 
 		};
 
-		_project.copy(closure);
+		project.copy(closure);
 
 		JavaDocBuilder javaDocBuilder = new JavaDocBuilder();
 
@@ -390,17 +654,85 @@ public class BuildPluginDescriptorTask extends DefaultTask {
 		}
 	}
 
-	private File _classesDir;
+	protected void readdForcedExclusions() throws Exception {
+		Set<String> forcedExclusions = getForcedExclusions();
+
+		if (forcedExclusions.isEmpty()) {
+			return;
+		}
+
+		File file = new File(getOutputDir(), "plugin.xml");
+
+		Path path = file.toPath();
+
+		String content = new String(
+			Files.readAllBytes(path), StandardCharsets.UTF_8);
+
+		int pos = content.lastIndexOf("</dependencies>");
+
+		if (pos == -1) {
+			if (_logger.isWarnEnabled()) {
+				_logger.warn("Unable to readd forced exclusions");
+			}
+
+			return;
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(content, 0, pos - 1);
+
+		for (String dependencyNotation : forcedExclusions) {
+			String[] tokens = parseDependencyNotation(dependencyNotation);
+
+			String groupId = tokens[0];
+			String artifactId = tokens[1];
+			String version = tokens[2];
+
+			sb.append("<dependency>");
+
+			sb.append("<groupId>");
+			sb.append(groupId);
+			sb.append("</groupId>");
+
+			sb.append("<artifactId>");
+			sb.append(artifactId);
+			sb.append("</artifactId>");
+
+			sb.append("<type>jar</type>");
+
+			sb.append("<version>");
+			sb.append(version);
+			sb.append("</version>");
+
+			sb.append("</dependency>");
+		}
+
+		sb.append(content, pos, content.length());
+
+		content = sb.toString();
+
+		Files.write(path, content.getBytes(StandardCharsets.UTF_8));
+	}
+
+	private static final Logger _logger = Logging.getLogger(
+		BuildPluginDescriptorTask.class);
+
+	private Object _classesDir;
 	private final Map<String, String> _configurationScopeMappings =
 		new HashMap<>();
-	private String _mavenExecutable;
-	private String _mavenVersion = "3.4";
-	private File _outputDir;
-	private String _pomArtifactId;
-	private String _pomGroupId;
-	private String _pomVersion;
-	private final Project _project;
-	private File _sourceDir;
+	private final Set<String> _forcedExclusions = new HashSet<>();
+	private Object _goalPrefix;
+	private FileCollection _mavenEmbedderClasspath;
+	private Object _mavenEmbedderMainClassName =
+		"org.apache.maven.cli.MavenCli";
+	private Object _mavenPluginPluginVersion = "3.4";
+	private Object _outputDir;
+	private Object _pomArtifactId;
+	private Object _pomGroupId;
+	private final Map<String, Object> _pomRepositories = new LinkedHashMap<>();
+	private Object _pomVersion;
+	private Object _sourceDir;
 	private boolean _useSetterComments = true;
 
 }

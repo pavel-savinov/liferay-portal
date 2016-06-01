@@ -1,15 +1,9 @@
 <definition component-name="portal-workflow">
+	<property name="portal.release" value="true" />
 	<property name="testray.main.component.name" value="Workflow" />
 
 	<set-up>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
-
-		<if>
-			<equals arg1="${testPortalInstance}" arg2="true" />
-			<then>
-				<execute macro="SignIn#signInPortalInstanceSetUp" />
-			</then>
-		</if>
+		<execute macro="TestCase#setUpPortalInstance" />
 
 		<execute macro="User#firstLoginPG" />
 	</set-up>
@@ -31,7 +25,7 @@
 					<var name="portlet" value="Documents and Media" />
 				</execute>
 
-				<execute macro="Workflow#configureWorkflowViaFolderInfo">
+				<execute macro="Workflow#configureWorkflowViaPortlet">
 					<var name="workflowDefinition" value="No Workflow" />
 				</execute>
 
@@ -76,13 +70,19 @@
 			<var name="portlet" value="Documents and Media" />
 		</execute>
 
-		<execute macro="Workflow#configureWorkflowViaFolderInfo">
+		<execute macro="Workflow#configureWorkflowViaPortlet">
 			<var name="workflowDefinition" value="Single Approver (Version 1)" />
+		</execute>
+
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Documents and Media" />
 		</execute>
 
 		<execute macro="DMDocument#addWithWorkflowCP">
 			<var name="dmDocumentDescription" value="DM Document Description" />
-			<var name="dmDocumentFile" value="Document_1.txt" />
+			<var name="dmDocumentFile" value="Document_1.jpg" />
 			<var name="dmDocumentTitle" value="DM Document Title" />
 		</execute>
 
@@ -104,7 +104,8 @@
 
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentTitle" value="DM Document Title" />
-			<var name="workflowStatus" value="Pending (Review)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Review" />
 		</execute>
 
 		<execute macro="Page#gotoMyAccount">
@@ -131,6 +132,18 @@
 		<execute macro="DMDocument#viewCP">
 			<var name="dmDocumentTitle" value="DM Document Title" />
 		</execute>
+
+		<execute macro="Page#gotoMyAccount">
+			<var name="portletName" value="My Submissions" />
+		</execute>
+
+		<execute macro="Workflow#gotoViewCompletedAssetViaMySubmissions">
+			<var name="workflowAssetTitle" value="DM Document Title" />
+		</execute>
+
+		<execute macro="DMDocument#viewDocumentImageAsWorkflowAsset">
+			<var name="dmDocumentTitle" value="DM Document Title" />
+		</execute>
 	</command>
 
 	<command name="ApproveInDMFolderNoWorkflowWithHomeFolderSingleApproverWorkflowCP" priority="3">
@@ -140,8 +153,14 @@
 			<var name="portlet" value="Documents and Media" />
 		</execute>
 
-		<execute macro="Workflow#configureWorkflowViaFolderInfo">
+		<execute macro="Workflow#configureWorkflowViaPortlet">
 			<var name="workflowDefinition" value="Single Approver (Version 1)" />
+		</execute>
+
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Documents and Media" />
 		</execute>
 
 		<execute macro="DMFolder#addCP">
@@ -186,7 +205,8 @@
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentDescription" value="DM Document Description" />
 			<var name="dmDocumentTitle" value="DM Document Title" />
-			<var name="workflowStatus" value="Pending (Review)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Review" />
 		</execute>
 
 		<execute macro="Page#gotoMyAccount">
@@ -208,7 +228,8 @@
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentDescription" value="DM Document Description" />
 			<var name="dmDocumentTitle" value="DM Document Title" />
-			<var name="workflowStatus" value="Pending (Review)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Review" />
 		</execute>
 
 		<execute macro="Page#gotoMyAccount">
@@ -233,12 +254,16 @@
 		</execute>
 	</command>
 
-	<command name="ApproveInDMFolderSingleApproverTypeSpecificWorkflowCP" priority="4">
+	<command name="ApproveInDMFolderSingleApproverTypeSpecificWorkflowCP" priority="5">
+		<property name="portal.acceptance" value="true" />
+
 		<execute macro="Navigator#openURL" />
 
 		<execute macro="ProductMenu#gotoSitesContent">
 			<var name="portlet" value="Documents and Media" />
 		</execute>
+
+		<execute macro="DMNavigator#gotoDocumentType" />
 
 		<execute macro="DMDocumentType#add">
 			<var name="dmDocumentTypeDescription" value="DM Document Type Description" />
@@ -286,7 +311,8 @@
 
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentTitle" value="DM Folder Document Type Title" />
-			<var name="workflowStatus" value="Pending (Review)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Review" />
 		</execute>
 
 		<execute macro="Navigator#openURL" />
@@ -352,7 +378,8 @@
 
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentTitle" value="DM Folder Document Type Title" />
-			<var name="workflowStatus" value="Pending (Review)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Review" />
 		</execute>
 
 		<execute macro="Page#gotoMyAccount">
@@ -437,7 +464,8 @@
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentDescription" value="DM Folder Document Description" />
 			<var name="dmDocumentTitle" value="DM Folder Document Title" />
-			<var name="workflowStatus" value="Pending (Review)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Review" />
 		</execute>
 
 		<execute macro="Page#gotoMyAccount">
@@ -464,7 +492,8 @@
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentDescription" value="DM Folder Document Description" />
 			<var name="dmDocumentTitle" value="DM Folder Document Title" />
-			<var name="workflowStatus" value="Pending (Review)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Review" />
 		</execute>
 
 		<execute macro="Page#gotoMyAccount">
@@ -501,8 +530,14 @@
 			<var name="portlet" value="Documents and Media" />
 		</execute>
 
-		<execute macro="Workflow#configureWorkflowViaFolderInfo">
+		<execute macro="Workflow#configureWorkflowViaPortlet">
 			<var name="workflowDefinition" value="Single Approver (Version 1)" />
+		</execute>
+
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Documents and Media" />
 		</execute>
 
 		<execute macro="DMFolder#addCP">
@@ -535,7 +570,8 @@
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentDescription" value="DM Folder Document Description" />
 			<var name="dmDocumentTitle" value="DM Folder Document Title" />
-			<var name="workflowStatus" value="Pending (Review)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Review" />
 		</execute>
 
 		<execute macro="Navigator#openURL" />
@@ -553,7 +589,8 @@
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentDescription" value="DM Document Description" />
 			<var name="dmDocumentTitle" value="DM Document Title" />
-			<var name="workflowStatus" value="Pending (Review)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Review" />
 		</execute>
 
 		<execute macro="Page#gotoMyAccount">
@@ -586,7 +623,8 @@
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentDescription" value="DM Folder Document Description" />
 			<var name="dmDocumentTitle" value="DM Folder Document Title" />
-			<var name="workflowStatus" value="Pending (Review)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Review" />
 		</execute>
 
 		<execute macro="Navigator#openURL" />
@@ -598,7 +636,8 @@
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentDescription" value="DM Document Description" />
 			<var name="dmDocumentTitle" value="DM Document Title" />
-			<var name="workflowStatus" value="Pending (Review)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Review" />
 		</execute>
 
 		<execute macro="Page#gotoMyAccount">
@@ -656,8 +695,14 @@
 			<var name="portlet" value="Documents and Media" />
 		</execute>
 
-		<execute macro="Workflow#configureWorkflowViaFolderInfo">
+		<execute macro="Workflow#configureWorkflowViaPortlet">
 			<var name="workflowDefinition" value="Single Approver (Version 1)" />
+		</execute>
+
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Documents and Media" />
 		</execute>
 
 		<execute macro="DMDocument#addWithWorkflowCP">
@@ -684,7 +729,8 @@
 
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentTitle" value="DM Document Title" />
-			<var name="workflowStatus" value="Pending (Review)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Review" />
 		</execute>
 
 		<execute macro="Page#gotoMyAccount">
@@ -714,7 +760,8 @@
 
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentTitle" value="DM Document Title" />
-			<var name="workflowStatus" value="Pending (Update)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Update" />
 		</execute>
 	</command>
 
@@ -725,8 +772,14 @@
 			<var name="portlet" value="Documents and Media" />
 		</execute>
 
-		<execute macro="Workflow#configureWorkflowViaFolderInfo">
+		<execute macro="Workflow#configureWorkflowViaPortlet">
 			<var name="workflowDefinition" value="Single Approver (Version 1)" />
+		</execute>
+
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Documents and Media" />
 		</execute>
 
 		<execute macro="DMFolder#addCP">
@@ -771,7 +824,8 @@
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentDescription" value="DM Document Description" />
 			<var name="dmDocumentTitle" value="DM Document Title" />
-			<var name="workflowStatus" value="Pending (Review)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Review" />
 		</execute>
 
 		<execute macro="Page#gotoMyAccount">
@@ -793,7 +847,8 @@
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentDescription" value="DM Document Description" />
 			<var name="dmDocumentTitle" value="DM Document Title" />
-			<var name="workflowStatus" value="Pending (Review)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Review" />
 		</execute>
 
 		<execute macro="Page#gotoMyAccount">
@@ -824,7 +879,8 @@
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentDescription" value="DM Document Description" />
 			<var name="dmDocumentTitle" value="DM Document Title" />
-			<var name="workflowStatus" value="Pending (Update)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Update" />
 		</execute>
 	</command>
 
@@ -834,6 +890,8 @@
 		<execute macro="ProductMenu#gotoSitesContent">
 			<var name="portlet" value="Documents and Media" />
 		</execute>
+
+		<execute macro="DMNavigator#gotoDocumentType" />
 
 		<execute macro="DMDocumentType#add">
 			<var name="dmDocumentTypeDescription" value="DM Document Type Description" />
@@ -892,7 +950,8 @@
 
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentTitle" value="DM Folder Type Title" />
-			<var name="workflowStatus" value="Pending (Review)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Review" />
 		</execute>
 
 		<execute macro="Navigator#openURL" />
@@ -936,7 +995,8 @@
 
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentTitle" value="DM Folder Type Title" />
-			<var name="workflowStatus" value="Pending (Review)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Review" />
 		</execute>
 
 		<execute macro="Page#gotoMyAccount">
@@ -971,7 +1031,8 @@
 
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentTitle" value="DM Folder Type Title" />
-			<var name="workflowStatus" value="Pending (Update)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Update" />
 		</execute>
 	</command>
 
@@ -1030,7 +1091,8 @@
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentDescription" value="DM Folder Document Description" />
 			<var name="dmDocumentTitle" value="DM Folder Document Title" />
-			<var name="workflowStatus" value="Pending (Review)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Review" />
 		</execute>
 
 		<execute macro="Page#gotoMyAccount">
@@ -1057,7 +1119,8 @@
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentDescription" value="DM Folder Document Description" />
 			<var name="dmDocumentTitle" value="DM Folder Document Title" />
-			<var name="workflowStatus" value="Pending (Review)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Review" />
 		</execute>
 
 		<execute macro="Page#gotoMyAccount">
@@ -1093,7 +1156,8 @@
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentDescription" value="DM Folder Document Description" />
 			<var name="dmDocumentTitle" value="DM Folder Document Title" />
-			<var name="workflowStatus" value="Pending (Update)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Update" />
 		</execute>
 	</command>
 
@@ -1104,8 +1168,14 @@
 			<var name="portlet" value="Documents and Media" />
 		</execute>
 
-		<execute macro="Workflow#configureWorkflowViaFolderInfo">
+		<execute macro="Workflow#configureWorkflowViaPortlet">
 			<var name="workflowDefinition" value="Single Approver (Version 1)" />
+		</execute>
+
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Documents and Media" />
 		</execute>
 
 		<execute macro="DMFolder#addCP">
@@ -1138,7 +1208,8 @@
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentDescription" value="DM Folder Document Description" />
 			<var name="dmDocumentTitle" value="DM Folder Document Title" />
-			<var name="workflowStatus" value="Pending (Review)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Review" />
 		</execute>
 
 		<execute macro="Navigator#openURL" />
@@ -1156,7 +1227,8 @@
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentDescription" value="DM Document Description" />
 			<var name="dmDocumentTitle" value="DM Document Title" />
-			<var name="workflowStatus" value="Pending (Review)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Review" />
 		</execute>
 
 		<execute macro="Page#gotoMyAccount">
@@ -1189,7 +1261,8 @@
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentDescription" value="DM Folder Document Description" />
 			<var name="dmDocumentTitle" value="DM Folder Document Title" />
-			<var name="workflowStatus" value="Pending (Review)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Review" />
 		</execute>
 
 		<execute macro="Navigator#openURL" />
@@ -1201,7 +1274,8 @@
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentDescription" value="DM Document Description" />
 			<var name="dmDocumentTitle" value="DM Document Title" />
-			<var name="workflowStatus" value="Pending (Review)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Review" />
 		</execute>
 
 		<execute macro="Page#gotoMyAccount">
@@ -1256,7 +1330,8 @@
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentDescription" value="DM Folder Document Description" />
 			<var name="dmDocumentTitle" value="DM Folder Document Title" />
-			<var name="workflowStatus" value="Pending (Update)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Update" />
 		</execute>
 
 		<execute macro="Navigator#openURL" />
@@ -1268,7 +1343,170 @@
 		<execute macro="DMDocument#viewWithWorkflowCP">
 			<var name="dmDocumentDescription" value="DM Document Description" />
 			<var name="dmDocumentTitle" value="DM Document Title" />
-			<var name="workflowStatus" value="Pending (Update)" />
+			<var name="workflowStatus" value="Pending" />
+			<var name="workflowTask" value="Update" />
+		</execute>
+	</command>
+
+	<command name="SaveAsDraftAndViewCategories" priority="3">
+		<description message="This is a use case for LPS-60870." />
+
+		<property name="custom.properties" value="dl.file.entry.drafts.enabled=true" />
+
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Categories" />
+		</execute>
+
+		<execute macro="Vocabulary#addCP">
+			<var name="vocabularyName" value="Vocabulary Name" />
+		</execute>
+
+		<execute macro="Category#addCP">
+			<var name="categoryName" value="legal" />
+			<var name="vocabularyName" value="Vocabulary Name" />
+		</execute>
+
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Categories" />
+		</execute>
+
+		<execute macro="Category#addCP">
+			<var name="categoryName" value="Other" />
+			<var name="vocabularyName" value="Vocabulary Name" />
+		</execute>
+
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Documents and Media" />
+		</execute>
+
+		<execute macro="DMFolder#addCP">
+			<var name="dmFolderDescription" value="DM Folder Description" />
+			<var name="dmFolderName" value="DM Folder Name" />
+		</execute>
+
+		<execute macro="DMFolder#configureWorkflowCP">
+			<var name="dmFolderName" value="DM Folder Name" />
+			<var name="workflowDefinition" value="Single Approver (Version 1)" />
+			<var name="workflowRestriction" value="Default Workflow" />
+		</execute>
+
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Documents and Media" />
+		</execute>
+
+		<execute macro="DMFolder#gotoCP">
+			<var name="dmDocumentTitle" value="DM Folder Name" />
+			<var name="dmFolderName" value="DM Folder Name" />
+		</execute>
+
+		<execute macro="DMNavigator#gotoAddDocumentType" />
+
+		<execute macro="DMDocument#editDocument">
+			<var name="dmDocumentDescription" value="DM Document Description" />
+			<var name="dmDocumentFile" value="Document_1.doc" />
+			<var name="dmDocumentTitle" value="DM Document Title" />
+		</execute>
+
+		<execute macro="DMDocument#addCategories">
+			<var name="categoryNameList" value="legal,Other" />
+			<var name="vocabularyName" value="Vocabulary Name" />
+		</execute>
+
+		<execute macro="Button#clickSubmitForPublication" />
+
+		<execute macro="Alert#viewSuccessMessage" />
+
+		<execute macro="Page#gotoMyAccount">
+			<var name="portletName" value="My Workflow Tasks" />
+		</execute>
+
+		<execute macro="Workflow#assignToMeTaskByActions">
+			<var name="workflowAssetTitle" value="DM Document Title" />
+			<var name="workflowAssetType" value="Document" />
+			<var name="workflowTask" value="Review" />
+		</execute>
+
+		<execute macro="Workflow#approveTaskByActions">
+			<var name="workflowAssetTitle" value="DM Document Title" />
+			<var name="workflowAssetType" value="Document" />
+			<var name="workflowTask" value="Review" />
+		</execute>
+
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoSitesContent">
+			<var name="portlet" value="Documents and Media" />
+		</execute>
+
+		<execute macro="DMFolder#gotoCP">
+			<var name="dmDocumentTitle" value="DM Folder Name" />
+			<var name="dmFolderName" value="DM Folder Name" />
+		</execute>
+
+		<execute macro="DMNavigator#gotoEditDocument">
+			<var name="dmDocumentTitle" value="DM Document Title" />
+		</execute>
+
+		<execute macro="DMDocument#viewCategories">
+			<var name="categoryNameList" value="legal,Other" />
+		</execute>
+
+		<execute macro="Button#clickSaveAsDraft" />
+
+		<execute macro="Alert#viewSuccessMessage" />
+
+		<execute macro="DMNavigator#gotoEditDocument">
+			<var name="dmDocumentTitle" value="DM Document Title" />
+		</execute>
+
+		<execute macro="DMDocument#viewCategories">
+			<var name="categoryNameList" value="legal,Other" />
+		</execute>
+
+		<execute macro="Button#clickSubmitForPublication" />
+
+		<execute macro="DMNavigator#gotoEditDocument">
+			<var name="dmDocumentTitle" value="DM Document Title" />
+		</execute>
+
+		<execute macro="DMDocument#viewCategories">
+			<var name="categoryNameList" value="legal,Other" />
+		</execute>
+
+		<execute macro="Page#gotoMyAccount">
+			<var name="portletName" value="My Workflow Tasks" />
+		</execute>
+
+		<execute macro="Workflow#assignToMeTaskByActions">
+			<var name="workflowAssetTitle" value="DM Document Title" />
+			<var name="workflowAssetType" value="Document" />
+			<var name="workflowTask" value="Review" />
+		</execute>
+
+		<execute macro="Workflow#viewTaskAssignedToMeDetails">
+			<var name="workflowAssetContent" value="DM Document Title" />
+			<var name="workflowAssetTitle" value="DM Document Title" />
+			<var name="workflowAssetType" value="Document" />
+			<var name="workflowTask" value="Review" />
+		</execute>
+
+		<execute macro="Workflow#viewPreviewCategories">
+			<var name="categoryNameList" value="legal,Other" />
+			<var name="vocabularyName" value="Vocabulary Name" />
+		</execute>
+
+		<execute macro="Workflow#gotoPreviewEdit" />
+
+		<execute macro="DMDocument#viewCategories">
+			<var name="categoryNameList" value="legal,Other" />
 		</execute>
 	</command>
 </definition>

@@ -19,10 +19,16 @@ package com.liferay.poshi.runner.util;
  */
 public class PropsValues {
 
+	public static final String ACCESSIBILITY_STANDARDS_JSON = PropsUtil.get(
+		"accessibility.standards.json");
+
 	public static final String BROWSER_COMMANDS_DIR_NAME = PropsUtil.get(
 		"browser.commands.dir.name");
 
 	public static final String BROWSER_TYPE = PropsUtil.get("browser.type");
+
+	public static final String BROWSER_VERSION = PropsUtil.get(
+		"browser.version");
 
 	public static final String CLUSTER_NODE_1 = PropsUtil.get("cluster.node1");
 
@@ -63,6 +69,15 @@ public class PropsValues {
 
 	public static final String[] FIXED_ISSUES = StringUtil.split(
 		PropsUtil.get("fixed.issues"));
+
+	public static final String GOOGLE_API_KEY = PropsUtil.get(
+		"google.api.key");
+
+	public static final String GOOGLE_CLIENT_ID = PropsUtil.get(
+		"google.client.id");
+
+	public static final String GOOGLE_CLIENT_SECRET = PropsUtil.get(
+		"google.client.secret");
 
 	public static final String IGNORE_ERRORS = PropsUtil.get("ignore.errors");
 
@@ -110,14 +125,14 @@ public class PropsValues {
 	public static final boolean SAVE_SOURCE = GetterUtil.getBoolean(
 		PropsUtil.get("save.source"));
 
+	public static final boolean SAVE_WEB_PAGE = GetterUtil.getBoolean(
+		PropsUtil.get("save.web.page"));
+
 	public static final String SELENIUM_CHROME_DRIVER_EXECUTABLE =
 		PropsUtil.get("selenium.chrome.driver.executable");
 
 	public static final String SELENIUM_DESIRED_CAPABILITIES_PLATFORM =
 		PropsUtil.get("selenium.desired.capabilities.platform");
-
-	public static final String SELENIUM_DESIRED_CAPABILITIES_VERSION =
-		PropsUtil.get("selenium.desired.capabilities.version");
 
 	public static final String SELENIUM_EXECUTABLE_DIR_NAME =
 		PropsUtil.get("selenium.executable.dir.name");
@@ -163,14 +178,23 @@ public class PropsValues {
 	public static final String TEST_BASE_DIR_NAME = PropsUtil.get(
 		"test.base.dir.name");
 
+	public static final String TEST_BATCH_GROUP_IGNORE_REGEX = PropsUtil.get(
+		"test.batch.group.ignore.regex");
+
 	public static final int TEST_BATCH_MAX_GROUP_SIZE = GetterUtil.getInteger(
 		PropsUtil.get("test.batch.max.group.size"));
+
+	public static final int TEST_BATCH_MAX_SUBGROUP_SIZE =
+		GetterUtil.getInteger(PropsUtil.get("test.batch.max.subgroup.size"));
 
 	public static final String[] TEST_BATCH_PROPERTY_NAMES = StringUtil.split(
 		PropsUtil.get("test.batch.property.names"));
 
 	public static final String[] TEST_BATCH_PROPERTY_VALUES = StringUtil.split(
 		PropsUtil.get("test.batch.property.values"));
+
+	public static final String TEST_BATCH_RUN_TYPE = PropsUtil.get(
+		"test.batch.run.type");
 
 	public static final String TEST_CASE_AVAILABLE_PROPERTY_NAMES =
 		PropsUtil.get("test.case.available.property.names");
@@ -193,11 +217,20 @@ public class PropsValues {
 	public static final String[] TEST_INCLUDE_DIR_NAMES = StringUtil.split(
 		PropsUtil.get("test.include.dir.names"));
 
+	public static final String TEST_NAME_SKIP_PORTAL_INSTANCE = PropsUtil.get(
+		"test.name.skip.portal.instance");
+
+	public static final boolean TEST_PAUSE_ON_FAILURE = GetterUtil.getBoolean(
+		PropsUtil.get("test.pause.on.failure"));
+
 	public static final boolean TEST_PORTAL_INSTANCE = GetterUtil.getBoolean(
 		PropsUtil.get("test.portal.instance"));
 
 	public static final String TEST_POSHI_WARNINGS_FILE_NAME = PropsUtil.get(
 		"test.poshi.warnings.file.name");
+
+	public static final int TEST_RETRY_COMMAND_WAIT_TIME =
+		GetterUtil.getInteger(PropsUtil.get("test.retry.command.wait.time"));
 
 	public static final boolean TEST_RUN_LOCALLY = GetterUtil.getBoolean(
 		PropsUtil.get("test.run.locally"));
