@@ -358,17 +358,19 @@ String selectStyle = (String)request.getAttribute("configuration.jsp-selectStyle
 			List<AssetEntryQueryProcessor> assetEntryQueryProcessors = AssetPublisherUtil.getAssetEntryQueryProcessors();
 
 			for (AssetEntryQueryProcessor assetEntryQueryProcessor : assetEntryQueryProcessors) {
+				if (assetPublisherCustomizer.isShowAssetEntryQueryProcessor(assetEntryQueryProcessor)) {
 			%>
 
-				<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" id='<%= "assetPublisherPanelContainerSection_" + assetEntryQueryProcessor.getKey() %>' label="<%= assetEntryQueryProcessor.getTitle(locale) %>">
+					<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" id='<%= "assetPublisherPanelContainerSection_" + assetEntryQueryProcessor.getKey() %>' label="<%= assetEntryQueryProcessor.getTitle(locale) %>">
 
-					<%
-					assetEntryQueryProcessor.include(request, new PipingServletResponse(pageContext));
-					%>
+						<%
+						assetEntryQueryProcessor.include(request, new PipingServletResponse(pageContext));
+						%>
 
-				</aui:fieldset>
+					</aui:fieldset>
 
 			<%
+				}
 			}
 			%>
 
