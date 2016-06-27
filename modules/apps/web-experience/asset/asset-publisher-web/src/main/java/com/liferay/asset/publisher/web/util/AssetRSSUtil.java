@@ -190,8 +190,13 @@ public class AssetRSSUtil {
 
 		SearchContainer searchContainer = new SearchContainer();
 
+		AssetPublisherCustomizer assetPublisherCustomizer =
+			(AssetPublisherCustomizer)portletRequest.getAttribute(
+				"assetPublisherCustomizer");
+
 		AssetPublisherDisplayContext assetPublisherDisplayContext =
 			new AssetPublisherDisplayContext(
+				assetPublisherCustomizer,
 				PortalUtil.getHttpServletRequest(portletRequest),
 				portletPreferences);
 
