@@ -16,7 +16,7 @@ package com.liferay.shopping.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.service.ServiceWrapper;
+import com.liferay.portal.kernel.service.ServiceWrapper;
 
 /**
  * Provides a wrapper for {@link ShoppingOrderService}.
@@ -34,47 +34,10 @@ public class ShoppingOrderServiceWrapper implements ShoppingOrderService,
 	}
 
 	@Override
-	public void completeOrder(long groupId, java.lang.String number,
-		java.lang.String ppTxnId, java.lang.String ppPaymentStatus,
-		double ppPaymentGross, java.lang.String ppReceiverEmail,
-		java.lang.String ppPayerEmail,
-		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		_shoppingOrderService.completeOrder(groupId, number, ppTxnId,
-			ppPaymentStatus, ppPaymentGross, ppReceiverEmail, ppPayerEmail,
-			serviceContext);
-	}
-
-	@Override
-	public void deleteOrder(long groupId, long orderId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		_shoppingOrderService.deleteOrder(groupId, orderId);
-	}
-
-	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
-	@Override
-	public java.lang.String getOSGiServiceIdentifier() {
-		return _shoppingOrderService.getOSGiServiceIdentifier();
-	}
-
-	@Override
 	public com.liferay.shopping.model.ShoppingOrder getOrder(long groupId,
 		long orderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _shoppingOrderService.getOrder(groupId, orderId);
-	}
-
-	@Override
-	public void sendEmail(long groupId, long orderId,
-		java.lang.String emailType,
-		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		_shoppingOrderService.sendEmail(groupId, orderId, emailType,
-			serviceContext);
 	}
 
 	@Override
@@ -115,20 +78,40 @@ public class ShoppingOrderServiceWrapper implements ShoppingOrderService,
 	}
 
 	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
-	 */
-	@Deprecated
-	public ShoppingOrderService getWrappedShoppingOrderService() {
-		return _shoppingOrderService;
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	@Override
+	public java.lang.String getOSGiServiceIdentifier() {
+		return _shoppingOrderService.getOSGiServiceIdentifier();
 	}
 
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
-	 */
-	@Deprecated
-	public void setWrappedShoppingOrderService(
-		ShoppingOrderService shoppingOrderService) {
-		_shoppingOrderService = shoppingOrderService;
+	@Override
+	public void completeOrder(long groupId, java.lang.String number,
+		java.lang.String ppTxnId, java.lang.String ppPaymentStatus,
+		double ppPaymentGross, java.lang.String ppReceiverEmail,
+		java.lang.String ppPayerEmail,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_shoppingOrderService.completeOrder(groupId, number, ppTxnId,
+			ppPaymentStatus, ppPaymentGross, ppReceiverEmail, ppPayerEmail,
+			serviceContext);
+	}
+
+	@Override
+	public void deleteOrder(long groupId, long orderId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_shoppingOrderService.deleteOrder(groupId, orderId);
+	}
+
+	@Override
+	public void sendEmail(long groupId, long orderId,
+		java.lang.String emailType,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_shoppingOrderService.sendEmail(groupId, orderId, emailType,
+			serviceContext);
 	}
 
 	@Override

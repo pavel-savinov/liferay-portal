@@ -16,14 +16,13 @@ package com.liferay.shopping.service.persistence;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.osgi.util.ServiceTrackerFactory;
+
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.service.ServiceContext;
 
 import com.liferay.shopping.model.ShoppingCart;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -50,28 +49,28 @@ public class ShoppingCartUtil {
 	 */
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#clearCache()
+	 * @see com.liferay.portal.kernel.service.persistence.BasePersistence#clearCache()
 	 */
 	public static void clearCache() {
 		getPersistence().clearCache();
 	}
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#clearCache(com.liferay.portal.model.BaseModel)
+	 * @see com.liferay.portal.kernel.service.persistence.BasePersistence#clearCache(com.liferay.portal.kernel.model.BaseModel)
 	 */
 	public static void clearCache(ShoppingCart shoppingCart) {
 		getPersistence().clearCache(shoppingCart);
 	}
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#countWithDynamicQuery(DynamicQuery)
+	 * @see com.liferay.portal.kernel.service.persistence.BasePersistence#countWithDynamicQuery(DynamicQuery)
 	 */
 	public static long countWithDynamicQuery(DynamicQuery dynamicQuery) {
 		return getPersistence().countWithDynamicQuery(dynamicQuery);
 	}
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#findWithDynamicQuery(DynamicQuery)
+	 * @see com.liferay.portal.kernel.service.persistence.BasePersistence#findWithDynamicQuery(DynamicQuery)
 	 */
 	public static List<ShoppingCart> findWithDynamicQuery(
 		DynamicQuery dynamicQuery) {
@@ -79,7 +78,7 @@ public class ShoppingCartUtil {
 	}
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#findWithDynamicQuery(DynamicQuery, int, int)
+	 * @see com.liferay.portal.kernel.service.persistence.BasePersistence#findWithDynamicQuery(DynamicQuery, int, int)
 	 */
 	public static List<ShoppingCart> findWithDynamicQuery(
 		DynamicQuery dynamicQuery, int start, int end) {
@@ -87,7 +86,7 @@ public class ShoppingCartUtil {
 	}
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#findWithDynamicQuery(DynamicQuery, int, int, OrderByComparator)
+	 * @see com.liferay.portal.kernel.service.persistence.BasePersistence#findWithDynamicQuery(DynamicQuery, int, int, OrderByComparator)
 	 */
 	public static List<ShoppingCart> findWithDynamicQuery(
 		DynamicQuery dynamicQuery, int start, int end,
@@ -98,14 +97,14 @@ public class ShoppingCartUtil {
 	}
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#update(com.liferay.portal.model.BaseModel)
+	 * @see com.liferay.portal.kernel.service.persistence.BasePersistence#update(com.liferay.portal.kernel.model.BaseModel)
 	 */
 	public static ShoppingCart update(ShoppingCart shoppingCart) {
 		return getPersistence().update(shoppingCart);
 	}
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#update(com.liferay.portal.model.BaseModel, ServiceContext)
+	 * @see com.liferay.portal.kernel.service.persistence.BasePersistence#update(com.liferay.portal.kernel.model.BaseModel, ServiceContext)
 	 */
 	public static ShoppingCart update(ShoppingCart shoppingCart,
 		ServiceContext serviceContext) {
@@ -186,7 +185,7 @@ public class ShoppingCartUtil {
 	* @param groupId the group ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching shopping cart
-	* @throws com.liferay.shopping.NoSuchCartException if a matching shopping cart could not be found
+	* @throws NoSuchCartException if a matching shopping cart could not be found
 	*/
 	public static ShoppingCart findByGroupId_First(long groupId,
 		OrderByComparator<ShoppingCart> orderByComparator)
@@ -212,7 +211,7 @@ public class ShoppingCartUtil {
 	* @param groupId the group ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching shopping cart
-	* @throws com.liferay.shopping.NoSuchCartException if a matching shopping cart could not be found
+	* @throws NoSuchCartException if a matching shopping cart could not be found
 	*/
 	public static ShoppingCart findByGroupId_Last(long groupId,
 		OrderByComparator<ShoppingCart> orderByComparator)
@@ -239,7 +238,7 @@ public class ShoppingCartUtil {
 	* @param groupId the group ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the previous, current, and next shopping cart
-	* @throws com.liferay.shopping.NoSuchCartException if a shopping cart with the primary key could not be found
+	* @throws NoSuchCartException if a shopping cart with the primary key could not be found
 	*/
 	public static ShoppingCart[] findByGroupId_PrevAndNext(long cartId,
 		long groupId, OrderByComparator<ShoppingCart> orderByComparator)
@@ -341,7 +340,7 @@ public class ShoppingCartUtil {
 	* @param userId the user ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching shopping cart
-	* @throws com.liferay.shopping.NoSuchCartException if a matching shopping cart could not be found
+	* @throws NoSuchCartException if a matching shopping cart could not be found
 	*/
 	public static ShoppingCart findByUserId_First(long userId,
 		OrderByComparator<ShoppingCart> orderByComparator)
@@ -367,7 +366,7 @@ public class ShoppingCartUtil {
 	* @param userId the user ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching shopping cart
-	* @throws com.liferay.shopping.NoSuchCartException if a matching shopping cart could not be found
+	* @throws NoSuchCartException if a matching shopping cart could not be found
 	*/
 	public static ShoppingCart findByUserId_Last(long userId,
 		OrderByComparator<ShoppingCart> orderByComparator)
@@ -394,7 +393,7 @@ public class ShoppingCartUtil {
 	* @param userId the user ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the previous, current, and next shopping cart
-	* @throws com.liferay.shopping.NoSuchCartException if a shopping cart with the primary key could not be found
+	* @throws NoSuchCartException if a shopping cart with the primary key could not be found
 	*/
 	public static ShoppingCart[] findByUserId_PrevAndNext(long cartId,
 		long userId, OrderByComparator<ShoppingCart> orderByComparator)
@@ -423,12 +422,12 @@ public class ShoppingCartUtil {
 	}
 
 	/**
-	* Returns the shopping cart where groupId = &#63; and userId = &#63; or throws a {@link com.liferay.shopping.NoSuchCartException} if it could not be found.
+	* Returns the shopping cart where groupId = &#63; and userId = &#63; or throws a {@link NoSuchCartException} if it could not be found.
 	*
 	* @param groupId the group ID
 	* @param userId the user ID
 	* @return the matching shopping cart
-	* @throws com.liferay.shopping.NoSuchCartException if a matching shopping cart could not be found
+	* @throws NoSuchCartException if a matching shopping cart could not be found
 	*/
 	public static ShoppingCart findByG_U(long groupId, long userId)
 		throws com.liferay.shopping.exception.NoSuchCartException {
@@ -515,7 +514,7 @@ public class ShoppingCartUtil {
 	*
 	* @param cartId the primary key of the shopping cart
 	* @return the shopping cart that was removed
-	* @throws com.liferay.shopping.NoSuchCartException if a shopping cart with the primary key could not be found
+	* @throws NoSuchCartException if a shopping cart with the primary key could not be found
 	*/
 	public static ShoppingCart remove(long cartId)
 		throws com.liferay.shopping.exception.NoSuchCartException {
@@ -527,11 +526,11 @@ public class ShoppingCartUtil {
 	}
 
 	/**
-	* Returns the shopping cart with the primary key or throws a {@link com.liferay.shopping.NoSuchCartException} if it could not be found.
+	* Returns the shopping cart with the primary key or throws a {@link NoSuchCartException} if it could not be found.
 	*
 	* @param cartId the primary key of the shopping cart
 	* @return the shopping cart
-	* @throws com.liferay.shopping.NoSuchCartException if a shopping cart with the primary key could not be found
+	* @throws NoSuchCartException if a shopping cart with the primary key could not be found
 	*/
 	public static ShoppingCart findByPrimaryKey(long cartId)
 		throws com.liferay.shopping.exception.NoSuchCartException {
@@ -634,21 +633,6 @@ public class ShoppingCartUtil {
 		return _serviceTracker.getService();
 	}
 
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setPersistence(ShoppingCartPersistence persistence) {
-	}
-
-	private static ServiceTracker<ShoppingCartPersistence, ShoppingCartPersistence> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(ShoppingCartUtil.class);
-
-		_serviceTracker = new ServiceTracker<ShoppingCartPersistence, ShoppingCartPersistence>(bundle.getBundleContext(),
-				ShoppingCartPersistence.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<ShoppingCartPersistence, ShoppingCartPersistence> _serviceTracker =
+		ServiceTrackerFactory.open(ShoppingCartPersistence.class);
 }

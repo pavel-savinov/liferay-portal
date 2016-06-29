@@ -18,9 +18,12 @@ import com.liferay.poshi.runner.util.OSDetector;
 import com.liferay.poshi.runner.util.PropsValues;
 import com.liferay.poshi.runner.util.StringPool;
 import com.liferay.poshi.runner.util.StringUtil;
+import com.liferay.poshi.runner.util.Validator;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
+
+import java.io.File;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -31,6 +34,7 @@ import java.util.Map;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
@@ -40,6 +44,7 @@ import org.openqa.selenium.safari.SafariDriver;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Kenji Heigel
  * @author Michael Hashimoto
  */
 public class WebDriverUtil extends PropsValues {
@@ -61,6 +66,8 @@ public class WebDriverUtil extends PropsValues {
 
 		desiredCapabilities.setCapability("browserName", "Browser");
 		desiredCapabilities.setCapability("deviceName", "deviceName");
+		desiredCapabilities.setCapability(
+			"newCommandTimeout", PropsValues.TIMEOUT_EXPLICIT_WAIT);
 		desiredCapabilities.setCapability("platformName", "Android");
 		desiredCapabilities.setCapability("platformVersion", "4.4");
 
@@ -81,6 +88,8 @@ public class WebDriverUtil extends PropsValues {
 		desiredCapabilities.setCapability("browserName", "Chrome");
 		desiredCapabilities.setCapability(
 			"deviceName", PropsValues.MOBILE_DEVICE_NAME);
+		desiredCapabilities.setCapability(
+			"newCommandTimeout", PropsValues.TIMEOUT_EXPLICIT_WAIT);
 		desiredCapabilities.setCapability("platformName", "Android");
 		desiredCapabilities.setCapability("platformVersion", "5.0.1");
 
@@ -174,7 +183,16 @@ public class WebDriverUtil extends PropsValues {
 		firefoxProfile.setPreference("dom.max_chrome_script_run_time", 300);
 		firefoxProfile.setPreference("dom.max_script_run_time", 300);
 
-		return new FirefoxDriver(firefoxProfile);
+		if (Validator.isNotNull(PropsValues.BROWSER_FIREFOX_BIN_FILE)) {
+			File file = new File(PropsValues.BROWSER_FIREFOX_BIN_FILE);
+
+			FirefoxBinary firefoxBinary = new FirefoxBinary(file);
+
+			return new FirefoxDriver(firefoxBinary, firefoxProfile);
+		}
+		else {
+			return new FirefoxDriver(firefoxProfile);
+		}
 	}
 
 	private WebDriver _getInternetExplorerDriver() {
@@ -200,7 +218,7 @@ public class WebDriverUtil extends PropsValues {
 		desiredCapabilities.setCapability(
 			"platform", PropsValues.SELENIUM_DESIRED_CAPABILITIES_PLATFORM);
 		desiredCapabilities.setCapability(
-			"version", PropsValues.SELENIUM_DESIRED_CAPABILITIES_VERSION);
+			"version", PropsValues.BROWSER_VERSION);
 
 		URL url = null;
 
@@ -215,12 +233,15 @@ public class WebDriverUtil extends PropsValues {
 	}
 
 	private WebDriver _getIOSMobileDriver() {
-		DesiredCapabilities desiredCapabilities = DesiredCapabilities.android();
+		DesiredCapabilities desiredCapabilities = DesiredCapabilities.iphone();
 
 		desiredCapabilities.setCapability("browserName", "Safari");
 		desiredCapabilities.setCapability("deviceName", "iPhone 5s");
+		desiredCapabilities.setCapability(
+			"newCommandTimeout", PropsValues.TIMEOUT_EXPLICIT_WAIT);
 		desiredCapabilities.setCapability("platformName", "iOS");
-		desiredCapabilities.setCapability("platformVersion", "8.2");
+		desiredCapabilities.setCapability(
+			"platformVersion", PropsValues.BROWSER_VERSION);
 
 		URL url = null;
 
@@ -254,6 +275,10 @@ public class WebDriverUtil extends PropsValues {
 		else if (BROWSER_TYPE.equals("edge") &&
 				 !SELENIUM_REMOTE_DRIVER_ENABLED) {
 
+			System.setProperty(
+				"webdriver.edge.driver",
+				SELENIUM_EXECUTABLE_DIR_NAME + "MicrosoftWebDriver.exe");
+
 			_webDriver = _getEdgeDriver();
 		}
 		else if (BROWSER_TYPE.equals("edge") &&
@@ -266,6 +291,10 @@ public class WebDriverUtil extends PropsValues {
 		}
 		else if (BROWSER_TYPE.equals("internetexplorer") &&
 				 !SELENIUM_REMOTE_DRIVER_ENABLED) {
+
+			System.setProperty(
+				"webdriver.ie.driver",
+				SELENIUM_EXECUTABLE_DIR_NAME + SELENIUM_IE_DRIVER_EXECUTABLE);
 
 			_webDriver = _getInternetExplorerDriver();
 		}

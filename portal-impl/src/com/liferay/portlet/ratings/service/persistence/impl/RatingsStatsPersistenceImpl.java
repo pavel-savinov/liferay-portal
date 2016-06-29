@@ -16,6 +16,7 @@ package com.liferay.portlet.ratings.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
@@ -27,17 +28,19 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.service.persistence.CompanyProvider;
+import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
+import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
-import com.liferay.portlet.ratings.NoSuchStatsException;
-import com.liferay.portlet.ratings.model.RatingsStats;
 import com.liferay.portlet.ratings.model.impl.RatingsStatsImpl;
 import com.liferay.portlet.ratings.model.impl.RatingsStatsModelImpl;
-import com.liferay.portlet.ratings.service.persistence.RatingsStatsPersistence;
+
+import com.liferay.ratings.kernel.exception.NoSuchStatsException;
+import com.liferay.ratings.kernel.model.RatingsStats;
+import com.liferay.ratings.kernel.service.persistence.RatingsStatsPersistence;
 
 import java.io.Serializable;
 
@@ -58,7 +61,7 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @see RatingsStatsPersistence
- * @see com.liferay.portlet.ratings.service.persistence.RatingsStatsUtil
+ * @see com.liferay.ratings.kernel.service.persistence.RatingsStatsUtil
  * @generated
  */
 @ProviderType
@@ -120,8 +123,8 @@ public class RatingsStatsPersistenceImpl extends BasePersistenceImpl<RatingsStat
 
 			msg.append(StringPool.CLOSE_CURLY_BRACE);
 
-			if (_log.isWarnEnabled()) {
-				_log.warn(msg.toString());
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
 			}
 
 			throw new NoSuchStatsException(msg.toString());
@@ -459,6 +462,8 @@ public class RatingsStatsPersistenceImpl extends BasePersistenceImpl<RatingsStat
 		ratingsStats.setNew(true);
 		ratingsStats.setPrimaryKey(statsId);
 
+		ratingsStats.setCompanyId(companyProvider.getCompanyId());
+
 		return ratingsStats;
 	}
 
@@ -493,8 +498,8 @@ public class RatingsStatsPersistenceImpl extends BasePersistenceImpl<RatingsStat
 					primaryKey);
 
 			if (ratingsStats == null) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+				if (_log.isDebugEnabled()) {
+					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
 				throw new NoSuchStatsException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
@@ -615,7 +620,7 @@ public class RatingsStatsPersistenceImpl extends BasePersistenceImpl<RatingsStat
 	}
 
 	/**
-	 * Returns the ratings stats with the primary key or throws a {@link com.liferay.portal.NoSuchModelException} if it could not be found.
+	 * Returns the ratings stats with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the ratings stats
 	 * @return the ratings stats
@@ -627,8 +632,8 @@ public class RatingsStatsPersistenceImpl extends BasePersistenceImpl<RatingsStat
 		RatingsStats ratingsStats = fetchByPrimaryKey(primaryKey);
 
 		if (ratingsStats == null) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			if (_log.isDebugEnabled()) {
+				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			throw new NoSuchStatsException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
@@ -659,12 +664,14 @@ public class RatingsStatsPersistenceImpl extends BasePersistenceImpl<RatingsStat
 	 */
 	@Override
 	public RatingsStats fetchByPrimaryKey(Serializable primaryKey) {
-		RatingsStats ratingsStats = (RatingsStats)entityCache.getResult(RatingsStatsModelImpl.ENTITY_CACHE_ENABLED,
+		Serializable serializable = entityCache.getResult(RatingsStatsModelImpl.ENTITY_CACHE_ENABLED,
 				RatingsStatsImpl.class, primaryKey);
 
-		if (ratingsStats == _nullRatingsStats) {
+		if (serializable == nullModel) {
 			return null;
 		}
+
+		RatingsStats ratingsStats = (RatingsStats)serializable;
 
 		if (ratingsStats == null) {
 			Session session = null;
@@ -680,7 +687,7 @@ public class RatingsStatsPersistenceImpl extends BasePersistenceImpl<RatingsStat
 				}
 				else {
 					entityCache.putResult(RatingsStatsModelImpl.ENTITY_CACHE_ENABLED,
-						RatingsStatsImpl.class, primaryKey, _nullRatingsStats);
+						RatingsStatsImpl.class, primaryKey, nullModel);
 				}
 			}
 			catch (Exception e) {
@@ -734,18 +741,20 @@ public class RatingsStatsPersistenceImpl extends BasePersistenceImpl<RatingsStat
 		Set<Serializable> uncachedPrimaryKeys = null;
 
 		for (Serializable primaryKey : primaryKeys) {
-			RatingsStats ratingsStats = (RatingsStats)entityCache.getResult(RatingsStatsModelImpl.ENTITY_CACHE_ENABLED,
+			Serializable serializable = entityCache.getResult(RatingsStatsModelImpl.ENTITY_CACHE_ENABLED,
 					RatingsStatsImpl.class, primaryKey);
 
-			if (ratingsStats == null) {
-				if (uncachedPrimaryKeys == null) {
-					uncachedPrimaryKeys = new HashSet<Serializable>();
-				}
+			if (serializable != nullModel) {
+				if (serializable == null) {
+					if (uncachedPrimaryKeys == null) {
+						uncachedPrimaryKeys = new HashSet<Serializable>();
+					}
 
-				uncachedPrimaryKeys.add(primaryKey);
-			}
-			else {
-				map.put(primaryKey, ratingsStats);
+					uncachedPrimaryKeys.add(primaryKey);
+				}
+				else {
+					map.put(primaryKey, (RatingsStats)serializable);
+				}
 			}
 		}
 
@@ -787,7 +796,7 @@ public class RatingsStatsPersistenceImpl extends BasePersistenceImpl<RatingsStat
 
 			for (Serializable primaryKey : uncachedPrimaryKeys) {
 				entityCache.putResult(RatingsStatsModelImpl.ENTITY_CACHE_ENABLED,
-					RatingsStatsImpl.class, primaryKey, _nullRatingsStats);
+					RatingsStatsImpl.class, primaryKey, nullModel);
 			}
 		}
 		catch (Exception e) {
@@ -889,7 +898,7 @@ public class RatingsStatsPersistenceImpl extends BasePersistenceImpl<RatingsStat
 
 			if (orderByComparator != null) {
 				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_RATINGSSTATS);
 
@@ -1009,6 +1018,8 @@ public class RatingsStatsPersistenceImpl extends BasePersistenceImpl<RatingsStat
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
+	@BeanReference(type = CompanyProviderWrapper.class)
+	protected CompanyProvider companyProvider;
 	protected EntityCache entityCache = EntityCacheUtil.getEntityCache();
 	protected FinderCache finderCache = FinderCacheUtil.getFinderCache();
 	private static final String _SQL_SELECT_RATINGSSTATS = "SELECT ratingsStats FROM RatingsStats ratingsStats";
@@ -1020,22 +1031,4 @@ public class RatingsStatsPersistenceImpl extends BasePersistenceImpl<RatingsStat
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No RatingsStats exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No RatingsStats exists with the key {";
 	private static final Log _log = LogFactoryUtil.getLog(RatingsStatsPersistenceImpl.class);
-	private static final RatingsStats _nullRatingsStats = new RatingsStatsImpl() {
-			@Override
-			public Object clone() {
-				return this;
-			}
-
-			@Override
-			public CacheModel<RatingsStats> toCacheModel() {
-				return _nullRatingsStatsCacheModel;
-			}
-		};
-
-	private static final CacheModel<RatingsStats> _nullRatingsStatsCacheModel = new CacheModel<RatingsStats>() {
-			@Override
-			public RatingsStats toEntityModel() {
-				return _nullRatingsStats;
-			}
-		};
 }

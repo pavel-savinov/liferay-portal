@@ -19,22 +19,21 @@
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
 <%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
 <%@ page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
-page import="com.liferay.unit.converter.web.model.UnitConverter" %><%@
-page import="com.liferay.unit.converter.web.util.UnitConverterUtil" %>
+page import="com.liferay.unit.converter.web.internal.model.UnitConverter" %><%@
+page import="com.liferay.unit.converter.web.internal.util.UnitConverterUtil" %>
 
 <%@ page import="javax.portlet.WindowState" %>
 
-<portlet:defineObjects />
+<liferay-frontend:defineObjects />
 
 <liferay-theme:defineObjects />
 
-<%
-WindowState windowState = liferayPortletRequest.getWindowState();
-%>
+<portlet:defineObjects />
 
 <%@ include file="/init-ext.jsp" %>

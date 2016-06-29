@@ -16,8 +16,7 @@ package com.liferay.shopping.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -42,42 +41,10 @@ public class ShoppingOrderServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.shopping.service.impl.ShoppingOrderServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
-	public static void completeOrder(long groupId, java.lang.String number,
-		java.lang.String ppTxnId, java.lang.String ppPaymentStatus,
-		double ppPaymentGross, java.lang.String ppReceiverEmail,
-		java.lang.String ppPayerEmail,
-		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		getService()
-			.completeOrder(groupId, number, ppTxnId, ppPaymentStatus,
-			ppPaymentGross, ppReceiverEmail, ppPayerEmail, serviceContext);
-	}
-
-	public static void deleteOrder(long groupId, long orderId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		getService().deleteOrder(groupId, orderId);
-	}
-
-	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
-		return getService().getOSGiServiceIdentifier();
-	}
-
 	public static com.liferay.shopping.model.ShoppingOrder getOrder(
 		long groupId, long orderId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getOrder(groupId, orderId);
-	}
-
-	public static void sendEmail(long groupId, long orderId,
-		java.lang.String emailType,
-		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		getService().sendEmail(groupId, orderId, emailType, serviceContext);
 	}
 
 	public static com.liferay.shopping.model.ShoppingOrder updateOrder(
@@ -117,25 +84,42 @@ public class ShoppingOrderServiceUtil {
 			ppPaymentGross, ppReceiverEmail, ppPayerEmail);
 	}
 
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	public static java.lang.String getOSGiServiceIdentifier() {
+		return getService().getOSGiServiceIdentifier();
+	}
+
+	public static void completeOrder(long groupId, java.lang.String number,
+		java.lang.String ppTxnId, java.lang.String ppPaymentStatus,
+		double ppPaymentGross, java.lang.String ppReceiverEmail,
+		java.lang.String ppPayerEmail,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService()
+			.completeOrder(groupId, number, ppTxnId, ppPaymentStatus,
+			ppPaymentGross, ppReceiverEmail, ppPayerEmail, serviceContext);
+	}
+
+	public static void deleteOrder(long groupId, long orderId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService().deleteOrder(groupId, orderId);
+	}
+
+	public static void sendEmail(long groupId, long orderId,
+		java.lang.String emailType,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService().sendEmail(groupId, orderId, emailType, serviceContext);
+	}
+
 	public static ShoppingOrderService getService() {
 		return _serviceTracker.getService();
 	}
 
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(ShoppingOrderService service) {
-	}
-
-	private static ServiceTracker<ShoppingOrderService, ShoppingOrderService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(ShoppingOrderServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<ShoppingOrderService, ShoppingOrderService>(bundle.getBundleContext(),
-				ShoppingOrderService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<ShoppingOrderService, ShoppingOrderService> _serviceTracker =
+		ServiceTrackerFactory.open(ShoppingOrderService.class);
 }

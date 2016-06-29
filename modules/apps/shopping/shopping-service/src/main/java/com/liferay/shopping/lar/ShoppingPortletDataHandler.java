@@ -14,9 +14,9 @@
 
 package com.liferay.shopping.lar;
 
+import com.liferay.exportimport.kernel.lar.BasePortletDataHandler;
+import com.liferay.exportimport.kernel.lar.PortletDataHandler;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
-import com.liferay.portlet.exportimport.lar.BasePortletDataHandler;
-import com.liferay.portlet.exportimport.lar.PortletDataHandler;
 import com.liferay.shopping.constants.ShoppingConstants;
 import com.liferay.shopping.constants.ShoppingPortletKeys;
 
@@ -34,6 +34,13 @@ import org.osgi.service.component.annotations.Reference;
 	service = PortletDataHandler.class
 )
 public class ShoppingPortletDataHandler extends BasePortletDataHandler {
+
+	public static final String SCHEMA_VERSION = "1.0.0";
+
+	@Override
+	public String getSchemaVersion() {
+		return SCHEMA_VERSION;
+	}
 
 	@Override
 	public String getServiceName() {

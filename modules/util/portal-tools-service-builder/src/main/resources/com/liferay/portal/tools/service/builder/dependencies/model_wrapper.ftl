@@ -1,14 +1,12 @@
-package ${packagePath}.model;
+package ${apiPackagePath}.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.ModelWrapper;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portlet.expando.model.ExpandoBridge;
-import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
-
-import com.liferay.portlet.exportimport.lar.StagedModelType;
+import com.liferay.expando.kernel.model.ExpandoBridge;
+import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
+import com.liferay.exportimport.kernel.lar.StagedModelType;
+import com.liferay.portal.kernel.model.ModelWrapper;
+import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
 
@@ -17,6 +15,7 @@ import java.sql.Blob;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * <p>
@@ -89,12 +88,12 @@ public class ${entity.name}Wrapper implements ${entity.name}, ModelWrapper<${ent
 	}
 
 	<#list methods as method>
+		<#assign parameters = method.parameters>
+
 		<#if !method.isConstructor() && !method.isStatic() && method.isPublic() && !(method.name == "equals" && (parameters?size == 1))>
 			<#if method.name == "getStagedModelType">
 				<#assign hasGetStagedModelTypeMethod = true>
 			</#if>
-
-			<#assign parameters = method.parameters>
 
 			${serviceBuilder.getJavadocComment(method)}
 
@@ -165,7 +164,7 @@ public class ${entity.name}Wrapper implements ${entity.name}, ModelWrapper<${ent
 
 		${entity.name}Wrapper ${entity.varName}Wrapper = (${entity.name}Wrapper)obj;
 
-		if (Validator.equals(_${entity.varName}, ${entity.varName}Wrapper._${entity.varName})) {
+		if (Objects.equals(_${entity.varName}, ${entity.varName}Wrapper._${entity.varName})) {
 			return true;
 		}
 
@@ -205,14 +204,6 @@ public class ${entity.name}Wrapper implements ${entity.name}, ModelWrapper<${ent
 			return _${entity.varName}.getStagedModelType();
 		}
 	</#if>
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedModel}
-	 */
-	@Deprecated
-	public ${entity.name} getWrapped${entity.name}() {
-		return _${entity.varName};
-	}
 
 	@Override
 	public ${entity.name} getWrappedModel() {

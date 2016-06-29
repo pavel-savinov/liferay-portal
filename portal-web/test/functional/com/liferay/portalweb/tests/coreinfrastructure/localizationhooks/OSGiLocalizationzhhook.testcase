@@ -1,4 +1,5 @@
 <definition component-name="portal-plugins-osgi">
+	<property name="portal.release" value="true" />
 	<property name="plugins.deployment.type" value="osgi" />
 	<property name="testray.main.component.name" value="Localization Hooks" />
 
@@ -10,13 +11,11 @@
 		<property name="hook.plugins.includes" value="localization-zh-hook" />
 
 		<var name="appName" value="Chinese Localization" />
+		<var name="portletName" value="localization-zh-hook" />
 
-		<execute macro="Page#gotoCP">
-			<var name="portletName" value="App Manager" />
+		<execute macro="OSGiSmoke#Smoke">
+			<var name="appName" value="${portletName}" />
+			<var name="portletName" value="${portletName}" />
 		</execute>
-
-		<execute function="AssertTextPresent#assertTextPresent" value1="${appName}" />
-
-		<execute function="AntCommand#antCommand" locator1="build-test.xml" value1="remove-plugin -Dplugin.name=localization-zh-hook" />
 	</command>
 </definition>

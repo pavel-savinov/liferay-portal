@@ -16,7 +16,7 @@ package com.liferay.portal.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.NoSuchWebDAVPropsException;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
@@ -26,19 +26,21 @@ import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
+import com.liferay.portal.kernel.exception.NoSuchWebDAVPropsException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.WebDAVProps;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.CompanyProvider;
+import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
+import com.liferay.portal.kernel.service.persistence.WebDAVPropsPersistence;
+import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.model.MVCCModel;
-import com.liferay.portal.model.WebDAVProps;
 import com.liferay.portal.model.impl.WebDAVPropsImpl;
 import com.liferay.portal.model.impl.WebDAVPropsModelImpl;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.ServiceContextThreadLocal;
-import com.liferay.portal.service.persistence.WebDAVPropsPersistence;
 
 import java.io.Serializable;
 
@@ -60,7 +62,7 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @see WebDAVPropsPersistence
- * @see com.liferay.portal.service.persistence.WebDAVPropsUtil
+ * @see com.liferay.portal.kernel.service.persistence.WebDAVPropsUtil
  * @generated
  */
 @ProviderType
@@ -122,8 +124,8 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 
 			msg.append(StringPool.CLOSE_CURLY_BRACE);
 
-			if (_log.isWarnEnabled()) {
-				_log.warn(msg.toString());
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
 			}
 
 			throw new NoSuchWebDAVPropsException(msg.toString());
@@ -460,6 +462,8 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 		webDAVProps.setNew(true);
 		webDAVProps.setPrimaryKey(webDavPropsId);
 
+		webDAVProps.setCompanyId(companyProvider.getCompanyId());
+
 		return webDAVProps;
 	}
 
@@ -495,8 +499,8 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 					primaryKey);
 
 			if (webDAVProps == null) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+				if (_log.isDebugEnabled()) {
+					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
 				throw new NoSuchWebDAVPropsException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
@@ -640,7 +644,7 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 	}
 
 	/**
-	 * Returns the web d a v props with the primary key or throws a {@link com.liferay.portal.NoSuchModelException} if it could not be found.
+	 * Returns the web d a v props with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the web d a v props
 	 * @return the web d a v props
@@ -652,8 +656,8 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 		WebDAVProps webDAVProps = fetchByPrimaryKey(primaryKey);
 
 		if (webDAVProps == null) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			if (_log.isDebugEnabled()) {
+				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			throw new NoSuchWebDAVPropsException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
@@ -684,12 +688,14 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 	 */
 	@Override
 	public WebDAVProps fetchByPrimaryKey(Serializable primaryKey) {
-		WebDAVProps webDAVProps = (WebDAVProps)entityCache.getResult(WebDAVPropsModelImpl.ENTITY_CACHE_ENABLED,
+		Serializable serializable = entityCache.getResult(WebDAVPropsModelImpl.ENTITY_CACHE_ENABLED,
 				WebDAVPropsImpl.class, primaryKey);
 
-		if (webDAVProps == _nullWebDAVProps) {
+		if (serializable == nullModel) {
 			return null;
 		}
+
+		WebDAVProps webDAVProps = (WebDAVProps)serializable;
 
 		if (webDAVProps == null) {
 			Session session = null;
@@ -705,7 +711,7 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 				}
 				else {
 					entityCache.putResult(WebDAVPropsModelImpl.ENTITY_CACHE_ENABLED,
-						WebDAVPropsImpl.class, primaryKey, _nullWebDAVProps);
+						WebDAVPropsImpl.class, primaryKey, nullModel);
 				}
 			}
 			catch (Exception e) {
@@ -759,18 +765,20 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 		Set<Serializable> uncachedPrimaryKeys = null;
 
 		for (Serializable primaryKey : primaryKeys) {
-			WebDAVProps webDAVProps = (WebDAVProps)entityCache.getResult(WebDAVPropsModelImpl.ENTITY_CACHE_ENABLED,
+			Serializable serializable = entityCache.getResult(WebDAVPropsModelImpl.ENTITY_CACHE_ENABLED,
 					WebDAVPropsImpl.class, primaryKey);
 
-			if (webDAVProps == null) {
-				if (uncachedPrimaryKeys == null) {
-					uncachedPrimaryKeys = new HashSet<Serializable>();
-				}
+			if (serializable != nullModel) {
+				if (serializable == null) {
+					if (uncachedPrimaryKeys == null) {
+						uncachedPrimaryKeys = new HashSet<Serializable>();
+					}
 
-				uncachedPrimaryKeys.add(primaryKey);
-			}
-			else {
-				map.put(primaryKey, webDAVProps);
+					uncachedPrimaryKeys.add(primaryKey);
+				}
+				else {
+					map.put(primaryKey, (WebDAVProps)serializable);
+				}
 			}
 		}
 
@@ -812,7 +820,7 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 
 			for (Serializable primaryKey : uncachedPrimaryKeys) {
 				entityCache.putResult(WebDAVPropsModelImpl.ENTITY_CACHE_ENABLED,
-					WebDAVPropsImpl.class, primaryKey, _nullWebDAVProps);
+					WebDAVPropsImpl.class, primaryKey, nullModel);
 			}
 		}
 		catch (Exception e) {
@@ -914,7 +922,7 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_WEBDAVPROPS);
 
@@ -1034,6 +1042,8 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
+	@BeanReference(type = CompanyProviderWrapper.class)
+	protected CompanyProvider companyProvider;
 	protected EntityCache entityCache = EntityCacheUtil.getEntityCache();
 	protected FinderCache finderCache = FinderCacheUtil.getFinderCache();
 	private static final String _SQL_SELECT_WEBDAVPROPS = "SELECT webDAVProps FROM WebDAVProps webDAVProps";
@@ -1045,34 +1055,4 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No WebDAVProps exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No WebDAVProps exists with the key {";
 	private static final Log _log = LogFactoryUtil.getLog(WebDAVPropsPersistenceImpl.class);
-	private static final WebDAVProps _nullWebDAVProps = new WebDAVPropsImpl() {
-			@Override
-			public Object clone() {
-				return this;
-			}
-
-			@Override
-			public CacheModel<WebDAVProps> toCacheModel() {
-				return _nullWebDAVPropsCacheModel;
-			}
-		};
-
-	private static final CacheModel<WebDAVProps> _nullWebDAVPropsCacheModel = new NullCacheModel();
-
-	private static class NullCacheModel implements CacheModel<WebDAVProps>,
-		MVCCModel {
-		@Override
-		public long getMvccVersion() {
-			return -1;
-		}
-
-		@Override
-		public void setMvccVersion(long mvccVersion) {
-		}
-
-		@Override
-		public WebDAVProps toEntityModel() {
-			return _nullWebDAVProps;
-		}
-	}
 }

@@ -26,17 +26,17 @@ import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.CompanyProvider;
+import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
+import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.security.permission.InlineSQLHelperUtil;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.ServiceContextThreadLocal;
-import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import com.liferay.shopping.exception.NoSuchOrderException;
@@ -54,6 +54,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -216,7 +217,7 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -284,7 +285,7 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 	 * @param groupId the group ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching shopping order
-	 * @throws com.liferay.shopping.NoSuchOrderException if a matching shopping order could not be found
+	 * @throws NoSuchOrderException if a matching shopping order could not be found
 	 */
 	@Override
 	public ShoppingOrder findByGroupId_First(long groupId,
@@ -335,7 +336,7 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 	 * @param groupId the group ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching shopping order
-	 * @throws com.liferay.shopping.NoSuchOrderException if a matching shopping order could not be found
+	 * @throws NoSuchOrderException if a matching shopping order could not be found
 	 */
 	@Override
 	public ShoppingOrder findByGroupId_Last(long groupId,
@@ -393,7 +394,7 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 	 * @param groupId the group ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next shopping order
-	 * @throws com.liferay.shopping.NoSuchOrderException if a shopping order with the primary key could not be found
+	 * @throws NoSuchOrderException if a shopping order with the primary key could not be found
 	 */
 	@Override
 	public ShoppingOrder[] findByGroupId_PrevAndNext(long orderId,
@@ -432,8 +433,9 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -585,10 +587,10 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 
 		if (orderByComparator != null) {
 			query = new StringBundler(3 +
-					(orderByComparator.getOrderByFields().length * 3));
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -663,7 +665,7 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 	 * @param groupId the group ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next shopping order
-	 * @throws com.liferay.shopping.NoSuchOrderException if a shopping order with the primary key could not be found
+	 * @throws NoSuchOrderException if a shopping order with the primary key could not be found
 	 */
 	@Override
 	public ShoppingOrder[] filterFindByGroupId_PrevAndNext(long orderId,
@@ -706,11 +708,12 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -964,11 +967,11 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 			new String[] { String.class.getName() });
 
 	/**
-	 * Returns the shopping order where number = &#63; or throws a {@link com.liferay.shopping.NoSuchOrderException} if it could not be found.
+	 * Returns the shopping order where number = &#63; or throws a {@link NoSuchOrderException} if it could not be found.
 	 *
 	 * @param number the number
 	 * @return the matching shopping order
-	 * @throws com.liferay.shopping.NoSuchOrderException if a matching shopping order could not be found
+	 * @throws NoSuchOrderException if a matching shopping order could not be found
 	 */
 	@Override
 	public ShoppingOrder findByNumber(String number)
@@ -985,8 +988,8 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 
 			msg.append(StringPool.CLOSE_CURLY_BRACE);
 
-			if (_log.isWarnEnabled()) {
-				_log.warn(msg.toString());
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
 			}
 
 			throw new NoSuchOrderException(msg.toString());
@@ -1027,7 +1030,7 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 		if (result instanceof ShoppingOrder) {
 			ShoppingOrder shoppingOrder = (ShoppingOrder)result;
 
-			if (!Validator.equals(number, shoppingOrder.getNumber())) {
+			if (!Objects.equals(number, shoppingOrder.getNumber())) {
 				result = null;
 			}
 		}
@@ -1197,11 +1200,11 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 			new String[] { String.class.getName() });
 
 	/**
-	 * Returns the shopping order where ppTxnId = &#63; or throws a {@link com.liferay.shopping.NoSuchOrderException} if it could not be found.
+	 * Returns the shopping order where ppTxnId = &#63; or throws a {@link NoSuchOrderException} if it could not be found.
 	 *
 	 * @param ppTxnId the pp txn ID
 	 * @return the matching shopping order
-	 * @throws com.liferay.shopping.NoSuchOrderException if a matching shopping order could not be found
+	 * @throws NoSuchOrderException if a matching shopping order could not be found
 	 */
 	@Override
 	public ShoppingOrder findByPPTxnId(String ppTxnId)
@@ -1218,8 +1221,8 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 
 			msg.append(StringPool.CLOSE_CURLY_BRACE);
 
-			if (_log.isWarnEnabled()) {
-				_log.warn(msg.toString());
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
 			}
 
 			throw new NoSuchOrderException(msg.toString());
@@ -1261,7 +1264,7 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 		if (result instanceof ShoppingOrder) {
 			ShoppingOrder shoppingOrder = (ShoppingOrder)result;
 
-			if (!Validator.equals(ppTxnId, shoppingOrder.getPpTxnId())) {
+			if (!Objects.equals(ppTxnId, shoppingOrder.getPpTxnId())) {
 				result = null;
 			}
 		}
@@ -1568,7 +1571,7 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 				for (ShoppingOrder shoppingOrder : list) {
 					if ((groupId != shoppingOrder.getGroupId()) ||
 							(userId != shoppingOrder.getUserId()) ||
-							!Validator.equals(ppPaymentStatus,
+							!Objects.equals(ppPaymentStatus,
 								shoppingOrder.getPpPaymentStatus())) {
 						list = null;
 
@@ -1583,7 +1586,7 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 
 			if (orderByComparator != null) {
 				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -1675,7 +1678,7 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 	 * @param ppPaymentStatus the pp payment status
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching shopping order
-	 * @throws com.liferay.shopping.NoSuchOrderException if a matching shopping order could not be found
+	 * @throws NoSuchOrderException if a matching shopping order could not be found
 	 */
 	@Override
 	public ShoppingOrder findByG_U_PPPS_First(long groupId, long userId,
@@ -1738,7 +1741,7 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 	 * @param ppPaymentStatus the pp payment status
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching shopping order
-	 * @throws com.liferay.shopping.NoSuchOrderException if a matching shopping order could not be found
+	 * @throws NoSuchOrderException if a matching shopping order could not be found
 	 */
 	@Override
 	public ShoppingOrder findByG_U_PPPS_Last(long groupId, long userId,
@@ -1808,7 +1811,7 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 	 * @param ppPaymentStatus the pp payment status
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next shopping order
-	 * @throws com.liferay.shopping.NoSuchOrderException if a shopping order with the primary key could not be found
+	 * @throws NoSuchOrderException if a shopping order with the primary key could not be found
 	 */
 	@Override
 	public ShoppingOrder[] findByG_U_PPPS_PrevAndNext(long orderId,
@@ -1850,10 +1853,11 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 
 		if (orderByComparator != null) {
 			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(5);
 		}
 
 		query.append(_SQL_SELECT_SHOPPINGORDER_WHERE);
@@ -2034,10 +2038,10 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 
 		if (orderByComparator != null) {
 			query = new StringBundler(5 +
-					(orderByComparator.getOrderByFields().length * 3));
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
-			query = new StringBundler(5);
+			query = new StringBundler(6);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -2136,7 +2140,7 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 	 * @param ppPaymentStatus the pp payment status
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next shopping order
-	 * @throws com.liferay.shopping.NoSuchOrderException if a shopping order with the primary key could not be found
+	 * @throws NoSuchOrderException if a shopping order with the primary key could not be found
 	 */
 	@Override
 	public ShoppingOrder[] filterFindByG_U_PPPS_PrevAndNext(long orderId,
@@ -2182,11 +2186,12 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(6);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -2680,6 +2685,8 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 		shoppingOrder.setNew(true);
 		shoppingOrder.setPrimaryKey(orderId);
 
+		shoppingOrder.setCompanyId(companyProvider.getCompanyId());
+
 		return shoppingOrder;
 	}
 
@@ -2688,7 +2695,7 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 	 *
 	 * @param orderId the primary key of the shopping order
 	 * @return the shopping order that was removed
-	 * @throws com.liferay.shopping.NoSuchOrderException if a shopping order with the primary key could not be found
+	 * @throws NoSuchOrderException if a shopping order with the primary key could not be found
 	 */
 	@Override
 	public ShoppingOrder remove(long orderId) throws NoSuchOrderException {
@@ -2700,7 +2707,7 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 	 *
 	 * @param primaryKey the primary key of the shopping order
 	 * @return the shopping order that was removed
-	 * @throws com.liferay.shopping.NoSuchOrderException if a shopping order with the primary key could not be found
+	 * @throws NoSuchOrderException if a shopping order with the primary key could not be found
 	 */
 	@Override
 	public ShoppingOrder remove(Serializable primaryKey)
@@ -2714,8 +2721,8 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 					primaryKey);
 
 			if (shoppingOrder == null) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+				if (_log.isDebugEnabled()) {
+					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
 				throw new NoSuchOrderException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
@@ -2945,11 +2952,11 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 	}
 
 	/**
-	 * Returns the shopping order with the primary key or throws a {@link com.liferay.portal.NoSuchModelException} if it could not be found.
+	 * Returns the shopping order with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the shopping order
 	 * @return the shopping order
-	 * @throws com.liferay.shopping.NoSuchOrderException if a shopping order with the primary key could not be found
+	 * @throws NoSuchOrderException if a shopping order with the primary key could not be found
 	 */
 	@Override
 	public ShoppingOrder findByPrimaryKey(Serializable primaryKey)
@@ -2957,8 +2964,8 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 		ShoppingOrder shoppingOrder = fetchByPrimaryKey(primaryKey);
 
 		if (shoppingOrder == null) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			if (_log.isDebugEnabled()) {
+				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			throw new NoSuchOrderException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
@@ -2969,11 +2976,11 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 	}
 
 	/**
-	 * Returns the shopping order with the primary key or throws a {@link com.liferay.shopping.NoSuchOrderException} if it could not be found.
+	 * Returns the shopping order with the primary key or throws a {@link NoSuchOrderException} if it could not be found.
 	 *
 	 * @param orderId the primary key of the shopping order
 	 * @return the shopping order
-	 * @throws com.liferay.shopping.NoSuchOrderException if a shopping order with the primary key could not be found
+	 * @throws NoSuchOrderException if a shopping order with the primary key could not be found
 	 */
 	@Override
 	public ShoppingOrder findByPrimaryKey(long orderId)
@@ -2989,12 +2996,14 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 	 */
 	@Override
 	public ShoppingOrder fetchByPrimaryKey(Serializable primaryKey) {
-		ShoppingOrder shoppingOrder = (ShoppingOrder)entityCache.getResult(ShoppingOrderModelImpl.ENTITY_CACHE_ENABLED,
+		Serializable serializable = entityCache.getResult(ShoppingOrderModelImpl.ENTITY_CACHE_ENABLED,
 				ShoppingOrderImpl.class, primaryKey);
 
-		if (shoppingOrder == _nullShoppingOrder) {
+		if (serializable == nullModel) {
 			return null;
 		}
+
+		ShoppingOrder shoppingOrder = (ShoppingOrder)serializable;
 
 		if (shoppingOrder == null) {
 			Session session = null;
@@ -3010,7 +3019,7 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 				}
 				else {
 					entityCache.putResult(ShoppingOrderModelImpl.ENTITY_CACHE_ENABLED,
-						ShoppingOrderImpl.class, primaryKey, _nullShoppingOrder);
+						ShoppingOrderImpl.class, primaryKey, nullModel);
 				}
 			}
 			catch (Exception e) {
@@ -3064,18 +3073,20 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 		Set<Serializable> uncachedPrimaryKeys = null;
 
 		for (Serializable primaryKey : primaryKeys) {
-			ShoppingOrder shoppingOrder = (ShoppingOrder)entityCache.getResult(ShoppingOrderModelImpl.ENTITY_CACHE_ENABLED,
+			Serializable serializable = entityCache.getResult(ShoppingOrderModelImpl.ENTITY_CACHE_ENABLED,
 					ShoppingOrderImpl.class, primaryKey);
 
-			if (shoppingOrder == null) {
-				if (uncachedPrimaryKeys == null) {
-					uncachedPrimaryKeys = new HashSet<Serializable>();
-				}
+			if (serializable != nullModel) {
+				if (serializable == null) {
+					if (uncachedPrimaryKeys == null) {
+						uncachedPrimaryKeys = new HashSet<Serializable>();
+					}
 
-				uncachedPrimaryKeys.add(primaryKey);
-			}
-			else {
-				map.put(primaryKey, shoppingOrder);
+					uncachedPrimaryKeys.add(primaryKey);
+				}
+				else {
+					map.put(primaryKey, (ShoppingOrder)serializable);
+				}
 			}
 		}
 
@@ -3117,7 +3128,7 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 
 			for (Serializable primaryKey : uncachedPrimaryKeys) {
 				entityCache.putResult(ShoppingOrderModelImpl.ENTITY_CACHE_ENABLED,
-					ShoppingOrderImpl.class, primaryKey, _nullShoppingOrder);
+					ShoppingOrderImpl.class, primaryKey, nullModel);
 			}
 		}
 		catch (Exception e) {
@@ -3219,7 +3230,7 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 
 			if (orderByComparator != null) {
 				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_SHOPPINGORDER);
 
@@ -3344,6 +3355,8 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
+	@ServiceReference(type = CompanyProviderWrapper.class)
+	protected CompanyProvider companyProvider;
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
 	@ServiceReference(type = FinderCache.class)
@@ -3370,22 +3383,4 @@ public class ShoppingOrderPersistenceImpl extends BasePersistenceImpl<ShoppingOr
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"number"
 			});
-	private static final ShoppingOrder _nullShoppingOrder = new ShoppingOrderImpl() {
-			@Override
-			public Object clone() {
-				return this;
-			}
-
-			@Override
-			public CacheModel<ShoppingOrder> toCacheModel() {
-				return _nullShoppingOrderCacheModel;
-			}
-		};
-
-	private static final CacheModel<ShoppingOrder> _nullShoppingOrderCacheModel = new CacheModel<ShoppingOrder>() {
-			@Override
-			public ShoppingOrder toEntityModel() {
-				return _nullShoppingOrder;
-			}
-		};
 }

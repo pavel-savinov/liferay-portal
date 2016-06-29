@@ -16,7 +16,6 @@ package com.liferay.portal.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.NoSuchCompanyException;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
@@ -26,20 +25,19 @@ import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
+import com.liferay.portal.kernel.exception.NoSuchCompanyException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.service.persistence.CompanyPersistence;
+import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.model.Company;
-import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.impl.CompanyImpl;
 import com.liferay.portal.model.impl.CompanyModelImpl;
-import com.liferay.portal.service.persistence.CompanyPersistence;
 
 import java.io.Serializable;
 
@@ -49,6 +47,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -60,7 +59,7 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @see CompanyPersistence
- * @see com.liferay.portal.service.persistence.CompanyUtil
+ * @see com.liferay.portal.kernel.service.persistence.CompanyUtil
  * @generated
  */
 @ProviderType
@@ -116,8 +115,8 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 
 			msg.append(StringPool.CLOSE_CURLY_BRACE);
 
-			if (_log.isWarnEnabled()) {
-				_log.warn(msg.toString());
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
 			}
 
 			throw new NoSuchCompanyException(msg.toString());
@@ -158,7 +157,7 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 		if (result instanceof Company) {
 			Company company = (Company)result;
 
-			if (!Validator.equals(webId, company.getWebId())) {
+			if (!Objects.equals(webId, company.getWebId())) {
 				result = null;
 			}
 		}
@@ -347,8 +346,8 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 
 			msg.append(StringPool.CLOSE_CURLY_BRACE);
 
-			if (_log.isWarnEnabled()) {
-				_log.warn(msg.toString());
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
 			}
 
 			throw new NoSuchCompanyException(msg.toString());
@@ -389,7 +388,7 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 		if (result instanceof Company) {
 			Company company = (Company)result;
 
-			if (!Validator.equals(mx, company.getMx())) {
+			if (!Objects.equals(mx, company.getMx())) {
 				result = null;
 			}
 		}
@@ -585,8 +584,8 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 
 			msg.append(StringPool.CLOSE_CURLY_BRACE);
 
-			if (_log.isWarnEnabled()) {
-				_log.warn(msg.toString());
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
 			}
 
 			throw new NoSuchCompanyException(msg.toString());
@@ -882,7 +881,7 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -1095,8 +1094,9 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -1494,8 +1494,8 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 			Company company = (Company)session.get(CompanyImpl.class, primaryKey);
 
 			if (company == null) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+				if (_log.isDebugEnabled()) {
+					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
 				throw new NoSuchCompanyException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
@@ -1638,7 +1638,7 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 	}
 
 	/**
-	 * Returns the company with the primary key or throws a {@link com.liferay.portal.NoSuchModelException} if it could not be found.
+	 * Returns the company with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the company
 	 * @return the company
@@ -1650,8 +1650,8 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 		Company company = fetchByPrimaryKey(primaryKey);
 
 		if (company == null) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			if (_log.isDebugEnabled()) {
+				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			throw new NoSuchCompanyException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
@@ -1682,12 +1682,14 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 	 */
 	@Override
 	public Company fetchByPrimaryKey(Serializable primaryKey) {
-		Company company = (Company)entityCache.getResult(CompanyModelImpl.ENTITY_CACHE_ENABLED,
+		Serializable serializable = entityCache.getResult(CompanyModelImpl.ENTITY_CACHE_ENABLED,
 				CompanyImpl.class, primaryKey);
 
-		if (company == _nullCompany) {
+		if (serializable == nullModel) {
 			return null;
 		}
+
+		Company company = (Company)serializable;
 
 		if (company == null) {
 			Session session = null;
@@ -1702,7 +1704,7 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 				}
 				else {
 					entityCache.putResult(CompanyModelImpl.ENTITY_CACHE_ENABLED,
-						CompanyImpl.class, primaryKey, _nullCompany);
+						CompanyImpl.class, primaryKey, nullModel);
 				}
 			}
 			catch (Exception e) {
@@ -1756,18 +1758,20 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 		Set<Serializable> uncachedPrimaryKeys = null;
 
 		for (Serializable primaryKey : primaryKeys) {
-			Company company = (Company)entityCache.getResult(CompanyModelImpl.ENTITY_CACHE_ENABLED,
+			Serializable serializable = entityCache.getResult(CompanyModelImpl.ENTITY_CACHE_ENABLED,
 					CompanyImpl.class, primaryKey);
 
-			if (company == null) {
-				if (uncachedPrimaryKeys == null) {
-					uncachedPrimaryKeys = new HashSet<Serializable>();
-				}
+			if (serializable != nullModel) {
+				if (serializable == null) {
+					if (uncachedPrimaryKeys == null) {
+						uncachedPrimaryKeys = new HashSet<Serializable>();
+					}
 
-				uncachedPrimaryKeys.add(primaryKey);
-			}
-			else {
-				map.put(primaryKey, company);
+					uncachedPrimaryKeys.add(primaryKey);
+				}
+				else {
+					map.put(primaryKey, (Company)serializable);
+				}
 			}
 		}
 
@@ -1809,7 +1813,7 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 
 			for (Serializable primaryKey : uncachedPrimaryKeys) {
 				entityCache.putResult(CompanyModelImpl.ENTITY_CACHE_ENABLED,
-					CompanyImpl.class, primaryKey, _nullCompany);
+					CompanyImpl.class, primaryKey, nullModel);
 			}
 		}
 		catch (Exception e) {
@@ -1910,7 +1914,7 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_COMPANY);
 
@@ -2049,34 +2053,4 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"key", "active"
 			});
-	private static final Company _nullCompany = new CompanyImpl() {
-			@Override
-			public Object clone() {
-				return this;
-			}
-
-			@Override
-			public CacheModel<Company> toCacheModel() {
-				return _nullCompanyCacheModel;
-			}
-		};
-
-	private static final CacheModel<Company> _nullCompanyCacheModel = new NullCacheModel();
-
-	private static class NullCacheModel implements CacheModel<Company>,
-		MVCCModel {
-		@Override
-		public long getMvccVersion() {
-			return -1;
-		}
-
-		@Override
-		public void setMvccVersion(long mvccVersion) {
-		}
-
-		@Override
-		public Company toEntityModel() {
-			return _nullCompany;
-		}
-	}
 }

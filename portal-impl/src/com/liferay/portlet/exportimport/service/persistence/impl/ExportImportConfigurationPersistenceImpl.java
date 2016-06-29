@@ -16,6 +16,11 @@ package com.liferay.portlet.exportimport.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.exportimport.kernel.exception.NoSuchConfigurationException;
+import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
+import com.liferay.exportimport.kernel.service.persistence.ExportImportConfigurationPersistence;
+
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
@@ -27,21 +32,18 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.CompanyProvider;
+import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
+import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.model.MVCCModel;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.ServiceContextThreadLocal;
-import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
-import com.liferay.portlet.exportimport.NoSuchConfigurationException;
-import com.liferay.portlet.exportimport.model.ExportImportConfiguration;
 import com.liferay.portlet.exportimport.model.impl.ExportImportConfigurationImpl;
 import com.liferay.portlet.exportimport.model.impl.ExportImportConfigurationModelImpl;
-import com.liferay.portlet.exportimport.service.persistence.ExportImportConfigurationPersistence;
 
 import java.io.Serializable;
 
@@ -63,7 +65,7 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @see ExportImportConfigurationPersistence
- * @see com.liferay.portlet.exportimport.service.persistence.ExportImportConfigurationUtil
+ * @see com.liferay.exportimport.kernel.service.persistence.ExportImportConfigurationUtil
  * @generated
  */
 @ProviderType
@@ -220,7 +222,7 @@ public class ExportImportConfigurationPersistenceImpl
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -439,8 +441,9 @@ public class ExportImportConfigurationPersistenceImpl
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -733,7 +736,7 @@ public class ExportImportConfigurationPersistenceImpl
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -954,8 +957,9 @@ public class ExportImportConfigurationPersistenceImpl
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -1257,7 +1261,7 @@ public class ExportImportConfigurationPersistenceImpl
 
 			if (orderByComparator != null) {
 				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -1491,11 +1495,12 @@ public class ExportImportConfigurationPersistenceImpl
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		query.append(_SQL_SELECT_EXPORTIMPORTCONFIGURATION_WHERE);
@@ -1805,7 +1810,7 @@ public class ExportImportConfigurationPersistenceImpl
 
 			if (orderByComparator != null) {
 				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -2039,11 +2044,12 @@ public class ExportImportConfigurationPersistenceImpl
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		query.append(_SQL_SELECT_EXPORTIMPORTCONFIGURATION_WHERE);
@@ -2368,7 +2374,7 @@ public class ExportImportConfigurationPersistenceImpl
 
 			if (orderByComparator != null) {
 				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -2624,10 +2630,11 @@ public class ExportImportConfigurationPersistenceImpl
 
 		if (orderByComparator != null) {
 			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(5);
 		}
 
 		query.append(_SQL_SELECT_EXPORTIMPORTCONFIGURATION_WHERE);
@@ -2909,6 +2916,8 @@ public class ExportImportConfigurationPersistenceImpl
 		exportImportConfiguration.setNew(true);
 		exportImportConfiguration.setPrimaryKey(exportImportConfigurationId);
 
+		exportImportConfiguration.setCompanyId(companyProvider.getCompanyId());
+
 		return exportImportConfiguration;
 	}
 
@@ -2944,8 +2953,8 @@ public class ExportImportConfigurationPersistenceImpl
 					primaryKey);
 
 			if (exportImportConfiguration == null) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+				if (_log.isDebugEnabled()) {
+					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
 				throw new NoSuchConfigurationException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
@@ -3206,7 +3215,7 @@ public class ExportImportConfigurationPersistenceImpl
 	}
 
 	/**
-	 * Returns the export import configuration with the primary key or throws a {@link com.liferay.portal.NoSuchModelException} if it could not be found.
+	 * Returns the export import configuration with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the export import configuration
 	 * @return the export import configuration
@@ -3218,8 +3227,8 @@ public class ExportImportConfigurationPersistenceImpl
 		ExportImportConfiguration exportImportConfiguration = fetchByPrimaryKey(primaryKey);
 
 		if (exportImportConfiguration == null) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			if (_log.isDebugEnabled()) {
+				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			throw new NoSuchConfigurationException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
@@ -3250,12 +3259,14 @@ public class ExportImportConfigurationPersistenceImpl
 	 */
 	@Override
 	public ExportImportConfiguration fetchByPrimaryKey(Serializable primaryKey) {
-		ExportImportConfiguration exportImportConfiguration = (ExportImportConfiguration)entityCache.getResult(ExportImportConfigurationModelImpl.ENTITY_CACHE_ENABLED,
+		Serializable serializable = entityCache.getResult(ExportImportConfigurationModelImpl.ENTITY_CACHE_ENABLED,
 				ExportImportConfigurationImpl.class, primaryKey);
 
-		if (exportImportConfiguration == _nullExportImportConfiguration) {
+		if (serializable == nullModel) {
 			return null;
 		}
+
+		ExportImportConfiguration exportImportConfiguration = (ExportImportConfiguration)serializable;
 
 		if (exportImportConfiguration == null) {
 			Session session = null;
@@ -3272,7 +3283,7 @@ public class ExportImportConfigurationPersistenceImpl
 				else {
 					entityCache.putResult(ExportImportConfigurationModelImpl.ENTITY_CACHE_ENABLED,
 						ExportImportConfigurationImpl.class, primaryKey,
-						_nullExportImportConfiguration);
+						nullModel);
 				}
 			}
 			catch (Exception e) {
@@ -3327,18 +3338,20 @@ public class ExportImportConfigurationPersistenceImpl
 		Set<Serializable> uncachedPrimaryKeys = null;
 
 		for (Serializable primaryKey : primaryKeys) {
-			ExportImportConfiguration exportImportConfiguration = (ExportImportConfiguration)entityCache.getResult(ExportImportConfigurationModelImpl.ENTITY_CACHE_ENABLED,
+			Serializable serializable = entityCache.getResult(ExportImportConfigurationModelImpl.ENTITY_CACHE_ENABLED,
 					ExportImportConfigurationImpl.class, primaryKey);
 
-			if (exportImportConfiguration == null) {
-				if (uncachedPrimaryKeys == null) {
-					uncachedPrimaryKeys = new HashSet<Serializable>();
-				}
+			if (serializable != nullModel) {
+				if (serializable == null) {
+					if (uncachedPrimaryKeys == null) {
+						uncachedPrimaryKeys = new HashSet<Serializable>();
+					}
 
-				uncachedPrimaryKeys.add(primaryKey);
-			}
-			else {
-				map.put(primaryKey, exportImportConfiguration);
+					uncachedPrimaryKeys.add(primaryKey);
+				}
+				else {
+					map.put(primaryKey, (ExportImportConfiguration)serializable);
+				}
 			}
 		}
 
@@ -3381,8 +3394,7 @@ public class ExportImportConfigurationPersistenceImpl
 
 			for (Serializable primaryKey : uncachedPrimaryKeys) {
 				entityCache.putResult(ExportImportConfigurationModelImpl.ENTITY_CACHE_ENABLED,
-					ExportImportConfigurationImpl.class, primaryKey,
-					_nullExportImportConfiguration);
+					ExportImportConfigurationImpl.class, primaryKey, nullModel);
 			}
 		}
 		catch (Exception e) {
@@ -3484,7 +3496,7 @@ public class ExportImportConfigurationPersistenceImpl
 
 			if (orderByComparator != null) {
 				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_EXPORTIMPORTCONFIGURATION);
 
@@ -3609,6 +3621,8 @@ public class ExportImportConfigurationPersistenceImpl
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
+	@BeanReference(type = CompanyProviderWrapper.class)
+	protected CompanyProvider companyProvider;
 	protected EntityCache entityCache = EntityCacheUtil.getEntityCache();
 	protected FinderCache finderCache = FinderCacheUtil.getFinderCache();
 	private static final String _SQL_SELECT_EXPORTIMPORTCONFIGURATION = "SELECT exportImportConfiguration FROM ExportImportConfiguration exportImportConfiguration";
@@ -3624,36 +3638,4 @@ public class ExportImportConfigurationPersistenceImpl
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"type", "settings"
 			});
-	private static final ExportImportConfiguration _nullExportImportConfiguration =
-		new ExportImportConfigurationImpl() {
-			@Override
-			public Object clone() {
-				return this;
-			}
-
-			@Override
-			public CacheModel<ExportImportConfiguration> toCacheModel() {
-				return _nullExportImportConfigurationCacheModel;
-			}
-		};
-
-	private static final CacheModel<ExportImportConfiguration> _nullExportImportConfigurationCacheModel =
-		new NullCacheModel();
-
-	private static class NullCacheModel implements CacheModel<ExportImportConfiguration>,
-		MVCCModel {
-		@Override
-		public long getMvccVersion() {
-			return -1;
-		}
-
-		@Override
-		public void setMvccVersion(long mvccVersion) {
-		}
-
-		@Override
-		public ExportImportConfiguration toEntityModel() {
-			return _nullExportImportConfiguration;
-		}
-	}
 }

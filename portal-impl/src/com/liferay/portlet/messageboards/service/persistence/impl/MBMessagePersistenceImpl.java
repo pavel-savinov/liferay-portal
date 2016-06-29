@@ -16,6 +16,11 @@ package com.liferay.portlet.messageboards.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.message.boards.kernel.exception.NoSuchMessageException;
+import com.liferay.message.boards.kernel.model.MBMessage;
+import com.liferay.message.boards.kernel.service.persistence.MBMessagePersistence;
+
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
@@ -32,6 +37,13 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.sanitizer.Sanitizer;
 import com.liferay.portal.kernel.sanitizer.SanitizerException;
 import com.liferay.portal.kernel.sanitizer.SanitizerUtil;
+import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.CompanyProvider;
+import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
+import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -42,18 +54,9 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
-import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.security.auth.PrincipalThreadLocal;
-import com.liferay.portal.security.permission.InlineSQLHelperUtil;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.ServiceContextThreadLocal;
-import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
-import com.liferay.portlet.messageboards.NoSuchMessageException;
-import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.messageboards.model.impl.MBMessageImpl;
 import com.liferay.portlet.messageboards.model.impl.MBMessageModelImpl;
-import com.liferay.portlet.messageboards.service.persistence.MBMessagePersistence;
 
 import java.io.Serializable;
 
@@ -65,6 +68,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -76,7 +80,7 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @see MBMessagePersistence
- * @see com.liferay.portlet.messageboards.service.persistence.MBMessageUtil
+ * @see com.liferay.message.boards.kernel.service.persistence.MBMessageUtil
  * @generated
  */
 @ProviderType
@@ -209,7 +213,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBMessage mbMessage : list) {
-					if (!Validator.equals(uuid, mbMessage.getUuid())) {
+					if (!Objects.equals(uuid, mbMessage.getUuid())) {
 						list = null;
 
 						break;
@@ -223,7 +227,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -450,8 +454,9 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -681,8 +686,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			msg.append(StringPool.CLOSE_CURLY_BRACE);
 
-			if (_log.isWarnEnabled()) {
-				_log.warn(msg.toString());
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
 			}
 
 			throw new NoSuchMessageException(msg.toString());
@@ -726,7 +731,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		if (result instanceof MBMessage) {
 			MBMessage mbMessage = (MBMessage)result;
 
-			if (!Validator.equals(uuid, mbMessage.getUuid()) ||
+			if (!Objects.equals(uuid, mbMessage.getUuid()) ||
 					(groupId != mbMessage.getGroupId())) {
 				result = null;
 			}
@@ -1018,7 +1023,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBMessage mbMessage : list) {
-					if (!Validator.equals(uuid, mbMessage.getUuid()) ||
+					if (!Objects.equals(uuid, mbMessage.getUuid()) ||
 							(companyId != mbMessage.getCompanyId())) {
 						list = null;
 
@@ -1033,7 +1038,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -1278,11 +1283,12 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		query.append(_SQL_SELECT_MBMESSAGE_WHERE);
@@ -1606,7 +1612,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -1819,8 +1825,9 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -1971,10 +1978,10 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(3 +
-					(orderByComparator.getOrderByFields().length * 3));
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -2092,11 +2099,12 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -2464,7 +2472,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -2679,8 +2687,9 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -2966,7 +2975,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -3179,8 +3188,9 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -3467,7 +3477,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -3680,8 +3690,9 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -3969,7 +3980,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -4185,8 +4196,9 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -4483,7 +4495,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -4713,11 +4725,12 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		query.append(_SQL_SELECT_MBMESSAGE_WHERE);
@@ -4873,10 +4886,10 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(4 +
-					(orderByComparator.getOrderByFields().length * 3));
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
-			query = new StringBundler(4);
+			query = new StringBundler(5);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -5001,10 +5014,11 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(5);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -5398,7 +5412,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -5629,11 +5643,12 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		query.append(_SQL_SELECT_MBMESSAGE_WHERE);
@@ -5789,10 +5804,10 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(4 +
-					(orderByComparator.getOrderByFields().length * 3));
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
-			query = new StringBundler(4);
+			query = new StringBundler(5);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -5917,10 +5932,11 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(5);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -6313,7 +6329,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -6543,11 +6559,12 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		query.append(_SQL_SELECT_MBMESSAGE_WHERE);
@@ -6703,10 +6720,10 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(4 +
-					(orderByComparator.getOrderByFields().length * 3));
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
-			query = new StringBundler(4);
+			query = new StringBundler(5);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -6830,10 +6847,11 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(5);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -7226,7 +7244,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -7457,11 +7475,12 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		query.append(_SQL_SELECT_MBMESSAGE_WHERE);
@@ -7771,7 +7790,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -8002,11 +8021,12 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		query.append(_SQL_SELECT_MBMESSAGE_WHERE);
@@ -8593,7 +8613,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -8824,11 +8844,12 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		query.append(_SQL_SELECT_MBMESSAGE_WHERE);
@@ -9134,7 +9155,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -9365,11 +9386,12 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		query.append(_SQL_SELECT_MBMESSAGE_WHERE);
@@ -9674,7 +9696,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -9905,11 +9927,12 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		query.append(_SQL_SELECT_MBMESSAGE_WHERE);
@@ -10214,7 +10237,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -10445,11 +10468,12 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		query.append(_SQL_SELECT_MBMESSAGE_WHERE);
@@ -10754,7 +10778,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -10985,11 +11009,12 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		query.append(_SQL_SELECT_MBMESSAGE_WHERE);
@@ -11308,7 +11333,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -11555,10 +11580,11 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(5);
 		}
 
 		query.append(_SQL_SELECT_MBMESSAGE_WHERE);
@@ -11724,10 +11750,10 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(5 +
-					(orderByComparator.getOrderByFields().length * 3));
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
-			query = new StringBundler(5);
+			query = new StringBundler(6);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -11856,11 +11882,12 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(6);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -12283,7 +12310,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -12531,10 +12558,11 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(5);
 		}
 
 		query.append(_SQL_SELECT_MBMESSAGE_WHERE);
@@ -12700,10 +12728,10 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(5 +
-					(orderByComparator.getOrderByFields().length * 3));
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
-			query = new StringBundler(5);
+			query = new StringBundler(6);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -12832,11 +12860,12 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(6);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -13261,7 +13290,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -13509,10 +13538,11 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(5);
 		}
 
 		query.append(_SQL_SELECT_MBMESSAGE_WHERE);
@@ -13678,10 +13708,10 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(5 +
-					(orderByComparator.getOrderByFields().length * 3));
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
-			query = new StringBundler(5);
+			query = new StringBundler(6);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -13810,11 +13840,12 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(6);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -14237,7 +14268,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -14485,10 +14516,11 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(5);
 		}
 
 		query.append(_SQL_SELECT_MBMESSAGE_WHERE);
@@ -14827,7 +14859,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -15075,10 +15107,11 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(5);
 		}
 
 		query.append(_SQL_SELECT_MBMESSAGE_WHERE);
@@ -15715,7 +15748,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(5 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(5);
@@ -15963,10 +15996,11 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(5);
 		}
 
 		query.append(_SQL_SELECT_MBMESSAGE_WHERE);
@@ -16307,7 +16341,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(6 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(6);
@@ -16574,11 +16608,12 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(6);
 		}
 
 		query.append(_SQL_SELECT_MBMESSAGE_WHERE);
@@ -16752,10 +16787,10 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 3));
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
-			query = new StringBundler(6);
+			query = new StringBundler(7);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -16892,11 +16927,12 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(8 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(7);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -17349,7 +17385,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(6 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(6);
@@ -17616,11 +17652,12 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(6);
 		}
 
 		query.append(_SQL_SELECT_MBMESSAGE_WHERE);
@@ -17794,10 +17831,10 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 		if (orderByComparator != null) {
 			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 3));
+					(orderByComparator.getOrderByFields().length * 2));
 		}
 		else {
-			query = new StringBundler(6);
+			query = new StringBundler(7);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -17934,11 +17971,12 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(8 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(7);
 		}
 
 		if (getDB().isSupportsInlineDistinct()) {
@@ -18391,7 +18429,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(6 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(6);
@@ -18654,11 +18692,12 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(6);
 		}
 
 		query.append(_SQL_SELECT_MBMESSAGE_WHERE);
@@ -19007,6 +19046,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 		mbMessage.setUuid(uuid);
 
+		mbMessage.setCompanyId(companyProvider.getCompanyId());
+
 		return mbMessage;
 	}
 
@@ -19041,8 +19082,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 					primaryKey);
 
 			if (mbMessage == null) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+				if (_log.isDebugEnabled()) {
+					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
 				throw new NoSuchMessageException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
@@ -19145,9 +19186,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			try {
 				mbMessage.setSubject(SanitizerUtil.sanitize(companyId, groupId,
-						userId,
-						com.liferay.portlet.messageboards.model.MBMessage.class.getName(),
-						messageId, ContentTypes.TEXT_PLAIN, Sanitizer.MODE_ALL,
+						userId, MBMessage.class.getName(), messageId,
+						ContentTypes.TEXT_PLAIN, Sanitizer.MODE_ALL,
 						mbMessage.getSubject(), null));
 			}
 			catch (SanitizerException se) {
@@ -19784,7 +19824,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	}
 
 	/**
-	 * Returns the message-boards message with the primary key or throws a {@link com.liferay.portal.NoSuchModelException} if it could not be found.
+	 * Returns the message-boards message with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the message-boards message
 	 * @return the message-boards message
@@ -19796,8 +19836,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		MBMessage mbMessage = fetchByPrimaryKey(primaryKey);
 
 		if (mbMessage == null) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			if (_log.isDebugEnabled()) {
+				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			throw new NoSuchMessageException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
@@ -19828,12 +19868,14 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 */
 	@Override
 	public MBMessage fetchByPrimaryKey(Serializable primaryKey) {
-		MBMessage mbMessage = (MBMessage)entityCache.getResult(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
+		Serializable serializable = entityCache.getResult(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
 				MBMessageImpl.class, primaryKey);
 
-		if (mbMessage == _nullMBMessage) {
+		if (serializable == nullModel) {
 			return null;
 		}
+
+		MBMessage mbMessage = (MBMessage)serializable;
 
 		if (mbMessage == null) {
 			Session session = null;
@@ -19849,7 +19891,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 				}
 				else {
 					entityCache.putResult(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-						MBMessageImpl.class, primaryKey, _nullMBMessage);
+						MBMessageImpl.class, primaryKey, nullModel);
 				}
 			}
 			catch (Exception e) {
@@ -19903,18 +19945,20 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		Set<Serializable> uncachedPrimaryKeys = null;
 
 		for (Serializable primaryKey : primaryKeys) {
-			MBMessage mbMessage = (MBMessage)entityCache.getResult(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
+			Serializable serializable = entityCache.getResult(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
 					MBMessageImpl.class, primaryKey);
 
-			if (mbMessage == null) {
-				if (uncachedPrimaryKeys == null) {
-					uncachedPrimaryKeys = new HashSet<Serializable>();
-				}
+			if (serializable != nullModel) {
+				if (serializable == null) {
+					if (uncachedPrimaryKeys == null) {
+						uncachedPrimaryKeys = new HashSet<Serializable>();
+					}
 
-				uncachedPrimaryKeys.add(primaryKey);
-			}
-			else {
-				map.put(primaryKey, mbMessage);
+					uncachedPrimaryKeys.add(primaryKey);
+				}
+				else {
+					map.put(primaryKey, (MBMessage)serializable);
+				}
 			}
 		}
 
@@ -19956,7 +20000,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			for (Serializable primaryKey : uncachedPrimaryKeys) {
 				entityCache.putResult(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-					MBMessageImpl.class, primaryKey, _nullMBMessage);
+					MBMessageImpl.class, primaryKey, nullModel);
 			}
 		}
 		catch (Exception e) {
@@ -20058,7 +20102,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_MBMESSAGE);
 
@@ -20183,6 +20227,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
+	@BeanReference(type = CompanyProviderWrapper.class)
+	protected CompanyProvider companyProvider;
 	protected EntityCache entityCache = EntityCacheUtil.getEntityCache();
 	protected FinderCache finderCache = FinderCacheUtil.getFinderCache();
 	private static final String _SQL_SELECT_MBMESSAGE = "SELECT mbMessage FROM MBMessage mbMessage";
@@ -20207,22 +20253,4 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"uuid"
 			});
-	private static final MBMessage _nullMBMessage = new MBMessageImpl() {
-			@Override
-			public Object clone() {
-				return this;
-			}
-
-			@Override
-			public CacheModel<MBMessage> toCacheModel() {
-				return _nullMBMessageCacheModel;
-			}
-		};
-
-	private static final CacheModel<MBMessage> _nullMBMessageCacheModel = new CacheModel<MBMessage>() {
-			@Override
-			public MBMessage toEntityModel() {
-				return _nullMBMessage;
-			}
-		};
 }

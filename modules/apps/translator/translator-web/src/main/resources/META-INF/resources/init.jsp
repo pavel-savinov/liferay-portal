@@ -19,6 +19,7 @@
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
 <%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
@@ -27,20 +28,20 @@ page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
 page import="com.liferay.portal.kernel.util.StringPool" %><%@
 page import="com.liferay.portal.kernel.util.Validator" %><%@
 page import="com.liferay.translator.web.configuration.TranslatorConfiguration" %><%@
-page import="com.liferay.translator.web.model.Translation" %><%@
-page import="com.liferay.translator.web.util.TranslatorUtil" %>
+page import="com.liferay.translator.web.internal.model.Translation" %><%@
+page import="com.liferay.translator.web.internal.util.TranslatorUtil" %>
 
 <%@ page import="java.util.Map" %>
 
 <%@ page import="javax.portlet.WindowState" %>
 
-<portlet:defineObjects />
+<liferay-frontend:defineObjects />
 
 <liferay-theme:defineObjects />
 
-<%
-WindowState windowState = liferayPortletRequest.getWindowState();
+<portlet:defineObjects />
 
+<%
 TranslatorConfiguration translatorConfiguration = (TranslatorConfiguration)request.getAttribute(TranslatorConfiguration.class.getName());
 %>
 

@@ -16,6 +16,7 @@ package com.liferay.portlet.social.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
@@ -27,19 +28,20 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.service.persistence.CompanyProvider;
+import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
+import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
-import com.liferay.portlet.social.NoSuchActivityCounterException;
-import com.liferay.portlet.social.model.SocialActivityCounter;
 import com.liferay.portlet.social.model.impl.SocialActivityCounterImpl;
 import com.liferay.portlet.social.model.impl.SocialActivityCounterModelImpl;
-import com.liferay.portlet.social.service.persistence.SocialActivityCounterPersistence;
+
+import com.liferay.social.kernel.exception.NoSuchActivityCounterException;
+import com.liferay.social.kernel.model.SocialActivityCounter;
+import com.liferay.social.kernel.service.persistence.SocialActivityCounterPersistence;
 
 import java.io.Serializable;
 
@@ -49,6 +51,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -60,7 +63,7 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @see SocialActivityCounterPersistence
- * @see com.liferay.portlet.social.service.persistence.SocialActivityCounterUtil
+ * @see com.liferay.social.kernel.service.persistence.SocialActivityCounterUtil
  * @generated
  */
 @ProviderType
@@ -212,7 +215,7 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -430,8 +433,9 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -732,7 +736,7 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 
 			if (orderByComparator != null) {
 				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -966,11 +970,12 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		query.append(_SQL_SELECT_SOCIALACTIVITYCOUNTER_WHERE);
@@ -1301,7 +1306,7 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 
 			if (orderByComparator != null) {
 				query = new StringBundler(6 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(6);
@@ -1572,11 +1577,12 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(7 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(6);
 		}
 
 		query.append(_SQL_SELECT_SOCIALACTIVITYCOUNTER_WHERE);
@@ -1842,8 +1848,8 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 
 			msg.append(StringPool.CLOSE_CURLY_BRACE);
 
-			if (_log.isWarnEnabled()) {
-				_log.warn(msg.toString());
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
 			}
 
 			throw new NoSuchActivityCounterException(msg.toString());
@@ -1904,7 +1910,7 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 			if ((groupId != socialActivityCounter.getGroupId()) ||
 					(classNameId != socialActivityCounter.getClassNameId()) ||
 					(classPK != socialActivityCounter.getClassPK()) ||
-					!Validator.equals(name, socialActivityCounter.getName()) ||
+					!Objects.equals(name, socialActivityCounter.getName()) ||
 					(ownerType != socialActivityCounter.getOwnerType()) ||
 					(startPeriod != socialActivityCounter.getStartPeriod())) {
 				result = null;
@@ -2199,8 +2205,8 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 
 			msg.append(StringPool.CLOSE_CURLY_BRACE);
 
-			if (_log.isWarnEnabled()) {
-				_log.warn(msg.toString());
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
 			}
 
 			throw new NoSuchActivityCounterException(msg.toString());
@@ -2261,7 +2267,7 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 			if ((groupId != socialActivityCounter.getGroupId()) ||
 					(classNameId != socialActivityCounter.getClassNameId()) ||
 					(classPK != socialActivityCounter.getClassPK()) ||
-					!Validator.equals(name, socialActivityCounter.getName()) ||
+					!Objects.equals(name, socialActivityCounter.getName()) ||
 					(ownerType != socialActivityCounter.getOwnerType()) ||
 					(endPeriod != socialActivityCounter.getEndPeriod())) {
 				result = null;
@@ -2735,6 +2741,8 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 		socialActivityCounter.setNew(true);
 		socialActivityCounter.setPrimaryKey(activityCounterId);
 
+		socialActivityCounter.setCompanyId(companyProvider.getCompanyId());
+
 		return socialActivityCounter;
 	}
 
@@ -2770,8 +2778,8 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 					primaryKey);
 
 			if (socialActivityCounter == null) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+				if (_log.isDebugEnabled()) {
+					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
 				throw new NoSuchActivityCounterException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
@@ -2966,7 +2974,7 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 	}
 
 	/**
-	 * Returns the social activity counter with the primary key or throws a {@link com.liferay.portal.NoSuchModelException} if it could not be found.
+	 * Returns the social activity counter with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the social activity counter
 	 * @return the social activity counter
@@ -2978,8 +2986,8 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 		SocialActivityCounter socialActivityCounter = fetchByPrimaryKey(primaryKey);
 
 		if (socialActivityCounter == null) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			if (_log.isDebugEnabled()) {
+				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			throw new NoSuchActivityCounterException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
@@ -3010,12 +3018,14 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 	 */
 	@Override
 	public SocialActivityCounter fetchByPrimaryKey(Serializable primaryKey) {
-		SocialActivityCounter socialActivityCounter = (SocialActivityCounter)entityCache.getResult(SocialActivityCounterModelImpl.ENTITY_CACHE_ENABLED,
+		Serializable serializable = entityCache.getResult(SocialActivityCounterModelImpl.ENTITY_CACHE_ENABLED,
 				SocialActivityCounterImpl.class, primaryKey);
 
-		if (socialActivityCounter == _nullSocialActivityCounter) {
+		if (serializable == nullModel) {
 			return null;
 		}
+
+		SocialActivityCounter socialActivityCounter = (SocialActivityCounter)serializable;
 
 		if (socialActivityCounter == null) {
 			Session session = null;
@@ -3031,8 +3041,7 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 				}
 				else {
 					entityCache.putResult(SocialActivityCounterModelImpl.ENTITY_CACHE_ENABLED,
-						SocialActivityCounterImpl.class, primaryKey,
-						_nullSocialActivityCounter);
+						SocialActivityCounterImpl.class, primaryKey, nullModel);
 				}
 			}
 			catch (Exception e) {
@@ -3086,18 +3095,20 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 		Set<Serializable> uncachedPrimaryKeys = null;
 
 		for (Serializable primaryKey : primaryKeys) {
-			SocialActivityCounter socialActivityCounter = (SocialActivityCounter)entityCache.getResult(SocialActivityCounterModelImpl.ENTITY_CACHE_ENABLED,
+			Serializable serializable = entityCache.getResult(SocialActivityCounterModelImpl.ENTITY_CACHE_ENABLED,
 					SocialActivityCounterImpl.class, primaryKey);
 
-			if (socialActivityCounter == null) {
-				if (uncachedPrimaryKeys == null) {
-					uncachedPrimaryKeys = new HashSet<Serializable>();
-				}
+			if (serializable != nullModel) {
+				if (serializable == null) {
+					if (uncachedPrimaryKeys == null) {
+						uncachedPrimaryKeys = new HashSet<Serializable>();
+					}
 
-				uncachedPrimaryKeys.add(primaryKey);
-			}
-			else {
-				map.put(primaryKey, socialActivityCounter);
+					uncachedPrimaryKeys.add(primaryKey);
+				}
+				else {
+					map.put(primaryKey, (SocialActivityCounter)serializable);
+				}
 			}
 		}
 
@@ -3140,8 +3151,7 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 
 			for (Serializable primaryKey : uncachedPrimaryKeys) {
 				entityCache.putResult(SocialActivityCounterModelImpl.ENTITY_CACHE_ENABLED,
-					SocialActivityCounterImpl.class, primaryKey,
-					_nullSocialActivityCounter);
+					SocialActivityCounterImpl.class, primaryKey, nullModel);
 			}
 		}
 		catch (Exception e) {
@@ -3243,7 +3253,7 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 
 			if (orderByComparator != null) {
 				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_SOCIALACTIVITYCOUNTER);
 
@@ -3368,6 +3378,8 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
+	@BeanReference(type = CompanyProviderWrapper.class)
+	protected CompanyProvider companyProvider;
 	protected EntityCache entityCache = EntityCacheUtil.getEntityCache();
 	protected FinderCache finderCache = FinderCacheUtil.getFinderCache();
 	private static final String _SQL_SELECT_SOCIALACTIVITYCOUNTER = "SELECT socialActivityCounter FROM SocialActivityCounter socialActivityCounter";
@@ -3382,23 +3394,4 @@ public class SocialActivityCounterPersistenceImpl extends BasePersistenceImpl<So
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"active"
 			});
-	private static final SocialActivityCounter _nullSocialActivityCounter = new SocialActivityCounterImpl() {
-			@Override
-			public Object clone() {
-				return this;
-			}
-
-			@Override
-			public CacheModel<SocialActivityCounter> toCacheModel() {
-				return _nullSocialActivityCounterCacheModel;
-			}
-		};
-
-	private static final CacheModel<SocialActivityCounter> _nullSocialActivityCounterCacheModel =
-		new CacheModel<SocialActivityCounter>() {
-			@Override
-			public SocialActivityCounter toEntityModel() {
-				return _nullSocialActivityCounter;
-			}
-		};
 }

@@ -138,12 +138,13 @@ PasswordPolicy passwordPolicy = user.getPasswordPolicy();
 					<aui:validator name="equalTo">
 						'#<portlet:namespace />password1'
 					</aui:validator>
+
 					<aui:validator name="required" />
 				</aui:input>
 			</aui:fieldset>
 
 			<aui:button-row>
-				<aui:button type="submit" />
+				<aui:button cssClass="btn-lg" type="submit" />
 			</aui:button-row>
 		</aui:form>
 	</c:otherwise>

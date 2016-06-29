@@ -45,11 +45,11 @@ if (iteratorURL != null) {
 
 <c:if test="<%= emptyResultsMessage != null %>">
 	<div class="alert alert-info <%= resultRows.isEmpty() ? StringPool.BLANK : "hide" %>" id="<%= namespace + id %>EmptyResultsMessage">
-		<%= LanguageUtil.get(request, emptyResultsMessage) %>
+		<%= LanguageUtil.get(resourceBundle, emptyResultsMessage) %>
 	</div>
 </c:if>
 
-<div class="lfr-search-container <%= resultRows.isEmpty() ? "hide" : StringPool.BLANK %> <%= searchContainer.getCssClass() %>">
+<div class="lfr-search-container lfr-search-container-wrapper <%= resultRows.isEmpty() ? "hide" : StringPool.BLANK %> <%= searchContainer.getCssClass() %>">
 	<c:if test="<%= PropsValues.SEARCH_CONTAINER_SHOW_PAGINATION_TOP && (resultRows.size() > PropsValues.SEARCH_CONTAINER_SHOW_PAGINATION_TOP_DELTA) && paginate %>">
 		<div class="taglib-search-iterator-page-iterator-top">
 			<liferay-ui:search-paginator id='<%= id + "PageIteratorTop" %>' searchContainer="<%= searchContainer %>" type="<%= type %>" />
@@ -59,7 +59,7 @@ if (iteratorURL != null) {
 	<div id="<%= namespace + id %>SearchContainer">
 		<table class="table table-bordered table-hover table-striped">
 
-		<c:if test="<%= headerNames != null %>">
+		<c:if test="<%= ListUtil.isNotNull(headerNames) %>">
 			<thead class="table-columns">
 				<tr>
 
@@ -113,7 +113,7 @@ if (iteratorURL != null) {
 						}
 					}
 
-					if (Validator.equals(orderByType, "asc")) {
+					if (Objects.equals(orderByType, "asc")) {
 						orderByType = "desc";
 					}
 					else {
@@ -134,7 +134,6 @@ if (iteratorURL != null) {
 							width="1%"
 						</c:if>
 					>
-
 						<c:if test="<%= orderKey != null %>">
 							<div class="table-sort-liner">
 
@@ -153,7 +152,7 @@ if (iteratorURL != null) {
 										<a href="<%= url %>">
 									</c:when>
 									<c:otherwise>
-										<a href="<%= StringUtil.replace(orderByJS, new String[] { "orderKey", "orderByType" }, new String[] { orderKey, orderByType }) %>">
+										<a href="<%= StringUtil.replace(orderByJS, new String[] {"orderKey", "orderByType"}, new String[] {orderKey, orderByType}) %>">
 									</c:otherwise>
 								</c:choose>
 						</c:if>
@@ -162,7 +161,7 @@ if (iteratorURL != null) {
 							String headerNameValue = null;
 
 							if ((rowChecker == null) || (i > 0)) {
-								headerNameValue = LanguageUtil.get(request, HtmlUtil.escape(headerName));
+								headerNameValue = LanguageUtil.get(resourceBundle, HtmlUtil.escape(headerName));
 							}
 							else {
 								headerNameValue = headerName;
@@ -265,9 +264,17 @@ if (iteratorURL != null) {
 				else if ((j + 1) == entries.size()) {
 					columnClassName += " last";
 				}
+
+				if (!Validator.isBlank(entry.getAlign())) {
+					columnClassName += " text-" + entry.getAlign();
+				}
+
+				if (!Validator.isBlank(entry.getValign())) {
+					columnClassName += " text-" + entry.getValign();
+				}
 			%>
 
-				<td class="table-cell <%= columnClassName %> text-<%= entry.getAlign() %> text-<%= entry.getValign() %>" colspan="<%= entry.getColspan() %>">
+				<td class="table-cell <%= columnClassName %>" colspan="<%= entry.getColspan() %>">
 
 					<%
 					entry.print(pageContext.getOut(), request, response);
@@ -318,7 +325,9 @@ if (iteratorURL != null) {
 
 <c:if test="<%= (rowChecker != null) && !resultRows.isEmpty() && Validator.isNotNull(rowChecker.getAllRowsId()) && allRowsIsChecked %>">
 	<aui:script>
-		document.<%= rowChecker.getFormName() %>.<%= rowChecker.getAllRowsId() %>.checked = true;
+		var container = $(document.<%= rowChecker.getFormName() %>).find('#<%= namespace + id %>SearchContainer');
+
+		container.find('input[name="<%= rowChecker.getAllRowsId() %>"]').prop('checked', true);
 	</aui:script>
 </c:if>
 

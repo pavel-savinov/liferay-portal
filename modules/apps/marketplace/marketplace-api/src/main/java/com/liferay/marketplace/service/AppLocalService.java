@@ -16,14 +16,32 @@ package com.liferay.marketplace.service;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.exportimport.kernel.lar.PortletDataContext;
+
+import com.liferay.marketplace.model.App;
+
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.model.PersistedModel;
+import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
+import com.liferay.portal.kernel.service.BaseLocalService;
+import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
-import com.liferay.portal.service.BaseLocalService;
-import com.liferay.portal.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.util.OrderByComparator;
+
+import java.io.File;
+import java.io.Serializable;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Provides the local service interface for App. Methods of this
@@ -54,11 +72,8 @@ public interface AppLocalService extends BaseLocalService,
 	* @param app the app
 	* @return the app that was added
 	*/
-	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.REINDEX)
-	public com.liferay.marketplace.model.App addApp(
-		com.liferay.marketplace.model.App app);
-
-	public void clearInstalledAppsCache();
+	@Indexable(type = IndexableType.REINDEX)
+	public App addApp(App app);
 
 	/**
 	* Creates a new app with the primary key. Does not add the app to the database.
@@ -66,7 +81,7 @@ public interface AppLocalService extends BaseLocalService,
 	* @param appId the primary key for the new app
 	* @return the new app
 	*/
-	public com.liferay.marketplace.model.App createApp(long appId);
+	public App createApp(long appId);
 
 	/**
 	* Deletes the app from the database. Also notifies the appropriate model listeners.
@@ -74,9 +89,8 @@ public interface AppLocalService extends BaseLocalService,
 	* @param app the app
 	* @return the app that was removed
 	*/
-	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
-	public com.liferay.marketplace.model.App deleteApp(
-		com.liferay.marketplace.model.App app);
+	@Indexable(type = IndexableType.DELETE)
+	public App deleteApp(App app);
 
 	/**
 	* Deletes the app with the primary key from the database. Also notifies the appropriate model listeners.
@@ -85,19 +99,101 @@ public interface AppLocalService extends BaseLocalService,
 	* @return the app that was removed
 	* @throws PortalException if a app with the primary key could not be found
 	*/
-	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
-	public com.liferay.marketplace.model.App deleteApp(long appId)
+	@Indexable(type = IndexableType.DELETE)
+	public App deleteApp(long appId) throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public App fetchApp(long appId);
+
+	/**
+	* Returns the app with the matching UUID and company.
+	*
+	* @param uuid the app's UUID
+	* @param companyId the primary key of the company
+	* @return the matching app, or <code>null</code> if a matching app could not be found
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public App fetchAppByUuidAndCompanyId(java.lang.String uuid, long companyId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public App fetchRemoteApp(long remoteAppId);
+
+	/**
+	* Returns the app with the primary key.
+	*
+	* @param appId the primary key of the app
+	* @return the app
+	* @throws PortalException if a app with the primary key could not be found
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public App getApp(long appId) throws PortalException;
+
+	/**
+	* Returns the app with the matching UUID and company.
+	*
+	* @param uuid the app's UUID
+	* @param companyId the primary key of the company
+	* @return the matching app
+	* @throws PortalException if a matching app could not be found
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public App getAppByUuidAndCompanyId(java.lang.String uuid, long companyId)
 		throws PortalException;
+
+	/**
+	* Updates the app in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	*
+	* @param app the app
+	* @return the app that was updated
+	*/
+	@Indexable(type = IndexableType.REINDEX)
+	public App updateApp(App app);
+
+	public App updateApp(long userId, File file) throws PortalException;
+
+	public App updateApp(long userId, long remoteAppId, java.lang.String title,
+		java.lang.String description, java.lang.String category,
+		java.lang.String iconURL, java.lang.String version, boolean required,
+		File file) throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public ActionableDynamicQuery getActionableDynamicQuery();
+
+	public DynamicQuery dynamicQuery();
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		PortletDataContext portletDataContext);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
 
 	/**
 	* @throws PortalException
 	*/
 	@Override
-	public com.liferay.portal.model.PersistedModel deletePersistedModel(
-		com.liferay.portal.model.PersistedModel persistedModel)
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException;
 
-	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
+	@Override
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
+		throws PortalException;
+
+	/**
+	* Returns the number of apps.
+	*
+	* @return the number of apps
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getAppsCount();
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	public java.lang.String getOSGiServiceIdentifier();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -105,8 +201,7 @@ public interface AppLocalService extends BaseLocalService,
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
 	*/
-	public <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery);
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery);
 
 	/**
 	* Performs a dynamic query on the database and returns a range of the matching rows.
@@ -120,8 +215,7 @@ public interface AppLocalService extends BaseLocalService,
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
 	*/
-	public <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
 		int end);
 
 	/**
@@ -137,77 +231,8 @@ public interface AppLocalService extends BaseLocalService,
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
 	*/
-	public <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end,
-		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator);
-
-	/**
-	* Returns the number of rows matching the dynamic query.
-	*
-	* @param dynamicQuery the dynamic query
-	* @return the number of rows matching the dynamic query
-	*/
-	public long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery);
-
-	/**
-	* Returns the number of rows matching the dynamic query.
-	*
-	* @param dynamicQuery the dynamic query
-	* @param projection the projection to apply to the query
-	* @return the number of rows matching the dynamic query
-	*/
-	public long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
-		com.liferay.portal.kernel.dao.orm.Projection projection);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.marketplace.model.App fetchApp(long appId);
-
-	/**
-	* Returns the app with the matching UUID and company.
-	*
-	* @param uuid the app's UUID
-	* @param companyId the primary key of the company
-	* @return the matching app, or <code>null</code> if a matching app could not be found
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.marketplace.model.App fetchAppByUuidAndCompanyId(
-		java.lang.String uuid, long companyId);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.marketplace.model.App fetchRemoteApp(long remoteAppId);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery();
-
-	/**
-	* Returns the app with the primary key.
-	*
-	* @param appId the primary key of the app
-	* @return the app
-	* @throws PortalException if a app with the primary key could not be found
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.marketplace.model.App getApp(long appId)
-		throws PortalException;
-
-	/**
-	* Returns the app with the matching UUID and company.
-	*
-	* @param uuid the app's UUID
-	* @param companyId the primary key of the company
-	* @return the matching app
-	* @throws PortalException if a matching app could not be found
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.marketplace.model.App getAppByUuidAndCompanyId(
-		java.lang.String uuid, long companyId) throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.marketplace.model.App> getApps(
-		java.lang.String category);
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
+		int end, OrderByComparator<T> orderByComparator);
 
 	/**
 	* Returns a range of all the apps.
@@ -221,68 +246,41 @@ public interface AppLocalService extends BaseLocalService,
 	* @return the range of apps
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.marketplace.model.App> getApps(
-		int start, int end);
+	public List<App> getApps(int start, int end);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<App> getApps(java.lang.String category);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<App> getInstalledApps();
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<App> getInstalledApps(java.lang.String category);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public Map<java.lang.String, java.lang.String> getPrepackagedApps();
 
 	/**
-	* Returns the number of apps.
+	* Returns the number of rows matching the dynamic query.
 	*
-	* @return the number of apps
+	* @param dynamicQuery the dynamic query
+	* @return the number of rows matching the dynamic query
 	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getAppsCount();
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery getExportActionableDynamicQuery(
-		com.liferay.portlet.exportimport.lar.PortletDataContext portletDataContext);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.marketplace.model.App> getInstalledApps();
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.marketplace.model.App> getInstalledApps(
-		java.lang.String category);
+	public long dynamicQueryCount(DynamicQuery dynamicQuery);
 
 	/**
-	* Returns the OSGi service identifier.
+	* Returns the number of rows matching the dynamic query.
 	*
-	* @return the OSGi service identifier
+	* @param dynamicQuery the dynamic query
+	* @param projection the projection to apply to the query
+	* @return the number of rows matching the dynamic query
 	*/
-	public java.lang.String getOSGiServiceIdentifier();
+	public long dynamicQueryCount(DynamicQuery dynamicQuery,
+		Projection projection);
 
-	@Override
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj) throws PortalException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.Map<java.lang.String, java.lang.String> getPrepackagedApps();
+	public void clearInstalledAppsCache();
 
 	public void installApp(long remoteAppId) throws PortalException;
 
-	public void processMarketplaceProperties(java.util.Properties properties)
-		throws PortalException;
-
 	public void uninstallApp(long remoteAppId) throws PortalException;
-
-	/**
-	* Updates the app in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
-	*
-	* @param app the app
-	* @return the app that was updated
-	*/
-	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.REINDEX)
-	public com.liferay.marketplace.model.App updateApp(
-		com.liferay.marketplace.model.App app);
-
-	public com.liferay.marketplace.model.App updateApp(long userId,
-		java.io.File file) throws PortalException;
-
-	public com.liferay.marketplace.model.App updateApp(long userId,
-		long remoteAppId, java.lang.String title, java.lang.String description,
-		java.lang.String category, java.lang.String iconURL,
-		java.lang.String version, java.io.File file) throws PortalException;
 }

@@ -16,14 +16,13 @@ package com.liferay.shopping.service.persistence;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.osgi.util.ServiceTrackerFactory;
+
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.service.ServiceContext;
 
 import com.liferay.shopping.model.ShoppingItemPrice;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -50,28 +49,28 @@ public class ShoppingItemPriceUtil {
 	 */
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#clearCache()
+	 * @see com.liferay.portal.kernel.service.persistence.BasePersistence#clearCache()
 	 */
 	public static void clearCache() {
 		getPersistence().clearCache();
 	}
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#clearCache(com.liferay.portal.model.BaseModel)
+	 * @see com.liferay.portal.kernel.service.persistence.BasePersistence#clearCache(com.liferay.portal.kernel.model.BaseModel)
 	 */
 	public static void clearCache(ShoppingItemPrice shoppingItemPrice) {
 		getPersistence().clearCache(shoppingItemPrice);
 	}
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#countWithDynamicQuery(DynamicQuery)
+	 * @see com.liferay.portal.kernel.service.persistence.BasePersistence#countWithDynamicQuery(DynamicQuery)
 	 */
 	public static long countWithDynamicQuery(DynamicQuery dynamicQuery) {
 		return getPersistence().countWithDynamicQuery(dynamicQuery);
 	}
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#findWithDynamicQuery(DynamicQuery)
+	 * @see com.liferay.portal.kernel.service.persistence.BasePersistence#findWithDynamicQuery(DynamicQuery)
 	 */
 	public static List<ShoppingItemPrice> findWithDynamicQuery(
 		DynamicQuery dynamicQuery) {
@@ -79,7 +78,7 @@ public class ShoppingItemPriceUtil {
 	}
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#findWithDynamicQuery(DynamicQuery, int, int)
+	 * @see com.liferay.portal.kernel.service.persistence.BasePersistence#findWithDynamicQuery(DynamicQuery, int, int)
 	 */
 	public static List<ShoppingItemPrice> findWithDynamicQuery(
 		DynamicQuery dynamicQuery, int start, int end) {
@@ -87,7 +86,7 @@ public class ShoppingItemPriceUtil {
 	}
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#findWithDynamicQuery(DynamicQuery, int, int, OrderByComparator)
+	 * @see com.liferay.portal.kernel.service.persistence.BasePersistence#findWithDynamicQuery(DynamicQuery, int, int, OrderByComparator)
 	 */
 	public static List<ShoppingItemPrice> findWithDynamicQuery(
 		DynamicQuery dynamicQuery, int start, int end,
@@ -98,14 +97,14 @@ public class ShoppingItemPriceUtil {
 	}
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#update(com.liferay.portal.model.BaseModel)
+	 * @see com.liferay.portal.kernel.service.persistence.BasePersistence#update(com.liferay.portal.kernel.model.BaseModel)
 	 */
 	public static ShoppingItemPrice update(ShoppingItemPrice shoppingItemPrice) {
 		return getPersistence().update(shoppingItemPrice);
 	}
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#update(com.liferay.portal.model.BaseModel, ServiceContext)
+	 * @see com.liferay.portal.kernel.service.persistence.BasePersistence#update(com.liferay.portal.kernel.model.BaseModel, ServiceContext)
 	 */
 	public static ShoppingItemPrice update(
 		ShoppingItemPrice shoppingItemPrice, ServiceContext serviceContext) {
@@ -186,7 +185,7 @@ public class ShoppingItemPriceUtil {
 	* @param itemId the item ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching shopping item price
-	* @throws com.liferay.shopping.NoSuchItemPriceException if a matching shopping item price could not be found
+	* @throws NoSuchItemPriceException if a matching shopping item price could not be found
 	*/
 	public static ShoppingItemPrice findByItemId_First(long itemId,
 		OrderByComparator<ShoppingItemPrice> orderByComparator)
@@ -212,7 +211,7 @@ public class ShoppingItemPriceUtil {
 	* @param itemId the item ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching shopping item price
-	* @throws com.liferay.shopping.NoSuchItemPriceException if a matching shopping item price could not be found
+	* @throws NoSuchItemPriceException if a matching shopping item price could not be found
 	*/
 	public static ShoppingItemPrice findByItemId_Last(long itemId,
 		OrderByComparator<ShoppingItemPrice> orderByComparator)
@@ -239,7 +238,7 @@ public class ShoppingItemPriceUtil {
 	* @param itemId the item ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the previous, current, and next shopping item price
-	* @throws com.liferay.shopping.NoSuchItemPriceException if a shopping item price with the primary key could not be found
+	* @throws NoSuchItemPriceException if a shopping item price with the primary key could not be found
 	*/
 	public static ShoppingItemPrice[] findByItemId_PrevAndNext(
 		long itemPriceId, long itemId,
@@ -302,7 +301,7 @@ public class ShoppingItemPriceUtil {
 	*
 	* @param itemPriceId the primary key of the shopping item price
 	* @return the shopping item price that was removed
-	* @throws com.liferay.shopping.NoSuchItemPriceException if a shopping item price with the primary key could not be found
+	* @throws NoSuchItemPriceException if a shopping item price with the primary key could not be found
 	*/
 	public static ShoppingItemPrice remove(long itemPriceId)
 		throws com.liferay.shopping.exception.NoSuchItemPriceException {
@@ -315,11 +314,11 @@ public class ShoppingItemPriceUtil {
 	}
 
 	/**
-	* Returns the shopping item price with the primary key or throws a {@link com.liferay.shopping.NoSuchItemPriceException} if it could not be found.
+	* Returns the shopping item price with the primary key or throws a {@link NoSuchItemPriceException} if it could not be found.
 	*
 	* @param itemPriceId the primary key of the shopping item price
 	* @return the shopping item price
-	* @throws com.liferay.shopping.NoSuchItemPriceException if a shopping item price with the primary key could not be found
+	* @throws NoSuchItemPriceException if a shopping item price with the primary key could not be found
 	*/
 	public static ShoppingItemPrice findByPrimaryKey(long itemPriceId)
 		throws com.liferay.shopping.exception.NoSuchItemPriceException {
@@ -422,21 +421,6 @@ public class ShoppingItemPriceUtil {
 		return _serviceTracker.getService();
 	}
 
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setPersistence(ShoppingItemPricePersistence persistence) {
-	}
-
-	private static ServiceTracker<ShoppingItemPricePersistence, ShoppingItemPricePersistence> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(ShoppingItemPriceUtil.class);
-
-		_serviceTracker = new ServiceTracker<ShoppingItemPricePersistence, ShoppingItemPricePersistence>(bundle.getBundleContext(),
-				ShoppingItemPricePersistence.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<ShoppingItemPricePersistence, ShoppingItemPricePersistence> _serviceTracker =
+		ServiceTrackerFactory.open(ShoppingItemPricePersistence.class);
 }

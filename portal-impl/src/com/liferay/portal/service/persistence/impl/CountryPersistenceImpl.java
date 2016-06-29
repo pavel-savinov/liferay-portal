@@ -16,7 +16,6 @@ package com.liferay.portal.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.NoSuchCountryException;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
@@ -26,19 +25,18 @@ import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
+import com.liferay.portal.kernel.exception.NoSuchCountryException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Country;
+import com.liferay.portal.kernel.service.persistence.CountryPersistence;
+import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.model.Country;
-import com.liferay.portal.model.MVCCModel;
 import com.liferay.portal.model.impl.CountryImpl;
 import com.liferay.portal.model.impl.CountryModelImpl;
-import com.liferay.portal.service.persistence.CountryPersistence;
 
 import java.io.Serializable;
 
@@ -48,6 +46,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -59,7 +58,7 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @see CountryPersistence
- * @see com.liferay.portal.service.persistence.CountryUtil
+ * @see com.liferay.portal.kernel.service.persistence.CountryUtil
  * @generated
  */
 @ProviderType
@@ -115,8 +114,8 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 
 			msg.append(StringPool.CLOSE_CURLY_BRACE);
 
-			if (_log.isWarnEnabled()) {
-				_log.warn(msg.toString());
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
 			}
 
 			throw new NoSuchCountryException(msg.toString());
@@ -157,7 +156,7 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 		if (result instanceof Country) {
 			Country country = (Country)result;
 
-			if (!Validator.equals(name, country.getName())) {
+			if (!Objects.equals(name, country.getName())) {
 				result = null;
 			}
 		}
@@ -346,8 +345,8 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 
 			msg.append(StringPool.CLOSE_CURLY_BRACE);
 
-			if (_log.isWarnEnabled()) {
-				_log.warn(msg.toString());
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
 			}
 
 			throw new NoSuchCountryException(msg.toString());
@@ -388,7 +387,7 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 		if (result instanceof Country) {
 			Country country = (Country)result;
 
-			if (!Validator.equals(a2, country.getA2())) {
+			if (!Objects.equals(a2, country.getA2())) {
 				result = null;
 			}
 		}
@@ -577,8 +576,8 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 
 			msg.append(StringPool.CLOSE_CURLY_BRACE);
 
-			if (_log.isWarnEnabled()) {
-				_log.warn(msg.toString());
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
 			}
 
 			throw new NoSuchCountryException(msg.toString());
@@ -619,7 +618,7 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 		if (result instanceof Country) {
 			Country country = (Country)result;
 
-			if (!Validator.equals(a3, country.getA3())) {
+			if (!Objects.equals(a3, country.getA3())) {
 				result = null;
 			}
 		}
@@ -899,7 +898,7 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -1112,8 +1111,9 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -1510,8 +1510,8 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 			Country country = (Country)session.get(CountryImpl.class, primaryKey);
 
 			if (country == null) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+				if (_log.isDebugEnabled()) {
+					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
 				throw new NoSuchCountryException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
@@ -1652,7 +1652,7 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 	}
 
 	/**
-	 * Returns the country with the primary key or throws a {@link com.liferay.portal.NoSuchModelException} if it could not be found.
+	 * Returns the country with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the country
 	 * @return the country
@@ -1664,8 +1664,8 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 		Country country = fetchByPrimaryKey(primaryKey);
 
 		if (country == null) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			if (_log.isDebugEnabled()) {
+				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			throw new NoSuchCountryException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
@@ -1696,12 +1696,14 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 	 */
 	@Override
 	public Country fetchByPrimaryKey(Serializable primaryKey) {
-		Country country = (Country)entityCache.getResult(CountryModelImpl.ENTITY_CACHE_ENABLED,
+		Serializable serializable = entityCache.getResult(CountryModelImpl.ENTITY_CACHE_ENABLED,
 				CountryImpl.class, primaryKey);
 
-		if (country == _nullCountry) {
+		if (serializable == nullModel) {
 			return null;
 		}
+
+		Country country = (Country)serializable;
 
 		if (country == null) {
 			Session session = null;
@@ -1716,7 +1718,7 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 				}
 				else {
 					entityCache.putResult(CountryModelImpl.ENTITY_CACHE_ENABLED,
-						CountryImpl.class, primaryKey, _nullCountry);
+						CountryImpl.class, primaryKey, nullModel);
 				}
 			}
 			catch (Exception e) {
@@ -1770,18 +1772,20 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 		Set<Serializable> uncachedPrimaryKeys = null;
 
 		for (Serializable primaryKey : primaryKeys) {
-			Country country = (Country)entityCache.getResult(CountryModelImpl.ENTITY_CACHE_ENABLED,
+			Serializable serializable = entityCache.getResult(CountryModelImpl.ENTITY_CACHE_ENABLED,
 					CountryImpl.class, primaryKey);
 
-			if (country == null) {
-				if (uncachedPrimaryKeys == null) {
-					uncachedPrimaryKeys = new HashSet<Serializable>();
-				}
+			if (serializable != nullModel) {
+				if (serializable == null) {
+					if (uncachedPrimaryKeys == null) {
+						uncachedPrimaryKeys = new HashSet<Serializable>();
+					}
 
-				uncachedPrimaryKeys.add(primaryKey);
-			}
-			else {
-				map.put(primaryKey, country);
+					uncachedPrimaryKeys.add(primaryKey);
+				}
+				else {
+					map.put(primaryKey, (Country)serializable);
+				}
 			}
 		}
 
@@ -1823,7 +1827,7 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 
 			for (Serializable primaryKey : uncachedPrimaryKeys) {
 				entityCache.putResult(CountryModelImpl.ENTITY_CACHE_ENABLED,
-					CountryImpl.class, primaryKey, _nullCountry);
+					CountryImpl.class, primaryKey, nullModel);
 			}
 		}
 		catch (Exception e) {
@@ -1924,7 +1928,7 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 
 			if (orderByComparator != null) {
 				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_COUNTRY);
 
@@ -2063,34 +2067,4 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"number", "idd", "active"
 			});
-	private static final Country _nullCountry = new CountryImpl() {
-			@Override
-			public Object clone() {
-				return this;
-			}
-
-			@Override
-			public CacheModel<Country> toCacheModel() {
-				return _nullCountryCacheModel;
-			}
-		};
-
-	private static final CacheModel<Country> _nullCountryCacheModel = new NullCacheModel();
-
-	private static class NullCacheModel implements CacheModel<Country>,
-		MVCCModel {
-		@Override
-		public long getMvccVersion() {
-			return -1;
-		}
-
-		@Override
-		public void setMvccVersion(long mvccVersion) {
-		}
-
-		@Override
-		public Country toEntityModel() {
-			return _nullCountry;
-		}
-	}
 }

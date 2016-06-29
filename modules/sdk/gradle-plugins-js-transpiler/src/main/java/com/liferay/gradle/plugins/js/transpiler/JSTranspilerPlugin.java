@@ -16,11 +16,14 @@ package com.liferay.gradle.plugins.js.transpiler;
 
 import com.liferay.gradle.plugins.node.NodePlugin;
 import com.liferay.gradle.plugins.node.tasks.DownloadNodeModuleTask;
+import com.liferay.gradle.plugins.node.tasks.ExecuteNpmTask;
 import com.liferay.gradle.util.GradleUtil;
 
 import java.io.File;
 
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.gradle.api.Action;
@@ -28,8 +31,10 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.file.FileCollection;
+import org.gradle.api.file.SourceDirectorySet;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.plugins.PluginContainer;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetOutput;
 import org.gradle.api.tasks.TaskContainer;
@@ -39,10 +44,11 @@ import org.gradle.api.tasks.TaskContainer;
  */
 public class JSTranspilerPlugin implements Plugin<Project> {
 
-	public static final String DOWNLOAD_BABEL_TASK_NAME = "downloadBabel";
-
 	public static final String DOWNLOAD_LFR_AMD_LOADER_TASK_NAME =
 		"downloadLfrAmdLoader";
+
+	public static final String DOWNLOAD_METAL_CLI_TASK_NAME =
+		"downloadMetalCli";
 
 	public static final String EXTENSION_NAME = "jsTranspiler";
 
@@ -52,11 +58,18 @@ public class JSTranspilerPlugin implements Plugin<Project> {
 	public void apply(Project project) {
 		GradleUtil.applyPlugin(project, NodePlugin.class);
 
+		final ExecuteNpmTask npmInstallTask =
+			(ExecuteNpmTask)GradleUtil.getTask(
+				project, NodePlugin.NPM_INSTALL_TASK_NAME);
+
 		JSTranspilerExtension jsTranspilerExtension = GradleUtil.addExtension(
 			project, EXTENSION_NAME, JSTranspilerExtension.class);
 
-		addTaskDownloadBabel(project, jsTranspilerExtension);
-		addTaskDownloadLfrAmdLoader(project, jsTranspilerExtension);
+		final DownloadNodeModuleTask downloadLfrAmdLoaderTask =
+			addTaskDownloadLfrAmdLoader(project, jsTranspilerExtension);
+		final DownloadNodeModuleTask downloadMetalCliTask =
+			addTaskDownloadMetalCli(project, jsTranspilerExtension);
+
 		addTaskTranspileJS(project);
 
 		project.afterEvaluate(
@@ -64,31 +77,12 @@ public class JSTranspilerPlugin implements Plugin<Project> {
 
 				@Override
 				public void execute(Project project) {
-					configureTasksTranspileJS(project);
+					configureTasksTranspileJS(
+						project, downloadLfrAmdLoaderTask, downloadMetalCliTask,
+						npmInstallTask);
 				}
 
 			});
-	}
-
-	protected DownloadNodeModuleTask addTaskDownloadBabel(
-		Project project, final JSTranspilerExtension jsTranspilerExtension) {
-
-		DownloadNodeModuleTask downloadNodeModuleTask = GradleUtil.addTask(
-			project, DOWNLOAD_BABEL_TASK_NAME, DownloadNodeModuleTask.class);
-
-		downloadNodeModuleTask.setModuleName("babel");
-
-		downloadNodeModuleTask.setModuleVersion(
-			new Callable<String>() {
-
-				@Override
-				public String call() throws Exception {
-					return jsTranspilerExtension.getBabelVersion();
-				}
-
-			});
-
-		return downloadNodeModuleTask;
 	}
 
 	protected DownloadNodeModuleTask addTaskDownloadLfrAmdLoader(
@@ -113,37 +107,56 @@ public class JSTranspilerPlugin implements Plugin<Project> {
 		return downloadNodeModuleTask;
 	}
 
-	protected TranspileJSTask addTaskTranspileJS(final Project project) {
-		TranspileJSTask transpileJSTask = GradleUtil.addTask(
+	protected DownloadNodeModuleTask addTaskDownloadMetalCli(
+		Project project, final JSTranspilerExtension jsTranspilerExtension) {
+
+		DownloadNodeModuleTask downloadNodeModuleTask = GradleUtil.addTask(
+			project, DOWNLOAD_METAL_CLI_TASK_NAME,
+			DownloadNodeModuleTask.class);
+
+		downloadNodeModuleTask.setModuleName("metal-cli");
+
+		downloadNodeModuleTask.setModuleVersion(
+			new Callable<String>() {
+
+				@Override
+				public String call() throws Exception {
+					return jsTranspilerExtension.getMetalCliVersion();
+				}
+
+			});
+
+		return downloadNodeModuleTask;
+	}
+
+	protected TranspileJSTask addTaskTranspileJS(Project project) {
+		final TranspileJSTask transpileJSTask = GradleUtil.addTask(
 			project, TRANSPILE_JS_TASK_NAME, TranspileJSTask.class);
 
 		transpileJSTask.setDescription("Transpiles JS files.");
 		transpileJSTask.setGroup(BasePlugin.BUILD_GROUP);
 
-		transpileJSTask.setOutputDir(
-			new Callable<File>() {
+		PluginContainer pluginContainer = project.getPlugins();
+
+		pluginContainer.withType(
+			JavaPlugin.class,
+			new Action<JavaPlugin>() {
 
 				@Override
-				public File call() throws Exception {
-					SourceSet sourceSet = GradleUtil.getSourceSet(
-						project, SourceSet.MAIN_SOURCE_SET_NAME);
-
-					SourceSetOutput sourceSetOutput = sourceSet.getOutput();
-
-					return sourceSetOutput.getResourcesDir();
+				public void execute(JavaPlugin javaPlugin) {
+					configureTaskTranspileJSForJavaPlugin(transpileJSTask);
 				}
 
 			});
 
-		Task classesTask = GradleUtil.getTask(
-			project, JavaPlugin.CLASSES_TASK_NAME);
-
-		classesTask.dependsOn(transpileJSTask);
-
 		return transpileJSTask;
 	}
 
-	protected void configureTasksTranspileJS(Project project) {
+	protected void configureTasksTranspileJS(
+		Project project, final DownloadNodeModuleTask downloadLfrAmdLoaderTask,
+		final DownloadNodeModuleTask downloadMetalCliTask,
+		final ExecuteNpmTask npmInstallTask) {
+
 		TaskContainer taskContainer = project.getTasks();
 
 		taskContainer.withType(
@@ -152,21 +165,103 @@ public class JSTranspilerPlugin implements Plugin<Project> {
 
 				@Override
 				public void execute(TranspileJSTask transpileJSTask) {
-					configureTaskTranspileJSEnabled(transpileJSTask);
+					configureTaskTranspileJS(
+						transpileJSTask, downloadLfrAmdLoaderTask,
+						downloadMetalCliTask, npmInstallTask);
 				}
 
 			});
 	}
 
-	protected void configureTaskTranspileJSEnabled(
-		TranspileJSTask transpileJSTask) {
+	protected void configureTaskTranspileJS(
+		TranspileJSTask transpileJSTask,
+		final DownloadNodeModuleTask downloadLfrAmdLoaderTask,
+		final DownloadNodeModuleTask downloadMetalCliTask,
+		final ExecuteNpmTask npmInstallTask) {
 
 		FileCollection fileCollection = transpileJSTask.getSourceFiles();
 
 		if (fileCollection.isEmpty()) {
 			transpileJSTask.setDependsOn(Collections.emptySet());
 			transpileJSTask.setEnabled(false);
+
+			return;
 		}
+
+		transpileJSTask.dependsOn(
+			downloadLfrAmdLoaderTask, downloadMetalCliTask, npmInstallTask);
+
+		transpileJSTask.setScriptFile(
+			new Callable<File>() {
+
+				@Override
+				public File call() throws Exception {
+					return new File(
+						downloadMetalCliTask.getModuleDir(), "index.js");
+				}
+
+			});
+
+		transpileJSTask.soyDependency(
+			new Callable<String>() {
+
+				@Override
+				public String call() throws Exception {
+					return npmInstallTask.getWorkingDir() +
+						"/node_modules/metal*/src/**/*.soy";
+				}
+
+			});
+	}
+
+	protected void configureTaskTranspileJSForJavaPlugin(
+		TranspileJSTask transpileJSTask) {
+
+		transpileJSTask.mustRunAfter(JavaPlugin.PROCESS_RESOURCES_TASK_NAME);
+
+		Project project = transpileJSTask.getProject();
+
+		final SourceSet sourceSet = GradleUtil.getSourceSet(
+			project, SourceSet.MAIN_SOURCE_SET_NAME);
+
+		transpileJSTask.setSourceDir(
+			new Callable<File>() {
+
+				@Override
+				public File call() throws Exception {
+					File resourcesDir = getSrcDir(sourceSet.getResources());
+
+					return new File(resourcesDir, "META-INF/resources");
+				}
+
+			});
+
+		transpileJSTask.setWorkingDir(
+			new Callable<File>() {
+
+				@Override
+				public File call() throws Exception {
+					SourceSetOutput sourceSetOutput = sourceSet.getOutput();
+
+					return new File(
+						sourceSetOutput.getResourcesDir(),
+						"META-INF/resources");
+				}
+
+			});
+
+		Task classesTask = GradleUtil.getTask(
+			project, JavaPlugin.CLASSES_TASK_NAME);
+
+		classesTask.dependsOn(transpileJSTask);
+	}
+
+	protected File getSrcDir(SourceDirectorySet sourceDirectorySet) {
+		Set<File> srcDirs = sourceDirectorySet.getSrcDirs();
+
+		Iterator<File> iterator = srcDirs.iterator();
+
+		return iterator.next();
 	}
 
 }

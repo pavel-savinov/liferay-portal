@@ -25,11 +25,12 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.service.persistence.CompanyProvider;
+import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
+import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import com.liferay.shopping.exception.NoSuchOrderItemException;
@@ -211,7 +212,7 @@ public class ShoppingOrderItemPersistenceImpl extends BasePersistenceImpl<Shoppi
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -279,7 +280,7 @@ public class ShoppingOrderItemPersistenceImpl extends BasePersistenceImpl<Shoppi
 	 * @param orderId the order ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching shopping order item
-	 * @throws com.liferay.shopping.NoSuchOrderItemException if a matching shopping order item could not be found
+	 * @throws NoSuchOrderItemException if a matching shopping order item could not be found
 	 */
 	@Override
 	public ShoppingOrderItem findByOrderId_First(long orderId,
@@ -330,7 +331,7 @@ public class ShoppingOrderItemPersistenceImpl extends BasePersistenceImpl<Shoppi
 	 * @param orderId the order ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching shopping order item
-	 * @throws com.liferay.shopping.NoSuchOrderItemException if a matching shopping order item could not be found
+	 * @throws NoSuchOrderItemException if a matching shopping order item could not be found
 	 */
 	@Override
 	public ShoppingOrderItem findByOrderId_Last(long orderId,
@@ -388,7 +389,7 @@ public class ShoppingOrderItemPersistenceImpl extends BasePersistenceImpl<Shoppi
 	 * @param orderId the order ID
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next shopping order item
-	 * @throws com.liferay.shopping.NoSuchOrderItemException if a shopping order item with the primary key could not be found
+	 * @throws NoSuchOrderItemException if a shopping order item with the primary key could not be found
 	 */
 	@Override
 	public ShoppingOrderItem[] findByOrderId_PrevAndNext(long orderItemId,
@@ -427,8 +428,9 @@ public class ShoppingOrderItemPersistenceImpl extends BasePersistenceImpl<Shoppi
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -686,6 +688,8 @@ public class ShoppingOrderItemPersistenceImpl extends BasePersistenceImpl<Shoppi
 		shoppingOrderItem.setNew(true);
 		shoppingOrderItem.setPrimaryKey(orderItemId);
 
+		shoppingOrderItem.setCompanyId(companyProvider.getCompanyId());
+
 		return shoppingOrderItem;
 	}
 
@@ -694,7 +698,7 @@ public class ShoppingOrderItemPersistenceImpl extends BasePersistenceImpl<Shoppi
 	 *
 	 * @param orderItemId the primary key of the shopping order item
 	 * @return the shopping order item that was removed
-	 * @throws com.liferay.shopping.NoSuchOrderItemException if a shopping order item with the primary key could not be found
+	 * @throws NoSuchOrderItemException if a shopping order item with the primary key could not be found
 	 */
 	@Override
 	public ShoppingOrderItem remove(long orderItemId)
@@ -707,7 +711,7 @@ public class ShoppingOrderItemPersistenceImpl extends BasePersistenceImpl<Shoppi
 	 *
 	 * @param primaryKey the primary key of the shopping order item
 	 * @return the shopping order item that was removed
-	 * @throws com.liferay.shopping.NoSuchOrderItemException if a shopping order item with the primary key could not be found
+	 * @throws NoSuchOrderItemException if a shopping order item with the primary key could not be found
 	 */
 	@Override
 	public ShoppingOrderItem remove(Serializable primaryKey)
@@ -721,8 +725,8 @@ public class ShoppingOrderItemPersistenceImpl extends BasePersistenceImpl<Shoppi
 					primaryKey);
 
 			if (shoppingOrderItem == null) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+				if (_log.isDebugEnabled()) {
+					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
 				throw new NoSuchOrderItemException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
@@ -864,11 +868,11 @@ public class ShoppingOrderItemPersistenceImpl extends BasePersistenceImpl<Shoppi
 	}
 
 	/**
-	 * Returns the shopping order item with the primary key or throws a {@link com.liferay.portal.NoSuchModelException} if it could not be found.
+	 * Returns the shopping order item with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the shopping order item
 	 * @return the shopping order item
-	 * @throws com.liferay.shopping.NoSuchOrderItemException if a shopping order item with the primary key could not be found
+	 * @throws NoSuchOrderItemException if a shopping order item with the primary key could not be found
 	 */
 	@Override
 	public ShoppingOrderItem findByPrimaryKey(Serializable primaryKey)
@@ -876,8 +880,8 @@ public class ShoppingOrderItemPersistenceImpl extends BasePersistenceImpl<Shoppi
 		ShoppingOrderItem shoppingOrderItem = fetchByPrimaryKey(primaryKey);
 
 		if (shoppingOrderItem == null) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			if (_log.isDebugEnabled()) {
+				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			throw new NoSuchOrderItemException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
@@ -888,11 +892,11 @@ public class ShoppingOrderItemPersistenceImpl extends BasePersistenceImpl<Shoppi
 	}
 
 	/**
-	 * Returns the shopping order item with the primary key or throws a {@link com.liferay.shopping.NoSuchOrderItemException} if it could not be found.
+	 * Returns the shopping order item with the primary key or throws a {@link NoSuchOrderItemException} if it could not be found.
 	 *
 	 * @param orderItemId the primary key of the shopping order item
 	 * @return the shopping order item
-	 * @throws com.liferay.shopping.NoSuchOrderItemException if a shopping order item with the primary key could not be found
+	 * @throws NoSuchOrderItemException if a shopping order item with the primary key could not be found
 	 */
 	@Override
 	public ShoppingOrderItem findByPrimaryKey(long orderItemId)
@@ -908,12 +912,14 @@ public class ShoppingOrderItemPersistenceImpl extends BasePersistenceImpl<Shoppi
 	 */
 	@Override
 	public ShoppingOrderItem fetchByPrimaryKey(Serializable primaryKey) {
-		ShoppingOrderItem shoppingOrderItem = (ShoppingOrderItem)entityCache.getResult(ShoppingOrderItemModelImpl.ENTITY_CACHE_ENABLED,
+		Serializable serializable = entityCache.getResult(ShoppingOrderItemModelImpl.ENTITY_CACHE_ENABLED,
 				ShoppingOrderItemImpl.class, primaryKey);
 
-		if (shoppingOrderItem == _nullShoppingOrderItem) {
+		if (serializable == nullModel) {
 			return null;
 		}
+
+		ShoppingOrderItem shoppingOrderItem = (ShoppingOrderItem)serializable;
 
 		if (shoppingOrderItem == null) {
 			Session session = null;
@@ -929,8 +935,7 @@ public class ShoppingOrderItemPersistenceImpl extends BasePersistenceImpl<Shoppi
 				}
 				else {
 					entityCache.putResult(ShoppingOrderItemModelImpl.ENTITY_CACHE_ENABLED,
-						ShoppingOrderItemImpl.class, primaryKey,
-						_nullShoppingOrderItem);
+						ShoppingOrderItemImpl.class, primaryKey, nullModel);
 				}
 			}
 			catch (Exception e) {
@@ -984,18 +989,20 @@ public class ShoppingOrderItemPersistenceImpl extends BasePersistenceImpl<Shoppi
 		Set<Serializable> uncachedPrimaryKeys = null;
 
 		for (Serializable primaryKey : primaryKeys) {
-			ShoppingOrderItem shoppingOrderItem = (ShoppingOrderItem)entityCache.getResult(ShoppingOrderItemModelImpl.ENTITY_CACHE_ENABLED,
+			Serializable serializable = entityCache.getResult(ShoppingOrderItemModelImpl.ENTITY_CACHE_ENABLED,
 					ShoppingOrderItemImpl.class, primaryKey);
 
-			if (shoppingOrderItem == null) {
-				if (uncachedPrimaryKeys == null) {
-					uncachedPrimaryKeys = new HashSet<Serializable>();
-				}
+			if (serializable != nullModel) {
+				if (serializable == null) {
+					if (uncachedPrimaryKeys == null) {
+						uncachedPrimaryKeys = new HashSet<Serializable>();
+					}
 
-				uncachedPrimaryKeys.add(primaryKey);
-			}
-			else {
-				map.put(primaryKey, shoppingOrderItem);
+					uncachedPrimaryKeys.add(primaryKey);
+				}
+				else {
+					map.put(primaryKey, (ShoppingOrderItem)serializable);
+				}
 			}
 		}
 
@@ -1037,8 +1044,7 @@ public class ShoppingOrderItemPersistenceImpl extends BasePersistenceImpl<Shoppi
 
 			for (Serializable primaryKey : uncachedPrimaryKeys) {
 				entityCache.putResult(ShoppingOrderItemModelImpl.ENTITY_CACHE_ENABLED,
-					ShoppingOrderItemImpl.class, primaryKey,
-					_nullShoppingOrderItem);
+					ShoppingOrderItemImpl.class, primaryKey, nullModel);
 			}
 		}
 		catch (Exception e) {
@@ -1140,7 +1146,7 @@ public class ShoppingOrderItemPersistenceImpl extends BasePersistenceImpl<Shoppi
 
 			if (orderByComparator != null) {
 				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_SHOPPINGORDERITEM);
 
@@ -1260,6 +1266,8 @@ public class ShoppingOrderItemPersistenceImpl extends BasePersistenceImpl<Shoppi
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
+	@ServiceReference(type = CompanyProviderWrapper.class)
+	protected CompanyProvider companyProvider;
 	@ServiceReference(type = EntityCache.class)
 	protected EntityCache entityCache;
 	@ServiceReference(type = FinderCache.class)
@@ -1273,23 +1281,4 @@ public class ShoppingOrderItemPersistenceImpl extends BasePersistenceImpl<Shoppi
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No ShoppingOrderItem exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No ShoppingOrderItem exists with the key {";
 	private static final Log _log = LogFactoryUtil.getLog(ShoppingOrderItemPersistenceImpl.class);
-	private static final ShoppingOrderItem _nullShoppingOrderItem = new ShoppingOrderItemImpl() {
-			@Override
-			public Object clone() {
-				return this;
-			}
-
-			@Override
-			public CacheModel<ShoppingOrderItem> toCacheModel() {
-				return _nullShoppingOrderItemCacheModel;
-			}
-		};
-
-	private static final CacheModel<ShoppingOrderItem> _nullShoppingOrderItemCacheModel =
-		new CacheModel<ShoppingOrderItem>() {
-			@Override
-			public ShoppingOrderItem toEntityModel() {
-				return _nullShoppingOrderItem;
-			}
-		};
 }
