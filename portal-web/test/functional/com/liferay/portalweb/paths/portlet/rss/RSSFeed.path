@@ -36,7 +36,7 @@
 <!--FEEDS-->
 <tr>
 	<td>FEEDS_TITLE</td>
-	<td>//div[@class='feed-title']/a[contains(.,'${key_feedTitle}')]</td>
+	<td>//h3[@class='feed-title']/a[contains(.,'${key_feedTitle}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -118,6 +118,16 @@
 <tr>
 	<td>DISPLAY_SETTINGS_SHOW_FEED_ITEM_AUTHOR</td>
 	<td>//input[contains(@id,'showFeedItemAuthor')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FEED_TIME</td>
+	<td>//input[contains(@id,'feedTime')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FEED_PANEL_HEADING</td>
+	<td>//div[contains(@class,'panel') and contains(@class,'title')]/a[contains(.,'${key_feedHeading}')]</td>
 	<td></td>
 </tr>
 </tbody>

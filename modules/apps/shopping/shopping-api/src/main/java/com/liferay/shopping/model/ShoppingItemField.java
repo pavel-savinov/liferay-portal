@@ -16,8 +16,9 @@ package com.liferay.shopping.model;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.annotation.ImplementationClassName;
+import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.util.Accessor;
-import com.liferay.portal.model.PersistedModel;
 
 /**
  * The extended model interface for the ShoppingItemField service. Represents a row in the &quot;ShoppingItemField&quot; database table, with each column mapped to a property of this class.
@@ -28,6 +29,7 @@ import com.liferay.portal.model.PersistedModel;
  * @see com.liferay.shopping.model.impl.ShoppingItemFieldModelImpl
  * @generated
  */
+@ImplementationClassName("com.liferay.shopping.model.impl.ShoppingItemFieldImpl")
 @ProviderType
 public interface ShoppingItemField extends ShoppingItemFieldModel, PersistedModel {
 	/*

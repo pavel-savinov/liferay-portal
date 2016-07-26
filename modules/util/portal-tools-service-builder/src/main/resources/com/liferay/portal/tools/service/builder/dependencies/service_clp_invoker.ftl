@@ -1,6 +1,6 @@
-package ${packagePath}.service.base;
+package ${apiPackagePath}.service.base;
 
-import ${packagePath}.service.${entity.name}${sessionTypeName}ServiceUtil;
+import ${apiPackagePath}.service.${entity.name}${sessionTypeName}ServiceUtil;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -23,7 +23,7 @@ public class ${entity.name}${sessionTypeName}ServiceClpInvoker {
 
 	public ${entity.name}${sessionTypeName}ServiceClpInvoker() {
 		<#list methods as method>
-			<#if !method.isConstructor() && method.isPublic() && serviceBuilder.isCustomMethod(method) && method.name != "invokeMethod">
+			<#if !method.isConstructor() && method.isPublic() && serviceBuilder.isCustomMethod(method) && (method.name != "invokeMethod")>
 				<#assign parameters = method.parameters>
 
 				_methodName${method_index} = "${method.name}";
@@ -48,7 +48,7 @@ public class ${entity.name}${sessionTypeName}ServiceClpInvoker {
 		throws Throwable {
 
 		<#list methods as method>
-			<#if !method.isConstructor() && method.isPublic() && serviceBuilder.isCustomMethod(method) && method.name != "invokeMethod">
+			<#if !method.isConstructor() && method.isPublic() && serviceBuilder.isCustomMethod(method) && (method.name != "invokeMethod")>
 				<#assign returnTypeName = serviceBuilder.getTypeGenericsName(method.returns)>
 				<#assign parameters = method.parameters>
 
@@ -89,7 +89,7 @@ public class ${entity.name}${sessionTypeName}ServiceClpInvoker {
 	}
 
 	<#list methods as method>
-		<#if !method.isConstructor() && method.isPublic() && serviceBuilder.isCustomMethod(method) && method.name != "invokeMethod">
+		<#if !method.isConstructor() && method.isPublic() && serviceBuilder.isCustomMethod(method) && (method.name != "invokeMethod")>
 			<#assign parameters = method.parameters>
 
 			private String _methodName${method_index};

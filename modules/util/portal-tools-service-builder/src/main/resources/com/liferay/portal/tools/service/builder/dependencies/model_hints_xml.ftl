@@ -1,5 +1,5 @@
 <#list entities as entity>
-	<#assign modelName = packagePath + ".model." + entity.name>
+	<#assign modelName = apiPackagePath + ".model." + entity.name>
 
 	<#if entity.hasColumns()>
 		<model name="${modelName}">
@@ -17,11 +17,13 @@
 
 			<#list entity.columnList as column>
 				<#if !column.isCollection()>
-					<field name="${column.name}" type="${column.type}"
+					<field
 
 					<#if column.localized>
 						localized="true"
 					</#if>
+
+					name="${column.name}" type="${column.type}"
 
 					<#assign closeField = false>
 

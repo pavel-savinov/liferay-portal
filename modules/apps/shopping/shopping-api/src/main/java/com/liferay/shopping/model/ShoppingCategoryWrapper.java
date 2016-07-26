@@ -16,12 +16,17 @@ package com.liferay.shopping.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.ModelWrapper;
+import com.liferay.expando.kernel.model.ExpandoBridge;
+
+import com.liferay.portal.kernel.model.ModelWrapper;
+import com.liferay.portal.kernel.service.ServiceContext;
+
+import java.io.Serializable;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * <p>
@@ -131,44 +136,63 @@ public class ShoppingCategoryWrapper implements ShoppingCategory,
 	}
 
 	@Override
-	public java.lang.Object clone() {
-		return new ShoppingCategoryWrapper((ShoppingCategory)_shoppingCategory.clone());
+	public ShoppingCategory toEscapedModel() {
+		return new ShoppingCategoryWrapper(_shoppingCategory.toEscapedModel());
 	}
 
 	@Override
-	public int compareTo(
-		com.liferay.shopping.model.ShoppingCategory shoppingCategory) {
+	public ShoppingCategory toUnescapedModel() {
+		return new ShoppingCategoryWrapper(_shoppingCategory.toUnescapedModel());
+	}
+
+	@Override
+	public boolean isCachedModel() {
+		return _shoppingCategory.isCachedModel();
+	}
+
+	@Override
+	public boolean isEscapedModel() {
+		return _shoppingCategory.isEscapedModel();
+	}
+
+	@Override
+	public boolean isNew() {
+		return _shoppingCategory.isNew();
+	}
+
+	@Override
+	public boolean isRoot() {
+		return _shoppingCategory.isRoot();
+	}
+
+	@Override
+	public ExpandoBridge getExpandoBridge() {
+		return _shoppingCategory.getExpandoBridge();
+	}
+
+	@Override
+	public com.liferay.portal.kernel.model.CacheModel<ShoppingCategory> toCacheModel() {
+		return _shoppingCategory.toCacheModel();
+	}
+
+	@Override
+	public int compareTo(ShoppingCategory shoppingCategory) {
 		return _shoppingCategory.compareTo(shoppingCategory);
 	}
 
-	/**
-	* Returns the category ID of this shopping category.
-	*
-	* @return the category ID of this shopping category
-	*/
 	@Override
-	public long getCategoryId() {
-		return _shoppingCategory.getCategoryId();
+	public int hashCode() {
+		return _shoppingCategory.hashCode();
 	}
 
-	/**
-	* Returns the company ID of this shopping category.
-	*
-	* @return the company ID of this shopping category
-	*/
 	@Override
-	public long getCompanyId() {
-		return _shoppingCategory.getCompanyId();
+	public Serializable getPrimaryKeyObj() {
+		return _shoppingCategory.getPrimaryKeyObj();
 	}
 
-	/**
-	* Returns the create date of this shopping category.
-	*
-	* @return the create date of this shopping category
-	*/
 	@Override
-	public Date getCreateDate() {
-		return _shoppingCategory.getCreateDate();
+	public java.lang.Object clone() {
+		return new ShoppingCategoryWrapper((ShoppingCategory)_shoppingCategory.clone());
 	}
 
 	/**
@@ -181,31 +205,6 @@ public class ShoppingCategoryWrapper implements ShoppingCategory,
 		return _shoppingCategory.getDescription();
 	}
 
-	@Override
-	public com.liferay.portlet.expando.model.ExpandoBridge getExpandoBridge() {
-		return _shoppingCategory.getExpandoBridge();
-	}
-
-	/**
-	* Returns the group ID of this shopping category.
-	*
-	* @return the group ID of this shopping category
-	*/
-	@Override
-	public long getGroupId() {
-		return _shoppingCategory.getGroupId();
-	}
-
-	/**
-	* Returns the modified date of this shopping category.
-	*
-	* @return the modified date of this shopping category
-	*/
-	@Override
-	public Date getModifiedDate() {
-		return _shoppingCategory.getModifiedDate();
-	}
-
 	/**
 	* Returns the name of this shopping category.
 	*
@@ -214,41 +213,6 @@ public class ShoppingCategoryWrapper implements ShoppingCategory,
 	@Override
 	public java.lang.String getName() {
 		return _shoppingCategory.getName();
-	}
-
-	/**
-	* Returns the parent category ID of this shopping category.
-	*
-	* @return the parent category ID of this shopping category
-	*/
-	@Override
-	public long getParentCategoryId() {
-		return _shoppingCategory.getParentCategoryId();
-	}
-
-	/**
-	* Returns the primary key of this shopping category.
-	*
-	* @return the primary key of this shopping category
-	*/
-	@Override
-	public long getPrimaryKey() {
-		return _shoppingCategory.getPrimaryKey();
-	}
-
-	@Override
-	public java.io.Serializable getPrimaryKeyObj() {
-		return _shoppingCategory.getPrimaryKeyObj();
-	}
-
-	/**
-	* Returns the user ID of this shopping category.
-	*
-	* @return the user ID of this shopping category
-	*/
-	@Override
-	public long getUserId() {
-		return _shoppingCategory.getUserId();
 	}
 
 	/**
@@ -272,28 +236,93 @@ public class ShoppingCategoryWrapper implements ShoppingCategory,
 	}
 
 	@Override
-	public int hashCode() {
-		return _shoppingCategory.hashCode();
+	public java.lang.String toString() {
+		return _shoppingCategory.toString();
 	}
 
 	@Override
-	public boolean isCachedModel() {
-		return _shoppingCategory.isCachedModel();
+	public java.lang.String toXmlString() {
+		return _shoppingCategory.toXmlString();
 	}
 
+	/**
+	* Returns the create date of this shopping category.
+	*
+	* @return the create date of this shopping category
+	*/
 	@Override
-	public boolean isEscapedModel() {
-		return _shoppingCategory.isEscapedModel();
+	public Date getCreateDate() {
+		return _shoppingCategory.getCreateDate();
 	}
 
+	/**
+	* Returns the modified date of this shopping category.
+	*
+	* @return the modified date of this shopping category
+	*/
 	@Override
-	public boolean isNew() {
-		return _shoppingCategory.isNew();
+	public Date getModifiedDate() {
+		return _shoppingCategory.getModifiedDate();
 	}
 
+	/**
+	* Returns the category ID of this shopping category.
+	*
+	* @return the category ID of this shopping category
+	*/
 	@Override
-	public boolean isRoot() {
-		return _shoppingCategory.isRoot();
+	public long getCategoryId() {
+		return _shoppingCategory.getCategoryId();
+	}
+
+	/**
+	* Returns the company ID of this shopping category.
+	*
+	* @return the company ID of this shopping category
+	*/
+	@Override
+	public long getCompanyId() {
+		return _shoppingCategory.getCompanyId();
+	}
+
+	/**
+	* Returns the group ID of this shopping category.
+	*
+	* @return the group ID of this shopping category
+	*/
+	@Override
+	public long getGroupId() {
+		return _shoppingCategory.getGroupId();
+	}
+
+	/**
+	* Returns the parent category ID of this shopping category.
+	*
+	* @return the parent category ID of this shopping category
+	*/
+	@Override
+	public long getParentCategoryId() {
+		return _shoppingCategory.getParentCategoryId();
+	}
+
+	/**
+	* Returns the primary key of this shopping category.
+	*
+	* @return the primary key of this shopping category
+	*/
+	@Override
+	public long getPrimaryKey() {
+		return _shoppingCategory.getPrimaryKey();
+	}
+
+	/**
+	* Returns the user ID of this shopping category.
+	*
+	* @return the user ID of this shopping category
+	*/
+	@Override
+	public long getUserId() {
+		return _shoppingCategory.getUserId();
 	}
 
 	@Override
@@ -347,20 +376,18 @@ public class ShoppingCategoryWrapper implements ShoppingCategory,
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
-		_shoppingCategory.setExpandoBridgeAttributes(baseModel);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portlet.expando.model.ExpandoBridge expandoBridge) {
+	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
 		_shoppingCategory.setExpandoBridgeAttributes(expandoBridge);
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(
-		com.liferay.portal.service.ServiceContext serviceContext) {
+		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+		_shoppingCategory.setExpandoBridgeAttributes(baseModel);
+	}
+
+	@Override
+	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
 		_shoppingCategory.setExpandoBridgeAttributes(serviceContext);
 	}
 
@@ -420,7 +447,7 @@ public class ShoppingCategoryWrapper implements ShoppingCategory,
 	}
 
 	@Override
-	public void setPrimaryKeyObj(java.io.Serializable primaryKeyObj) {
+	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		_shoppingCategory.setPrimaryKeyObj(primaryKeyObj);
 	}
 
@@ -455,31 +482,6 @@ public class ShoppingCategoryWrapper implements ShoppingCategory,
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<com.liferay.shopping.model.ShoppingCategory> toCacheModel() {
-		return _shoppingCategory.toCacheModel();
-	}
-
-	@Override
-	public com.liferay.shopping.model.ShoppingCategory toEscapedModel() {
-		return new ShoppingCategoryWrapper(_shoppingCategory.toEscapedModel());
-	}
-
-	@Override
-	public java.lang.String toString() {
-		return _shoppingCategory.toString();
-	}
-
-	@Override
-	public com.liferay.shopping.model.ShoppingCategory toUnescapedModel() {
-		return new ShoppingCategoryWrapper(_shoppingCategory.toUnescapedModel());
-	}
-
-	@Override
-	public java.lang.String toXmlString() {
-		return _shoppingCategory.toXmlString();
-	}
-
-	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -491,20 +493,12 @@ public class ShoppingCategoryWrapper implements ShoppingCategory,
 
 		ShoppingCategoryWrapper shoppingCategoryWrapper = (ShoppingCategoryWrapper)obj;
 
-		if (Validator.equals(_shoppingCategory,
+		if (Objects.equals(_shoppingCategory,
 					shoppingCategoryWrapper._shoppingCategory)) {
 			return true;
 		}
 
 		return false;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedModel}
-	 */
-	@Deprecated
-	public ShoppingCategory getWrappedShoppingCategory() {
-		return _shoppingCategory;
 	}
 
 	@Override

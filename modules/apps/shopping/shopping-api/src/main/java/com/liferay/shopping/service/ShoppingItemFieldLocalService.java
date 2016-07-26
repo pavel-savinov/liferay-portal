@@ -16,14 +16,27 @@ package com.liferay.shopping.service;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.model.PersistedModel;
+import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
+import com.liferay.portal.kernel.service.BaseLocalService;
+import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
-import com.liferay.portal.service.BaseLocalService;
-import com.liferay.portal.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.util.OrderByComparator;
+
+import com.liferay.shopping.model.ShoppingItemField;
+
+import java.io.Serializable;
+
+import java.util.List;
 
 /**
  * Provides the local service interface for ShoppingItemField. Methods of this
@@ -47,6 +60,25 @@ public interface ShoppingItemFieldLocalService extends BaseLocalService,
 	 *
 	 * Never modify or reference this interface directly. Always use {@link ShoppingItemFieldLocalServiceUtil} to access the shopping item field local service. Add custom service methods to {@link com.liferay.shopping.service.impl.ShoppingItemFieldLocalServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public ActionableDynamicQuery getActionableDynamicQuery();
+
+	public DynamicQuery dynamicQuery();
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
+
+	/**
+	* @throws PortalException
+	*/
+	@Override
+	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
+		throws PortalException;
+
+	@Override
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public PersistedModel getPersistedModel(Serializable primaryKeyObj)
+		throws PortalException;
 
 	/**
 	* Adds the shopping item field to the database. Also notifies the appropriate model listeners.
@@ -54,9 +86,9 @@ public interface ShoppingItemFieldLocalService extends BaseLocalService,
 	* @param shoppingItemField the shopping item field
 	* @return the shopping item field that was added
 	*/
-	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.REINDEX)
-	public com.liferay.shopping.model.ShoppingItemField addShoppingItemField(
-		com.liferay.shopping.model.ShoppingItemField shoppingItemField);
+	@Indexable(type = IndexableType.REINDEX)
+	public ShoppingItemField addShoppingItemField(
+		ShoppingItemField shoppingItemField);
 
 	/**
 	* Creates a new shopping item field with the primary key. Does not add the shopping item field to the database.
@@ -64,16 +96,17 @@ public interface ShoppingItemFieldLocalService extends BaseLocalService,
 	* @param itemFieldId the primary key for the new shopping item field
 	* @return the new shopping item field
 	*/
-	public com.liferay.shopping.model.ShoppingItemField createShoppingItemField(
-		long itemFieldId);
+	public ShoppingItemField createShoppingItemField(long itemFieldId);
 
 	/**
-	* @throws PortalException
+	* Deletes the shopping item field from the database. Also notifies the appropriate model listeners.
+	*
+	* @param shoppingItemField the shopping item field
+	* @return the shopping item field that was removed
 	*/
-	@Override
-	public com.liferay.portal.model.PersistedModel deletePersistedModel(
-		com.liferay.portal.model.PersistedModel persistedModel)
-		throws PortalException;
+	@Indexable(type = IndexableType.DELETE)
+	public ShoppingItemField deleteShoppingItemField(
+		ShoppingItemField shoppingItemField);
 
 	/**
 	* Deletes the shopping item field with the primary key from the database. Also notifies the appropriate model listeners.
@@ -82,21 +115,48 @@ public interface ShoppingItemFieldLocalService extends BaseLocalService,
 	* @return the shopping item field that was removed
 	* @throws PortalException if a shopping item field with the primary key could not be found
 	*/
-	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
-	public com.liferay.shopping.model.ShoppingItemField deleteShoppingItemField(
-		long itemFieldId) throws PortalException;
+	@Indexable(type = IndexableType.DELETE)
+	public ShoppingItemField deleteShoppingItemField(long itemFieldId)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public ShoppingItemField fetchShoppingItemField(long itemFieldId);
 
 	/**
-	* Deletes the shopping item field from the database. Also notifies the appropriate model listeners.
+	* Returns the shopping item field with the primary key.
+	*
+	* @param itemFieldId the primary key of the shopping item field
+	* @return the shopping item field
+	* @throws PortalException if a shopping item field with the primary key could not be found
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public ShoppingItemField getShoppingItemField(long itemFieldId)
+		throws PortalException;
+
+	/**
+	* Updates the shopping item field in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	*
 	* @param shoppingItemField the shopping item field
-	* @return the shopping item field that was removed
+	* @return the shopping item field that was updated
 	*/
-	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.DELETE)
-	public com.liferay.shopping.model.ShoppingItemField deleteShoppingItemField(
-		com.liferay.shopping.model.ShoppingItemField shoppingItemField);
+	@Indexable(type = IndexableType.REINDEX)
+	public ShoppingItemField updateShoppingItemField(
+		ShoppingItemField shoppingItemField);
 
-	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery();
+	/**
+	* Returns the number of shopping item fields.
+	*
+	* @return the number of shopping item fields
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getShoppingItemFieldsCount();
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	public java.lang.String getOSGiServiceIdentifier();
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
@@ -104,8 +164,7 @@ public interface ShoppingItemFieldLocalService extends BaseLocalService,
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
 	*/
-	public <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery);
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery);
 
 	/**
 	* Performs a dynamic query on the database and returns a range of the matching rows.
@@ -119,8 +178,7 @@ public interface ShoppingItemFieldLocalService extends BaseLocalService,
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
 	*/
-	public <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
 		int end);
 
 	/**
@@ -136,67 +194,11 @@ public interface ShoppingItemFieldLocalService extends BaseLocalService,
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
 	*/
-	public <T> java.util.List<T> dynamicQuery(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery, int start,
-		int end,
-		com.liferay.portal.kernel.util.OrderByComparator<T> orderByComparator);
-
-	/**
-	* Returns the number of rows matching the dynamic query.
-	*
-	* @param dynamicQuery the dynamic query
-	* @return the number of rows matching the dynamic query
-	*/
-	public long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery);
-
-	/**
-	* Returns the number of rows matching the dynamic query.
-	*
-	* @param dynamicQuery the dynamic query
-	* @param projection the projection to apply to the query
-	* @return the number of rows matching the dynamic query
-	*/
-	public long dynamicQueryCount(
-		com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery,
-		com.liferay.portal.kernel.dao.orm.Projection projection);
+	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
+		int end, OrderByComparator<T> orderByComparator);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.shopping.model.ShoppingItemField fetchShoppingItemField(
-		long itemFieldId);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery getActionableDynamicQuery();
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.shopping.model.ShoppingItemField> getItemFields(
-		long itemId);
-
-	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
-	public java.lang.String getOSGiServiceIdentifier();
-
-	@Override
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.portal.model.PersistedModel getPersistedModel(
-		java.io.Serializable primaryKeyObj) throws PortalException;
-
-	/**
-	* Returns the shopping item field with the primary key.
-	*
-	* @param itemFieldId the primary key of the shopping item field
-	* @return the shopping item field
-	* @throws PortalException if a shopping item field with the primary key could not be found
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public com.liferay.shopping.model.ShoppingItemField getShoppingItemField(
-		long itemFieldId) throws PortalException;
+	public List<ShoppingItemField> getItemFields(long itemId);
 
 	/**
 	* Returns a range of all the shopping item fields.
@@ -210,24 +212,23 @@ public interface ShoppingItemFieldLocalService extends BaseLocalService,
 	* @return the range of shopping item fields
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.shopping.model.ShoppingItemField> getShoppingItemFields(
-		int start, int end);
+	public List<ShoppingItemField> getShoppingItemFields(int start, int end);
 
 	/**
-	* Returns the number of shopping item fields.
+	* Returns the number of rows matching the dynamic query.
 	*
-	* @return the number of shopping item fields
+	* @param dynamicQuery the dynamic query
+	* @return the number of rows matching the dynamic query
 	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getShoppingItemFieldsCount();
+	public long dynamicQueryCount(DynamicQuery dynamicQuery);
 
 	/**
-	* Updates the shopping item field in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
+	* Returns the number of rows matching the dynamic query.
 	*
-	* @param shoppingItemField the shopping item field
-	* @return the shopping item field that was updated
+	* @param dynamicQuery the dynamic query
+	* @param projection the projection to apply to the query
+	* @return the number of rows matching the dynamic query
 	*/
-	@com.liferay.portal.kernel.search.Indexable(type = IndexableType.REINDEX)
-	public com.liferay.shopping.model.ShoppingItemField updateShoppingItemField(
-		com.liferay.shopping.model.ShoppingItemField shoppingItemField);
+	public long dynamicQueryCount(DynamicQuery dynamicQuery,
+		Projection projection);
 }

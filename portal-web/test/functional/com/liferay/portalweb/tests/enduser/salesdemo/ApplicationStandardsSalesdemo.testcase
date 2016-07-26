@@ -1,15 +1,9 @@
 <definition component-name="portal-application-standards">
+	<property name="portal.release" value="true" />
 	<property name="testray.main.component.name" value="Application Standards" />
 
 	<set-up>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
-
-		<if>
-			<equals arg1="${testPortalInstance}" arg2="true" />
-			<then>
-				<execute macro="SignIn#signInPortalInstanceSetUp" />
-			</then>
-		</if>
+		<execute macro="TestCase#setUpPortalInstance" />
 
 		<execute macro="User#firstLoginPG" />
 	</set-up>
@@ -29,9 +23,9 @@
 	</tear-down>
 
 	<command name="WebProxyDemo" priority="4">
-		<execute macro="Page#addPG">
+		<execute macro="Page#add">
 			<var name="pageName" value="Web Proxy Page" />
-			<var name="pageType" value="1 Column" />
+			<var name="sitePageType" value="1 Column" />
 		</execute>
 
 		<execute macro="Portlet#addPG">
@@ -46,7 +40,7 @@
 			<var name="initialURL" value="http://images.google.com/" />
 		</execute>
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="Web Proxy Page" />
 		</execute>
 
