@@ -14,8 +14,8 @@
 
 package com.liferay.gradle.plugins.node.tasks;
 
+import com.liferay.gradle.plugins.node.util.GradleUtil;
 import com.liferay.gradle.util.FileUtil;
-import com.liferay.gradle.util.GradleUtil;
 import com.liferay.gradle.util.Validator;
 
 import groovy.json.JsonOutput;
@@ -36,7 +36,6 @@ import java.util.Map;
 
 import org.codehaus.groovy.runtime.EncodingGroovyMethods;
 
-import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -50,17 +49,12 @@ import org.gradle.api.tasks.Optional;
 public class PublishNodeModuleTask extends ExecuteNpmTask {
 
 	@Override
-	public void executeNode() {
+	public void executeNode() throws Exception {
 		try {
-			setArgs(getCompleteArgs());
-
 			createNpmrcFile();
 			createPackageJsonFile();
 
 			super.executeNode();
-		}
-		catch (IOException ioe) {
-			throw new GradleException(ioe.getMessage(), ioe);
 		}
 		finally {
 			Project project = getProject();
@@ -94,6 +88,12 @@ public class PublishNodeModuleTask extends ExecuteNpmTask {
 	@Optional
 	public String getModuleLicense() {
 		return GradleUtil.toString(_moduleLicense);
+	}
+
+	@Input
+	@Optional
+	public String getModuleMain() {
+		return GradleUtil.toString(_moduleMain);
 	}
 
 	@Input
@@ -149,12 +149,16 @@ public class PublishNodeModuleTask extends ExecuteNpmTask {
 		_moduleKeywords.clear();
 	}
 
-	public void setModuleKeywords(Object ... moduleKeywords) {
+	public void setModuleKeywords(Object... moduleKeywords) {
 		setModuleKeywords(Arrays.asList(moduleKeywords));
 	}
 
 	public void setModuleLicense(Object moduleLicense) {
 		_moduleLicense = moduleLicense;
+	}
+
+	public void setModuleMain(Object moduleMain) {
+		_moduleMain = moduleMain;
 	}
 
 	public void setModuleName(Object moduleName) {
@@ -224,6 +228,12 @@ public class PublishNodeModuleTask extends ExecuteNpmTask {
 			map.put("license", license);
 		}
 
+		String main = getModuleMain();
+
+		if (Validator.isNotNull(main)) {
+			map.put("main", main);
+		}
+
 		map.put("name", getModuleName());
 
 		String repository = getModuleRepository();
@@ -246,15 +256,14 @@ public class PublishNodeModuleTask extends ExecuteNpmTask {
 			packageJsonFile.toPath(), json.getBytes(StandardCharsets.UTF_8));
 	}
 
-	protected List<Object> getCompleteArgs() {
-		List<Object> completeArgs = new ArrayList<>();
+	@Override
+	protected List<String> getCompleteArgs() {
+		List<String> completeArgs = super.getCompleteArgs();
 
 		completeArgs.add("publish");
 
 		completeArgs.add("--userconfig");
 		completeArgs.add(FileUtil.getAbsolutePath(getNpmrcFile()));
-
-		completeArgs.addAll(getArgs());
 
 		return completeArgs;
 	}
@@ -283,6 +292,7 @@ public class PublishNodeModuleTask extends ExecuteNpmTask {
 	private Object _moduleDescription;
 	private final List<Object> _moduleKeywords = new ArrayList<>();
 	private Object _moduleLicense;
+	private Object _moduleMain;
 	private Object _moduleName;
 	private Object _moduleRepository;
 	private Object _moduleVersion;

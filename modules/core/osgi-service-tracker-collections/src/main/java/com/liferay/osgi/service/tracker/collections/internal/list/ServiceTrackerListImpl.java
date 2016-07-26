@@ -16,6 +16,7 @@ package com.liferay.osgi.service.tracker.collections.internal.list;
 
 import com.liferay.osgi.service.tracker.collections.ServiceReferenceServiceTuple;
 import com.liferay.osgi.service.tracker.collections.internal.ServiceReferenceServiceTupleComparator;
+import com.liferay.osgi.service.tracker.collections.internal.ServiceTrackerUtil;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 
 import java.util.Collections;
@@ -25,8 +26,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Filter;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
@@ -37,10 +36,9 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 public class ServiceTrackerListImpl<S, T> implements ServiceTrackerList<S, T> {
 
 	public ServiceTrackerListImpl(
-			BundleContext bundleContext, Class<S> clazz, String filterString,
-			ServiceTrackerCustomizer<S, T> serviceTrackerCustomizer,
-			Comparator<ServiceReference<S>> comparator)
-		throws InvalidSyntaxException {
+		BundleContext bundleContext, Class<S> clazz, String filterString,
+		ServiceTrackerCustomizer<S, T> serviceTrackerCustomizer,
+		Comparator<ServiceReference<S>> comparator) {
 
 		_bundleContext = bundleContext;
 		_serviceTrackerCustomizer = serviceTrackerCustomizer;
@@ -53,19 +51,9 @@ public class ServiceTrackerListImpl<S, T> implements ServiceTrackerList<S, T> {
 				comparator);
 		}
 
-		if (filterString != null) {
-			Filter filter = bundleContext.createFilter(
-				"(&(objectClass=" + clazz.getName() + ")" + filterString + ")");
-
-			_serviceTracker = new ServiceTracker<>(
-				bundleContext, filter,
-				new ServiceReferenceServiceTrackerCustomizer());
-		}
-		else {
-			_serviceTracker = new ServiceTracker<>(
-				bundleContext, clazz,
-				new ServiceReferenceServiceTrackerCustomizer());
-		}
+		_serviceTracker = ServiceTrackerUtil.createServiceTracker(
+			_bundleContext, clazz, filterString,
+			new ServiceReferenceServiceTrackerCustomizer());
 	}
 
 	@Override
@@ -131,7 +119,7 @@ public class ServiceTrackerListImpl<S, T> implements ServiceTrackerList<S, T> {
 
 		@Override
 		public T addingService(ServiceReference<S> serviceReference) {
-			return update(
+			return _update(
 				serviceReference, getService(serviceReference), false);
 		}
 
@@ -144,7 +132,7 @@ public class ServiceTrackerListImpl<S, T> implements ServiceTrackerList<S, T> {
 					serviceReference, service);
 			}
 
-			update(serviceReference, service, false);
+			_update(serviceReference, service, false);
 		}
 
 		@Override
@@ -156,7 +144,7 @@ public class ServiceTrackerListImpl<S, T> implements ServiceTrackerList<S, T> {
 					serviceReference, service);
 			}
 
-			update(serviceReference, service, true);
+			_update(serviceReference, service, true);
 
 			_bundleContext.ungetService(serviceReference);
 		}
@@ -165,7 +153,7 @@ public class ServiceTrackerListImpl<S, T> implements ServiceTrackerList<S, T> {
 			return _serviceTrackerCustomizer.addingService(serviceReference);
 		}
 
-		private T update(
+		private T _update(
 			ServiceReference<S> serviceReference, T service, boolean remove) {
 
 			if (service == null) {

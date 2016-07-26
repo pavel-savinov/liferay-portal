@@ -16,16 +16,24 @@ package com.liferay.poshi.runner;
 
 import com.liferay.poshi.runner.exception.PoshiRunnerWarningException;
 import com.liferay.poshi.runner.logger.CommandLoggerHandler;
+import com.liferay.poshi.runner.logger.LoggerUtil;
 import com.liferay.poshi.runner.logger.SummaryLoggerHandler;
 import com.liferay.poshi.runner.logger.XMLLoggerHandler;
 import com.liferay.poshi.runner.selenium.LiferaySelenium;
+import com.liferay.poshi.runner.selenium.LiferaySeleniumHelper;
 import com.liferay.poshi.runner.selenium.SeleniumUtil;
+import com.liferay.poshi.runner.util.ExternalMethod;
+import com.liferay.poshi.runner.util.FileUtil;
 import com.liferay.poshi.runner.util.GetterUtil;
 import com.liferay.poshi.runner.util.PropsUtil;
 import com.liferay.poshi.runner.util.PropsValues;
 import com.liferay.poshi.runner.util.RegexUtil;
 import com.liferay.poshi.runner.util.StringUtil;
 import com.liferay.poshi.runner.util.Validator;
+
+import groovy.lang.Binding;
+
+import groovy.util.GroovyScriptEngine;
 
 import java.lang.reflect.Method;
 
@@ -37,6 +45,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.dom4j.Element;
+
+import org.openqa.selenium.StaleElementReferenceException;
 
 /**
  * @author Karen Dang
@@ -142,6 +152,8 @@ public class PoshiRunnerExecutor {
 	}
 
 	public static void parseElement(Element element) throws Exception {
+		LoggerUtil.pauseLoggerCheck();
+
 		List<Element> childElements = element.elements();
 
 		for (Element childElement : childElements) {
@@ -156,17 +168,20 @@ public class PoshiRunnerExecutor {
 				if (childElement.attributeValue("function") != null) {
 					runFunctionExecuteElement(childElement);
 				}
+				else if (childElement.attributeValue("groovy-script") != null) {
+					runGroovyScriptElement(childElement);
+				}
 				else if (childElement.attributeValue("macro") != null) {
 					runMacroExecuteElement(childElement, "macro");
 				}
-				else if ((childElement.attributeValue(
-							"macro-desktop") != null) &&
+				else if ((childElement.attributeValue("macro-desktop") !=
+							null) &&
 						 !PropsValues.MOBILE_BROWSER) {
 
 					runMacroExecuteElement(childElement, "macro-desktop");
 				}
-				else if ((childElement.attributeValue(
-							"macro-mobile") != null) &&
+				else if ((childElement.attributeValue("macro-mobile") !=
+							null) &&
 						 PropsValues.MOBILE_BROWSER) {
 
 					runMacroExecuteElement(childElement, "macro-mobile");
@@ -176,6 +191,9 @@ public class PoshiRunnerExecutor {
 				}
 				else if (childElement.attributeValue("test-case") != null) {
 					runTestCaseExecuteElement(childElement);
+				}
+				else if (childElement.attributeValue("method") != null) {
+					runMethodExecuteElement(childElement);
 				}
 			}
 			else if (childElementName.equals("if")) {
@@ -359,7 +377,9 @@ public class PoshiRunnerExecutor {
 			}
 		}
 
-		SummaryLoggerHandler.startSummary(executeElement);
+		if (_functionExecuteElement == executeElement) {
+			SummaryLoggerHandler.startSummary(_functionExecuteElement);
+		}
 
 		CommandLoggerHandler.startCommand(executeElement);
 
@@ -419,6 +439,59 @@ public class PoshiRunnerExecutor {
 
 			_functionExecuteElement = null;
 			_functionWarningMessage = null;
+		}
+	}
+
+	public static void runGroovyScriptElement(Element executeElement)
+		throws Exception {
+
+		PoshiRunnerStackTraceUtil.setCurrentElement(executeElement);
+
+		XMLLoggerHandler.updateStatus(executeElement, "pending");
+
+		List<Element> executeArgElements = executeElement.elements("arg");
+
+		Binding binding = new Binding();
+
+		if (!executeArgElements.isEmpty()) {
+			List<String> arguments = new ArrayList<>();
+
+			for (Element executeArgElement : executeArgElements) {
+				arguments.add(
+					PoshiRunnerVariablesUtil.replaceCommandVars(
+						executeArgElement.attributeValue("value")));
+			}
+
+			binding.setVariable(
+				"args", arguments.toArray(new String[arguments.size()]));
+		}
+
+		String status = "fail";
+
+		try {
+			String fileName = PoshiRunnerVariablesUtil.replaceCommandVars(
+				executeElement.attributeValue("groovy-script"));
+
+			String fileSeparator = FileUtil.getSeparator();
+
+			GroovyScriptEngine groovyScriptEngine = new GroovyScriptEngine(
+				LiferaySeleniumHelper.getSourceDirFilePath(
+					fileSeparator + PropsValues.TEST_DEPENDENCIES_DIR_NAME +
+						fileSeparator + fileName));
+
+			Object result = groovyScriptEngine.run(fileName, binding);
+
+			String returnVariable = executeElement.attributeValue("return");
+
+			if (returnVariable != null) {
+				PoshiRunnerVariablesUtil.putIntoCommandMap(
+					returnVariable, result.toString());
+			}
+
+			status = "pass";
+		}
+		finally {
+			XMLLoggerHandler.updateStatus(executeElement, status);
 		}
 	}
 
@@ -613,6 +686,54 @@ public class PoshiRunnerExecutor {
 		XMLLoggerHandler.updateStatus(executeElement, "pass");
 	}
 
+	public static void runMethodExecuteElement(Element executeElement)
+		throws Exception {
+
+		PoshiRunnerStackTraceUtil.setCurrentElement(executeElement);
+
+		XMLLoggerHandler.updateStatus(executeElement, "pending");
+
+		List<String> parameterList = new ArrayList<>();
+		List<Element> argElements = executeElement.elements("arg");
+
+		for (Element argElement : argElements) {
+			String parameter = argElement.attributeValue("value");
+
+			parameter = PoshiRunnerVariablesUtil.replaceCommandVars(parameter);
+
+			parameterList.add(parameter);
+		}
+
+		Element returnElement = executeElement.element("return");
+
+		String returnVariable = returnElement.attributeValue("name");
+		String className = executeElement.attributeValue("class");
+		String methodName = executeElement.attributeValue("method");
+
+		String[] parameters = parameterList.toArray(
+			new String[parameterList.size()]);
+
+		try {
+			String returnValue = ExternalMethod.execute(
+				className, methodName, parameters);
+
+			if (returnVariable != null) {
+				PoshiRunnerVariablesUtil.putIntoCommandMap(
+					returnVariable, returnValue);
+			}
+
+			CommandLoggerHandler.logExternalMethodCommand(
+				executeElement, parameterList, returnValue);
+		}
+		catch (Throwable t) {
+			XMLLoggerHandler.updateStatus(executeElement, "fail");
+
+			throw t;
+		}
+
+		XMLLoggerHandler.updateStatus(executeElement, "pass");
+	}
+
 	public static void runReturnElement(Element returnElement)
 		throws Exception {
 
@@ -656,8 +777,10 @@ public class PoshiRunnerExecutor {
 						selenium.equals("assertLocation") ||
 						selenium.equals("assertHTMLSourceTextNotPresent") ||
 						selenium.equals("assertHTMLSourceTextPresent") ||
+						selenium.equals("assertNotLocation") ||
 						selenium.equals("assertTextNotPresent") ||
 						selenium.equals("assertTextPresent") ||
+						selenium.equals("scrollBy") ||
 						selenium.equals("waitForConfirmation") ||
 						selenium.equals("waitForTextNotPresent") ||
 						selenium.equals("waitForTextPresent")) {
@@ -709,19 +832,39 @@ public class PoshiRunnerExecutor {
 
 		Class<?> clazz = liferaySelenium.getClass();
 
-		try {
-			Method method = clazz.getMethod(
-				selenium,
-				parameterClasses.toArray(new Class[parameterClasses.size()]));
+		Method method = clazz.getMethod(
+			selenium,
+			parameterClasses.toArray(new Class[parameterClasses.size()]));
 
+		try {
 			_returnObject = method.invoke(
 				liferaySelenium,
-				(Object[])arguments.toArray(new String[arguments.size()]));
+				arguments.toArray(new String[arguments.size()]));
 		}
-		catch (Exception e) {
-			Throwable throwable = e.getCause();
+		catch (Exception e1) {
+			Throwable throwable = e1.getCause();
 
-			throw new Exception(throwable.getMessage(), e);
+			if (throwable instanceof StaleElementReferenceException) {
+				System.out.println(
+					"\nElement turned stale while running " + selenium +
+						". Retrying in " +
+							PropsValues.TEST_RETRY_COMMAND_WAIT_TIME +
+								"seconds.");
+
+				try {
+					_returnObject = method.invoke(
+						liferaySelenium,
+						arguments.toArray(new String[arguments.size()]));
+				}
+				catch (Exception e2) {
+					throwable = e2.getCause();
+
+					throw new Exception(throwable.getMessage(), e2);
+				}
+			}
+			else {
+				throw new Exception(throwable.getMessage(), e1);
+			}
 		}
 	}
 
@@ -817,7 +960,12 @@ public class PoshiRunnerExecutor {
 				LiferaySelenium liferaySelenium = SeleniumUtil.getSelenium();
 
 				String attribute = element.attributeValue("attribute");
+
 				String locator = element.attributeValue("locator");
+
+				if (locator.contains("#")) {
+					locator = PoshiRunnerContext.getPathLocator(locator);
+				}
 
 				varValue = liferaySelenium.getAttribute(
 					locator + "@" + attribute);
@@ -848,7 +996,7 @@ public class PoshiRunnerExecutor {
 						varValue = liferaySelenium.getElementValue(locator);
 					}
 					else {
-						varValue = liferaySelenium.getElementText(locator);
+						varValue = liferaySelenium.getText(locator);
 					}
 				}
 				catch (Exception e) {
@@ -931,13 +1079,30 @@ public class PoshiRunnerExecutor {
 			return;
 		}
 
+		String staticValue = element.attributeValue("static");
+
 		if (commandVar) {
 			PoshiRunnerVariablesUtil.putIntoCommandMap(
 				varName, replacedVarValue);
 		}
+		else if ((staticValue != null) && staticValue.equals("true")) {
+			if (!PoshiRunnerVariablesUtil.containsKeyInStaticMap(varName)) {
+				PoshiRunnerVariablesUtil.putIntoStaticMap(
+					varName, replacedVarValue);
+			}
+		}
 		else {
 			PoshiRunnerVariablesUtil.putIntoExecuteMap(
 				varName, replacedVarValue);
+		}
+
+		String currentFilePath = PoshiRunnerStackTraceUtil.getCurrentFilePath();
+
+		if (commandVar && currentFilePath.contains(".testcase")) {
+			if (PoshiRunnerVariablesUtil.containsKeyInStaticMap(varName)) {
+				PoshiRunnerVariablesUtil.putIntoStaticMap(
+					varName, replacedVarValue);
+			}
 		}
 
 		if (updateLoggerStatus) {

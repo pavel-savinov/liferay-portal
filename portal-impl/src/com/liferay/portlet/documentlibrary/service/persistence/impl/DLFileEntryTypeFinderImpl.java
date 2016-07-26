@@ -14,21 +14,21 @@
 
 package com.liferay.portlet.documentlibrary.service.persistence.impl;
 
+import com.liferay.document.library.kernel.model.DLFileEntryType;
+import com.liferay.document.library.kernel.service.persistence.DLFileEntryTypeFinder;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.Type;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.security.permission.InlineSQLHelperUtil;
-import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
 import com.liferay.portlet.documentlibrary.model.impl.DLFileEntryTypeImpl;
-import com.liferay.portlet.documentlibrary.service.persistence.DLFileEntryTypeFinder;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
 import java.util.Iterator;
@@ -166,7 +166,7 @@ public class DLFileEntryTypeFinderImpl
 				sql, "[$BASIC_DOCUMENT$]",
 				getBasicDocumentCount(includeBasicFileEntryType));
 			sql = StringUtil.replace(
-				sql, "[$GROUP_ID$]", getGroupIds(groupIds));
+				sql, "[$GROUP_ID$]", getGroupIds(groupIds.length));
 			sql = CustomSQLUtil.replaceKeywords(
 				sql, "lower(DLFileEntryType.name)", StringPool.LIKE, false,
 				names);
@@ -243,7 +243,7 @@ public class DLFileEntryTypeFinderImpl
 				sql, "[$BASIC_DOCUMENT$]",
 				getBasicDocument(includeBasicFileEntryType));
 			sql = StringUtil.replace(
-				sql, "[$GROUP_ID$]", getGroupIds(groupIds));
+				sql, "[$GROUP_ID$]", getGroupIds(groupIds.length));
 			sql = CustomSQLUtil.replaceKeywords(
 				sql, "lower(DLFileEntryType.name)", StringPool.LIKE, false,
 				names);
@@ -302,17 +302,15 @@ public class DLFileEntryTypeFinderImpl
 	}
 
 	protected String getBasicDocument(String prefix) {
-		StringBundler sb = new StringBundler(9);
+		StringBundler sb = new StringBundler(7);
 
 		sb.append(prefix);
-		sb.append("((DLFileEntryType.companyId = 0) ");
-		sb.append("AND (DLFileEntryType.groupId = 0) AND (");
+		sb.append("((DLFileEntryType.companyId = 0) AND ");
+		sb.append("(DLFileEntryType.groupId = 0) AND (");
 		sb.append("(lower(DLFileEntryType.name) LIKE ? ");
-		sb.append("[$AND_OR_NULL_CHECK$]) ");
-		sb.append("[$AND_OR_CONNECTOR$] ");
+		sb.append("[$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$] ");
 		sb.append("(DLFileEntryType.description LIKE ? ");
-		sb.append("[$AND_OR_NULL_CHECK$]) ");
-		sb.append("))) UNION ALL (");
+		sb.append("[$AND_OR_NULL_CHECK$]) ))) UNION ALL (");
 
 		return sb.toString();
 	}
@@ -326,24 +324,20 @@ public class DLFileEntryTypeFinderImpl
 			"(SELECT COUNT(*) AS COUNT_VALUE From DLFileEntryType WHERE ");
 	}
 
-	protected String getGroupIds(long[] groupIds) {
-		if (groupIds.length == 0) {
+	protected String getGroupIds(int size) {
+		if (size == 0) {
 			return StringPool.BLANK;
 		}
 
-		StringBundler sb = new StringBundler(groupIds.length * 2);
+		StringBundler sb = new StringBundler(size + 1);
 
 		sb.append(StringPool.OPEN_PARENTHESIS);
 
-		for (int i = 0; i < groupIds.length; i++) {
-			sb.append("DLFileEntryType.groupId = ?");
-
-			if ((i + 1) < groupIds.length) {
-				sb.append(" OR ");
-			}
+		for (int i = 0; i < size - 1; i++) {
+			sb.append("DLFileEntryType.groupId = ? OR ");
 		}
 
-		sb.append(") AND");
+		sb.append("DLFileEntryType.groupId = ?) AND");
 
 		return sb.toString();
 	}
