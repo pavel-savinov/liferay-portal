@@ -16,10 +16,10 @@ package com.liferay.taglib.ui;
 
 import com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorCategoryUtil;
 import com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorEntryUtil;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.taglib.util.IncludeTag;
 
 import javax.servlet.http.HttpServletRequest;
@@ -209,6 +209,8 @@ public class FormNavigatorTag extends IncludeTag {
 	protected void setAttributes(HttpServletRequest request) {
 		request.setAttribute("liferay-ui:form-navigator:backURL", _backURL);
 		request.setAttribute(
+			"liferay-ui:form-navigator:categoryKeys", getCategoryKeys());
+		request.setAttribute(
 			"liferay-ui:form-navigator:categoryLabels", getCategoryLabels());
 		request.setAttribute(
 			"liferay-ui:form-navigator:categorySectionKeys",
@@ -224,10 +226,10 @@ public class FormNavigatorTag extends IncludeTag {
 		request.setAttribute(
 			"liferay-ui:form-navigator:formModelBean", _formModelBean);
 		request.setAttribute("liferay-ui:form-navigator:formName", _formName);
-		request.setAttribute("liferay-ui:form-navigator:id", _id);
 		request.setAttribute(
 			"liferay-ui:form-navigator:htmlBottom", _htmlBottom);
 		request.setAttribute("liferay-ui:form-navigator:htmlTop", _htmlTop);
+		request.setAttribute("liferay-ui:form-navigator:id", _id);
 		request.setAttribute("liferay-ui:form-navigator:jspPath", _jspPath);
 		request.setAttribute(
 			"liferay-ui:form-navigator:showButtons",

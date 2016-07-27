@@ -18,11 +18,19 @@ import aQute.bnd.header.OSGiHeader;
 import aQute.bnd.header.Parameters;
 import aQute.bnd.version.Version;
 
+import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.io.unsync.UnsyncBufferedInputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.lpkg.StaticLPKGResolver;
+import com.liferay.portal.kernel.module.framework.ThrowableCollector;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
-import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -31,43 +39,58 @@ import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.ServiceLoader;
 import com.liferay.portal.kernel.util.ServiceLoaderCondition;
-import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.module.framework.ModuleFramework;
-import com.liferay.portal.security.auth.PrincipalException;
-import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.collections.ServiceTrackerMapFactory;
 import com.liferay.registry.collections.ServiceTrackerMapFactoryUtil;
 import com.liferay.registry.internal.RegistryImpl;
 import com.liferay.registry.internal.ServiceTrackerMapFactoryImpl;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
 import java.net.URL;
 
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.jar.Attributes;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import javax.servlet.ServletContext;
 
@@ -77,11 +100,14 @@ import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkEvent;
+import org.osgi.framework.FrameworkListener;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 import org.osgi.framework.startlevel.BundleStartLevel;
 import org.osgi.framework.startlevel.FrameworkStartLevel;
 import org.osgi.framework.wiring.BundleRevision;
+import org.osgi.framework.wiring.FrameworkWiring;
 import org.osgi.util.tracker.BundleTracker;
 
 import org.springframework.beans.factory.BeanIsAbstractException;
@@ -110,30 +136,14 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		return bundle.getBundleId();
 	}
 
-	/**
-	 * @see com.liferay.modulesadmin.portlet.ModulesAdminPortlet#getBundle(
-	 *      BundleContext, InputStream)
-	 */
 	public Bundle getBundle(
 			BundleContext bundleContext, InputStream inputStream)
 		throws PortalException {
 
 		try {
-			if (inputStream.markSupported()) {
-
-				// 1 megabyte is more than enough for even the largest manifest
-				// file
-
-				inputStream.mark(1024 * 1000);
-			}
-
 			JarInputStream jarInputStream = new JarInputStream(inputStream);
 
 			Manifest manifest = jarInputStream.getManifest();
-
-			if (inputStream.markSupported()) {
-				inputStream.reset();
-			}
 
 			Attributes attributes = manifest.getMainAttributes();
 
@@ -185,6 +195,17 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 	}
 
 	@Override
+	public URL getBundleResource(long bundleId, String name) {
+		Bundle bundle = getBundle(bundleId);
+
+		if (bundle == null) {
+			return null;
+		}
+
+		return bundle.getResource(name);
+	}
+
+	@Override
 	public Framework getFramework() {
 		return _framework;
 	}
@@ -226,35 +247,81 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 	@Override
 	public void initFramework() throws Exception {
+		if (_log.isDebugEnabled()) {
+			_log.debug("Initializing the OSGi framework");
+		}
+
+		_initRequiredStartupDirs();
+
 		List<ServiceLoaderCondition> serviceLoaderConditions =
 			ServiceLoader.load(ServiceLoaderCondition.class);
 
 		ServiceLoaderCondition serviceLoaderCondition =
 			serviceLoaderConditions.get(0);
 
+		if (_log.isDebugEnabled()) {
+			Class<?> clazz = serviceLoaderCondition.getClass();
+
+			_log.debug(
+				"Using conditional loading to find the OSGi framework " +
+					"factory " + clazz.getName());
+		}
+
 		List<FrameworkFactory> frameworkFactories = ServiceLoader.load(
 			FrameworkFactory.class, serviceLoaderCondition);
 
 		FrameworkFactory frameworkFactory = frameworkFactories.get(0);
 
+		if (_log.isDebugEnabled()) {
+			Class<?> clazz = frameworkFactory.getClass();
+
+			_log.debug("Using the OSGi framework factory " + clazz.getName());
+		}
+
 		Map<String, String> properties = _buildFrameworkProperties(
 			frameworkFactory.getClass());
 
+		if (_log.isDebugEnabled()) {
+			_log.debug("Creating a new OSGi framework instance");
+		}
+
 		_framework = frameworkFactory.newFramework(properties);
 
+		if (_log.isDebugEnabled()) {
+			_log.debug("Initializing the new OSGi framework instance");
+		}
+
 		_framework.init();
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Binding the OSGi framework to the registry API");
+		}
 
 		RegistryUtil.setRegistry(
 			new RegistryImpl(_framework.getBundleContext()));
 
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				"Binding the OSGi framework to the service tracker map " +
+					"factory");
+		}
+
 		ServiceTrackerMapFactoryUtil.setServiceTrackerMapFactory(
 			new ServiceTrackerMapFactoryImpl(_framework.getBundleContext()));
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Initialized the OSGi framework");
+		}
 	}
 
 	@Override
 	public void registerContext(Object context) {
 		if (context == null) {
 			return;
+		}
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Registering context " + context);
 		}
 
 		if ((context instanceof ApplicationContext) &&
@@ -268,6 +335,10 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			ServletContext servletContext = (ServletContext)context;
 
 			_registerServletContext(servletContext);
+		}
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Registered context " + context);
 		}
 	}
 
@@ -331,11 +402,21 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 	@Override
 	public void startFramework() throws Exception {
+		if (_log.isDebugEnabled()) {
+			_log.debug("Starting the OSGi framework");
+		}
+
 		_framework.start();
 
 		_setUpPrerequisiteFrameworkServices(_framework.getBundleContext());
 
-		_setUpInitialBundles();
+		Set<Bundle> initialBundles = _setUpInitialBundles();
+
+		_startDynamicBundles(initialBundles);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Started the OSGi framework");
+		}
 	}
 
 	@Override
@@ -344,11 +425,19 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			return;
 		}
 
+		if (_log.isDebugEnabled()) {
+			_log.debug("Starting the OSGi runtime");
+		}
+
 		FrameworkStartLevel frameworkStartLevel = _framework.adapt(
 			FrameworkStartLevel.class);
 
 		frameworkStartLevel.setStartLevel(
 			PropsValues.MODULE_FRAMEWORK_RUNTIME_START_LEVEL);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Started the OSGi runtime");
+		}
 	}
 
 	@Override
@@ -382,20 +471,40 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			return;
 		}
 
+		Registry registry = RegistryUtil.getRegistry();
+
+		if (registry instanceof RegistryImpl) {
+			RegistryImpl registryImpl = (RegistryImpl)registry;
+
+			registryImpl.closeServiceTrackers();
+		}
+
+		ServiceTrackerMapFactory serviceTrackerMapFactory =
+			ServiceTrackerMapFactoryUtil.getServiceTrackerMapFactory();
+
+		if (serviceTrackerMapFactory instanceof ServiceTrackerMapFactoryImpl) {
+			ServiceTrackerMapFactoryImpl serviceTrackerMapFactoryImpl =
+				(ServiceTrackerMapFactoryImpl)serviceTrackerMapFactory;
+
+			serviceTrackerMapFactoryImpl.clearServiceTrackerMaps();
+		}
+
 		_framework.stop();
 
 		FrameworkEvent frameworkEvent = _framework.waitForStop(timeout);
 
 		if (frameworkEvent.getType() == FrameworkEvent.WAIT_TIMEDOUT) {
 			_log.error(
-				"Module framework shutdown timeout after waiting " + timeout +
-					"ms, " + frameworkEvent);
+				"OSGi framework event " + frameworkEvent +
+					" triggered after a " + timeout + "ms timeout");
 		}
 		else if (_log.isInfoEnabled()) {
 			_log.info(frameworkEvent);
 		}
 
 		RegistryUtil.setRegistry(null);
+
+		ServiceTrackerMapFactoryUtil.setServiceTrackerMapFactory(null);
 	}
 
 	@Override
@@ -432,6 +541,27 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 	}
 
 	@Override
+	public void unregisterContext(Object context) {
+		if (context == null) {
+			return;
+		}
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Unregistering context " + context);
+		}
+
+		if (!(context instanceof ApplicationContext)) {
+			return;
+		}
+
+		_unregisterApplicationContext((ApplicationContext)context);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Registered context " + context);
+		}
+	}
+
+	@Override
 	public void updateBundle(long bundleId) throws PortalException {
 		updateBundle(bundleId, null);
 	}
@@ -463,7 +593,8 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		throws PortalException {
 
 		if (_framework == null) {
-			throw new IllegalStateException("Framework is not initialized");
+			throw new IllegalStateException(
+				"OSGi framework is not initialized");
 		}
 
 		if (checkPermission) {
@@ -473,11 +604,25 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		BundleContext bundleContext = _framework.getBundleContext();
 
 		if (inputStream != null) {
-			Bundle bundle = getBundle(bundleContext, inputStream);
+			UnsyncBufferedInputStream unsyncBufferedInputStream =
+				new UnsyncBufferedInputStream(inputStream);
+
+			unsyncBufferedInputStream.mark(1024 * 1000);
+
+			Bundle bundle = getBundle(bundleContext, unsyncBufferedInputStream);
+
+			try {
+				unsyncBufferedInputStream.reset();
+			}
+			catch (IOException ioe) {
+				throw new PortalException(ioe);
+			}
 
 			if (bundle != null) {
 				return bundle;
 			}
+
+			inputStream = unsyncBufferedInputStream;
 		}
 
 		try {
@@ -491,6 +636,10 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 	}
 
 	private Map<String, String> _buildFrameworkProperties(Class<?> clazz) {
+		if (_log.isDebugEnabled()) {
+			_log.debug("Building OSGi framework properties");
+		}
+
 		Map<String, String> properties = new HashMap<>();
 
 		// Release
@@ -510,14 +659,15 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			FrameworkPropsKeys.FELIX_FILEINSTALL_POLL,
 			String.valueOf(PropsValues.MODULE_FRAMEWORK_AUTO_DEPLOY_INTERVAL));
 		properties.put(
+			FrameworkPropsKeys.FELIX_FILEINSTALL_START_LEVEL,
+			String.valueOf(
+				PropsValues.MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL));
+		properties.put(
 			FrameworkPropsKeys.FELIX_FILEINSTALL_TMPDIR,
 			SystemProperties.get(SystemProperties.TMP_DIR));
 
 		// Framework
 
-		properties.put(
-			Constants.FRAMEWORK_BEGINNING_STARTLEVEL,
-			String.valueOf(PropsValues.MODULE_FRAMEWORK_BEGINNING_START_LEVEL));
 		properties.put(
 			Constants.FRAMEWORK_BUNDLE_PARENT,
 			Constants.FRAMEWORK_BUNDLE_PARENT_APP);
@@ -569,6 +719,14 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 		properties.put(
 			Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA, systemPackagesExtra);
+
+		if (_log.isDebugEnabled()) {
+			for (Entry<String, String> entry : properties.entrySet()) {
+				_log.debug(
+					"OSGi framework property key \"" + entry.getKey() +
+						"\" with value \"" + entry.getValue() + "\"");
+			}
+		}
 
 		return properties;
 	}
@@ -642,12 +800,12 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 		sb.append(exportedPackages);
 
-		if (_log.isTraceEnabled()) {
+		if (_log.isDebugEnabled()) {
 			String s = sb.toString();
 
 			s = s.replace(",", "\n");
 
-			_log.trace(
+			_log.debug(
 				"The portal's system bundle is exporting the following " +
 					"packages:\n" +s);
 		}
@@ -680,106 +838,67 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		return false;
 	}
 
-	private void _installInitialBundle(String location) {
-		boolean start = false;
-		int startLevel = PropsValues.MODULE_FRAMEWORK_BEGINNING_START_LEVEL;
-
-		int index = location.lastIndexOf(StringPool.AT);
-
-		if (index != -1) {
-			String[] parts = StringUtil.split(
-				location.substring(index + 1), StringPool.COLON);
-
-			for (String part : parts) {
-				if (part.equals("start")) {
-					start = true;
-				}
-				else {
-					startLevel = GetterUtil.getInteger(part);
-				}
-			}
-
-			location = location.substring(0, index);
+	private void _initRequiredStartupDirs() {
+		if (_log.isDebugEnabled()) {
+			_log.debug("Initializing required startup directories");
 		}
 
-		InputStream inputStream = null;
+		String[] dirNames = StringUtil.split(_getFelixFileInstallDir());
+
+		for (String dirName : dirNames) {
+			FileUtil.mkdirs(dirName);
+		}
+
+		FileUtil.mkdirs(PropsValues.MODULE_FRAMEWORK_BASE_DIR + "/static");
+	}
+
+	private Bundle _installInitialBundle(
+		String location, InputStream inputStream) {
 
 		try {
-			if (!location.startsWith("file:")) {
-				location =
-					"file:" + PropsValues.MODULE_FRAMEWORK_BASE_DIR +
-						"/static/" + location;
+			if (_log.isDebugEnabled()) {
+				_log.debug("Adding initial bundle " + location.toString());
 			}
 
-			URL initialBundleURL = new URL(location);
+			Bundle bundle = _addBundle(
+				"reference:" + location, inputStream, false);
 
-			try {
-				inputStream = new BufferedInputStream(
-					initialBundleURL.openStream());
+			if (_log.isDebugEnabled()) {
+				_log.debug("Added initial bundle " + bundle);
 			}
-			catch (IOException ioe) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(ioe.getMessage());
-				}
-
-				return;
-			}
-
-			final Bundle bundle = _addBundle(
-				initialBundleURL.toString(), inputStream, false);
 
 			if ((bundle == null) || _isFragmentBundle(bundle)) {
-				return;
+				return bundle;
 			}
 
-			if (!start && _hasLazyActivationPolicy(bundle)) {
-				bundle.start(Bundle.START_ACTIVATION_POLICY);
-
-				return;
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Setting bundle " + bundle + " at start level " +
+						PropsValues.MODULE_FRAMEWORK_BEGINNING_START_LEVEL);
 			}
 
-			if (start) {
-				bundle.start();
+			BundleStartLevel bundleStartLevel = bundle.adapt(
+				BundleStartLevel.class);
 
-				final CountDownLatch countDownLatch = new CountDownLatch(1);
+			bundleStartLevel.setStartLevel(
+				PropsValues.MODULE_FRAMEWORK_BEGINNING_START_LEVEL);
 
-				BundleTracker<Void> bundleTracker = new BundleTracker<Void>(
-					_framework.getBundleContext(), Bundle.ACTIVE, null) {
-
-						@Override
-						public Void addingBundle(
-							Bundle trackedBundle, BundleEvent bundleEvent) {
-
-							if (trackedBundle == bundle) {
-								countDownLatch.countDown();
-
-								close();
-							}
-
-							return null;
-						}
-
-					};
-
-				bundleTracker.open();
-
-				countDownLatch.await();
+			if (_log.isDebugEnabled()) {
+				_log.debug("Starting initial bundle " + bundle);
 			}
 
-			if (((bundle.getState() & Bundle.UNINSTALLED) == 0) &&
-				(startLevel > 0)) {
+			bundle.start();
 
-				BundleStartLevel bundleStartLevel = bundle.adapt(
-					BundleStartLevel.class);
-
-				bundleStartLevel.setStartLevel(startLevel);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Started bundle " + bundle);
 			}
+
+			return bundle;
 		}
 		catch (Exception e) {
 			_log.error(e, e);
-		}
-		finally {
-			StreamUtil.cleanUp(inputStream);
+
+			return null;
 		}
 	}
 
@@ -813,7 +932,11 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 	private void _registerApplicationContext(
 		ApplicationContext applicationContext) {
 
-		BundleContext bundleContext = _framework.getBundleContext();
+		if (_log.isDebugEnabled()) {
+			_log.debug("Register application context");
+		}
+
+		List<ServiceRegistration<?>> serviceRegistrations = new ArrayList<>();
 
 		for (String beanName : applicationContext.getBeanDefinitionNames()) {
 			Object bean = null;
@@ -828,12 +951,19 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			}
 
 			if (bean != null) {
-				_registerService(bundleContext, beanName, bean);
+				ServiceRegistration<?> serviceRegistration = _registerService(
+					_framework.getBundleContext(), beanName, bean);
+
+				if (serviceRegistration != null) {
+					serviceRegistrations.add(serviceRegistration);
+				}
 			}
 		}
+
+		_springContextServices.put(applicationContext, serviceRegistrations);
 	}
 
-	private void _registerService(
+	private ServiceRegistration<?> _registerService(
 		BundleContext bundleContext, String beanName, Object bean) {
 
 		Set<Class<?>> interfaces = OSGiBeanProperties.Service.interfaces(bean);
@@ -851,42 +981,441 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		}
 
 		if (names.isEmpty()) {
-			return;
+			return null;
 		}
 
-		bundleContext.registerService(
-			names.toArray(new String[names.size()]), bean,
-			_getProperties(bean, beanName));
+		ServiceRegistration<?> serviceRegistration =
+			bundleContext.registerService(
+				names.toArray(new String[names.size()]), bean,
+				_getProperties(bean, beanName));
+
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				"Registered service as " + serviceRegistration.getReference());
+		}
+
+		return serviceRegistration;
 	}
 
 	private void _registerServletContext(ServletContext servletContext) {
 		BundleContext bundleContext = _framework.getBundleContext();
 
-		bundleContext.registerService(
-			new String[] {ServletContext.class.getName()}, servletContext,
-			_getProperties(servletContext, "liferayServletContext"));
+		if (_log.isDebugEnabled()) {
+			_log.debug("Register servlet context");
+		}
+
+		ServiceRegistration<?> serviceRegistration =
+			bundleContext.registerService(
+				new String[] {ServletContext.class.getName()}, servletContext,
+				_getProperties(servletContext, "liferayServletContext"));
+
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				"Registered servlet context as " +
+					serviceRegistration.getReference());
+		}
 	}
 
-	private void _setUpInitialBundles() throws Exception {
-		for (String initialBundle :
-				PropsValues.MODULE_FRAMEWORK_INITIAL_BUNDLES) {
-
-			_installInitialBundle(initialBundle);
+	private Set<Bundle> _setUpInitialBundles() throws Exception {
+		if (_log.isDebugEnabled()) {
+			_log.debug("Starting initial bundles");
 		}
+
+		BundleContext bundleContext = _framework.getBundleContext();
+
+		ThrowableCollector throwableCollector = new ThrowableCollector();
+
+		Dictionary<String, Object> dictionary = new HashMapDictionary<>();
+
+		dictionary.put("throwable.collector", "initial.bundles");
+
+		bundleContext.registerService(
+			ThrowableCollector.class, throwableCollector, dictionary);
+
+		final List<Bundle> bundles = new ArrayList<>();
+
+		final List<Path> jarPaths = new ArrayList<>();
+
+		Files.walkFileTree(
+			Paths.get(PropsValues.MODULE_FRAMEWORK_BASE_DIR, "static"),
+			new SimpleFileVisitor<Path>() {
+
+				@Override
+				public FileVisitResult visitFile(
+						Path filePath, BasicFileAttributes basicFileAttributes)
+					throws IOException {
+
+					Path fileNamePath = filePath.getFileName();
+
+					String fileName = StringUtil.toLowerCase(
+						fileNamePath.toString());
+
+					if (fileName.endsWith(".jar")) {
+						jarPaths.add(filePath.toAbsolutePath());
+					}
+
+					return FileVisitResult.CONTINUE;
+				}
+
+			});
+
+		File utilTaglibFile = new File(
+			PropsValues.LIFERAY_LIB_PORTAL_DIR, "util-taglib.jar");
+
+		if (utilTaglibFile.exists()) {
+			jarPaths.add(utilTaglibFile.toPath());
+		}
+		else {
+			_log.error("Missing " + utilTaglibFile);
+		}
+
+		Collections.sort(jarPaths);
+
+		String prefix = "reference:".concat(_STATIC_JAR);
+
+		List<Bundle> refreshBundles = new ArrayList<>();
+
+		for (Bundle bundle : bundleContext.getBundles()) {
+			String location = bundle.getLocation();
+
+			if (!location.startsWith(prefix)) {
+				continue;
+			}
+
+			Path filePath = Paths.get(location.substring(prefix.length()));
+
+			if (jarPaths.contains(filePath)) {
+				bundles.add(bundle);
+
+				continue;
+			}
+
+			bundle.uninstall();
+
+			refreshBundles.add(bundle);
+
+			if (_log.isInfoEnabled()) {
+				_log.info(
+					"Uninstalled orphan overwritten static JAR bundle " +
+						location);
+			}
+		}
+
+		FrameworkWiring frameworkWiring = _framework.adapt(
+			FrameworkWiring.class);
+
+		frameworkWiring.refreshBundles(refreshBundles);
+
+		refreshBundles.clear();
+
+		Set<String> overwrittenFileNames = new HashSet<>();
+
+		for (Path jarPath : jarPaths) {
+			try (InputStream inputStream = Files.newInputStream(jarPath)) {
+				String path = jarPath.toString();
+
+				Bundle bundle = _installInitialBundle(
+					_STATIC_JAR.concat(path), inputStream);
+
+				if (bundle != null) {
+					bundles.add(bundle);
+
+					overwrittenFileNames.add(
+						path.substring(path.lastIndexOf(StringPool.SLASH) + 1));
+				}
+			}
+		}
+
+		File file = new File(
+			bundleContext.getProperty("lpkg.deployer.dir") + StringPool.SLASH +
+				StaticLPKGResolver.getStaticLPKGFileName());
+
+		if (file.exists()) {
+			try (ZipFile zipFile = new ZipFile(file)) {
+				Enumeration<? extends ZipEntry> enumeration = zipFile.entries();
+
+				List<ZipEntry> zipEntries = new ArrayList<>();
+
+				while (enumeration.hasMoreElements()) {
+					ZipEntry zipEntry = enumeration.nextElement();
+
+					String name = StringUtil.toLowerCase(zipEntry.getName());
+
+					if (!name.endsWith(".jar")) {
+						continue;
+					}
+
+					zipEntries.add(zipEntry);
+				}
+
+				Collections.sort(
+					zipEntries,
+					new Comparator<ZipEntry>() {
+
+						@Override
+						public int compare(
+							ZipEntry zipEntry1, ZipEntry zipEntry2) {
+
+							String name1 = zipEntry1.getName();
+							String name2 = zipEntry2.getName();
+
+							return name1.compareTo(name2);
+						}
+
+					});
+
+				for (ZipEntry zipEntry : zipEntries) {
+					try (InputStream inputStream = zipFile.getInputStream(
+							zipEntry)) {
+
+						String zipEntryName = zipEntry.getName();
+
+						Matcher matcher = _pattern.matcher(zipEntryName);
+
+						if (matcher.matches()) {
+							String fileName =
+								matcher.group(1) + matcher.group(4);
+
+							if (overwrittenFileNames.contains(fileName)) {
+								if (_log.isInfoEnabled()) {
+									StringBundler sb = new StringBundler(7);
+
+									sb.append(zipFile);
+									sb.append(":");
+									sb.append(zipEntry);
+									sb.append(" is overwritten by ");
+									sb.append(
+										PropsValues.MODULE_FRAMEWORK_BASE_DIR);
+									sb.append("/static/");
+									sb.append(fileName);
+
+									_log.info(sb.toString());
+								}
+
+								continue;
+							}
+						}
+
+						Bundle bundle = _installInitialBundle(
+							StringPool.SLASH.concat(zipEntryName), inputStream);
+
+						if (bundle != null) {
+							bundles.add(bundle);
+						}
+					}
+				}
+			}
+		}
+
+		Bundle[] initialBundles = bundleContext.getBundles();
+
+		FrameworkStartLevel frameworkStartLevel = _framework.adapt(
+			FrameworkStartLevel.class);
+
+		frameworkStartLevel.setStartLevel(
+			PropsValues.MODULE_FRAMEWORK_BEGINNING_START_LEVEL);
+
+		for (final Bundle bundle : bundles) {
+			if (_isFragmentBundle(bundle)) {
+				continue;
+			}
+
+			final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+			BundleTracker<Void> bundleTracker = new BundleTracker<Void>(
+				_framework.getBundleContext(), Bundle.ACTIVE, null) {
+
+				@Override
+				public Void addingBundle(
+					Bundle trackedBundle, BundleEvent bundleEvent) {
+
+					if (trackedBundle == bundle) {
+						countDownLatch.countDown();
+
+						close();
+					}
+
+					return null;
+				}
+
+			};
+
+			bundleTracker.open();
+
+			countDownLatch.await();
+		}
+
+		throwableCollector.rethrow();
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Started initial bundles");
+		}
+
+		Bundle[] installedBundles = bundleContext.getBundles();
+
+		List<String> hostBundleSymbolicNames = new ArrayList<>();
+
+		for (Bundle bundle : installedBundles) {
+			BundleStartLevel bundleStartLevel = bundle.adapt(
+				BundleStartLevel.class);
+
+			if (bundleStartLevel.getStartLevel() !=
+					PropsValues.MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL) {
+
+				continue;
+			}
+
+			Dictionary<String, String> headers = bundle.getHeaders();
+
+			String fragmentHost = headers.get(Constants.FRAGMENT_HOST);
+
+			if (fragmentHost == null) {
+				continue;
+			}
+
+			int index = fragmentHost.indexOf(CharPool.SEMICOLON);
+
+			if (index != -1) {
+				fragmentHost = fragmentHost.substring(0, index);
+			}
+
+			hostBundleSymbolicNames.add(fragmentHost);
+		}
+
+		for (Bundle bundle : installedBundles) {
+			if (hostBundleSymbolicNames.contains(bundle.getSymbolicName())) {
+				refreshBundles.add(bundle);
+			}
+		}
+
+		frameworkWiring.refreshBundles(refreshBundles);
+
+		return new HashSet<>(Arrays.asList(initialBundles));
 	}
 
 	private void _setUpPrerequisiteFrameworkServices(
 		BundleContext bundleContext) {
 
+		if (_log.isDebugEnabled()) {
+			_log.debug("Setting up required services");
+		}
+
 		Props props = PropsUtil.getProps();
 
-		bundleContext.registerService(
-			Props.class, props, _getProperties(props, Props.class.getName()));
+		ServiceRegistration<Props> serviceRegistration =
+			bundleContext.registerService(
+				Props.class, props,
+				_getProperties(props, Props.class.getName()));
+
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				"Registered required service as " +
+					serviceRegistration.getReference());
+		}
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Registered required services");
+		}
 	}
+
+	private void _startDynamicBundles(Set<Bundle> installedBundles)
+		throws Exception {
+
+		FrameworkStartLevel frameworkStartLevel = _framework.adapt(
+			FrameworkStartLevel.class);
+
+		final DefaultNoticeableFuture<FrameworkEvent> defaultNoticeableFuture =
+			new DefaultNoticeableFuture<>();
+
+		frameworkStartLevel.setStartLevel(
+			PropsValues.MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL,
+			new FrameworkListener() {
+
+				@Override
+				public void frameworkEvent(FrameworkEvent fe) {
+					defaultNoticeableFuture.set(fe);
+				}
+
+			});
+
+		FrameworkEvent frameworkEvent = defaultNoticeableFuture.get();
+
+		if (frameworkEvent.getType() == FrameworkEvent.ERROR) {
+			ReflectionUtil.throwException(frameworkEvent.getThrowable());
+		}
+
+		BundleContext bundleContext = _framework.getBundleContext();
+
+		for (Bundle bundle : bundleContext.getBundles()) {
+			if (installedBundles.contains(bundle) ||
+				((bundle.getState() != Bundle.INSTALLED) &&
+				 (bundle.getState() != Bundle.RESOLVED))) {
+
+				continue;
+			}
+
+			BundleRevision bundleRevision = bundle.adapt(BundleRevision.class);
+
+			if ((bundleRevision.getTypes() & BundleRevision.TYPE_FRAGMENT) !=
+					0) {
+
+				continue;
+			}
+
+			BundleStartLevel bundleStartLevel = bundle.adapt(
+				BundleStartLevel.class);
+
+			if (bundleStartLevel.getStartLevel() ==
+					PropsValues.MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL) {
+
+				try {
+					bundle.start();
+				}
+				catch (BundleException be) {
+					_log.error(
+						"Unable to start bundle " + bundle.getSymbolicName(),
+						be);
+				}
+			}
+		}
+	}
+
+	private void _unregisterApplicationContext(
+		ApplicationContext applicationContext) {
+
+		List<ServiceRegistration<?>> serviceRegistrations =
+			_springContextServices.remove(applicationContext);
+
+		if (serviceRegistrations == null) {
+			return;
+		}
+
+		for (ServiceRegistration<?> serviceRegistration :
+				serviceRegistrations) {
+
+			try {
+				serviceRegistration.unregister();
+			}
+			catch (IllegalStateException ise) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						"Service registration " + serviceRegistration +
+							" is already unregistered");
+				}
+			}
+		}
+	}
+
+	private static final String _STATIC_JAR = "Static-Jar::";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ModuleFrameworkImpl.class);
 
+	private static final Pattern _pattern = Pattern.compile(
+		"(.*?)(-\\d+\\.\\d+\\.\\d+)(\\..+)?(\\.jar)");
+
 	private Framework _framework;
+	private final Map<ApplicationContext, List<ServiceRegistration<?>>>
+		_springContextServices = new ConcurrentHashMap<>();
 
 }
