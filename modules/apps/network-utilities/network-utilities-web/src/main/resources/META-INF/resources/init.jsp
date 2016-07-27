@@ -19,12 +19,13 @@
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
 <%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
-<%@ page import="com.liferay.network.utilities.web.model.DNSLookup" %><%@
-page import="com.liferay.network.utilities.web.model.Whois" %><%@
-page import="com.liferay.network.utilities.web.util.NetworkUtil" %><%@
+<%@ page import="com.liferay.network.utilities.web.internal.model.DNSLookup" %><%@
+page import="com.liferay.network.utilities.web.internal.model.Whois" %><%@
+page import="com.liferay.network.utilities.web.internal.util.NetworkUtil" %><%@
 page import="com.liferay.portal.kernel.servlet.SessionErrors" %><%@
 page import="com.liferay.portal.kernel.util.Constants" %><%@
 page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
@@ -33,12 +34,10 @@ page import="com.liferay.portal.kernel.util.ParamUtil" %>
 <%@ page import="javax.portlet.PortletURL" %><%@
 page import="javax.portlet.WindowState" %>
 
-<portlet:defineObjects />
+<liferay-frontend:defineObjects />
 
 <liferay-theme:defineObjects />
 
-<%
-WindowState windowState = liferayPortletRequest.getWindowState();
-%>
+<portlet:defineObjects />
 
 <%@ include file="/init-ext.jsp" %>

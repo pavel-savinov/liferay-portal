@@ -16,8 +16,7 @@ package com.liferay.shopping.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -50,7 +49,7 @@ public class ShoppingCouponServiceUtil {
 		int endDateMinute, boolean neverExpire, boolean active,
 		java.lang.String limitCategories, java.lang.String limitSkus,
 		double minOrder, double discount, java.lang.String discountType,
-		com.liferay.portal.service.ServiceContext serviceContext)
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .addCoupon(code, autoCode, name, description,
@@ -60,15 +59,28 @@ public class ShoppingCouponServiceUtil {
 			limitSkus, minOrder, discount, discountType, serviceContext);
 	}
 
-	public static void deleteCoupon(long groupId, long couponId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		getService().deleteCoupon(groupId, couponId);
-	}
-
 	public static com.liferay.shopping.model.ShoppingCoupon getCoupon(
 		long groupId, long couponId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().getCoupon(groupId, couponId);
+	}
+
+	public static com.liferay.shopping.model.ShoppingCoupon updateCoupon(
+		long couponId, java.lang.String name, java.lang.String description,
+		int startDateMonth, int startDateDay, int startDateYear,
+		int startDateHour, int startDateMinute, int endDateMonth,
+		int endDateDay, int endDateYear, int endDateHour, int endDateMinute,
+		boolean neverExpire, boolean active, java.lang.String limitCategories,
+		java.lang.String limitSkus, double minOrder, double discount,
+		java.lang.String discountType,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .updateCoupon(couponId, name, description, startDateMonth,
+			startDateDay, startDateYear, startDateHour, startDateMinute,
+			endDateMonth, endDateDay, endDateYear, endDateHour, endDateMinute,
+			neverExpire, active, limitCategories, limitSkus, minOrder,
+			discount, discountType, serviceContext);
 	}
 
 	/**
@@ -89,43 +101,15 @@ public class ShoppingCouponServiceUtil {
 			andOperator, start, end);
 	}
 
-	public static com.liferay.shopping.model.ShoppingCoupon updateCoupon(
-		long couponId, java.lang.String name, java.lang.String description,
-		int startDateMonth, int startDateDay, int startDateYear,
-		int startDateHour, int startDateMinute, int endDateMonth,
-		int endDateDay, int endDateYear, int endDateHour, int endDateMinute,
-		boolean neverExpire, boolean active, java.lang.String limitCategories,
-		java.lang.String limitSkus, double minOrder, double discount,
-		java.lang.String discountType,
-		com.liferay.portal.service.ServiceContext serviceContext)
+	public static void deleteCoupon(long groupId, long couponId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService()
-				   .updateCoupon(couponId, name, description, startDateMonth,
-			startDateDay, startDateYear, startDateHour, startDateMinute,
-			endDateMonth, endDateDay, endDateYear, endDateHour, endDateMinute,
-			neverExpire, active, limitCategories, limitSkus, minOrder,
-			discount, discountType, serviceContext);
+		getService().deleteCoupon(groupId, couponId);
 	}
 
 	public static ShoppingCouponService getService() {
 		return _serviceTracker.getService();
 	}
 
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(ShoppingCouponService service) {
-	}
-
-	private static ServiceTracker<ShoppingCouponService, ShoppingCouponService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(ShoppingCouponServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<ShoppingCouponService, ShoppingCouponService>(bundle.getBundleContext(),
-				ShoppingCouponService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<ShoppingCouponService, ShoppingCouponService> _serviceTracker =
+		ServiceTrackerFactory.open(ShoppingCouponService.class);
 }

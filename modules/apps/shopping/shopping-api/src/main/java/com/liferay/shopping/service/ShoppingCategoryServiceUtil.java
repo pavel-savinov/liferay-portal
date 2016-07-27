@@ -16,8 +16,7 @@ package com.liferay.shopping.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -45,16 +44,44 @@ public class ShoppingCategoryServiceUtil {
 	public static com.liferay.shopping.model.ShoppingCategory addCategory(
 		long parentCategoryId, java.lang.String name,
 		java.lang.String description,
-		com.liferay.portal.service.ServiceContext serviceContext)
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
 				   .addCategory(parentCategoryId, name, description,
 			serviceContext);
 	}
 
-	public static void deleteCategory(long categoryId)
+	public static com.liferay.shopping.model.ShoppingCategory getCategory(
+		long categoryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		getService().deleteCategory(categoryId);
+		return getService().getCategory(categoryId);
+	}
+
+	public static com.liferay.shopping.model.ShoppingCategory updateCategory(
+		long categoryId, long parentCategoryId, java.lang.String name,
+		java.lang.String description, boolean mergeWithParentCategory,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .updateCategory(categoryId, parentCategoryId, name,
+			description, mergeWithParentCategory, serviceContext);
+	}
+
+	public static int getCategoriesAndItemsCount(long groupId, long categoryId) {
+		return getService().getCategoriesAndItemsCount(groupId, categoryId);
+	}
+
+	public static int getCategoriesCount(long groupId, long parentCategoryId) {
+		return getService().getCategoriesCount(groupId, parentCategoryId);
+	}
+
+	/**
+	* Returns the OSGi service identifier.
+	*
+	* @return the OSGi service identifier
+	*/
+	public static java.lang.String getOSGiServiceIdentifier() {
+		return getService().getOSGiServiceIdentifier();
 	}
 
 	public static java.util.List<com.liferay.shopping.model.ShoppingCategory> getCategories(
@@ -67,23 +94,16 @@ public class ShoppingCategoryServiceUtil {
 		return getService().getCategories(groupId, parentCategoryId, start, end);
 	}
 
-	public static int getCategoriesCount(long groupId, long parentCategoryId) {
-		return getService().getCategoriesCount(groupId, parentCategoryId);
+	public static java.util.List<java.lang.Object> getCategoriesAndItems(
+		long groupId, long categoryId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<?> obc) {
+		return getService()
+				   .getCategoriesAndItems(groupId, categoryId, start, end, obc);
 	}
 
-	public static com.liferay.shopping.model.ShoppingCategory getCategory(
-		long categoryId)
+	public static void deleteCategory(long categoryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().getCategory(categoryId);
-	}
-
-	/**
-	* Returns the OSGi service identifier.
-	*
-	* @return the OSGi service identifier
-	*/
-	public static java.lang.String getOSGiServiceIdentifier() {
-		return getService().getOSGiServiceIdentifier();
+		getService().deleteCategory(categoryId);
 	}
 
 	public static void getSubcategoryIds(
@@ -92,35 +112,10 @@ public class ShoppingCategoryServiceUtil {
 		getService().getSubcategoryIds(categoryIds, groupId, categoryId);
 	}
 
-	public static com.liferay.shopping.model.ShoppingCategory updateCategory(
-		long categoryId, long parentCategoryId, java.lang.String name,
-		java.lang.String description, boolean mergeWithParentCategory,
-		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService()
-				   .updateCategory(categoryId, parentCategoryId, name,
-			description, mergeWithParentCategory, serviceContext);
-	}
-
 	public static ShoppingCategoryService getService() {
 		return _serviceTracker.getService();
 	}
 
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(ShoppingCategoryService service) {
-	}
-
-	private static ServiceTracker<ShoppingCategoryService, ShoppingCategoryService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(ShoppingCategoryServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<ShoppingCategoryService, ShoppingCategoryService>(bundle.getBundleContext(),
-				ShoppingCategoryService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<ShoppingCategoryService, ShoppingCategoryService> _serviceTracker =
+		ServiceTrackerFactory.open(ShoppingCategoryService.class);
 }
