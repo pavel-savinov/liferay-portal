@@ -1,13 +1,14 @@
-package ${packagePath}.model;
+package ${apiPackagePath}.model;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.annotation.ImplementationClassName;
+import com.liferay.portal.kernel.model.NestedSetsTreeNodeModel;
+import com.liferay.portal.kernel.model.PermissionedModel;
+import com.liferay.portal.kernel.model.PersistedModel;
+import com.liferay.portal.kernel.model.TreeModel;
 import com.liferay.portal.kernel.util.Accessor;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
-import com.liferay.portal.model.NestedSetsTreeNodeModel;
-import com.liferay.portal.model.PermissionedModel;
-import com.liferay.portal.model.PersistedModel;
-import com.liferay.portal.model.TreeModel;
 
 /**
  * The extended model interface for the ${entity.name} service. Represents a row in the &quot;${entity.table}&quot; database table, with each column mapped to a property of this class.
@@ -26,11 +27,12 @@ import com.liferay.portal.model.TreeModel;
 	@Deprecated
 </#if>
 
+@ImplementationClassName("${packagePath}.model.impl.${entity.name}Impl")
 @ProviderType
 public interface ${entity.name} extends
 	${entity.name}Model
 
-	<#assign overrideColumnNames = []>
+	<#assign overrideColumnNames = [] />
 
 	<#if entity.hasLocalService() && entity.hasColumns()>
 		<#if entity.isHierarchicalTree()>
@@ -46,7 +48,7 @@ public interface ${entity.name} extends
 		<#if entity.isTreeModel()>
 			, TreeModel
 
-			<#assign overrideColumnNames = overrideColumnNames + ["buildTreePath", "updateTreePath"]>
+			<#assign overrideColumnNames = overrideColumnNames + ["buildTreePath", "updateTreePath"] />
 		</#if>
 	</#if>
 
@@ -106,16 +108,18 @@ public interface ${entity.name} extends
 		<#if !method.isConstructor() && !method.isStatic() && method.isPublic()>
 			${serviceBuilder.getJavadocComment(method)}
 
-			<#assign parameters = method.parameters>
+			<#assign
+				parameters = method.parameters
 
-			<#assign annotations = method.annotations>
+				annotations = method.annotations
+			/>
 
 			<#list annotations as annotation>
 				<#if annotation.type.javaClass.name != "Override">
 					${annotation.toString()}
 				<#else>
 					<#if (method.name == "equals") && (parameters?size == 1)>
-						<#assign firstParameter = parameters?first>
+						<#assign firstParameter = parameters?first />
 
 						<#if serviceBuilder.getTypeGenericsName(firstParameter.type) == "java.lang.Object">
 							@Override

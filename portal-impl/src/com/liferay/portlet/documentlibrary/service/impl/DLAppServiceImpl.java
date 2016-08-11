@@ -14,8 +14,15 @@
 
 package com.liferay.portlet.documentlibrary.service.impl;
 
-import com.liferay.portal.NoSuchGroupException;
+import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
+import com.liferay.document.library.kernel.model.DLFolderConstants;
+import com.liferay.document.library.kernel.util.DLProcessorRegistryUtil;
+import com.liferay.document.library.kernel.util.comparator.FolderNameComparator;
+import com.liferay.document.library.kernel.util.comparator.RepositoryModelModifiedDateComparator;
+import com.liferay.document.library.kernel.util.comparator.RepositoryModelTitleComparator;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.exception.NoSuchGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
@@ -26,7 +33,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.InvalidRepositoryIdException;
 import com.liferay.portal.kernel.repository.Repository;
 import com.liferay.portal.kernel.repository.RepositoryException;
-import com.liferay.portal.kernel.repository.RepositoryProviderUtil;
+import com.liferay.portal.kernel.repository.RepositoryProvider;
 import com.liferay.portal.kernel.repository.capabilities.TrashCapability;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileShortcut;
@@ -37,6 +44,9 @@ import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -49,23 +59,10 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.security.permission.ActionKeys;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
-import com.liferay.portlet.documentlibrary.NoSuchFileShortcutException;
-import com.liferay.portlet.documentlibrary.NoSuchFileVersionException;
-import com.liferay.portlet.documentlibrary.NoSuchFolderException;
-import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.base.DLAppServiceBaseImpl;
-import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryPermission;
-import com.liferay.portlet.documentlibrary.service.permission.DLFileShortcutPermission;
 import com.liferay.portlet.documentlibrary.service.permission.DLFolderPermission;
 import com.liferay.portlet.documentlibrary.service.permission.DLPermission;
 import com.liferay.portlet.documentlibrary.util.DLAppUtil;
-import com.liferay.portlet.documentlibrary.util.DLProcessorRegistryUtil;
-import com.liferay.portlet.documentlibrary.util.comparator.FolderNameComparator;
-import com.liferay.portlet.documentlibrary.util.comparator.RepositoryModelModifiedDateComparator;
-import com.liferay.portlet.documentlibrary.util.comparator.RepositoryModelTitleComparator;
 
 import java.io.File;
 import java.io.IOException;
@@ -98,7 +95,7 @@ import java.util.concurrent.Callable;
  * Liferay repository, the <code>repositoryId</code> is the <code>groupId</code>
  * or <code>scopeGroupId</code>. Otherwise, the <code>repositoryId</code> will
  * correspond to values obtained from {@link
- * com.liferay.portal.service.RepositoryServiceUtil}.
+ * com.liferay.portal.kernel.service.RepositoryServiceUtil}.
  * </p>
  *
  * @author Alexander Chow
@@ -437,7 +434,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 	 */
 	@Override
 	public void cancelCheckOut(long fileEntryId) throws PortalException {
-		Repository repository = getFileEntryRepository(fileEntryId);
+		Repository repository = repositoryProvider.getFileEntryRepository(
+			fileEntryId);
 
 		FileEntry fileEntry = repository.getFileEntry(fileEntryId);
 
@@ -480,7 +478,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		Repository repository = getFileEntryRepository(fileEntryId);
+		Repository repository = repositoryProvider.getFileEntryRepository(
+			fileEntryId);
 
 		repository.checkInFileEntry(
 			getUserId(), fileEntryId, majorVersion, changeLog, serviceContext);
@@ -492,18 +491,6 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 		dlAppHelperLocalService.updateFileEntry(
 			getUserId(), fileEntry, null, fileVersion,
 			fileVersion.getFileVersionId());
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #checkInFileEntry(long,
-	 *             String, ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public void checkInFileEntry(long fileEntryId, String lockUuid)
-		throws PortalException {
-
-		checkInFileEntry(fileEntryId, lockUuid, new ServiceContext());
 	}
 
 	/**
@@ -533,7 +520,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			long fileEntryId, String lockUuid, ServiceContext serviceContext)
 		throws PortalException {
 
-		Repository repository = getFileEntryRepository(fileEntryId);
+		Repository repository = repositoryProvider.getFileEntryRepository(
+			fileEntryId);
 
 		repository.checkInFileEntry(
 			getUserId(), fileEntryId, lockUuid, serviceContext);
@@ -571,7 +559,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			long fileEntryId, ServiceContext serviceContext)
 		throws PortalException {
 
-		Repository repository = getFileEntryRepository(fileEntryId);
+		Repository repository = repositoryProvider.getFileEntryRepository(
+			fileEntryId);
 
 		FileEntry fileEntry = repository.checkOutFileEntry(
 			fileEntryId, serviceContext);
@@ -613,7 +602,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		Repository repository = getFileEntryRepository(fileEntryId);
+		Repository repository = repositoryProvider.getFileEntryRepository(
+			fileEntryId);
 
 		FileEntry fileEntry = repository.checkOutFileEntry(
 			fileEntryId, owner, expirationTime, serviceContext);
@@ -665,7 +655,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 	 */
 	@Override
 	public void deleteFileEntry(long fileEntryId) throws PortalException {
-		Repository repository = getFileEntryRepository(fileEntryId);
+		Repository repository = repositoryProvider.getFileEntryRepository(
+			fileEntryId);
 
 		FileEntry fileEntry = repository.getFileEntry(fileEntryId);
 
@@ -703,7 +694,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 	 */
 	@Override
 	public void deleteFileShortcut(long fileShortcutId) throws PortalException {
-		Repository repository = getFileShortcutRepository(fileShortcutId);
+		Repository repository = repositoryProvider.getFileShortcutRepository(
+			fileShortcutId);
 
 		repository.deleteFileShortcut(fileShortcutId);
 	}
@@ -720,7 +712,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 	public void deleteFileVersion(long fileEntryId, String version)
 		throws PortalException {
 
-		Repository repository = getFileEntryRepository(fileEntryId);
+		Repository repository = repositoryProvider.getFileEntryRepository(
+			fileEntryId);
 
 		repository.deleteFileVersion(fileEntryId, version);
 	}
@@ -733,7 +726,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 	 */
 	@Override
 	public void deleteFolder(long folderId) throws PortalException {
-		Repository repository = getFolderRepository(folderId);
+		Repository repository = repositoryProvider.getFolderRepository(
+			folderId);
 
 		Folder folder = repository.getFolder(folderId);
 
@@ -1100,7 +1094,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 	 */
 	@Override
 	public FileEntry getFileEntry(long fileEntryId) throws PortalException {
-		Repository repository = getFileEntryRepository(fileEntryId);
+		Repository repository = repositoryProvider.getFileEntryRepository(
+			fileEntryId);
 
 		return repository.getFileEntry(fileEntryId);
 	}
@@ -1124,7 +1119,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 		}
 		catch (NoSuchFileEntryException nsfee) {
 			if (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-				Repository repository = getFolderRepository(folderId);
+				Repository repository = repositoryProvider.getFolderRepository(
+					folderId);
 
 				return repository.getFileEntry(folderId, title);
 			}
@@ -1152,10 +1148,12 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			return fileEntry;
 		}
 
-		List<com.liferay.portal.model.Repository> repositories =
+		List<com.liferay.portal.kernel.model.Repository> repositories =
 			repositoryPersistence.findByGroupId(groupId);
 
-		for (com.liferay.portal.model.Repository repository : repositories) {
+		for (com.liferay.portal.kernel.model.Repository repository :
+				repositories) {
+
 			fileEntry = fetchFileEntryByUuidAndRepositoryId(
 				uuid, repository.getRepositoryId());
 
@@ -1187,7 +1185,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 	public FileShortcut getFileShortcut(long fileShortcutId)
 		throws PortalException {
 
-		Repository repository = getFileShortcutRepository(fileShortcutId);
+		Repository repository = repositoryProvider.getFileShortcutRepository(
+			fileShortcutId);
 
 		return repository.getFileShortcut(fileShortcutId);
 	}
@@ -1202,7 +1201,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 	public FileVersion getFileVersion(long fileVersionId)
 		throws PortalException {
 
-		Repository repository = getFileVersionRepository(fileVersionId);
+		Repository repository = repositoryProvider.getFileVersionRepository(
+			fileVersionId);
 
 		return repository.getFileVersion(fileVersionId);
 	}
@@ -1215,7 +1215,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 	 */
 	@Override
 	public Folder getFolder(long folderId) throws PortalException {
-		Repository repository = getFolderRepository(folderId);
+		Repository repository = repositoryProvider.getFolderRepository(
+			folderId);
 
 		return repository.getFolder(folderId);
 	}
@@ -2072,7 +2073,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			long fileEntryId, long newFolderId, ServiceContext serviceContext)
 		throws PortalException {
 
-		Repository fromRepository = getFileEntryRepository(fileEntryId);
+		Repository fromRepository = repositoryProvider.getFileEntryRepository(
+			fileEntryId);
 		Repository toRepository = getFolderRepository(
 			newFolderId, serviceContext.getScopeGroupId());
 
@@ -2095,108 +2097,9 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 
 		// Move file entries between repositories
 
-		return moveFileEntries(
+		return moveFileEntry(
 			fileEntryId, newFolderId, fromRepository, toRepository,
 			serviceContext);
-	}
-
-	/**
-	 * Moves the file entry from a trashed folder to the new folder.
-	 *
-	 * @param  fileEntryId the primary key of the file entry
-	 * @param  newFolderId the primary key of the new folder
-	 * @param  serviceContext the service context to be applied
-	 * @return the file entry
-	 */
-	@Override
-	public FileEntry moveFileEntryFromTrash(
-			long fileEntryId, long newFolderId, ServiceContext serviceContext)
-		throws PortalException {
-
-		Repository repository = getFileEntryRepository(fileEntryId);
-
-		TrashCapability trashCapability = repository.getCapability(
-			TrashCapability.class);
-
-		FileEntry fileEntry = repository.getFileEntry(fileEntryId);
-
-		DLFileEntryPermission.check(
-			getPermissionChecker(), fileEntry, ActionKeys.UPDATE);
-
-		Folder destinationFolder = repository.getFolder(newFolderId);
-
-		return trashCapability.moveFileEntryFromTrash(
-			getUserId(), fileEntry, destinationFolder, serviceContext);
-	}
-
-	/**
-	 * Moves the file entry with the primary key to the trash portlet.
-	 *
-	 * @param  fileEntryId the primary key of the file entry
-	 * @return the file entry
-	 */
-	@Override
-	public FileEntry moveFileEntryToTrash(long fileEntryId)
-		throws PortalException {
-
-		Repository repository = getFileEntryRepository(fileEntryId);
-
-		TrashCapability trashCapability = repository.getCapability(
-			TrashCapability.class);
-
-		FileEntry fileEntry = repository.getFileEntry(fileEntryId);
-
-		DLFileEntryPermission.check(
-			getPermissionChecker(), fileEntry, ActionKeys.DELETE);
-
-		return trashCapability.moveFileEntryToTrash(getUserId(), fileEntry);
-	}
-
-	/**
-	 * Moves the file shortcut from a trashed folder to the new folder.
-	 *
-	 * @param  fileShortcutId the primary key of the file shortcut
-	 * @param  newFolderId the primary key of the new folder
-	 * @param  serviceContext the service context to be applied
-	 * @return the file shortcut
-	 */
-	@Override
-	public FileShortcut moveFileShortcutFromTrash(
-			long fileShortcutId, long newFolderId,
-			ServiceContext serviceContext)
-		throws PortalException {
-
-		FileShortcut fileShortcut = getFileShortcut(fileShortcutId);
-
-		DLFileShortcutPermission.check(
-			getPermissionChecker(), fileShortcut, ActionKeys.UPDATE);
-
-		return dlAppHelperLocalService.moveFileShortcutFromTrash(
-			getUserId(), fileShortcut, newFolderId, serviceContext);
-	}
-
-	/**
-	 * Moves the file shortcut with the primary key to the trash portlet.
-	 *
-	 * @param  fileShortcutId the primary key of the file shortcut
-	 * @return the file shortcut
-	 */
-	@Override
-	public FileShortcut moveFileShortcutToTrash(long fileShortcutId)
-		throws PortalException {
-
-		Repository repository = getFileShortcutRepository(fileShortcutId);
-
-		TrashCapability trashCapability = repository.getCapability(
-			TrashCapability.class);
-
-		FileShortcut fileShortcut = repository.getFileShortcut(fileShortcutId);
-
-		DLFileShortcutPermission.check(
-			getPermissionChecker(), fileShortcut, ActionKeys.DELETE);
-
-		return trashCapability.moveFileShortcutToTrash(
-			getUserId(), fileShortcut);
 	}
 
 	/**
@@ -2212,7 +2115,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			long folderId, long parentFolderId, ServiceContext serviceContext)
 		throws PortalException {
 
-		Repository fromRepository = getFolderRepository(folderId);
+		Repository fromRepository = repositoryProvider.getFolderRepository(
+			folderId);
 		Repository toRepository = getFolderRepository(
 			parentFolderId, serviceContext.getScopeGroupId());
 
@@ -2235,64 +2139,9 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 
 		// Move file entries between repositories
 
-		return moveFolders(
+		return moveFolder(
 			folderId, parentFolderId, fromRepository, toRepository,
 			serviceContext);
-	}
-
-	/**
-	 * Moves the folder with the primary key from the trash portlet to the new
-	 * parent folder with the primary key.
-	 *
-	 * @param  folderId the primary key of the folder
-	 * @param  parentFolderId the primary key of the new parent folder
-	 * @param  serviceContext the service context to be applied
-	 * @return the file entry
-	 */
-	@Override
-	public Folder moveFolderFromTrash(
-			long folderId, long parentFolderId, ServiceContext serviceContext)
-		throws PortalException {
-
-		Repository repository = getFolderRepository(folderId);
-
-		TrashCapability trashCapability = repository.getCapability(
-			TrashCapability.class);
-
-		Folder folder = repository.getFolder(folderId);
-
-		DLFolderPermission.check(
-			getPermissionChecker(), folder, ActionKeys.UPDATE);
-
-		Folder destinationFolder = null;
-
-		if (parentFolderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-			destinationFolder = repository.getFolder(parentFolderId);
-		}
-
-		return trashCapability.moveFolderFromTrash(
-			getUserId(), folder, destinationFolder, serviceContext);
-	}
-
-	/**
-	 * Moves the folder with the primary key to the trash portlet.
-	 *
-	 * @param  folderId the primary key of the folder
-	 * @return the file entry
-	 */
-	@Override
-	public Folder moveFolderToTrash(long folderId) throws PortalException {
-		Repository repository = getFolderRepository(folderId);
-
-		TrashCapability trashCapability = repository.getCapability(
-			TrashCapability.class);
-
-		Folder folder = repository.getFolder(folderId);
-
-		DLFolderPermission.check(
-			getPermissionChecker(), folder, ActionKeys.DELETE);
-
-		return trashCapability.moveFolderToTrash(getUserId(), folder);
 	}
 
 	/**
@@ -2316,7 +2165,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 
 		long fileEntryId = GetterUtil.getLong(lock.getKey());
 
-		Repository repository = getFileEntryRepository(fileEntryId);
+		Repository repository = repositoryProvider.getFileEntryRepository(
+			fileEntryId);
 
 		return repository.refreshFileEntryLock(
 			lockUuid, companyId, expirationTime);
@@ -2343,70 +2193,11 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 
 		long folderId = GetterUtil.getLong(lock.getKey());
 
-		Repository repository = getFolderRepository(folderId);
+		Repository repository = repositoryProvider.getFolderRepository(
+			folderId);
 
 		return repository.refreshFolderLock(
 			lockUuid, companyId, expirationTime);
-	}
-
-	/**
-	 * Restores the file entry with the primary key from the trash portlet.
-	 *
-	 * @param fileEntryId the primary key of the file entry
-	 */
-	@Override
-	public void restoreFileEntryFromTrash(long fileEntryId)
-		throws PortalException {
-
-		Repository repository = getFileEntryRepository(fileEntryId);
-
-		TrashCapability trashCapability = repository.getCapability(
-			TrashCapability.class);
-
-		FileEntry fileEntry = repository.getFileEntry(fileEntryId);
-
-		DLFileEntryPermission.check(
-			getPermissionChecker(), fileEntry, ActionKeys.DELETE);
-
-		trashCapability.restoreFileEntryFromTrash(getUserId(), fileEntry);
-	}
-
-	/**
-	 * Restores the file shortcut with the primary key from the trash portlet.
-	 *
-	 * @param fileShortcutId the primary key of the file shortcut
-	 */
-	@Override
-	public void restoreFileShortcutFromTrash(long fileShortcutId)
-		throws PortalException {
-
-		FileShortcut fileShortcut = getFileShortcut(fileShortcutId);
-
-		DLFileShortcutPermission.check(
-			getPermissionChecker(), fileShortcut, ActionKeys.DELETE);
-
-		dlAppHelperLocalService.restoreFileShortcutFromTrash(
-			getUserId(), fileShortcut);
-	}
-
-	/**
-	 * Restores the folder with the primary key from the trash portlet.
-	 *
-	 * @param folderId the primary key of the folder
-	 */
-	@Override
-	public void restoreFolderFromTrash(long folderId) throws PortalException {
-		Repository repository = getFolderRepository(folderId);
-
-		TrashCapability trashCapability = repository.getCapability(
-			TrashCapability.class);
-
-		Folder folder = repository.getFolder(folderId);
-
-		DLFolderPermission.check(
-			getPermissionChecker(), folder, ActionKeys.DELETE);
-
-		trashCapability.restoreFolderFromTrash(getUserId(), folder);
 	}
 
 	/**
@@ -2422,7 +2213,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			long fileEntryId, String version, ServiceContext serviceContext)
 		throws PortalException {
 
-		Repository repository = getFileEntryRepository(fileEntryId);
+		Repository repository = repositoryProvider.getFileEntryRepository(
+			fileEntryId);
 
 		repository.revertFileEntry(
 			getUserId(), fileEntryId, version, serviceContext);
@@ -2464,6 +2256,11 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 		try {
 			Repository repository = getRepository(repositoryId);
 
+			PermissionChecker permissionChecker = getPermissionChecker();
+
+			searchContext.setCompanyId(permissionChecker.getCompanyId());
+			searchContext.setUserId(permissionChecker.getUserId());
+
 			return repository.search(searchContext);
 		}
 		catch (Exception e) {
@@ -2478,6 +2275,11 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 
 		try {
 			Repository repository = getRepository(repositoryId);
+
+			PermissionChecker permissionChecker = getPermissionChecker();
+
+			searchContext.setCompanyId(permissionChecker.getCompanyId());
+			searchContext.setUserId(permissionChecker.getUserId());
 
 			return repository.search(searchContext, query);
 		}
@@ -2519,29 +2321,6 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			getPermissionChecker(), groupId, folderId, ActionKeys.SUBSCRIBE);
 
 		dlAppLocalService.subscribeFolder(getUserId(), groupId, folderId);
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #checkInFileEntry(long,
-	 *             boolean, String, ServiceContext)}.
-	 */
-	@Deprecated
-	@Override
-	public void unlockFileEntry(long fileEntryId) throws PortalException {
-		checkInFileEntry(
-			fileEntryId, false, StringPool.BLANK, new ServiceContext());
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #checkInFileEntry(long,
-	 *             String)}.
-	 */
-	@Deprecated
-	@Override
-	public void unlockFileEntry(long fileEntryId, String lockUuid)
-		throws PortalException {
-
-		checkInFileEntry(fileEntryId, lockUuid);
 	}
 
 	/**
@@ -2721,7 +2500,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 
 		mimeType = DLAppUtil.getMimeType(sourceFileName, mimeType, title, file);
 
-		Repository repository = getFileEntryRepository(fileEntryId);
+		Repository repository = repositoryProvider.getFileEntryRepository(
+			fileEntryId);
 
 		FileEntry fileEntry = repository.updateFileEntry(
 			getUserId(), fileEntryId, sourceFileName, mimeType, title,
@@ -2805,7 +2585,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			}
 		}
 
-		Repository repository = getFileEntryRepository(fileEntryId);
+		Repository repository = repositoryProvider.getFileEntryRepository(
+			fileEntryId);
 
 		FileEntry fileEntry = repository.updateFileEntry(
 			getUserId(), fileEntryId, sourceFileName, mimeType, title,
@@ -2831,7 +2612,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 				changeLog, majorVersion, null, 0, serviceContext);
 		}
 
-		Repository repository = getFileEntryRepository(fileEntryId);
+		Repository repository = repositoryProvider.getFileEntryRepository(
+			fileEntryId);
 
 		FileEntry fileEntry = repository.updateFileEntry(
 			getUserId(), fileEntryId, sourceFileName, mimeType, title,
@@ -2855,7 +2637,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		Repository repository = getFileEntryRepository(fileEntryId);
+		Repository repository = repositoryProvider.getFileEntryRepository(
+			fileEntryId);
 
 		FileEntry fileEntry = repository.updateFileEntry(
 			getUserId(), fileEntryId, sourceFileName, mimeType, title,
@@ -2889,7 +2672,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		Repository repository = getFileShortcutRepository(fileShortcutId);
+		Repository repository = repositoryProvider.getFileShortcutRepository(
+			fileShortcutId);
 
 		return repository.updateFileShortcut(
 			getUserId(), fileShortcutId, folderId, toFileEntryId,
@@ -3009,6 +2793,8 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 		for (int i = fileVersions.size() - 2; i >= 0; i--) {
 			FileVersion fileVersion = fileVersions.get(i);
 
+			sourceFileName = DLAppUtil.getSourceFileName(fileVersion);
+
 			FileVersion previousFileVersion = fileVersions.get(i + 1);
 
 			try {
@@ -3037,6 +2823,38 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 		}
 
 		return destinationFileEntry;
+	}
+
+	protected Folder copyFolder(
+			long folderId, long parentFolderId, Repository fromRepository,
+			Repository toRepository, ServiceContext serviceContext)
+		throws PortalException {
+
+		Folder newFolder = null;
+
+		try {
+			Folder folder = fromRepository.getFolder(folderId);
+
+			newFolder = toRepository.addFolder(
+				getUserId(), parentFolderId, folder.getName(),
+				folder.getDescription(), serviceContext);
+
+			dlAppHelperLocalService.addFolder(
+				getUserId(), newFolder, serviceContext);
+
+			copyFolderDependencies(
+				folder, newFolder, fromRepository, toRepository,
+				serviceContext);
+
+			return newFolder;
+		}
+		catch (PortalException pe) {
+			if (newFolder != null) {
+				toRepository.deleteFolder(newFolder.getFolderId());
+			}
+
+			throw pe;
+		}
 	}
 
 	protected void copyFolder(
@@ -3111,6 +2929,52 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			});
 	}
 
+	protected void copyFolderDependencies(
+			Folder sourceFolder, Folder destinationFolder,
+			Repository fromRepository, Repository toRepository,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		List<RepositoryEntry> repositoryEntries =
+			fromRepository.getFoldersAndFileEntriesAndFileShortcuts(
+				sourceFolder.getFolderId(), WorkflowConstants.STATUS_ANY, true,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+		for (RepositoryEntry repositoryEntry : repositoryEntries) {
+			if (repositoryEntry instanceof FileEntry) {
+				FileEntry fileEntry = (FileEntry)repositoryEntry;
+
+				copyFileEntry(
+					toRepository, fileEntry, destinationFolder.getFolderId(),
+					serviceContext);
+			}
+			else if (repositoryEntry instanceof FileShortcut) {
+				if (destinationFolder.isSupportsShortcuts()) {
+					FileShortcut fileShortcut = (FileShortcut)repositoryEntry;
+
+					toRepository.addFileShortcut(
+						getUserId(), destinationFolder.getFolderId(),
+						fileShortcut.getToFileEntryId(), serviceContext);
+				}
+			}
+			else if (repositoryEntry instanceof Folder) {
+				Folder currentFolder = (Folder)repositoryEntry;
+
+				Folder newFolder = toRepository.addFolder(
+					getUserId(), destinationFolder.getFolderId(),
+					currentFolder.getName(), currentFolder.getDescription(),
+					serviceContext);
+
+				dlAppHelperLocalService.addFolder(
+					getUserId(), newFolder, serviceContext);
+
+				copyFolderDependencies(
+					currentFolder, newFolder, fromRepository, toRepository,
+					serviceContext);
+			}
+		}
+	}
+
 	protected void deleteFileEntry(
 			long oldFileEntryId, long newFileEntryId, Repository fromRepository,
 			Repository toRepository)
@@ -3155,76 +3019,6 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 		}
 	}
 
-	protected Repository getFileEntryRepository(long fileEntryId)
-		throws PortalException {
-
-		try {
-			return RepositoryProviderUtil.getFileEntryRepository(fileEntryId);
-		}
-		catch (InvalidRepositoryIdException irie) {
-			StringBundler sb = new StringBundler(3);
-
-			sb.append("No FileEntry exists with the key {fileEntryId=");
-			sb.append(fileEntryId);
-			sb.append("}");
-
-			throw new NoSuchFileEntryException(sb.toString(), irie);
-		}
-	}
-
-	protected Repository getFileShortcutRepository(long fileShortcutId)
-		throws PortalException {
-
-		try {
-			return RepositoryProviderUtil.getFileShortcutRepository(
-				fileShortcutId);
-		}
-		catch (InvalidRepositoryIdException irie) {
-			StringBundler sb = new StringBundler(3);
-
-			sb.append("No FileShortcut exists with the key {fileShortcutId=");
-			sb.append(fileShortcutId);
-			sb.append("}");
-
-			throw new NoSuchFileShortcutException(sb.toString(), irie);
-		}
-	}
-
-	protected Repository getFileVersionRepository(long fileVersionId)
-		throws PortalException {
-
-		try {
-			return RepositoryProviderUtil.getFileVersionRepository(
-				fileVersionId);
-		}
-		catch (InvalidRepositoryIdException irie) {
-			StringBundler sb = new StringBundler(3);
-
-			sb.append("No FileVersion exists with the key {fileVersionId=");
-			sb.append(fileVersionId);
-			sb.append("}");
-
-			throw new NoSuchFileVersionException(sb.toString(), irie);
-		}
-	}
-
-	protected Repository getFolderRepository(long folderId)
-		throws PortalException {
-
-		try {
-			return RepositoryProviderUtil.getFolderRepository(folderId);
-		}
-		catch (InvalidRepositoryIdException irie) {
-			StringBundler sb = new StringBundler(3);
-
-			sb.append("No Folder exists with the key {folderId=");
-			sb.append(folderId);
-			sb.append("}");
-
-			throw new NoSuchFolderException(sb.toString(), irie);
-		}
-	}
-
 	protected Repository getFolderRepository(long folderId, long groupId)
 		throws PortalException {
 
@@ -3232,14 +3026,14 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			return getRepository(groupId);
 		}
 
-		return getFolderRepository(folderId);
+		return repositoryProvider.getFolderRepository(folderId);
 	}
 
 	protected Repository getRepository(long repositoryId)
 		throws PortalException {
 
 		try {
-			return RepositoryProviderUtil.getRepository(repositoryId);
+			return repositoryProvider.getRepository(repositoryId);
 		}
 		catch (InvalidRepositoryIdException irie) {
 			StringBundler sb = new StringBundler(3);
@@ -3252,7 +3046,7 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 		}
 	}
 
-	protected FileEntry moveFileEntries(
+	protected FileEntry moveFileEntry(
 			long fileEntryId, long newFolderId, Repository fromRepository,
 			Repository toRepository, ServiceContext serviceContext)
 		throws PortalException {
@@ -3269,70 +3063,22 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 		return destinationFileEntry;
 	}
 
-	protected Folder moveFolders(
+	protected Folder moveFolder(
 			long folderId, long parentFolderId, Repository fromRepository,
 			Repository toRepository, ServiceContext serviceContext)
 		throws PortalException {
 
-		Folder folder = fromRepository.getFolder(folderId);
+		Folder newFolder = copyFolder(
+			folderId, parentFolderId, fromRepository, toRepository,
+			serviceContext);
 
-		Folder newFolder = toRepository.addFolder(
-			getUserId(), parentFolderId, folder.getName(),
-			folder.getDescription(), serviceContext);
-
-		dlAppHelperLocalService.addFolder(
-			getUserId(), newFolder, serviceContext);
-
-		List<RepositoryEntry> repositoryEntries =
-			fromRepository.getFoldersAndFileEntriesAndFileShortcuts(
-				folderId, WorkflowConstants.STATUS_ANY, true, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS, null);
-
-		try {
-			for (RepositoryEntry repositoryEntry : repositoryEntries) {
-				if (repositoryEntry instanceof FileEntry) {
-					FileEntry fileEntry = (FileEntry)repositoryEntry;
-
-					copyFileEntry(
-						toRepository, fileEntry, newFolder.getFolderId(),
-						serviceContext);
-				}
-				else if (repositoryEntry instanceof Folder) {
-					Folder currentFolder = (Folder)repositoryEntry;
-
-					moveFolders(
-						currentFolder.getFolderId(), newFolder.getFolderId(),
-						fromRepository, toRepository, serviceContext);
-				}
-				else if (repositoryEntry instanceof FileShortcut) {
-					if (newFolder.isSupportsShortcuts()) {
-						FileShortcut fileShortcut =
-							(FileShortcut)repositoryEntry;
-
-						toRepository.addFileShortcut(
-							getUserId(), newFolder.getFolderId(),
-							fileShortcut.getToFileEntryId(), serviceContext);
-					}
-				}
-			}
-		}
-		catch (PortalException pe) {
-			toRepository.deleteFolder(newFolder.getFolderId());
-
-			throw pe;
-		}
-
-		try {
-			fromRepository.deleteFolder(folderId);
-		}
-		catch (PortalException pe) {
-			toRepository.deleteFolder(newFolder.getFolderId());
-
-			throw pe;
-		}
+		fromRepository.deleteFolder(folderId);
 
 		return newFolder;
 	}
+
+	@BeanReference(type = RepositoryProvider.class)
+	protected RepositoryProvider repositoryProvider;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DLAppServiceImpl.class);

@@ -14,8 +14,7 @@
 
 package com.liferay.gradle.plugins.node;
 
-import com.liferay.gradle.util.FileUtil;
-import com.liferay.gradle.util.GradleUtil;
+import com.liferay.gradle.plugins.node.util.GradleUtil;
 import com.liferay.gradle.util.OSDetector;
 import com.liferay.gradle.util.Validator;
 
@@ -35,11 +34,56 @@ import org.gradle.util.GUtil;
 public class NodeExtension {
 
 	public NodeExtension(final Project project) {
+		_download = GradleUtil.getProperty(project, "nodeDownload", true);
+
 		_nodeDir = new Callable<File>() {
 
 			@Override
 			public File call() throws Exception {
-				return new File(project.getBuildDir(), "node");
+				Project curProject = project;
+
+				if (isGlobal()) {
+					curProject = curProject.getRootProject();
+				}
+
+				return new File(curProject.getBuildDir(), "node");
+			}
+
+		};
+
+		_nodeExeUrl = new Callable<String>() {
+
+			@Override
+			public String call() throws Exception {
+				String nodeVersion = getNodeVersion();
+
+				if (Validator.isNull(nodeVersion)) {
+					return null;
+				}
+
+				StringBuilder sb = new StringBuilder();
+
+				sb.append("http://nodejs.org/dist/v");
+				sb.append(nodeVersion);
+				sb.append('/');
+
+				String bitmode = OSDetector.getBitmode();
+
+				if (bitmode.equals("64")) {
+					if (nodeVersion.charAt(0) != '0') {
+						sb.append("win-x64");
+					}
+					else {
+						sb.append("x64");
+					}
+				}
+				else if (nodeVersion.charAt(0) != '0') {
+					sb.append("win-x86");
+				}
+
+				sb.append("/node.exe");
+
+				return sb.toString();
 			}
 
 		};
@@ -58,75 +102,42 @@ public class NodeExtension {
 
 				sb.append("http://nodejs.org/dist/v");
 				sb.append(nodeVersion);
-				sb.append('/');
+				sb.append("/node-v");
+				sb.append(nodeVersion);
+				sb.append('-');
+
+				String os = "linux";
+
+				if (OSDetector.isApple()) {
+					os = "darwin";
+				}
+
+				sb.append(os);
+				sb.append("-x");
 
 				String bitmode = OSDetector.getBitmode();
 
-				if (OSDetector.isWindows()) {
-					if (bitmode.equals("64")) {
-						sb.append("x64/");
-					}
-
-					sb.append("node.exe");
+				if (bitmode.equals("32") || OSDetector.isWindows()) {
+					bitmode = "86";
 				}
-				else {
-					sb.append("/node-v");
-					sb.append(nodeVersion);
-					sb.append('-');
 
-					String os = "linux";
-
-					if (OSDetector.isApple()) {
-						os = "darwin";
-					}
-
-					sb.append(os);
-					sb.append("-x");
-
-					if (bitmode.equals("32")) {
-						bitmode = "86";
-					}
-
-					sb.append(bitmode);
-					sb.append(".tar.gz");
-				}
+				sb.append(bitmode);
+				sb.append(".tar.gz");
 
 				return sb.toString();
 			}
 
 		};
 
-		_npmUrl = new Callable<String>() {
-
-			@Override
-			public String call() throws Exception {
-				String npmVersion = getNpmVersion();
-
-				if (Validator.isNull(npmVersion)) {
-					return null;
-				}
-
-				return "http://nodejs.org/dist/npm/npm-" + npmVersion + ".zip";
-			}
-
-		};
-
 		_project = project;
-
-		setNpmArgs(
-			"--cache",
-			new Callable<String>() {
-
-				@Override
-				public String call() throws Exception {
-					return FileUtil.getAbsolutePath(getNpmCacheDir());
-				}
-
-			});
 	}
 
 	public File getNodeDir() {
 		return GradleUtil.toFile(_project, _nodeDir);
+	}
+
+	public String getNodeExeUrl() {
+		return GradleUtil.toString(_nodeExeUrl);
 	}
 
 	public String getNodeUrl() {
@@ -141,12 +152,12 @@ public class NodeExtension {
 		return GradleUtil.toStringList(_npmArgs);
 	}
 
-	public String getNpmUrl() {
-		return GradleUtil.toString(_npmUrl);
+	public boolean isDownload() {
+		return _download;
 	}
 
-	public String getNpmVersion() {
-		return GradleUtil.toString(_npmVersion);
+	public boolean isGlobal() {
+		return _global;
 	}
 
 	public NodeExtension npmArgs(Iterable<?> npmArgs) {
@@ -155,12 +166,24 @@ public class NodeExtension {
 		return this;
 	}
 
-	public NodeExtension npmArgs(Object ... npmArgs) {
+	public NodeExtension npmArgs(Object... npmArgs) {
 		return npmArgs(Arrays.asList(npmArgs));
+	}
+
+	public void setDownload(boolean download) {
+		_download = download;
+	}
+
+	public void setGlobal(boolean global) {
+		_global = global;
 	}
 
 	public void setNodeDir(Object nodeDir) {
 		_nodeDir = nodeDir;
+	}
+
+	public void setNodeExeUrl(Object nodeExeUrl) {
+		_nodeExeUrl = nodeExeUrl;
 	}
 
 	public void setNodeUrl(Object nodeUrl) {
@@ -177,28 +200,17 @@ public class NodeExtension {
 		npmArgs(npmArgs);
 	}
 
-	public void setNpmArgs(Object ... npmArgs) {
+	public void setNpmArgs(Object... npmArgs) {
 		setNpmArgs(Arrays.asList(npmArgs));
 	}
 
-	public void setNpmUrl(Object npmUrl) {
-		_npmUrl = npmUrl;
-	}
-
-	public void setNpmVersion(Object npmVersion) {
-		_npmVersion = npmVersion;
-	}
-
-	protected File getNpmCacheDir() {
-		return new File(getNodeDir(), ".cache");
-	}
-
+	private boolean _download;
+	private boolean _global;
 	private Object _nodeDir;
+	private Object _nodeExeUrl;
 	private Object _nodeUrl;
-	private Object _nodeVersion = "0.12.6";
+	private Object _nodeVersion = "5.5.0";
 	private final List<Object> _npmArgs = new ArrayList<>();
-	private Object _npmUrl;
-	private Object _npmVersion = "1.4.9";
 	private final Project _project;
 
 }

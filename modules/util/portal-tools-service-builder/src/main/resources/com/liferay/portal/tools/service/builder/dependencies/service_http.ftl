@@ -1,24 +1,24 @@
 package ${packagePath}.service.http;
 
 <#if hasHttpMethods>
-	import ${packagePath}.service.${entity.name}ServiceUtil;
+	import ${apiPackagePath}.service.${entity.name}ServiceUtil;
 </#if>
 
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.auth.HttpPrincipal;
+import com.liferay.portal.kernel.service.http.TunnelUtil;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
-import com.liferay.portal.security.auth.HttpPrincipal;
-import com.liferay.portal.service.http.TunnelUtil;
 
 /**
  * Provides the HTTP utility for the
- * {@link ${packagePath}.service.${entity.name}ServiceUtil} service utility. The
+ * {@link ${apiPackagePath}.service.${entity.name}ServiceUtil} service utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it requires an additional
- * {@link com.liferay.portal.security.auth.HttpPrincipal} parameter.
+ * {@link com.liferay.portal.kernel.security.auth.HttpPrincipal} parameter.
  *
  * <p>
  * The benefits of using the HTTP utility is that it is fast and allows for
@@ -37,8 +37,8 @@ import com.liferay.portal.service.http.TunnelUtil;
  *
  * @author ${author}
  * @see ${entity.name}ServiceSoap
- * @see com.liferay.portal.security.auth.HttpPrincipal
- * @see ${packagePath}.service.${entity.name}ServiceUtil
+ * @see com.liferay.portal.kernel.security.auth.HttpPrincipal
+ * @see ${apiPackagePath}.service.${entity.name}ServiceUtil
 <#if classDeprecated>
  * @deprecated ${classDeprecatedComment}
 </#if>
@@ -52,14 +52,16 @@ import com.liferay.portal.service.http.TunnelUtil;
 @ProviderType
 public class ${entity.name}ServiceHttp {
 
-	<#assign hasMethods = false>
+	<#assign hasMethods = false />
 
 	<#list methods as method>
 		<#if !method.isConstructor() && method.isPublic() && serviceBuilder.isCustomMethod(method)>
-			<#assign hasMethods = true>
+			<#assign
+				hasMethods = true
 
-			<#assign returnTypeName = serviceBuilder.getTypeGenericsName(method.returns)>
-			<#assign parameters = method.parameters>
+				returnTypeName = serviceBuilder.getTypeGenericsName(method.returns)
+				parameters = method.parameters
+			/>
 
 			public static ${returnTypeName} ${method.name} (HttpPrincipal httpPrincipal
 
@@ -149,7 +151,7 @@ public class ${entity.name}ServiceHttp {
 
 	<#list methods as method>
 		<#if !method.isConstructor() && method.isPublic() && serviceBuilder.isCustomMethod(method)>
-			<#assign parameters = method.parameters>
+			<#assign parameters = method.parameters />
 
 			private static final Class<?>[] _${method.name}ParameterTypes${method_index} = new Class[] {
 
