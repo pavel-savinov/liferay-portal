@@ -25,7 +25,7 @@ import com.liferay.dynamic.data.mapping.test.util.DDMTemplateTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.search.TestOrderHelper;
 import com.liferay.dynamic.data.mapping.util.DDMIndexer;
 import com.liferay.dynamic.data.mapping.util.DDMUtil;
-import com.liferay.journal.configuration.JournalServiceConfigurationValues;
+import com.liferay.journal.configuration.JournalServiceConfiguration;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleConstants;
 import com.liferay.journal.model.JournalFolder;
@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.ClassedModel;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.IndexSearcherHelperUtil;
@@ -94,6 +95,11 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 	@Before
 	@Override
 	public void setUp() throws Exception {
+		_journalServiceConfiguration =
+			ConfigurationProviderUtil.getCompanyConfiguration(
+				JournalServiceConfiguration.class,
+				TestPropsValues.getCompanyId());
+
 		ServiceTestUtil.setUser(TestPropsValues.getUser());
 
 		super.setUp();
@@ -425,14 +431,13 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 
 	@Override
 	protected boolean isCheckBaseModelPermission() {
-		return JournalServiceConfigurationValues.
-			JOURNAL_ARTICLE_VIEW_PERMISSION_CHECK_ENABLED;
+		return
+			_journalServiceConfiguration.articleViewPermissionsCheckEnabled();
 	}
 
 	@Override
 	protected boolean isExpirableAllVersions() {
-		return JournalServiceConfigurationValues.
-			JOURNAL_ARTICLE_EXPIRE_ALL_VERSIONS;
+		return _journalServiceConfiguration.expireAllArticleVersionsEnabled();
 	}
 
 	@Override
@@ -574,5 +579,6 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 
 	private DDMIndexer _ddmIndexer;
 	private DDMStructure _ddmStructure;
+	private JournalServiceConfiguration _journalServiceConfiguration;
 
 }

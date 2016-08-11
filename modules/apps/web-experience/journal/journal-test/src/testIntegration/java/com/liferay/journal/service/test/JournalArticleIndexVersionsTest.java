@@ -15,9 +15,6 @@
 package com.liferay.journal.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.journal.configuration.JournalServiceConfigurationKeys;
-import com.liferay.journal.configuration.JournalServiceConfigurationUtil;
-import com.liferay.journal.configuration.JournalServiceConfigurationValues;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalFolderConstants;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
@@ -39,7 +36,6 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.SearchContextTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.service.test.ServiceTestUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -48,7 +44,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -72,21 +67,9 @@ public class JournalArticleIndexVersionsTest {
 
 	@Before
 	public void setUp() throws Exception {
-		JournalServiceConfigurationValues.JOURNAL_ARTICLE_INDEX_ALL_VERSIONS =
-			false;
-
 		_group = GroupTestUtil.addGroup();
 
 		ServiceTestUtil.setUser(TestPropsValues.getUser());
-	}
-
-	@After
-	public void tearDown() {
-		JournalServiceConfigurationValues.JOURNAL_ARTICLE_INDEX_ALL_VERSIONS =
-			GetterUtil.getBoolean(
-				JournalServiceConfigurationUtil.get(
-					JournalServiceConfigurationKeys.
-						JOURNAL_ARTICLE_INDEX_ALL_VERSIONS));
 	}
 
 	@Test
