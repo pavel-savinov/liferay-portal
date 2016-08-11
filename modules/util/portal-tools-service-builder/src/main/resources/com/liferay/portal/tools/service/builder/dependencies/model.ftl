@@ -1,35 +1,35 @@
-package ${packagePath}.model;
+package ${apiPackagePath}.model;
 
 <#if entity.hasCompoundPK()>
-	import ${packagePath}.service.persistence.${entity.name}PK;
+	import ${apiPackagePath}.service.persistence.${entity.name}PK;
 </#if>
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.LocaleException;
+import com.liferay.expando.kernel.model.ExpandoBridge;
+import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.portal.kernel.bean.AutoEscape;
+import com.liferay.portal.kernel.exception.LocaleException;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.AttachedModel;
+import com.liferay.portal.kernel.model.AuditedModel;
+import com.liferay.portal.kernel.model.BaseModel;
+import com.liferay.portal.kernel.model.CacheModel;
+import com.liferay.portal.kernel.model.ContainerModel;
+import com.liferay.portal.kernel.model.GroupedModel;
+import com.liferay.portal.kernel.model.LocalizedModel;
+import com.liferay.portal.kernel.model.MVCCModel;
+import com.liferay.portal.kernel.model.ResourcedModel;
+import com.liferay.portal.kernel.model.ShardedModel;
+import com.liferay.portal.kernel.model.StagedAuditedModel;
+import com.liferay.portal.kernel.model.StagedGroupedModel;
+import com.liferay.portal.kernel.model.StagedModel;
+import com.liferay.portal.kernel.model.TrashedModel;
+import com.liferay.portal.kernel.model.TypedModel;
+import com.liferay.portal.kernel.model.WorkflowedModel;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.trash.TrashHandler;
-import com.liferay.portal.model.AttachedModel;
-import com.liferay.portal.model.AuditedModel;
-import com.liferay.portal.model.BaseModel;
-import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.model.ContainerModel;
-import com.liferay.portal.model.GroupedModel;
-import com.liferay.portal.model.LocalizedModel;
-import com.liferay.portal.model.MVCCModel;
-import com.liferay.portal.model.ResourcedModel;
-import com.liferay.portal.model.ShardedModel;
-import com.liferay.portal.model.TrashedModel;
-import com.liferay.portal.model.TypedModel;
-import com.liferay.portal.model.StagedAuditedModel;
-import com.liferay.portal.model.StagedGroupedModel;
-import com.liferay.portal.model.StagedModel;
-import com.liferay.portal.model.WorkflowedModel;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portlet.expando.model.ExpandoBridge;
-import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
-import com.liferay.portlet.trash.model.TrashEntry;
+import com.liferay.trash.kernel.model.TrashEntry;
 
 import java.io.Serializable;
 
@@ -62,18 +62,18 @@ import java.util.Map;
 
 @ProviderType
 public interface ${entity.name}Model extends
-	<#assign overrideColumnNames = []>
+	<#assign overrideColumnNames = [] />
 
 	<#if entity.isAttachedModel()>
 		AttachedModel,
 
-		<#assign overrideColumnNames = overrideColumnNames + ["className", "classNameId", "classPK"]>
+		<#assign overrideColumnNames = overrideColumnNames + ["className", "classNameId", "classPK"] />
 	</#if>
 
 	<#if entity.isAuditedModel() && !entity.isGroupedModel() && !entity.isStagedAuditedModel()>
 		AuditedModel,
 
-		<#assign overrideColumnNames = overrideColumnNames + ["companyId", "createDate", "modifiedDate", "userId", "userName", "userUuid"]>
+		<#assign overrideColumnNames = overrideColumnNames + ["companyId", "createDate", "modifiedDate", "userId", "userName", "userUuid"] />
 	</#if>
 
 	BaseModel<${entity.name}>
@@ -85,7 +85,7 @@ public interface ${entity.name}Model extends
 	<#if entity.isGroupedModel() && !entity.isStagedGroupedModel()>
 		, GroupedModel
 
-		<#assign overrideColumnNames = overrideColumnNames + ["companyId", "createDate", "groupId", "modifiedDate", "userId", "userName", "userUuid"]>
+		<#assign overrideColumnNames = overrideColumnNames + ["companyId", "createDate", "groupId", "modifiedDate", "userId", "userName", "userUuid"] />
 	</#if>
 
 	<#if entity.isLocalizedModel()>
@@ -95,55 +95,55 @@ public interface ${entity.name}Model extends
 	<#if entity.isMvccEnabled()>
 		, MVCCModel
 
-		<#assign overrideColumnNames = overrideColumnNames + ["mvccVersion"]>
+		<#assign overrideColumnNames = overrideColumnNames + ["mvccVersion"] />
 	</#if>
 
 	<#if entity.isResourcedModel()>
 		, ResourcedModel
 
-		<#assign overrideColumnNames = overrideColumnNames + ["resourcePrimKey"]>
+		<#assign overrideColumnNames = overrideColumnNames + ["resourcePrimKey"] />
 	</#if>
 
 	<#if entity.isShardedModel()>
 		, ShardedModel
 
-		<#assign overrideColumnNames = overrideColumnNames + ["companyId"]>
+		<#assign overrideColumnNames = overrideColumnNames + ["companyId"] />
 	</#if>
 
 	<#if entity.isStagedGroupedModel()>
 		, StagedGroupedModel
 
-		<#assign overrideColumnNames = overrideColumnNames + ["companyId", "createDate", "groupId", "lastPublishDate", "modifiedDate", "stagedModelType", "userId", "userName", "userUuid", "uuid"]>
+		<#assign overrideColumnNames = overrideColumnNames + ["companyId", "createDate", "groupId", "lastPublishDate", "modifiedDate", "stagedModelType", "userId", "userName", "userUuid", "uuid"] />
 	</#if>
 
 	<#if entity.isStagedAuditedModel() && !entity.isStagedGroupedModel()>
 		, StagedAuditedModel
 
-		<#assign overrideColumnNames = overrideColumnNames + ["companyId", "createDate", "modifiedDate", "stagedModelType", "userId", "userName", "userUuid", "uuid"]>
+		<#assign overrideColumnNames = overrideColumnNames + ["companyId", "createDate", "modifiedDate", "stagedModelType", "userId", "userName", "userUuid", "uuid"] />
 	</#if>
 
 	<#if !entity.isStagedAuditedModel() && !entity.isStagedGroupedModel() && entity.isStagedModel()>
 		, StagedModel
 
-		<#assign overrideColumnNames = overrideColumnNames + ["companyId", "createDate", "modifiedDate", "stagedModelType", "uuid"]>
+		<#assign overrideColumnNames = overrideColumnNames + ["companyId", "createDate", "modifiedDate", "stagedModelType", "uuid"] />
 	</#if>
 
 	<#if entity.isTrashEnabled()>
 		, TrashedModel
 
-		<#assign overrideColumnNames = overrideColumnNames + ["status"]>
+		<#assign overrideColumnNames = overrideColumnNames + ["status"] />
 	</#if>
 
 	<#if entity.isTypedModel() && !entity.isAttachedModel()>
 		, TypedModel
 
-		<#assign overrideColumnNames = overrideColumnNames + ["className", "classNameId"]>
+		<#assign overrideColumnNames = overrideColumnNames + ["className", "classNameId"] />
 	</#if>
 
 	<#if entity.isWorkflowEnabled()>
 		, WorkflowedModel
 
-		<#assign overrideColumnNames = overrideColumnNames + ["status", "statusByUserId", "statusByUserName", "statusByUserUuid", "statusDate"]>
+		<#assign overrideColumnNames = overrideColumnNames + ["status", "statusByUserId", "statusByUserName", "statusByUserUuid", "statusDate"] />
 	</#if>
 
 	{
@@ -185,18 +185,20 @@ public interface ${entity.name}Model extends
 			public void setClassName(String className);
 		</#if>
 
-		<#assign autoEscape = true>
+		<#assign
+			autoEscape = true
 
-		<#assign modelName = packagePath + ".model." + entity.name>
+			modelName = apiPackagePath + ".model." + entity.name
+		/>
 
 		<#if modelHintsUtil.getHints(modelName, column.name)??>
-			<#assign hints = modelHintsUtil.getHints(modelName, column.name)>
+			<#assign hints = modelHintsUtil.getHints(modelName, column.name) />
 
 			<#if hints["auto-escape"]??>
-				<#assign autoEscapeHintValue = hints["auto-escape"]>
+				<#assign autoEscapeHintValue = hints["auto-escape"] />
 
 				<#if autoEscapeHintValue == "false">
-					<#assign autoEscape = false>
+					<#assign autoEscape = false />
 				</#if>
 			</#if>
 		</#if>
@@ -421,13 +423,6 @@ public interface ${entity.name}Model extends
 
 	<#if entity.isWorkflowEnabled()>
 		/**
-		 * @deprecated As of 6.1.0, replaced by {@link #isApproved()}
-		 */
-		@Deprecated
-		@Override
-		public boolean getApproved();
-
-		/**
 		 * Returns <code>true</code> if this ${entity.humanName} is approved.
 		 *
 		 * @return <code>true</code> if this ${entity.humanName} is approved; <code>false</code> otherwise
@@ -539,7 +534,7 @@ public interface ${entity.name}Model extends
 	</#if>
 
 	<#--
-	Copy methods from com.liferay.portal.model.BaseModel and java.lang.Object to
+	Copy methods from com.liferay.portal.kernel.model.BaseModel and java.lang.Object to
 	correctly generate wrappers.
 	-->
 
@@ -594,19 +589,19 @@ public interface ${entity.name}Model extends
 	public Object clone();
 
 	@Override
-	public int compareTo(${packagePath}.model.${entity.name} ${entity.varName});
+	public int compareTo(${apiPackagePath}.model.${entity.name} ${entity.varName});
 
 	@Override
 	public int hashCode();
 
 	@Override
-	public CacheModel<${packagePath}.model.${entity.name}> toCacheModel();
+	public CacheModel<${apiPackagePath}.model.${entity.name}> toCacheModel();
 
 	@Override
-	public ${packagePath}.model.${entity.name} toEscapedModel();
+	public ${apiPackagePath}.model.${entity.name} toEscapedModel();
 
 	@Override
-	public ${packagePath}.model.${entity.name} toUnescapedModel();
+	public ${apiPackagePath}.model.${entity.name} toUnescapedModel();
 
 	@Override
 	public String toString();

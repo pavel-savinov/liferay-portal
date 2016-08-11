@@ -14,6 +14,8 @@
 
 package com.liferay.portal.model.adapter.builder;
 
+import com.liferay.portal.kernel.model.adapter.builder.ModelAdapterBuilder;
+import com.liferay.portal.kernel.model.adapter.builder.ModelAdapterBuilderLocator;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.registry.Registry;
@@ -44,10 +46,10 @@ public class ServiceTrackerMapModelAdapterBuilderLocator
 		Class<T> adapteeModelClass, Class<V> adaptedModelClass) {
 
 		return _modelAdapterBuilders.getService(
-			getKey(adapteeModelClass, adaptedModelClass));
+			_getKey(adapteeModelClass, adaptedModelClass));
 	}
 
-	private <T, V> String getKey(
+	private <T, V> String _getKey(
 		Class<T> adapteeModelClass, Class<V> adaptedModelClass) {
 
 		return adapteeModelClass.getName() + "->" + adaptedModelClass.getName();
@@ -95,7 +97,7 @@ public class ServiceTrackerMapModelAdapterBuilderLocator
 						Class adaptedModelClass = (Class)typeArguments[1];
 
 						emitter.emit(
-							getKey(adapteeModelClass, adaptedModelClass));
+							_getKey(adapteeModelClass, adaptedModelClass));
 					}
 					catch (ClassCastException cce) {
 						return;
