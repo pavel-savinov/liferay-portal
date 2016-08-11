@@ -18,14 +18,20 @@ import com.liferay.poshi.runner.PoshiRunnerContext;
 import com.liferay.poshi.runner.PoshiRunnerGetterUtil;
 import com.liferay.poshi.runner.PoshiRunnerStackTraceUtil;
 import com.liferay.poshi.runner.PoshiRunnerVariablesUtil;
+import com.liferay.poshi.runner.exception.PoshiRunnerLoggerException;
 import com.liferay.poshi.runner.selenium.LiferaySeleniumHelper;
+import com.liferay.poshi.runner.selenium.WebDriverHelper;
+import com.liferay.poshi.runner.selenium.WebDriverUtil;
 import com.liferay.poshi.runner.util.HtmlUtil;
 import com.liferay.poshi.runner.util.StringUtil;
 import com.liferay.poshi.runner.util.Validator;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.dom4j.Element;
+
+import org.openqa.selenium.WebDriver;
 
 /**
  * @author Michael Hashimoto
@@ -33,19 +39,27 @@ import org.dom4j.Element;
  */
 public final class CommandLoggerHandler {
 
-	public static void failCommand(Element element) throws Exception {
+	public static void failCommand(Element element)
+		throws PoshiRunnerLoggerException {
+
 		if (!_isCurrentCommand(element)) {
 			return;
 		}
 
-		_commandElement = null;
+		try {
+			_commandElement = null;
 
-		_failLineGroupLoggerElement(_lineGroupLoggerElement);
+			_failLineGroupLoggerElement(_lineGroupLoggerElement);
 
-		LoggerElement xmlLoggerElement = XMLLoggerHandler.getXMLLoggerElement(
-			PoshiRunnerStackTraceUtil.getSimpleStackTrace());
+			LoggerElement xmlLoggerElement =
+				XMLLoggerHandler.getXMLLoggerElement(
+					PoshiRunnerStackTraceUtil.getSimpleStackTrace());
 
-		_updateStatus(xmlLoggerElement, "fail");
+			_updateStatus(xmlLoggerElement, "fail");
+		}
+		catch (Throwable t) {
+			throw new PoshiRunnerLoggerException(t.getMessage(), t);
+		}
 	}
 
 	public static String getCommandLogText() {
@@ -64,8 +78,19 @@ public final class CommandLoggerHandler {
 			dividerLineLoggerElement);
 	}
 
-	public static void logMessage(Element element) throws Exception {
-		_lineGroupLoggerElement = _getMessageGroupLoggerElement(element);
+	public static void logExternalMethodCommand(
+			Element element, List<String> arguments, String returnValue)
+		throws Exception {
+
+		LoggerElement loggerElement = new LoggerElement();
+
+		loggerElement.setClassName("line-group linkable");
+		loggerElement.setName("li");
+		loggerElement.addChildLoggerElement(
+			_getExternalMethodLineLoggerElement(
+				element, arguments, returnValue));
+
+		_lineGroupLoggerElement = loggerElement;
 
 		_commandLogLoggerElement.addChildLoggerElement(_lineGroupLoggerElement);
 
@@ -73,8 +98,28 @@ public final class CommandLoggerHandler {
 			PoshiRunnerStackTraceUtil.getSimpleStackTrace());
 
 		_linkLoggerElements(xmlLoggerElement);
+	}
 
-		_updateStatus(xmlLoggerElement, "pass");
+	public static void logMessage(Element element)
+		throws PoshiRunnerLoggerException {
+
+		try {
+			_lineGroupLoggerElement = _getMessageGroupLoggerElement(element);
+
+			_commandLogLoggerElement.addChildLoggerElement(
+				_lineGroupLoggerElement);
+
+			LoggerElement xmlLoggerElement =
+				XMLLoggerHandler.getXMLLoggerElement(
+					PoshiRunnerStackTraceUtil.getSimpleStackTrace());
+
+			_linkLoggerElements(xmlLoggerElement);
+
+			_updateStatus(xmlLoggerElement, "pass");
+		}
+		catch (Throwable t) {
+			throw new PoshiRunnerLoggerException(t.getMessage(), t);
+		}
 	}
 
 	public static void logSeleniumCommand(
@@ -100,46 +145,70 @@ public final class CommandLoggerHandler {
 		_updateStatus(xmlLoggerElement, "pass");
 	}
 
-	public static void startCommand(Element element) throws Exception {
+	public static void startCommand(Element element)
+		throws PoshiRunnerLoggerException {
+
 		if (!_isCommand(element)) {
 			return;
 		}
 
-		_takeScreenshot("before", _errorLinkId);
+		try {
+			_takeScreenshot("before", _errorLinkId);
 
-		_commandElement = element;
+			_commandElement = element;
 
-		_lineGroupLoggerElement = _getLineGroupLoggerElement(element);
+			_lineGroupLoggerElement = _getLineGroupLoggerElement(element);
 
-		_commandLogLoggerElement.addChildLoggerElement(_lineGroupLoggerElement);
+			_commandLogLoggerElement.addChildLoggerElement(
+				_lineGroupLoggerElement);
 
-		LoggerElement xmlLoggerElement = XMLLoggerHandler.getXMLLoggerElement(
-			PoshiRunnerStackTraceUtil.getSimpleStackTrace());
+			LoggerElement xmlLoggerElement =
+				XMLLoggerHandler.getXMLLoggerElement(
+					PoshiRunnerStackTraceUtil.getSimpleStackTrace());
 
-		_linkLoggerElements(xmlLoggerElement);
+			_linkLoggerElements(xmlLoggerElement);
 
-		_updateStatus(xmlLoggerElement, "pending");
+			_updateStatus(xmlLoggerElement, "pending");
+		}
+		catch (Throwable t) {
+			throw new PoshiRunnerLoggerException(t.getMessage(), t);
+		}
 	}
 
-	public static void startRunning() throws Exception {
+	public static void startRunning() {
 		_commandLogLoggerElement = new LoggerElement("commandLog");
 
 		_commandLogLoggerElement.setAttribute("data-logid", "01");
-		_commandLogLoggerElement.setClassName("collapse command-log");
+		_commandLogLoggerElement.setClassName("collapse command-log running");
 		_commandLogLoggerElement.setName("ul");
 		_commandLogLoggerElement.setWrittenToLogger(true);
-
-		_xmlLogLoggerElement.addClassName("running");
 	}
 
-	public static void stopRunning() throws Exception {
-		_xmlLogLoggerElement.removeClassName("running");
-
-		_commandLogLoggerElement = null;
+	public static void stopRunning() {
+		_commandLogLoggerElement.removeClassName("running");
 	}
 
-	public static void warnCommand(Element element) throws Exception {
-		failCommand(element);
+	public static void warnCommand(Element element)
+		throws PoshiRunnerLoggerException {
+
+		if (!_isCurrentCommand(element)) {
+			return;
+		}
+
+		try {
+			_commandElement = null;
+
+			_warningLineGroupLoggerElement(_lineGroupLoggerElement);
+
+			LoggerElement xmlLoggerElement =
+				XMLLoggerHandler.getXMLLoggerElement(
+					PoshiRunnerStackTraceUtil.getSimpleStackTrace());
+
+			_updateStatus(xmlLoggerElement, "warning");
+		}
+		catch (Throwable t) {
+			throw new PoshiRunnerLoggerException(t.getMessage(), t);
+		}
 	}
 
 	private static void _failLineGroupLoggerElement(
@@ -226,6 +295,50 @@ public final class CommandLoggerHandler {
 		_errorLinkId++;
 
 		return loggerElement;
+	}
+
+	private static LoggerElement _getExternalMethodLineLoggerElement(
+			Element element, List<String> arguments, String returnValue)
+		throws Exception {
+
+		LoggerElement loggerElement = new LoggerElement();
+
+		loggerElement.setClassName("line-container");
+		loggerElement.setText(
+			_getExternalMethodLineText(element, arguments, returnValue));
+
+		return loggerElement;
+	}
+
+	private static String _getExternalMethodLineText(
+			Element element, List<String> arguments, String returnValue)
+		throws Exception {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(_getLineItemText("misc", "Running "));
+		sb.append(
+			_getLineItemText("command-name", element.attributeValue("method")));
+
+		if (!arguments.isEmpty()) {
+			sb.append(_getLineItemText("misc", " with parameters"));
+
+			for (String argument : arguments) {
+				argument = "Arg: " + argument;
+
+				sb.append(
+					_getLineItemText("param-value", HtmlUtil.escape(argument)));
+			}
+		}
+
+		if (returnValue != null) {
+			returnValue = "Return: " + returnValue;
+
+			sb.append(
+				_getLineItemText("param-value", HtmlUtil.escape(returnValue)));
+		}
+
+		return sb.toString();
 	}
 
 	private static LoggerElement _getLineContainerLoggerElement(Element element)
@@ -464,8 +577,8 @@ public final class CommandLoggerHandler {
 	}
 
 	private static boolean _isCommand(Element element) {
-		if (!Validator.equals(element.getName(), "condition") &&
-			!Validator.equals(element.getName(), "execute")) {
+		if (!Objects.equals(element.getName(), "condition") &&
+			!Objects.equals(element.getName(), "execute")) {
 
 			return false;
 		}
@@ -486,7 +599,7 @@ public final class CommandLoggerHandler {
 	}
 
 	private static boolean _isFail(Element element) {
-		return Validator.equals(
+		return Objects.equals(
 			StringUtil.toLowerCase(element.getName()), "fail");
 	}
 
@@ -505,6 +618,12 @@ public final class CommandLoggerHandler {
 			"data-functionlinkid", "functionLinkId-" + _functionLinkId);
 
 		_functionLinkId++;
+	}
+
+	private static void _setHTMLSource() throws Exception {
+		WebDriver webDriver = WebDriverUtil.getWebDriver();
+
+		_htmlSource = webDriver.getPageSource();
 	}
 
 	private static void _takeScreenshot(String screenshotName, int errorLinkId)
@@ -532,13 +651,49 @@ public final class CommandLoggerHandler {
 				loggerElement.getID() + "')");
 	}
 
+	private static void _warningLineGroupLoggerElement(
+			LoggerElement lineGroupLoggerElement)
+		throws Exception {
+
+		lineGroupLoggerElement.addClassName("warning");
+
+		lineGroupLoggerElement.addChildLoggerElement(
+			_getErrorContainerLoggerElement());
+
+		LoggerElement childContainerLoggerElement =
+			lineGroupLoggerElement.loggerElement("ul");
+
+		List<LoggerElement> runLineLoggerElements =
+			childContainerLoggerElement.loggerElements("li");
+
+		if (!runLineLoggerElements.isEmpty()) {
+			LoggerElement runLineLoggerElement = runLineLoggerElements.get(
+				runLineLoggerElements.size() - 1);
+
+			runLineLoggerElement.addClassName("warning-line");
+		}
+	}
+
+	private static void _writeWebPage(int errorLinkId) throws Exception {
+		String testClassCommandName =
+			PoshiRunnerContext.getTestCaseCommandName();
+
+		testClassCommandName = StringUtil.replace(
+			testClassCommandName, "#", "_");
+
+		WebDriverHelper.saveWebPage(
+			PoshiRunnerGetterUtil.getCanonicalPath(".") + "/test-results/" +
+				testClassCommandName + "/web-pages/index" + errorLinkId +
+					".html",
+			_htmlSource);
+	}
+
 	private static int _btnLinkId;
 	private static Element _commandElement;
 	private static LoggerElement _commandLogLoggerElement;
 	private static int _errorLinkId;
 	private static int _functionLinkId;
+	private static String _htmlSource;
 	private static LoggerElement _lineGroupLoggerElement;
-	private static final LoggerElement _xmlLogLoggerElement = new LoggerElement(
-		"xml-log");
 
 }

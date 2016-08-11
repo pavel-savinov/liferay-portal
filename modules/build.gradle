@@ -1,22 +1,32 @@
+import com.liferay.gradle.plugins.node.tasks.DownloadNodeTask
+import com.liferay.gradle.plugins.node.tasks.ExecuteNpmTask
 import com.liferay.gradle.util.FileUtil
+import com.liferay.gradle.util.GradleUtil
+
+import java.util.concurrent.ConcurrentSkipListSet
 
 buildscript {
+	apply from: rootProject.file("build-buildscript.gradle"), to: buildscript
+}
+
+Set<File> bndPrintJarFiles = null
+
+if (Boolean.getBoolean("build.bnd.print.enabled") && System.getenv("JENKINS_HOME")) {
+	configurations {
+		bnd
+	}
+
 	dependencies {
-		classpath group: "com.liferay", name: "com.liferay.gradle.plugins", version: "1.0.40"
-		classpath group: "com.liferay", name: "com.liferay.gradle.plugins.alloy.taglib", version: "1.0.1"
-		classpath group: "com.liferay", name: "com.liferay.gradle.plugins.cache", version: "1.0.1"
-		classpath group: "com.liferay", name: "com.liferay.gradle.plugins.maven.plugin.builder", version: "1.0.2"
+		bnd group: "biz.aQute.bnd", name: "biz.aQute.bnd", version: "3.2.0"
 	}
 
 	repositories {
-		if (!Boolean.getBoolean("maven.local.ignore")) {
-			mavenLocal()
-		}
-
 		maven {
-			url System.properties["repository.url"] ?: "http://cdn.repository.liferay.com/nexus/content/groups/public"
+			url System.properties["repository.url"] ?: "https://cdn.lfrs.sl/repository.liferay.com/nexus/content/groups/public"
 		}
 	}
+
+	bndPrintJarFiles = new ConcurrentSkipListSet<File>()
 }
 
 buildDir = new File(rootDir.parentFile, "build")
@@ -24,8 +34,137 @@ buildDir = new File(rootDir.parentFile, "build")
 gradle.beforeProject {
 	Project project ->
 
-	if (FileUtil.exists(project, "bnd.bnd") && FileUtil.exists(project, "build.gradle") && project.parent) {
-		project.apply from: rootProject.file("build-module.gradle")
+	if (!project.parent || project.childProjects) {
+		return
+	}
+
+	configure(project) {
+		apply plugin: "com.liferay.defaults.plugin"
+
+		pluginManager.withPlugin("com.liferay.ant.plugin") {
+			task buildLang(dependsOn: "build-lang")
+
+			if (FileUtil.exists(project, "docroot/WEB-INF/service.xml")) {
+				task buildService(dependsOn: "build-service")
+				task buildWSDD(dependsOn: "build-wsdd")
+			}
+
+			deploy {
+				dependsOn ":apps:foundation:frontend-css:frontend-css-common:buildCssCommon"
+			}
+		}
+
+		pluginManager.withPlugin("com.liferay.osgi.plugin") {
+			afterEvaluate {
+				bundle.jarBuilderFactory.contextClassLoader = buildscript.classLoader
+
+				File forcedDeployDir = GradleUtil.getProperty(project, "forced.deploy.dir", (File)null)
+
+				if (forcedDeployDir) {
+					liferay.deployDir = forcedDeployDir
+				}
+			}
+
+			configurations {
+				xmltask
+			}
+
+			dependencies {
+				xmltask rootProject.files("../lib/development/xmltask.jar")
+			}
+
+			testIntegration {
+				doLast {
+					String databaseType = System.properties["database.type"]
+
+					if (!databaseType) {
+						return
+					}
+
+					FileTree fileTree = fileTree(dir: reports.junitXml.destination, exclude: "TEST-*-*.xml", include: "TEST-*.xml")
+
+					ant.taskdef classname: "com.oopsconsultancy.xmltask.ant.XmlTask", classpath: configurations.xmltask.asPath, name: "xmltask"
+
+					fileTree.each {
+						File file ->
+
+						String fileTitle = FileUtil.stripExtension(file.name)
+
+						ant.xmltask(dest: new File(file.parentFile, "${fileTitle}-${databaseType}.xml"), source: file) {
+							replace path: "/testsuite/@name", withText: "${fileTitle}-${databaseType}"
+						}
+
+						delete file
+					}
+				}
+			}
+
+			if (bndPrintJarFiles != null) {
+				jar {
+					doLast {
+						bndPrintJarFiles << archivePath
+					}
+				}
+			}
+
+			if (gradle.hasProperty("testClassGroupIndex")) {
+				configure([test, testIntegration]) {
+					include gradle.testClasses
+
+					jvmArgs "-Dtest.class.group.index=" + gradle.testClassGroupIndex
+					jvmArgs "-Dtest.class.groups=" + gradle.testClassGroups
+				}
+			}
+
+			if (System.getenv("JENKINS_HOME")) {
+				buildCSS {
+					jvmArgs "-Xss4m"
+				}
+
+				startTestableTomcat {
+					deleteLiferayHome = false
+				}
+			}
+		}
+
+		if (System.getenv("JENKINS_HOME")) {
+			pluginManager.withPlugin("com.liferay.theme.plugin") {
+				npmInstall {
+					nodeModulesCacheDir = new File(System.properties["user.home"], ".liferay/node-modules-cache")
+					removeShrinkwrappedUrls = true
+				}
+			}
+
+			tasks.withType(DownloadNodeTask) {
+				doFirst {
+					if (plugins.hasPlugin("com.liferay.cache")) {
+						throw new GradleException("Unable to use Node.js on CI, please configure com.liferay.cache or update the cache")
+					}
+				}
+			}
+
+			String ciRegistry = project.properties["nodejs.npm.ci.registry"]
+
+			if (ciRegistry) {
+				tasks.withType(ExecuteNpmTask) {
+					registry = ciRegistry
+				}
+			}
+		}
+	}
+}
+
+if (bndPrintJarFiles != null) {
+	gradle.buildFinished {
+		bndPrintJarFiles.each {
+			File jarFile ->
+
+			javaexec {
+				args "print", jarFile
+				classpath = configurations.bnd
+				main = "aQute.bnd.main.bnd"
+			}
+		}
 	}
 }
 
@@ -40,12 +179,12 @@ gradle.taskGraph.useFilter {
 		}
 	}
 	else if (task.name == "test") {
-		if (!_hasTestClasses(task.project, "src/test/java") && !_hasTestClasses(task.project, "test/unit")) {
+		if (!_hasTestClasses(task.project, "src/test/java")) {
 			return false
 		}
 	}
 	else if (task.name == "testIntegration") {
-		if (!_hasTestClasses(task.project, "src/testIntegration/java") && !_hasTestClasses(task.project, "test/integration")) {
+		if (!_hasTestClasses(task.project, "src/testIntegration/java")) {
 			return false
 		}
 	}

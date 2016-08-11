@@ -16,8 +16,9 @@ package com.liferay.shopping.model;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.kernel.annotation.ImplementationClassName;
+import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.util.Accessor;
-import com.liferay.portal.model.PersistedModel;
 
 /**
  * The extended model interface for the ShoppingOrder service. Represents a row in the &quot;ShoppingOrder&quot; database table, with each column mapped to a property of this class.
@@ -28,6 +29,7 @@ import com.liferay.portal.model.PersistedModel;
  * @see com.liferay.shopping.model.impl.ShoppingOrderModelImpl
  * @generated
  */
+@ImplementationClassName("com.liferay.shopping.model.impl.ShoppingOrderImpl")
 @ProviderType
 public interface ShoppingOrder extends ShoppingOrderModel, PersistedModel {
 	/*

@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.url.URLContainer;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.PathUtil;
@@ -95,30 +96,15 @@ public class FileChecker extends BaseChecker {
 		}
 
 		_defaultReadPathsFromArray = new String[] {
-			"${/}",
-			"${auto.deploy.installed.dir}",
-			"${catalina.base}",
-			"${com.sun.aas.instanceRoot}",
-			"${com.sun.aas.installRoot}",
-			"${file.separator}",
-			"${java.home}",
-			"${java.io.tmpdir}",
-			"${jboss.home.dir}",
-			"${jetty.home}",
-			"${jonas.base}",
-			"${liferay.web.portal.dir}",
-			"${liferay.home}",
-			"${line.separator}",
-			"${path.separator}",
-			"${plugin.servlet.context.name}",
-			"${release.info.version}",
-			"${resin.home}",
-			"${user.dir}",
-			"${user.home}",
-			"${user.name}",
-			"${weblogic.domain.dir}",
-			"${websphere.cell}",
-			"${websphere.profile.dir}",
+			"${/}", "${auto.deploy.installed.dir}", "${catalina.base}",
+			"${com.sun.aas.instanceRoot}", "${com.sun.aas.installRoot}",
+			"${file.separator}", "${java.home}", "${java.io.tmpdir}",
+			"${jboss.home.dir}", "${jetty.home}", "${jonas.base}",
+			"${liferay.web.portal.dir}", "${liferay.home}", "${line.separator}",
+			"${path.separator}", "${plugin.servlet.context.name}",
+			"${release.info.version}", "${resin.home}", "${user.dir}",
+			"${user.home}", "${user.name}", "${weblogic.domain.dir}",
+			"${websphere.cell}", "${websphere.profile.dir}",
 			StringPool.DOUBLE_SLASH
 		};
 
@@ -237,8 +223,7 @@ public class FileChecker extends BaseChecker {
 			}
 		}
 
-		path = StringUtil.replace(
-			path, StringPool.BACK_SLASH, StringPool.SLASH);
+		path = StringUtil.replace(path, CharPool.BACK_SLASH, CharPool.SLASH);
 
 		if (path.endsWith(StringPool.SLASH)) {
 			path = path + "-";
