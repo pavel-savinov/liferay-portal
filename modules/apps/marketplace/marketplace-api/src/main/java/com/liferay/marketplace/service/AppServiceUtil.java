@@ -16,8 +16,7 @@ package com.liferay.marketplace.service;
 
 import aQute.bnd.annotation.ProviderType;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import com.liferay.osgi.util.ServiceTrackerFactory;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -47,6 +46,11 @@ public class AppServiceUtil {
 		return getService().deleteApp(appId);
 	}
 
+	public static com.liferay.marketplace.model.App updateApp(java.io.File file)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().updateApp(file);
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -66,30 +70,9 @@ public class AppServiceUtil {
 		getService().uninstallApp(remoteAppId);
 	}
 
-	public static com.liferay.marketplace.model.App updateApp(java.io.File file)
-		throws com.liferay.portal.kernel.exception.PortalException {
-		return getService().updateApp(file);
-	}
-
 	public static AppService getService() {
 		return _serviceTracker.getService();
 	}
 
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setService(AppService service) {
-	}
-
-	private static ServiceTracker<AppService, AppService> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(AppServiceUtil.class);
-
-		_serviceTracker = new ServiceTracker<AppService, AppService>(bundle.getBundleContext(),
-				AppService.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<AppService, AppService> _serviceTracker = ServiceTrackerFactory.open(AppService.class);
 }

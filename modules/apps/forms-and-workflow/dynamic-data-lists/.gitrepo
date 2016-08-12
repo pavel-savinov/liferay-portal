@@ -1,0 +1,10 @@
+;
+; Do not manually edit this file. See
+; https://github.com/git-commands/git-subrepo#readme for more information.
+;
+[subrepo]
+	cmdver = liferay
+	commit = 5ed8a7f8962cdd57ccf3f8ec3e1daa11c6dd1fc1
+	mode = push
+	parent = b126d23fe7c99094a4bc5bcbe2ee91f5276775f8
+	remote = git@github.com:liferay/com-liferay-dynamic-data-lists.git

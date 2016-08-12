@@ -16,11 +16,16 @@ package com.liferay.shopping.model;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.ModelWrapper;
+import com.liferay.expando.kernel.model.ExpandoBridge;
+
+import com.liferay.portal.kernel.model.ModelWrapper;
+import com.liferay.portal.kernel.service.ServiceContext;
+
+import java.io.Serializable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * <p>
@@ -138,124 +143,13 @@ public class ShoppingItemPriceWrapper implements ShoppingItemPrice,
 	}
 
 	@Override
-	public java.lang.Object clone() {
-		return new ShoppingItemPriceWrapper((ShoppingItemPrice)_shoppingItemPrice.clone());
+	public ShoppingItemPrice toEscapedModel() {
+		return new ShoppingItemPriceWrapper(_shoppingItemPrice.toEscapedModel());
 	}
 
 	@Override
-	public int compareTo(
-		com.liferay.shopping.model.ShoppingItemPrice shoppingItemPrice) {
-		return _shoppingItemPrice.compareTo(shoppingItemPrice);
-	}
-
-	/**
-	* Returns the company ID of this shopping item price.
-	*
-	* @return the company ID of this shopping item price
-	*/
-	@Override
-	public long getCompanyId() {
-		return _shoppingItemPrice.getCompanyId();
-	}
-
-	/**
-	* Returns the discount of this shopping item price.
-	*
-	* @return the discount of this shopping item price
-	*/
-	@Override
-	public double getDiscount() {
-		return _shoppingItemPrice.getDiscount();
-	}
-
-	@Override
-	public com.liferay.portlet.expando.model.ExpandoBridge getExpandoBridge() {
-		return _shoppingItemPrice.getExpandoBridge();
-	}
-
-	/**
-	* Returns the item ID of this shopping item price.
-	*
-	* @return the item ID of this shopping item price
-	*/
-	@Override
-	public long getItemId() {
-		return _shoppingItemPrice.getItemId();
-	}
-
-	/**
-	* Returns the item price ID of this shopping item price.
-	*
-	* @return the item price ID of this shopping item price
-	*/
-	@Override
-	public long getItemPriceId() {
-		return _shoppingItemPrice.getItemPriceId();
-	}
-
-	/**
-	* Returns the max quantity of this shopping item price.
-	*
-	* @return the max quantity of this shopping item price
-	*/
-	@Override
-	public int getMaxQuantity() {
-		return _shoppingItemPrice.getMaxQuantity();
-	}
-
-	/**
-	* Returns the min quantity of this shopping item price.
-	*
-	* @return the min quantity of this shopping item price
-	*/
-	@Override
-	public int getMinQuantity() {
-		return _shoppingItemPrice.getMinQuantity();
-	}
-
-	/**
-	* Returns the price of this shopping item price.
-	*
-	* @return the price of this shopping item price
-	*/
-	@Override
-	public double getPrice() {
-		return _shoppingItemPrice.getPrice();
-	}
-
-	/**
-	* Returns the primary key of this shopping item price.
-	*
-	* @return the primary key of this shopping item price
-	*/
-	@Override
-	public long getPrimaryKey() {
-		return _shoppingItemPrice.getPrimaryKey();
-	}
-
-	@Override
-	public java.io.Serializable getPrimaryKeyObj() {
-		return _shoppingItemPrice.getPrimaryKeyObj();
-	}
-
-	/**
-	* Returns the shipping of this shopping item price.
-	*
-	* @return the shipping of this shopping item price
-	*/
-	@Override
-	public double getShipping() {
-		return _shoppingItemPrice.getShipping();
-	}
-
-	/**
-	* Returns the status of this shopping item price.
-	*
-	* @return the status of this shopping item price
-	*/
-	@Override
-	public int getStatus() {
-		return _shoppingItemPrice.getStatus();
+	public ShoppingItemPrice toUnescapedModel() {
+		return new ShoppingItemPriceWrapper(_shoppingItemPrice.toUnescapedModel());
 	}
 
 	/**
@@ -276,11 +170,6 @@ public class ShoppingItemPriceWrapper implements ShoppingItemPrice,
 	@Override
 	public boolean getUseShippingFormula() {
 		return _shoppingItemPrice.getUseShippingFormula();
-	}
-
-	@Override
-	public int hashCode() {
-		return _shoppingItemPrice.hashCode();
 	}
 
 	@Override
@@ -319,6 +208,146 @@ public class ShoppingItemPriceWrapper implements ShoppingItemPrice,
 	}
 
 	@Override
+	public ExpandoBridge getExpandoBridge() {
+		return _shoppingItemPrice.getExpandoBridge();
+	}
+
+	@Override
+	public com.liferay.portal.kernel.model.CacheModel<ShoppingItemPrice> toCacheModel() {
+		return _shoppingItemPrice.toCacheModel();
+	}
+
+	/**
+	* Returns the discount of this shopping item price.
+	*
+	* @return the discount of this shopping item price
+	*/
+	@Override
+	public double getDiscount() {
+		return _shoppingItemPrice.getDiscount();
+	}
+
+	/**
+	* Returns the price of this shopping item price.
+	*
+	* @return the price of this shopping item price
+	*/
+	@Override
+	public double getPrice() {
+		return _shoppingItemPrice.getPrice();
+	}
+
+	/**
+	* Returns the shipping of this shopping item price.
+	*
+	* @return the shipping of this shopping item price
+	*/
+	@Override
+	public double getShipping() {
+		return _shoppingItemPrice.getShipping();
+	}
+
+	@Override
+	public int compareTo(ShoppingItemPrice shoppingItemPrice) {
+		return _shoppingItemPrice.compareTo(shoppingItemPrice);
+	}
+
+	/**
+	* Returns the max quantity of this shopping item price.
+	*
+	* @return the max quantity of this shopping item price
+	*/
+	@Override
+	public int getMaxQuantity() {
+		return _shoppingItemPrice.getMaxQuantity();
+	}
+
+	/**
+	* Returns the min quantity of this shopping item price.
+	*
+	* @return the min quantity of this shopping item price
+	*/
+	@Override
+	public int getMinQuantity() {
+		return _shoppingItemPrice.getMinQuantity();
+	}
+
+	/**
+	* Returns the status of this shopping item price.
+	*
+	* @return the status of this shopping item price
+	*/
+	@Override
+	public int getStatus() {
+		return _shoppingItemPrice.getStatus();
+	}
+
+	@Override
+	public int hashCode() {
+		return _shoppingItemPrice.hashCode();
+	}
+
+	@Override
+	public Serializable getPrimaryKeyObj() {
+		return _shoppingItemPrice.getPrimaryKeyObj();
+	}
+
+	@Override
+	public java.lang.Object clone() {
+		return new ShoppingItemPriceWrapper((ShoppingItemPrice)_shoppingItemPrice.clone());
+	}
+
+	@Override
+	public java.lang.String toString() {
+		return _shoppingItemPrice.toString();
+	}
+
+	@Override
+	public java.lang.String toXmlString() {
+		return _shoppingItemPrice.toXmlString();
+	}
+
+	/**
+	* Returns the company ID of this shopping item price.
+	*
+	* @return the company ID of this shopping item price
+	*/
+	@Override
+	public long getCompanyId() {
+		return _shoppingItemPrice.getCompanyId();
+	}
+
+	/**
+	* Returns the item ID of this shopping item price.
+	*
+	* @return the item ID of this shopping item price
+	*/
+	@Override
+	public long getItemId() {
+		return _shoppingItemPrice.getItemId();
+	}
+
+	/**
+	* Returns the item price ID of this shopping item price.
+	*
+	* @return the item price ID of this shopping item price
+	*/
+	@Override
+	public long getItemPriceId() {
+		return _shoppingItemPrice.getItemPriceId();
+	}
+
+	/**
+	* Returns the primary key of this shopping item price.
+	*
+	* @return the primary key of this shopping item price
+	*/
+	@Override
+	public long getPrimaryKey() {
+		return _shoppingItemPrice.getPrimaryKey();
+	}
+
+	@Override
 	public void persist() {
 		_shoppingItemPrice.persist();
 	}
@@ -349,20 +378,18 @@ public class ShoppingItemPriceWrapper implements ShoppingItemPrice,
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portal.model.BaseModel<?> baseModel) {
-		_shoppingItemPrice.setExpandoBridgeAttributes(baseModel);
-	}
-
-	@Override
-	public void setExpandoBridgeAttributes(
-		com.liferay.portlet.expando.model.ExpandoBridge expandoBridge) {
+	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
 		_shoppingItemPrice.setExpandoBridgeAttributes(expandoBridge);
 	}
 
 	@Override
 	public void setExpandoBridgeAttributes(
-		com.liferay.portal.service.ServiceContext serviceContext) {
+		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
+		_shoppingItemPrice.setExpandoBridgeAttributes(baseModel);
+	}
+
+	@Override
+	public void setExpandoBridgeAttributes(ServiceContext serviceContext) {
 		_shoppingItemPrice.setExpandoBridgeAttributes(serviceContext);
 	}
 
@@ -432,7 +459,7 @@ public class ShoppingItemPriceWrapper implements ShoppingItemPrice,
 	}
 
 	@Override
-	public void setPrimaryKeyObj(java.io.Serializable primaryKeyObj) {
+	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
 		_shoppingItemPrice.setPrimaryKeyObj(primaryKeyObj);
 	}
 
@@ -477,31 +504,6 @@ public class ShoppingItemPriceWrapper implements ShoppingItemPrice,
 	}
 
 	@Override
-	public com.liferay.portal.model.CacheModel<com.liferay.shopping.model.ShoppingItemPrice> toCacheModel() {
-		return _shoppingItemPrice.toCacheModel();
-	}
-
-	@Override
-	public com.liferay.shopping.model.ShoppingItemPrice toEscapedModel() {
-		return new ShoppingItemPriceWrapper(_shoppingItemPrice.toEscapedModel());
-	}
-
-	@Override
-	public java.lang.String toString() {
-		return _shoppingItemPrice.toString();
-	}
-
-	@Override
-	public com.liferay.shopping.model.ShoppingItemPrice toUnescapedModel() {
-		return new ShoppingItemPriceWrapper(_shoppingItemPrice.toUnescapedModel());
-	}
-
-	@Override
-	public java.lang.String toXmlString() {
-		return _shoppingItemPrice.toXmlString();
-	}
-
-	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -513,20 +515,12 @@ public class ShoppingItemPriceWrapper implements ShoppingItemPrice,
 
 		ShoppingItemPriceWrapper shoppingItemPriceWrapper = (ShoppingItemPriceWrapper)obj;
 
-		if (Validator.equals(_shoppingItemPrice,
+		if (Objects.equals(_shoppingItemPrice,
 					shoppingItemPriceWrapper._shoppingItemPrice)) {
 			return true;
 		}
 
 		return false;
-	}
-
-	/**
-	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedModel}
-	 */
-	@Deprecated
-	public ShoppingItemPrice getWrappedShoppingItemPrice() {
-		return _shoppingItemPrice;
 	}
 
 	@Override

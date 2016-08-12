@@ -1,11 +1,12 @@
 <definition component-name="portal-test-plugins">
+	<property name="portal.release" value="true" />
 	<property name="testray.main.component.name" value="Security" />
 	<property name="portlet.plugins.includes" value="test-runtime-action-portlet,test-runtime-parent-portlet" />
 
 	<set-up>
 		<execute macro="User#firstLoginPG" />
 
-		<execute macro="Page#addPG">
+		<execute macro="Page#add">
 			<var name="pageName" value="Test Runtime Page" />
 		</execute>
 	</set-up>
@@ -27,6 +28,6 @@
 
 		<execute function="Click" locator1="Button#EXECUTE" />
 
-		<execute macro="Alert#viewSuccess" />
+		<execute macro="Alert#viewSuccessMessage" />
 	</command>
 </definition>

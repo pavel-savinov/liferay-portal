@@ -1,4 +1,5 @@
 <definition component-name="portal-plugins-osgi">
+	<property name="portal.release" value="true" />
 	<property name="plugins.deployment.type" value="osgi" />
 	<property name="testray.main.component.name" value="MongoDB" />
 
@@ -6,17 +7,16 @@
 		<execute macro="User#firstLoginPG" />
 	</set-up>
 
-	<command name="MongoDBHookSmoke" priority="4">
+	<command name="MongoDBHookSmoke" priority="5">
 		<property name="hook.plugins.includes" value="mongodb-hook" />
+		<property name="portal.acceptance" value="true" />
 
 		<var name="appName" value="MongoDB Expando Adapter" />
+		<var name="portletName" value="mongodb-hook" />
 
-		<execute macro="Page#gotoCP">
-			<var name="portletName" value="App Manager" />
+		<execute macro="OSGiSmoke#Smoke">
+			<var name="appName" value="${portletName}" />
+			<var name="portletName" value="${portletName}" />
 		</execute>
-
-		<execute function="AssertTextPresent#assertTextPresent" value1="${appName}" />
-
-		<execute function="AntCommand#antCommand" locator1="build-test.xml" value1="remove-plugin -Dplugin.name=mongodb-hook" />
 	</command>
 </definition>
