@@ -101,7 +101,7 @@ public class LiferayPortlet extends GenericPortlet {
 			boolean emptySessionMessages = isEmptySessionMessages(
 				actionRequest);
 
-			if (emptySessionMessages) {
+			if (_isAddSuccessMessage(actionRequest)) {
 				addSuccessMessage(actionRequest, actionResponse);
 			}
 
@@ -499,6 +499,36 @@ public class LiferayPortlet extends GenericPortlet {
 			Arrays.asList(StringUtil.split(getInitParameter("valid-paths"))));
 	}
 
+	protected boolean isAddSuccessMessage(ActionRequest actionRequest) {
+		String portletId = PortalUtil.getPortletId(actionRequest);
+
+		if (SessionMessages.contains(
+				actionRequest,
+				portletId +
+					SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_SUCCESS_MESSAGE)) {
+
+			return false;
+		}
+
+		if (SessionMessages.isEmpty(actionRequest)) {
+			return true;
+		}
+
+		int sessionMessagesSize = SessionMessages.size(actionRequest);
+
+		for (String suffix : _IGNORED_SESSION_MESSAGE_SUFFIXES) {
+			if (SessionMessages.contains(actionRequest, portletId + suffix)) {
+				sessionMessagesSize--;
+			}
+		}
+
+		if (sessionMessagesSize == 0) {
+			return true;
+		}
+
+		return false;
+	}
+
 	protected boolean isAlwaysSendRedirect() {
 		return alwaysSendRedirect;
 	}
@@ -623,6 +653,36 @@ public class LiferayPortlet extends GenericPortlet {
 		PortletResponseUtil.write(mimeResponse, json.toString());
 
 		mimeResponse.flushBuffer();
+	}
+
+	private boolean _isAddSuccessMessage(ActionRequest actionRequest) {
+		String portletId = PortalUtil.getPortletId(actionRequest);
+
+		if (SessionMessages.contains(
+			actionRequest,
+			portletId +
+			SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_SUCCESS_MESSAGE)) {
+
+			return false;
+		}
+
+		if (SessionMessages.isEmpty(actionRequest)) {
+			return true;
+		}
+
+		int sessionMessagesSize = SessionMessages.size(actionRequest);
+
+		for (String suffix : _IGNORED_SESSION_MESSAGE_SUFFIXES) {
+			if (SessionMessages.contains(actionRequest, portletId + suffix)) {
+				sessionMessagesSize--;
+			}
+		}
+
+		if (sessionMessagesSize == 0) {
+			return true;
+		}
+
+		return false;
 	}
 
 	protected boolean addProcessActionSuccessMessage;
