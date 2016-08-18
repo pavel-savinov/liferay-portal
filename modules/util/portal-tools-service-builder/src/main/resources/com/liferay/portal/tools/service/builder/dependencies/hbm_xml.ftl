@@ -1,24 +1,32 @@
 <#list entities as entity>
-	<import class="${packagePath}.model.${entity.name}" />
+	<import class="${apiPackagePath}.model.${entity.name}" />
 </#list>
 
 <#list entities as entity>
 	<#if entity.hasColumns()>
-		<class name="${packagePath}.model.impl.${entity.name}Impl" table="${entity.table}"
+		<class
 			<#if entity.isDynamicUpdateEnabled()>
 				dynamic-update="true"
 			</#if>
+
+			name="${packagePath}.model.impl.${entity.name}Impl" table="${entity.table}"
 		>
 			<#if entity.hasCompoundPK()>
-				<composite-id name="primaryKey" class="${packagePath}.service.persistence.${entity.name}PK">
-					<#assign pkList = entity.getPKList()>
+				<composite-id class="${apiPackagePath}.service.persistence.${entity.name}PK" name="primaryKey">
+					<#assign pkList = entity.getPKList() />
 
 					<#list pkList as column>
-						<key-property name="${column.name}"
+						<key-property
+
+						<#if serviceBuilder.isHBMCamelCasePropertyAccessor(column.name)>
+							access="com.liferay.portal.dao.orm.hibernate.CamelCasePropertyAccessor"
+						</#if>
 
 						<#if column.name != column.DBName>
 							column="${column.DBName}"
 						</#if>
+
+						name="${column.name}"
 
 						<#if column.isPrimitiveType() || (column.type == "Map") || (column.type == "String")>
 							type="com.liferay.portal.dao.orm.hibernate.${serviceBuilder.getPrimitiveObj("${column.type}")}Type"
@@ -28,37 +36,34 @@
 							type="org.hibernate.type.TimestampType"
 						</#if>
 
-						<#if serviceBuilder.isHBMCamelCasePropertyAccessor(column.name)>
-							access="com.liferay.portal.dao.orm.hibernate.CamelCasePropertyAccessor"
-						</#if>
-
 						/>
 					</#list>
 				</composite-id>
 			<#else>
-				<#assign column = entity.getPKList()?first>
+				<#assign column = entity.getPKList()?first />
 
-				<id name="${column.name}"
-					<#if column.name != column.DBName>
-						column="${column.DBName}"
-					</#if>
-
-					type="<#if !entity.hasPrimitivePK()>java.lang.</#if>${column.type}"
-
+				<id
 					<#if serviceBuilder.isHBMCamelCasePropertyAccessor(column.name)>
 						access="com.liferay.portal.dao.orm.hibernate.CamelCasePropertyAccessor"
 					</#if>
 
+					<#if column.name != column.DBName>
+						column="${column.DBName}"
+					</#if>
+
+					name="${column.name}"
+					type="<#if !entity.hasPrimitivePK()>java.lang.</#if>${column.type}"
+
 					>
 
 					<#if column.idType??>
-						<#assign class = serviceBuilder.getGeneratorClass("${column.idType}")>
+						<#assign class = serviceBuilder.getGeneratorClass("${column.idType}") />
 
 						<#if class == "class">
-							<#assign class = column.idParam>
+							<#assign class = column.idParam />
 						</#if>
 					<#else>
-						<#assign class = "assigned">
+						<#assign class = "assigned" />
 					</#if>
 
 					<generator class="${class}"
@@ -73,24 +78,30 @@
 			</#if>
 
 			<#if entity.isMvccEnabled()>
-				<version name="mvccVersion" type="long" access="com.liferay.portal.dao.orm.hibernate.PrivatePropertyAccessor" />
+				<version access="com.liferay.portal.dao.orm.hibernate.PrivatePropertyAccessor" name="mvccVersion" type="long" />
 			</#if>
 
 			<#list entity.columnList as column>
 				<#if column.EJBName??>
-					<#assign ejbName = true>
+					<#assign ejbName = true />
 				<#else>
-					<#assign ejbName = false>
+					<#assign ejbName = false />
 				</#if>
 
 				<#if !column.isPrimary() && !column.isCollection() && !ejbName && ((column.type != "Blob") || ((column.type == "Blob") && !column.lazy)) && (column.name != "mvccVersion")>
-					<property name="${column.name}"
+					<property
 
 					<#if serviceBuilder.isHBMCamelCasePropertyAccessor(column.name)>
 						access="com.liferay.portal.dao.orm.hibernate.CamelCasePropertyAccessor"
 					</#if>
 
-					<#if (serviceBuilder.getSqlType(packagePath + ".model." + entity.getName(), column.getName(), column.getType()) == "CLOB") && (column.type != "Map")>
+					<#if column.name != column.DBName>
+						column="${column.DBName}"
+					</#if>
+
+					name="${column.name}"
+
+					<#if (serviceBuilder.getSqlType(entity.getName(), column.getName(), column.getType()) == "CLOB") && (column.type != "Map")>
 						type="com.liferay.portal.dao.orm.hibernate.StringClobType"
 					<#elseif column.isPrimitiveType() || (column.type == "Map") || (column.type == "String")>
 						type="com.liferay.portal.dao.orm.hibernate.${serviceBuilder.getPrimitiveObj("${column.type}")}Type"
@@ -102,32 +113,32 @@
 						</#if>
 					</#if>
 
-					<#if column.name != column.DBName>
-						column="${column.DBName}"
-					</#if>
 					/>
 				</#if>
 
 				<#if (column.type == "Blob") && column.lazy>
-					<one-to-one name="${column.name}BlobModel" access="com.liferay.portal.dao.orm.hibernate.PrivatePropertyAccessor" class="${packagePath}.model.${entity.name}${column.methodName}BlobModel" cascade="save-update" outer-join="false" constrained="true" />
+					<one-to-one access="com.liferay.portal.dao.orm.hibernate.PrivatePropertyAccessor" cascade="save-update" class="${apiPackagePath}.model.${entity.name}${column.methodName}BlobModel" constrained="true" name="${column.name}BlobModel" outer-join="false" />
 				</#if>
 			</#list>
 		</class>
 
 		<#list entity.blobList as blobColumn>
 			<#if blobColumn.lazy>
-				<class name="${packagePath}.model.${entity.name}${blobColumn.methodName}BlobModel" table="${entity.table}" lazy="true"
+				<class
 					<#if entity.isDynamicUpdateEnabled()>
 						dynamic-update="true"
 					</#if>
-				>
-					<#assign column = entity.getPKList()?first>
 
-					<id name="${column.name}" column="${column.DBName}">
+					lazy="true" name="${apiPackagePath}.model.${entity.name}${blobColumn.methodName}BlobModel" table="${entity.table}"
+				>
+					<#assign column = entity.getPKList()?first />
+
+					<id column="${column.DBName}" name="${column.name}">
 						<generator class="foreign">
 							<param name="property">${packagePath}.model.impl.${entity.name}Impl</param>
 						</generator>
 					</id>
+
 					<property column="${blobColumn.DBName}" name="${blobColumn.name}Blob" type="blob" />
 				</class>
 			</#if>

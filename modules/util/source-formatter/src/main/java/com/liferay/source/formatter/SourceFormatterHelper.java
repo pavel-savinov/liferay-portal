@@ -14,6 +14,7 @@
 
 package com.liferay.source.formatter;
 
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -108,8 +109,8 @@ public class SourceFormatterHelper {
 		File basedirFile = new File("./");
 
 		String basedirAbsolutePath = StringUtil.replace(
-			basedirFile.getAbsolutePath(), new String[] {".", ":", "/", "\\"},
-			new String[] {"_", "_", "_", "_"});
+			basedirFile.getAbsolutePath(), new char[] {'.', ':', '/', '\\'},
+			new char[] {'_', '_', '_', '_'});
 
 		String propertiesFileName =
 			System.getProperty("java.io.tmpdir") + "/SourceFormatter." +
@@ -131,12 +132,25 @@ public class SourceFormatterHelper {
 	public void printError(String fileName, String message) {
 		if (_useProperties) {
 			String encodedFileName = StringUtil.replace(
-				fileName, StringPool.BACK_SLASH, StringPool.SLASH);
+				fileName, CharPool.BACK_SLASH, CharPool.SLASH);
 
 			_properties.remove(encodedFileName);
 		}
 
 		System.out.println(message);
+	}
+
+	protected Path getCanonicalPath(Path path) {
+		try {
+			File file = path.toFile();
+
+			File canonicalFile = file.getCanonicalFile();
+
+			return canonicalFile.toPath();
+		}
+		catch (IOException ioe) {
+			throw new RuntimeException(ioe);
+		}
 	}
 
 	protected List<String> getFileNames(
@@ -154,7 +168,9 @@ public class SourceFormatterHelper {
 
 			File file = new File(fileName);
 
-			Path filePath = file.toPath();
+			File canonicalFile = file.getCanonicalFile();
+
+			Path filePath = canonicalFile.toPath();
 
 			for (PathMatcher pathMatcher : excludeFilePathMatchers) {
 				if (pathMatcher.matches(filePath)) {
@@ -165,7 +181,9 @@ public class SourceFormatterHelper {
 			File dir = file.getParentFile();
 
 			while (true) {
-				Path dirPath = dir.toPath();
+				File canonicalDir = dir.getCanonicalFile();
+
+				Path dirPath = canonicalDir.toPath();
 
 				for (PathMatcher pathMatcher : excludeDirPathMatchers) {
 					if (pathMatcher.matches(dirPath)) {
@@ -187,7 +205,7 @@ public class SourceFormatterHelper {
 			for (PathMatcher pathMatcher : includeFilePathMatchers) {
 				if (pathMatcher.matches(filePath)) {
 					fileName = StringUtil.replace(
-						fileName, StringPool.SLASH, StringPool.BACK_SLASH);
+						fileName, CharPool.SLASH, CharPool.BACK_SLASH);
 
 					fileNames.add(fileName);
 
@@ -223,6 +241,8 @@ public class SourceFormatterHelper {
 						return FileVisitResult.SKIP_SUBTREE;
 					}
 
+					dirPath = getCanonicalPath(dirPath);
+
 					for (PathMatcher pathMatcher : excludeDirPathMatchers) {
 						if (pathMatcher.matches(dirPath)) {
 							return FileVisitResult.SKIP_SUBTREE;
@@ -236,14 +256,16 @@ public class SourceFormatterHelper {
 				public FileVisitResult visitFile(
 					Path filePath, BasicFileAttributes basicFileAttributes) {
 
+					Path canonicalPath = getCanonicalPath(filePath);
+
 					for (PathMatcher pathMatcher : excludeFilePathMatchers) {
-						if (pathMatcher.matches(filePath)) {
+						if (pathMatcher.matches(canonicalPath)) {
 							return FileVisitResult.CONTINUE;
 						}
 					}
 
 					for (PathMatcher pathMatcher : includeFilePathMatchers) {
-						if (!pathMatcher.matches(filePath)) {
+						if (!pathMatcher.matches(canonicalPath)) {
 							continue;
 						}
 
@@ -272,7 +294,7 @@ public class SourceFormatterHelper {
 		File file = new File(fileName);
 
 		String encodedFileName = StringUtil.replace(
-			fileName, StringPool.BACK_SLASH, StringPool.SLASH);
+			fileName, CharPool.BACK_SLASH, CharPool.SLASH);
 
 		long timestamp = GetterUtil.getLong(
 			_properties.getProperty(encodedFileName));
