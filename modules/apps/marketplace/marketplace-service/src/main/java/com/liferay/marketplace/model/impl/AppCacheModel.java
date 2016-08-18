@@ -18,10 +18,10 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.marketplace.model.App;
 
+import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.model.CacheModel;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -65,7 +65,7 @@ public class AppCacheModel implements CacheModel<App>, Externalizable {
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(27);
+		StringBundler sb = new StringBundler(29);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -93,6 +93,8 @@ public class AppCacheModel implements CacheModel<App>, Externalizable {
 		sb.append(iconURL);
 		sb.append(", version=");
 		sb.append(version);
+		sb.append(", required=");
+		sb.append(required);
 		sb.append("}");
 
 		return sb.toString();
@@ -171,6 +173,8 @@ public class AppCacheModel implements CacheModel<App>, Externalizable {
 			appImpl.setVersion(version);
 		}
 
+		appImpl.setRequired(required);
+
 		appImpl.resetOriginalValues();
 
 		return appImpl;
@@ -179,18 +183,24 @@ public class AppCacheModel implements CacheModel<App>, Externalizable {
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
 		uuid = objectInput.readUTF();
+
 		appId = objectInput.readLong();
+
 		companyId = objectInput.readLong();
+
 		userId = objectInput.readLong();
 		userName = objectInput.readUTF();
 		createDate = objectInput.readLong();
 		modifiedDate = objectInput.readLong();
+
 		remoteAppId = objectInput.readLong();
 		title = objectInput.readUTF();
 		description = objectInput.readUTF();
 		category = objectInput.readUTF();
 		iconURL = objectInput.readUTF();
 		version = objectInput.readUTF();
+
+		required = objectInput.readBoolean();
 	}
 
 	@Override
@@ -204,7 +214,9 @@ public class AppCacheModel implements CacheModel<App>, Externalizable {
 		}
 
 		objectOutput.writeLong(appId);
+
 		objectOutput.writeLong(companyId);
+
 		objectOutput.writeLong(userId);
 
 		if (userName == null) {
@@ -216,6 +228,7 @@ public class AppCacheModel implements CacheModel<App>, Externalizable {
 
 		objectOutput.writeLong(createDate);
 		objectOutput.writeLong(modifiedDate);
+
 		objectOutput.writeLong(remoteAppId);
 
 		if (title == null) {
@@ -252,6 +265,8 @@ public class AppCacheModel implements CacheModel<App>, Externalizable {
 		else {
 			objectOutput.writeUTF(version);
 		}
+
+		objectOutput.writeBoolean(required);
 	}
 
 	public String uuid;
@@ -267,4 +282,5 @@ public class AppCacheModel implements CacheModel<App>, Externalizable {
 	public String category;
 	public String iconURL;
 	public String version;
+	public boolean required;
 }

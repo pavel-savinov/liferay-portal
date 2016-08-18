@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -468,7 +469,7 @@ public class BasicRegistryImpl implements Registry {
 	private final Map<ServiceTracker<?, ?>, Filter> _serviceTrackers =
 		new ConcurrentHashMap<>();
 
-	private class BasicFilter implements Filter {
+	private static class BasicFilter implements Filter {
 
 		public BasicFilter(String filterString) {
 			_filter = new aQute.lib.filter.Filter(filterString);
@@ -505,6 +506,15 @@ public class BasicRegistryImpl implements Registry {
 		}
 
 		private aQute.lib.filter.Filter _filter;
+
+	}
+
+	private static class LowerCaseKeyTreeMap extends TreeMap<String, Object> {
+
+		@Override
+		public Object put(String key, Object value) {
+			return super.put(key.toLowerCase(), value);
+		}
 
 	}
 
@@ -738,14 +748,13 @@ public class BasicRegistryImpl implements Registry {
 
 		@Override
 		public T getService() {
-			Entry<ServiceReference<S>, T> firstEntry =
-				_trackedServices.firstEntry();
+			Optional<Entry<ServiceReference<S>, T>> optionalEntry =
+				ServiceRankingUtil.getHighestRankingEntry(_trackedServices);
 
-			if (firstEntry == null) {
-				return null;
-			}
+			Optional<T> optionalTrackedService = optionalEntry.map(
+				Entry::getValue);
 
-			return firstEntry.getValue();
+			return optionalTrackedService.orElse(null);
 		}
 
 		@Override
@@ -766,7 +775,13 @@ public class BasicRegistryImpl implements Registry {
 
 		@Override
 		public ServiceReference<S> getServiceReference() {
-			return _trackedServices.firstKey();
+			Optional<Entry<ServiceReference<S>, T>> optionalEntry =
+				ServiceRankingUtil.getHighestRankingEntry(_trackedServices);
+
+			Optional<ServiceReference<S>> optionalServiceReference =
+				optionalEntry.map(Entry::getKey);
+
+			return optionalServiceReference.orElse(null);
 		}
 
 		@Override
@@ -893,15 +908,6 @@ public class BasicRegistryImpl implements Registry {
 		private final AtomicInteger _stateCounter = new AtomicInteger();
 		private final NavigableMap<ServiceReference<S>, T> _trackedServices =
 			new ConcurrentSkipListMap<>();
-
-	}
-
-	private class LowerCaseKeyTreeMap extends TreeMap<String, Object> {
-
-		@Override
-		public Object put(String key, Object value) {
-			return super.put(key.toLowerCase(), value);
-		}
 
 	}
 

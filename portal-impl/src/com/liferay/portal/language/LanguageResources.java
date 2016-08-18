@@ -21,6 +21,8 @@ import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
+import com.liferay.portal.kernel.util.ResourceBundleLoader;
+import com.liferay.portal.kernel.util.ResourceBundleLoaderUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -53,6 +55,17 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Kamesh Sampath
  */
 public class LanguageResources {
+
+	public static ResourceBundleLoader RESOURCE_BUNDLE_LOADER =
+		new ResourceBundleLoader() {
+
+			@Override
+			public ResourceBundle loadResourceBundle(String languageId) {
+				return LanguageResources.getResourceBundle(
+					LocaleUtil.fromLanguageId(languageId));
+			}
+
+		};
 
 	public static String fixValue(String value) {
 		if (value.endsWith(LangBuilder.AUTOMATIC_COPY)) {
@@ -141,6 +154,9 @@ public class LanguageResources {
 			new LanguageResourceServiceTrackerCustomizer());
 
 		_serviceTracker.open();
+
+		ResourceBundleLoaderUtil.setPortalResourceBundleLoader(
+			RESOURCE_BUNDLE_LOADER);
 	}
 
 	public void setConfig(String config) {
@@ -355,7 +371,7 @@ public class LanguageResources {
 				serviceReference);
 
 			String languageId = GetterUtil.getString(
-				serviceReference.getProperty("language.id"), StringPool.BLANK);
+				serviceReference.getProperty("language.id"));
 			Map<String, String> languageMap = new HashMap<>();
 			Locale locale = null;
 
@@ -401,7 +417,7 @@ public class LanguageResources {
 			registry.ungetService(serviceReference);
 
 			String languageId = GetterUtil.getString(
-				serviceReference.getProperty("language.id"), StringPool.BLANK);
+				serviceReference.getProperty("language.id"));
 			Locale locale = null;
 
 			if (Validator.isNotNull(languageId)) {

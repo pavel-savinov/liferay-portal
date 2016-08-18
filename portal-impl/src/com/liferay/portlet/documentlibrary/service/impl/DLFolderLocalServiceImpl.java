@@ -14,6 +14,21 @@
 
 package com.liferay.portlet.documentlibrary.service.impl;
 
+import com.liferay.document.library.kernel.exception.DuplicateFileEntryException;
+import com.liferay.document.library.kernel.exception.DuplicateFolderNameException;
+import com.liferay.document.library.kernel.exception.FolderNameException;
+import com.liferay.document.library.kernel.exception.InvalidFolderException;
+import com.liferay.document.library.kernel.exception.NoSuchFolderException;
+import com.liferay.document.library.kernel.exception.RequiredFileEntryTypeException;
+import com.liferay.document.library.kernel.model.DLFileEntry;
+import com.liferay.document.library.kernel.model.DLFileEntryType;
+import com.liferay.document.library.kernel.model.DLFileEntryTypeConstants;
+import com.liferay.document.library.kernel.model.DLFolder;
+import com.liferay.document.library.kernel.model.DLFolderConstants;
+import com.liferay.document.library.kernel.store.DLStoreUtil;
+import com.liferay.document.library.kernel.util.DLValidatorUtil;
+import com.liferay.document.library.kernel.util.comparator.FolderIdComparator;
+import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -26,6 +41,12 @@ import com.liferay.portal.kernel.lock.LockManagerUtil;
 import com.liferay.portal.kernel.lock.NoSuchLockException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Repository;
+import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.SystemEventConstants;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
 import com.liferay.portal.kernel.repository.event.RepositoryEventTrigger;
 import com.liferay.portal.kernel.repository.event.RepositoryEventType;
 import com.liferay.portal.kernel.repository.model.Folder;
@@ -33,43 +54,21 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.kernel.tree.TreeModelTasksAdapter;
+import com.liferay.portal.kernel.tree.TreePathUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.TreeModelTasksAdapter;
-import com.liferay.portal.kernel.util.TreePathUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.model.Group;
-import com.liferay.portal.model.Repository;
-import com.liferay.portal.model.ResourceConstants;
-import com.liferay.portal.model.SystemEventConstants;
-import com.liferay.portal.model.TreeModel;
-import com.liferay.portal.model.User;
-import com.liferay.portal.model.WorkflowDefinitionLink;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFolder;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.permission.ModelPermissions;
 import com.liferay.portal.util.RepositoryUtil;
-import com.liferay.portlet.documentlibrary.DuplicateFileEntryException;
-import com.liferay.portlet.documentlibrary.DuplicateFolderNameException;
-import com.liferay.portlet.documentlibrary.FolderNameException;
-import com.liferay.portlet.documentlibrary.InvalidFolderException;
-import com.liferay.portlet.documentlibrary.NoSuchFolderException;
-import com.liferay.portlet.documentlibrary.RequiredFileEntryTypeException;
-import com.liferay.portlet.documentlibrary.model.DLFileEntry;
-import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
-import com.liferay.portlet.documentlibrary.model.DLFileEntryTypeConstants;
-import com.liferay.portlet.documentlibrary.model.DLFolder;
-import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.model.impl.DLFolderImpl;
 import com.liferay.portlet.documentlibrary.service.base.DLFolderLocalServiceBaseImpl;
-import com.liferay.portlet.documentlibrary.store.DLStoreUtil;
-import com.liferay.portlet.documentlibrary.util.DLValidatorUtil;
-import com.liferay.portlet.documentlibrary.util.comparator.FolderIdComparator;
-import com.liferay.portlet.exportimport.lar.ExportImportThreadLocal;
 
 import java.io.Serializable;
 
@@ -150,24 +149,6 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 		}
 
 		return dlFolder;
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by more general {@link #addFolder(long,
-	 *             long, long, boolean, long, String, String, boolean,
-	 *             ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public DLFolder addFolder(
-			long userId, long groupId, long repositoryId, boolean mountPoint,
-			long parentFolderId, String name, String description,
-			ServiceContext serviceContext)
-		throws PortalException {
-
-		return addFolder(
-			userId, groupId, repositoryId, mountPoint, parentFolderId, name,
-			description, false, serviceContext);
 	}
 
 	/**
@@ -346,43 +327,11 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 		return dlFolderPersistence.countByCompanyId(companyId);
 	}
 
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link
-	 *             #getFileEntriesAndFileShortcuts(long, long, QueryDefinition)}
-	 */
-	@Deprecated
-	@Override
-	public List<Object> getFileEntriesAndFileShortcuts(
-		long groupId, long folderId, int status, int start, int end) {
-
-		QueryDefinition<?> queryDefinition = new QueryDefinition<>(
-			status, start, end, null);
-
-		return getFileEntriesAndFileShortcuts(
-			groupId, folderId, queryDefinition);
-	}
-
 	@Override
 	public List<Object> getFileEntriesAndFileShortcuts(
 		long groupId, long folderId, QueryDefinition<?> queryDefinition) {
 
 		return dlFolderFinder.findFE_FS_ByG_F(
-			groupId, folderId, queryDefinition);
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link
-	 *             #getFileEntriesAndFileShortcutsCount(long, long,
-	 *             QueryDefinition)}
-	 */
-	@Deprecated
-	@Override
-	public int getFileEntriesAndFileShortcutsCount(
-		long groupId, long folderId, int status) {
-
-		QueryDefinition<?> queryDefinition = new QueryDefinition<>(status);
-
-		return getFileEntriesAndFileShortcutsCount(
 			groupId, folderId, queryDefinition);
 	}
 
@@ -489,82 +438,12 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 		return getFolders(groupId, parentFolderId, true, start, end, obc);
 	}
 
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link
-	 *             #getFoldersAndFileEntriesAndFileShortcuts(long, long,
-	 *             String[], boolean, QueryDefinition)}
-	 */
-	@Deprecated
-	@Override
-	public List<Object> getFoldersAndFileEntriesAndFileShortcuts(
-		long groupId, long folderId, int status, boolean includeMountFolders,
-		int start, int end, OrderByComparator<?> obc) {
-
-		QueryDefinition<?> queryDefinition = new QueryDefinition<>(
-			status, start, end, (OrderByComparator<Object>)obc);
-
-		return getFoldersAndFileEntriesAndFileShortcuts(
-			groupId, folderId, null, includeMountFolders, queryDefinition);
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link
-	 *             #getFoldersAndFileEntriesAndFileShortcutsCount(long, long,
-	 *             String[], boolean, QueryDefinition)}
-	 */
-	@Deprecated
-	@Override
-	public List<Object> getFoldersAndFileEntriesAndFileShortcuts(
-		long groupId, long folderId, int status, String[] mimeTypes,
-		boolean includeMountFolders, int start, int end,
-		OrderByComparator<?> obc) {
-
-		QueryDefinition<?> queryDefinition = new QueryDefinition<>(
-			status, start, end, (OrderByComparator<Object>)obc);
-
-		return getFoldersAndFileEntriesAndFileShortcuts(
-			groupId, folderId, mimeTypes, includeMountFolders, queryDefinition);
-	}
-
 	@Override
 	public List<Object> getFoldersAndFileEntriesAndFileShortcuts(
 		long groupId, long folderId, String[] mimeTypes,
 		boolean includeMountFolders, QueryDefinition<?> queryDefinition) {
 
 		return dlFolderFinder.findF_FE_FS_ByG_F_M_M(
-			groupId, folderId, mimeTypes, includeMountFolders, queryDefinition);
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link
-	 *             #getFoldersAndFileEntriesAndFileShortcutsCount(long, long,
-	 *             String[], boolean, QueryDefinition)}
-	 */
-	@Deprecated
-	@Override
-	public int getFoldersAndFileEntriesAndFileShortcutsCount(
-		long groupId, long folderId, int status, boolean includeMountFolders) {
-
-		QueryDefinition<?> queryDefinition = new QueryDefinition<>(status);
-
-		return getFoldersAndFileEntriesAndFileShortcutsCount(
-			groupId, folderId, null, includeMountFolders, queryDefinition);
-	}
-
-	/**
-	 * @deprecated As of 6.2.0, replaced by {@link
-	 *             #getFoldersAndFileEntriesAndFileShortcutsCount(long, long,
-	 *             String[], boolean, QueryDefinition)}
-	 */
-	@Deprecated
-	@Override
-	public int getFoldersAndFileEntriesAndFileShortcutsCount(
-		long groupId, long folderId, int status, String[] mimeTypes,
-		boolean includeMountFolders) {
-
-		QueryDefinition<?> queryDefinition = new QueryDefinition<>(status);
-
-		return getFoldersAndFileEntriesAndFileShortcutsCount(
 			groupId, folderId, mimeTypes, includeMountFolders, queryDefinition);
 	}
 
@@ -864,26 +743,7 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 						parentPrimaryKey, treePath);
 				}
 
-				@Override
-				public void reindexTreeModels(List<TreeModel> treeModels)
-					throws PortalException {
-
-					if (!reindex) {
-						return;
-					}
-
-					Indexer<DLFolder> indexer =
-						IndexerRegistryUtil.nullSafeGetIndexer(DLFolder.class);
-
-					for (TreeModel treeModel : treeModels) {
-						DLFolder dlFolder = (DLFolder)treeModel;
-
-						indexer.reindex(dlFolder);
-					}
-				}
-
-			}
-		);
+			});
 	}
 
 	@Override
@@ -979,8 +839,10 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 					description, defaultFileEntryTypeId, fileEntryTypeIds,
 					restrictionType, serviceContext);
 
-				dlFileEntryTypeLocalService.cascadeFileEntryTypes(
-					serviceContext.getUserId(), dlFolder);
+				if (!ExportImportThreadLocal.isImportInProcess()) {
+					dlFileEntryTypeLocalService.cascadeFileEntryTypes(
+						serviceContext.getUserId(), dlFolder);
+				}
 			}
 
 			// Workflow definitions

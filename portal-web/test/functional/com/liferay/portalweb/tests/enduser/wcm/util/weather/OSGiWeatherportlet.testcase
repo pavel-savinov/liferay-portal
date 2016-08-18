@@ -1,11 +1,13 @@
 <definition component-name="portal-plugins-osgi">
+	<property name="osgi.modules.includes" value="weather-web" />
 	<property name="plugins.deployment.type" value="osgi" />
+	<property name="portal.release" value="true" />
 	<property name="testray.main.component.name" value="Weather" />
 
 	<set-up>
 		<execute macro="User#firstLoginPG" />
 
-		<execute macro="Page#addPG">
+		<execute macro="Page#add">
 			<var name="pageName" value="Test Page" />
 		</execute>
 	</set-up>
@@ -15,18 +17,14 @@
 	</tear-down>
 
 	<command name="WeatherPortletSmoke" priority="4">
-		<property name="portlet.plugins.includes" value="weather-portlet" />
-
 		<var name="appName" value="Weather" />
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="Test Page" />
 		</execute>
 
 		<execute macro="Portlet#addPG">
 			<var name="portletName" value="Weather" />
 		</execute>
-
-		<execute function="AntCommand#antCommand" locator1="build-test.xml" value1="remove-plugin -Dplugin.name=weather-portlet" />
 	</command>
 </definition>
