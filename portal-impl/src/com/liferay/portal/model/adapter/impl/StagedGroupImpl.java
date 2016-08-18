@@ -14,18 +14,20 @@
 
 package com.liferay.portal.model.adapter.impl;
 
-import com.liferay.portal.model.Group;
-import com.liferay.portal.model.adapter.StagedGroup;
+import com.liferay.exportimport.kernel.lar.StagedModelType;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.adapter.StagedGroup;
 import com.liferay.portal.model.impl.GroupImpl;
-import com.liferay.portlet.exportimport.lar.StagedModelType;
 
 import java.io.Serializable;
 
 import java.util.Date;
 
 /**
- * @author Daniel Kocsis
+ * @author     Daniel Kocsis
+ * @deprecated As of 7.0.0
  */
+@Deprecated
 public class StagedGroupImpl extends GroupImpl implements StagedGroup {
 
 	public StagedGroupImpl(Group group) {
