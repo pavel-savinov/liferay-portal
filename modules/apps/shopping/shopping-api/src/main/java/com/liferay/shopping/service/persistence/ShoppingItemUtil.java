@@ -16,14 +16,13 @@ package com.liferay.shopping.service.persistence;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.osgi.util.ServiceTrackerFactory;
+
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.service.ServiceContext;
 
 import com.liferay.shopping.model.ShoppingItem;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -50,28 +49,28 @@ public class ShoppingItemUtil {
 	 */
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#clearCache()
+	 * @see com.liferay.portal.kernel.service.persistence.BasePersistence#clearCache()
 	 */
 	public static void clearCache() {
 		getPersistence().clearCache();
 	}
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#clearCache(com.liferay.portal.model.BaseModel)
+	 * @see com.liferay.portal.kernel.service.persistence.BasePersistence#clearCache(com.liferay.portal.kernel.model.BaseModel)
 	 */
 	public static void clearCache(ShoppingItem shoppingItem) {
 		getPersistence().clearCache(shoppingItem);
 	}
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#countWithDynamicQuery(DynamicQuery)
+	 * @see com.liferay.portal.kernel.service.persistence.BasePersistence#countWithDynamicQuery(DynamicQuery)
 	 */
 	public static long countWithDynamicQuery(DynamicQuery dynamicQuery) {
 		return getPersistence().countWithDynamicQuery(dynamicQuery);
 	}
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#findWithDynamicQuery(DynamicQuery)
+	 * @see com.liferay.portal.kernel.service.persistence.BasePersistence#findWithDynamicQuery(DynamicQuery)
 	 */
 	public static List<ShoppingItem> findWithDynamicQuery(
 		DynamicQuery dynamicQuery) {
@@ -79,7 +78,7 @@ public class ShoppingItemUtil {
 	}
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#findWithDynamicQuery(DynamicQuery, int, int)
+	 * @see com.liferay.portal.kernel.service.persistence.BasePersistence#findWithDynamicQuery(DynamicQuery, int, int)
 	 */
 	public static List<ShoppingItem> findWithDynamicQuery(
 		DynamicQuery dynamicQuery, int start, int end) {
@@ -87,7 +86,7 @@ public class ShoppingItemUtil {
 	}
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#findWithDynamicQuery(DynamicQuery, int, int, OrderByComparator)
+	 * @see com.liferay.portal.kernel.service.persistence.BasePersistence#findWithDynamicQuery(DynamicQuery, int, int, OrderByComparator)
 	 */
 	public static List<ShoppingItem> findWithDynamicQuery(
 		DynamicQuery dynamicQuery, int start, int end,
@@ -98,14 +97,14 @@ public class ShoppingItemUtil {
 	}
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#update(com.liferay.portal.model.BaseModel)
+	 * @see com.liferay.portal.kernel.service.persistence.BasePersistence#update(com.liferay.portal.kernel.model.BaseModel)
 	 */
 	public static ShoppingItem update(ShoppingItem shoppingItem) {
 		return getPersistence().update(shoppingItem);
 	}
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#update(com.liferay.portal.model.BaseModel, ServiceContext)
+	 * @see com.liferay.portal.kernel.service.persistence.BasePersistence#update(com.liferay.portal.kernel.model.BaseModel, ServiceContext)
 	 */
 	public static ShoppingItem update(ShoppingItem shoppingItem,
 		ServiceContext serviceContext) {
@@ -113,11 +112,11 @@ public class ShoppingItemUtil {
 	}
 
 	/**
-	* Returns the shopping item where smallImageId = &#63; or throws a {@link com.liferay.shopping.NoSuchItemException} if it could not be found.
+	* Returns the shopping item where smallImageId = &#63; or throws a {@link NoSuchItemException} if it could not be found.
 	*
 	* @param smallImageId the small image ID
 	* @return the matching shopping item
-	* @throws com.liferay.shopping.NoSuchItemException if a matching shopping item could not be found
+	* @throws NoSuchItemException if a matching shopping item could not be found
 	*/
 	public static ShoppingItem findBySmallImageId(long smallImageId)
 		throws com.liferay.shopping.exception.NoSuchItemException {
@@ -169,11 +168,11 @@ public class ShoppingItemUtil {
 	}
 
 	/**
-	* Returns the shopping item where mediumImageId = &#63; or throws a {@link com.liferay.shopping.NoSuchItemException} if it could not be found.
+	* Returns the shopping item where mediumImageId = &#63; or throws a {@link NoSuchItemException} if it could not be found.
 	*
 	* @param mediumImageId the medium image ID
 	* @return the matching shopping item
-	* @throws com.liferay.shopping.NoSuchItemException if a matching shopping item could not be found
+	* @throws NoSuchItemException if a matching shopping item could not be found
 	*/
 	public static ShoppingItem findByMediumImageId(long mediumImageId)
 		throws com.liferay.shopping.exception.NoSuchItemException {
@@ -225,11 +224,11 @@ public class ShoppingItemUtil {
 	}
 
 	/**
-	* Returns the shopping item where largeImageId = &#63; or throws a {@link com.liferay.shopping.NoSuchItemException} if it could not be found.
+	* Returns the shopping item where largeImageId = &#63; or throws a {@link NoSuchItemException} if it could not be found.
 	*
 	* @param largeImageId the large image ID
 	* @return the matching shopping item
-	* @throws com.liferay.shopping.NoSuchItemException if a matching shopping item could not be found
+	* @throws NoSuchItemException if a matching shopping item could not be found
 	*/
 	public static ShoppingItem findByLargeImageId(long largeImageId)
 		throws com.liferay.shopping.exception.NoSuchItemException {
@@ -359,7 +358,7 @@ public class ShoppingItemUtil {
 	* @param categoryId the category ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching shopping item
-	* @throws com.liferay.shopping.NoSuchItemException if a matching shopping item could not be found
+	* @throws NoSuchItemException if a matching shopping item could not be found
 	*/
 	public static ShoppingItem findByG_C_First(long groupId, long categoryId,
 		OrderByComparator<ShoppingItem> orderByComparator)
@@ -389,7 +388,7 @@ public class ShoppingItemUtil {
 	* @param categoryId the category ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching shopping item
-	* @throws com.liferay.shopping.NoSuchItemException if a matching shopping item could not be found
+	* @throws NoSuchItemException if a matching shopping item could not be found
 	*/
 	public static ShoppingItem findByG_C_Last(long groupId, long categoryId,
 		OrderByComparator<ShoppingItem> orderByComparator)
@@ -420,7 +419,7 @@ public class ShoppingItemUtil {
 	* @param categoryId the category ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the previous, current, and next shopping item
-	* @throws com.liferay.shopping.NoSuchItemException if a shopping item with the primary key could not be found
+	* @throws NoSuchItemException if a shopping item with the primary key could not be found
 	*/
 	public static ShoppingItem[] findByG_C_PrevAndNext(long itemId,
 		long groupId, long categoryId,
@@ -491,7 +490,7 @@ public class ShoppingItemUtil {
 	* @param categoryId the category ID
 	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the previous, current, and next shopping item
-	* @throws com.liferay.shopping.NoSuchItemException if a shopping item with the primary key could not be found
+	* @throws NoSuchItemException if a shopping item with the primary key could not be found
 	*/
 	public static ShoppingItem[] filterFindByG_C_PrevAndNext(long itemId,
 		long groupId, long categoryId,
@@ -535,12 +534,12 @@ public class ShoppingItemUtil {
 	}
 
 	/**
-	* Returns the shopping item where companyId = &#63; and sku = &#63; or throws a {@link com.liferay.shopping.NoSuchItemException} if it could not be found.
+	* Returns the shopping item where companyId = &#63; and sku = &#63; or throws a {@link NoSuchItemException} if it could not be found.
 	*
 	* @param companyId the company ID
 	* @param sku the sku
 	* @return the matching shopping item
-	* @throws com.liferay.shopping.NoSuchItemException if a matching shopping item could not be found
+	* @throws NoSuchItemException if a matching shopping item could not be found
 	*/
 	public static ShoppingItem findByC_S(long companyId, java.lang.String sku)
 		throws com.liferay.shopping.exception.NoSuchItemException {
@@ -627,7 +626,7 @@ public class ShoppingItemUtil {
 	*
 	* @param itemId the primary key of the shopping item
 	* @return the shopping item that was removed
-	* @throws com.liferay.shopping.NoSuchItemException if a shopping item with the primary key could not be found
+	* @throws NoSuchItemException if a shopping item with the primary key could not be found
 	*/
 	public static ShoppingItem remove(long itemId)
 		throws com.liferay.shopping.exception.NoSuchItemException {
@@ -639,11 +638,11 @@ public class ShoppingItemUtil {
 	}
 
 	/**
-	* Returns the shopping item with the primary key or throws a {@link com.liferay.shopping.NoSuchItemException} if it could not be found.
+	* Returns the shopping item with the primary key or throws a {@link NoSuchItemException} if it could not be found.
 	*
 	* @param itemId the primary key of the shopping item
 	* @return the shopping item
-	* @throws com.liferay.shopping.NoSuchItemException if a shopping item with the primary key could not be found
+	* @throws NoSuchItemException if a shopping item with the primary key could not be found
 	*/
 	public static ShoppingItem findByPrimaryKey(long itemId)
 		throws com.liferay.shopping.exception.NoSuchItemException {
@@ -750,21 +749,6 @@ public class ShoppingItemUtil {
 		return _serviceTracker.getService();
 	}
 
-	/**
-	 * @deprecated As of 6.2.0
-	 */
-	@Deprecated
-	public void setPersistence(ShoppingItemPersistence persistence) {
-	}
-
-	private static ServiceTracker<ShoppingItemPersistence, ShoppingItemPersistence> _serviceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(ShoppingItemUtil.class);
-
-		_serviceTracker = new ServiceTracker<ShoppingItemPersistence, ShoppingItemPersistence>(bundle.getBundleContext(),
-				ShoppingItemPersistence.class, null);
-
-		_serviceTracker.open();
-	}
+	private static ServiceTracker<ShoppingItemPersistence, ShoppingItemPersistence> _serviceTracker =
+		ServiceTrackerFactory.open(ShoppingItemPersistence.class);
 }

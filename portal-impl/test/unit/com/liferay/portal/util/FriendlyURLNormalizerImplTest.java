@@ -37,6 +37,13 @@ public class FriendlyURLNormalizerImplTest {
 	}
 
 	@Test
+	public void testNormalizeInternationalizedResourceIdentifiers() {
+		Assert.assertEquals(
+			"%E5%BC%95",
+			_friendlyURLNormalizerImpl.normalizeWithEncoding("\u5F15"));
+	}	
+	
+	@Test
 	public void testNormalizeSentenceWithBlanks() {
 		Assert.assertEquals(
 			"sentence-with-blanks",
@@ -85,15 +92,6 @@ public class FriendlyURLNormalizerImplTest {
 		Assert.assertEquals(
 			StringPool.SPACE,
 			_friendlyURLNormalizerImpl.normalize(StringPool.SPACE));
-	}
-
-	@SuppressWarnings("deprecation")
-	@Test
-	public void testNormalizeWordReplacingChars() {
-		Assert.assertEquals(
-			"s-nt-nc-ith-r-plac-chars",
-			_friendlyURLNormalizerImpl.normalize(
-				"sentence with replace chars", new char[] {'e', 'w'}));
 	}
 
 	@Test

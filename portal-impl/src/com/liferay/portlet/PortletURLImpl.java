@@ -17,14 +17,25 @@ package com.liferay.portlet;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.Portlet;
+import com.liferay.portal.kernel.model.PortletApp;
+import com.liferay.portal.kernel.model.PublicRenderParameter;
+import com.liferay.portal.kernel.model.impl.VirtualLayout;
 import com.liferay.portal.kernel.portlet.FriendlyURLMapper;
 import com.liferay.portal.kernel.portlet.LiferayPortletConfig;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletModeFactory;
-import com.liferay.portal.kernel.portlet.PortletProvider;
-import com.liferay.portal.kernel.portlet.PortletProviderUtil;
+import com.liferay.portal.kernel.portlet.PortletQName;
+import com.liferay.portal.kernel.portlet.PortletQNameUtil;
 import com.liferay.portal.kernel.portlet.WindowStateFactory;
+import com.liferay.portal.kernel.security.auth.AuthTokenUtil;
+import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
+import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
+import com.liferay.portal.kernel.theme.PortletDisplay;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.CharPool;
@@ -35,28 +46,14 @@ import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.QName;
-import com.liferay.portal.model.Company;
-import com.liferay.portal.model.Layout;
-import com.liferay.portal.model.LayoutTypePortlet;
-import com.liferay.portal.model.Portlet;
-import com.liferay.portal.model.PortletApp;
-import com.liferay.portal.model.PublicRenderParameter;
-import com.liferay.portal.model.impl.VirtualLayout;
-import com.liferay.portal.security.auth.AuthTokenUtil;
-import com.liferay.portal.security.auth.AuthTokenWhitelistUtil;
 import com.liferay.portal.security.lang.DoPrivilegedUtil;
-import com.liferay.portal.service.LayoutLocalServiceUtil;
-import com.liferay.portal.service.PortletLocalServiceUtil;
-import com.liferay.portal.theme.PortletDisplay;
-import com.liferay.portal.theme.ThemeDisplay;
-import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portlet.admin.util.PortalProductMenuApplicationType;
 import com.liferay.portlet.social.util.FacebookUtil;
 import com.liferay.util.Encryptor;
 import com.liferay.util.EncryptorException;
@@ -207,6 +204,7 @@ public class PortletURLImpl
 		return _parametersIncludedInPath;
 	}
 
+	@Override
 	public long getPlid() {
 		return _plid;
 	}
@@ -790,83 +788,11 @@ public class PortletURLImpl
 	}
 
 	protected void addPortalAuthToken(StringBundler sb, Key key) {
-		if (!PropsValues.AUTH_TOKEN_CHECK_ENABLED ||
-			!_lifecycle.equals(PortletRequest.ACTION_PHASE)) {
-
-			return;
-		}
-
-		Portlet portlet = getPortlet();
-
-		if (portlet == null) {
-			return;
-		}
-
-		String strutsAction = getParameter("struts_action");
-
-		if (AuthTokenWhitelistUtil.isPortletCSRFWhitelisted(
-				portlet.getCompanyId(), _portletId, strutsAction)) {
-
-			return;
-		}
-
-		sb.append("p_auth");
-		sb.append(StringPool.EQUAL);
-		sb.append(processValue(key, AuthTokenUtil.getToken(_request)));
-		sb.append(StringPool.AMPERSAND);
+		AuthTokenUtil.addCSRFToken(_request, this);
 	}
 
 	protected void addPortletAuthToken(StringBundler sb, Key key) {
-		if (!PropsValues.PORTLET_ADD_DEFAULT_RESOURCE_CHECK_ENABLED) {
-			return;
-		}
-
-		Portlet portlet = getPortlet();
-
-		if (portlet == null) {
-			return;
-		}
-
-		if (!portlet.isAddDefaultResource()) {
-			return;
-		}
-
-		String strutsAction = getParameter("struts_action");
-
-		if (AuthTokenWhitelistUtil.isPortletInvocationWhitelisted(
-				portlet.getCompanyId(), _portletId, strutsAction)) {
-
-			return;
-		}
-
-		try {
-			LayoutTypePortlet targetLayoutTypePortlet =
-				(LayoutTypePortlet)getLayout().getLayoutType();
-
-			if (targetLayoutTypePortlet.hasPortletId(_portletId)) {
-				return;
-			}
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(e.getMessage(), e);
-			}
-		}
-
-		String controlPanelMenuPortletId = PortletProviderUtil.getPortletId(
-			PortalProductMenuApplicationType.ProductMenu.CLASS_NAME,
-			PortletProvider.Action.VIEW);
-
-		if (_portletId.equals(controlPanelMenuPortletId)) {
-			return;
-		}
-
-		sb.append("p_p_auth");
-		sb.append(StringPool.EQUAL);
-		sb.append(
-			processValue(
-				key, AuthTokenUtil.getToken(_request, _plid, _portletId)));
-		sb.append(StringPool.AMPERSAND);
+		AuthTokenUtil.addPortletInvocationToken(_request, this);
 	}
 
 	protected void clearCache() {
@@ -887,17 +813,6 @@ public class PortletURLImpl
 			}
 
 			return StringPool.BLANK;
-		}
-
-		String portalURL = null;
-
-		if (themeDisplay.isFacebook()) {
-			portalURL =
-				FacebookUtil.FACEBOOK_APPS_URL +
-					themeDisplay.getFacebookCanvasPageURL();
-		}
-		else {
-			portalURL = PortalUtil.getPortalURL(_request, _secure);
 		}
 
 		try {
@@ -934,7 +849,7 @@ public class PortletURLImpl
 		}
 
 		if (Validator.isNull(_layoutFriendlyURL)) {
-			sb.append(portalURL);
+			sb.append(PortalUtil.getPortalURL(_request, _secure));
 			sb.append(themeDisplay.getPathMain());
 			sb.append("/portal/layout?");
 
@@ -947,7 +862,8 @@ public class PortletURLImpl
 		}
 		else {
 			if (themeDisplay.isFacebook()) {
-				sb.append(portalURL);
+				sb.append(FacebookUtil.FACEBOOK_APPS_URL);
+				sb.append(themeDisplay.getFacebookCanvasPageURL());
 			}
 			else {
 
@@ -958,7 +874,7 @@ public class PortletURLImpl
 				if (!_layoutFriendlyURL.startsWith(Http.HTTP_WITH_SLASH) &&
 					!_layoutFriendlyURL.startsWith(Http.HTTPS_WITH_SLASH)) {
 
-					sb.append(portalURL);
+					sb.append(PortalUtil.getPortalURL(_request, _secure));
 				}
 
 				sb.append(_layoutFriendlyURL);
@@ -1096,13 +1012,15 @@ public class PortletURLImpl
 			sb.append(StringPool.AMPERSAND);
 		}
 
+		Map<String, String[]> renderParams = _params;
+
 		if (_copyCurrentRenderParameters) {
-			mergeRenderParameters();
+			renderParams = _mergeWithRenderParameters(renderParams);
 		}
 
 		int previousSbIndex = sb.index();
 
-		for (Map.Entry<String, String[]> entry : _params.entrySet()) {
+		for (Map.Entry<String, String[]> entry : renderParams.entrySet()) {
 			String name = entry.getKey();
 			String[] values = entry.getValue();
 
@@ -1147,8 +1065,10 @@ public class PortletURLImpl
 
 				String lastString = sb.stringAt(sb.index() - 1);
 
-				if (lastString.charAt(lastString.length() - 1) !=
-						CharPool.AMPERSAND) {
+				char lastChar = lastString.charAt(lastString.length() - 1);
+
+				if ((lastChar != CharPool.AMPERSAND) &&
+					(lastChar != CharPool.QUESTION)) {
 
 					sb.append(StringPool.AMPERSAND);
 				}
@@ -1263,15 +1183,17 @@ public class PortletURLImpl
 			}
 		}
 
+		Map<String, String[]> renderParams = _params;
+
 		if (_copyCurrentRenderParameters) {
-			mergeRenderParameters();
+			renderParams = _mergeWithRenderParameters(renderParams);
 		}
 
 		StringBundler parameterSb = new StringBundler();
 
 		int previousSbIndex = sb.index();
 
-		for (Map.Entry<String, String[]> entry : _params.entrySet()) {
+		for (Map.Entry<String, String[]> entry : renderParams.entrySet()) {
 			String name = entry.getKey();
 			String[] values = entry.getValue();
 
@@ -1357,57 +1279,25 @@ public class PortletURLImpl
 		}
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	protected void mergeRenderParameters() {
-		String namespace = getNamespace();
-
-		Layout layout = getLayout();
-
-		Map<String, String[]> renderParameters = RenderParametersPool.get(
-			_request, layout.getPlid(), getPortlet().getPortletId());
-
-		for (Map.Entry<String, String[]> entry : renderParameters.entrySet()) {
-			String name = entry.getKey();
-
-			if (name.contains(namespace)) {
-				name = name.substring(namespace.length());
-			}
-
-			if (!_lifecycle.equals(PortletRequest.RESOURCE_PHASE) &&
-				(_removedParameterNames != null) &&
-				_removedParameterNames.contains(name)) {
-
-				continue;
-			}
-
-			String[] oldValues = entry.getValue();
-			String[] newValues = _params.get(name);
-
-			if (newValues == null) {
-				_params.put(name, oldValues);
-			}
-			else if (isBlankValue(newValues)) {
-				_params.remove(name);
-			}
-			else {
-				newValues = ArrayUtil.append(newValues, oldValues);
-
-				_params.put(name, newValues);
-			}
-		}
+		_params = _mergeWithRenderParameters(_params);
 	}
 
 	protected String prependNamespace(String name) {
 		String namespace = getNamespace();
 
-		if (!PortalUtil.isReservedParameter(name) &&
-			!name.startsWith(PortletQName.PUBLIC_RENDER_PARAMETER_NAMESPACE) &&
-			!name.startsWith(namespace)) {
+		if (!name.startsWith(PortletQName.PUBLIC_RENDER_PARAMETER_NAMESPACE) &&
+			!name.startsWith(namespace) &&
+			!PortalUtil.isReservedParameter(name)) {
 
 			return namespace.concat(name);
 		}
-		else {
-			return name;
-		}
+
+		return name;
 	}
 
 	protected String processValue(Key key, int value) {
@@ -1435,6 +1325,56 @@ public class PortletURLImpl
 		if (_params.containsKey(name)) {
 			_params.remove(name);
 		}
+	}
+
+	private Map<String, String[]> _mergeWithRenderParameters(
+		Map<String, String[]> portletURLParams) {
+
+		String namespace = getNamespace();
+
+		Layout layout = getLayout();
+
+		Map<String, String[]> renderParameters = RenderParametersPool.get(
+			_request, layout.getPlid(), getPortlet().getPortletId());
+
+		if (renderParameters == null) {
+			return portletURLParams;
+		}
+
+		Map<String, String[]> mergedRenderParams = new LinkedHashMap<>(
+			portletURLParams);
+
+		for (Map.Entry<String, String[]> entry : renderParameters.entrySet()) {
+			String name = entry.getKey();
+
+			if (name.contains(namespace)) {
+				name = name.substring(namespace.length());
+			}
+
+			if (!_lifecycle.equals(PortletRequest.RESOURCE_PHASE) &&
+				(_removedParameterNames != null) &&
+				_removedParameterNames.contains(name)) {
+
+				continue;
+			}
+
+			String[] oldValues = entry.getValue();
+			String[] newValues = _params.get(name);
+
+			if (newValues == null) {
+				mergedRenderParams.put(name, oldValues);
+			}
+			else if (isBlankValue(newValues)) {
+				mergedRenderParams.remove(name);
+			}
+			else {
+				newValues = ArrayUtil.append(newValues, oldValues);
+
+				mergedRenderParams.put(name, newValues);
+			}
+		}
+
+		return mergedRenderParams;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(PortletURLImpl.class);

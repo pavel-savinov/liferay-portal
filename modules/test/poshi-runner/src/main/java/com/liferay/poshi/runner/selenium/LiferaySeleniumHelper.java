@@ -14,6 +14,7 @@
 
 package com.liferay.poshi.runner.selenium;
 
+import com.liferay.poshi.runner.PoshiRunnerContext;
 import com.liferay.poshi.runner.PoshiRunnerGetterUtil;
 import com.liferay.poshi.runner.exception.PoshiRunnerWarningException;
 import com.liferay.poshi.runner.util.AntCommands;
@@ -30,6 +31,7 @@ import com.liferay.poshi.runner.util.Validator;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
 import java.io.BufferedReader;
@@ -44,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -106,8 +109,7 @@ public class LiferaySeleniumHelper {
 			LiferaySelenium liferaySelenium, String fileName, String target)
 		throws Exception {
 
-		AntCommands antCommands = new AntCommands(
-			liferaySelenium, fileName, target);
+		AntCommands antCommands = new AntCommands(fileName, target);
 
 		ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -158,8 +160,8 @@ public class LiferaySeleniumHelper {
 
 		if (!pattern.equals(confirmation)) {
 			throw new Exception(
-				"Pattern \"" + pattern + "\" does not match \"" + confirmation +
-					"\"");
+				"Expected text \"" + pattern +
+					"\" does not match actual text \"" + confirmation + "\"");
 		}
 	}
 
@@ -192,7 +194,7 @@ public class LiferaySeleniumHelper {
 		for (Element eventElement : eventElements) {
 			String level = eventElement.attributeValue("level");
 
-			if (level.equals("ERROR")) {
+			if (level.equals("ERROR") || level.equals("FATAL")) {
 				String timestamp = eventElement.attributeValue("timestamp");
 
 				if (_errorTimestamps.contains(timestamp)) {
@@ -305,7 +307,8 @@ public class LiferaySeleniumHelper {
 	}
 
 	public static void assertLocation(
-		LiferaySelenium liferaySelenium, String pattern) {
+			LiferaySelenium liferaySelenium, String pattern)
+		throws Exception {
 
 		TestCase.assertEquals(pattern, liferaySelenium.getLocation());
 	}
@@ -460,7 +463,7 @@ public class LiferaySeleniumHelper {
 		LiferaySelenium liferaySelenium, String pattern) {
 
 		TestCase.assertTrue(
-			Validator.equals(pattern, liferaySelenium.getAlert()));
+			Objects.equals(pattern, liferaySelenium.getAlert()));
 	}
 
 	public static void assertNotChecked(
@@ -484,10 +487,11 @@ public class LiferaySeleniumHelper {
 	}
 
 	public static void assertNotLocation(
-		LiferaySelenium liferaySelenium, String pattern) {
+			LiferaySelenium liferaySelenium, String pattern)
+		throws Exception {
 
 		TestCase.assertTrue(
-			Validator.equals(pattern, liferaySelenium.getLocation()));
+			Objects.equals(pattern, liferaySelenium.getLocation()));
 	}
 
 	public static void assertNotPartialText(
@@ -497,7 +501,7 @@ public class LiferaySeleniumHelper {
 		liferaySelenium.assertElementPresent(locator);
 
 		if (liferaySelenium.isPartialText(locator, pattern)) {
-			String text = liferaySelenium.getElementText(locator);
+			String text = liferaySelenium.getText(locator);
 
 			throw new Exception(
 				"\"" + text + "\" contains \"" + pattern + "\" at \"" +
@@ -528,7 +532,7 @@ public class LiferaySeleniumHelper {
 		liferaySelenium.assertElementPresent(locator);
 
 		if (liferaySelenium.isText(locator, pattern)) {
-			String text = liferaySelenium.getElementText(locator);
+			String text = liferaySelenium.getText(locator);
 
 			throw new Exception(
 				"Pattern \"" + pattern + "\" matches \"" + text + "\" at \"" +
@@ -582,7 +586,7 @@ public class LiferaySeleniumHelper {
 		liferaySelenium.assertElementPresent(locator);
 
 		if (liferaySelenium.isNotPartialText(locator, pattern)) {
-			String text = liferaySelenium.getElementText(locator);
+			String text = liferaySelenium.getText(locator);
 
 			throw new Exception(
 				"\"" + text + "\" does not contain \"" + pattern + "\" at \"" +
@@ -601,8 +605,9 @@ public class LiferaySeleniumHelper {
 			String text = liferaySelenium.getSelectedLabel(selectLocator);
 
 			throw new Exception(
-				"Pattern \"" + pattern + "\" does not match \"" + text +
-					"\" at \"" + selectLocator + "\"");
+				"Expected text \"" + pattern +
+					"\" does not match actual text \"" + text + "\" at \"" +
+						selectLocator + "\"");
 		}
 	}
 
@@ -613,11 +618,12 @@ public class LiferaySeleniumHelper {
 		liferaySelenium.assertElementPresent(locator);
 
 		if (liferaySelenium.isNotText(locator, pattern)) {
-			String text = liferaySelenium.getElementText(locator);
+			String text = liferaySelenium.getText(locator);
 
 			throw new Exception(
-				"Pattern \"" + pattern + "\" does not match \"" + text +
-					"\" at \"" + locator + "\"");
+				"Expected text \"" + pattern +
+					"\" does not match actual text \"" + text + "\" at \"" +
+						locator + "\"");
 		}
 	}
 
@@ -649,8 +655,9 @@ public class LiferaySeleniumHelper {
 			String value = liferaySelenium.getElementValue(locator);
 
 			throw new Exception(
-				"Pattern \"" + pattern + "\" does not match \"" + value +
-					"\" at \"" + locator + "\"");
+				"Expected text \"" + pattern +
+					"\" does not match actual text \"" + value + "\" at \"" +
+						locator + "\"");
 		}
 	}
 
@@ -782,8 +789,7 @@ public class LiferaySeleniumHelper {
 		DirectoryScanner directoryScanner = new DirectoryScanner();
 
 		directoryScanner.setIncludes(
-			new String[] {PropsValues.TEST_CONSOLE_LOG_FILE_NAME}
-		);
+			new String[] {PropsValues.TEST_CONSOLE_LOG_FILE_NAME});
 
 		directoryScanner.scan();
 
@@ -910,11 +916,11 @@ public class LiferaySeleniumHelper {
 			return true;
 		}
 
-		if (Validator.equals(PropsValues.LIFERAY_PORTAL_BUNDLE, "6.2.10.1") ||
-			Validator.equals(PropsValues.LIFERAY_PORTAL_BUNDLE, "6.2.10.2") ||
-			Validator.equals(PropsValues.LIFERAY_PORTAL_BUNDLE, "6.2.10.3") ||
-			Validator.equals(PropsValues.LIFERAY_PORTAL_BUNDLE, "6.2.10.4") ||
-			Validator.equals(PropsValues.LIFERAY_PORTAL_BRANCH, "ee-6.2.10")) {
+		if (Objects.equals(PropsValues.LIFERAY_PORTAL_BUNDLE, "6.2.10.1") ||
+			Objects.equals(PropsValues.LIFERAY_PORTAL_BUNDLE, "6.2.10.2") ||
+			Objects.equals(PropsValues.LIFERAY_PORTAL_BUNDLE, "6.2.10.3") ||
+			Objects.equals(PropsValues.LIFERAY_PORTAL_BUNDLE, "6.2.10.4") ||
+			Objects.equals(PropsValues.LIFERAY_PORTAL_BRANCH, "ee-6.2.10")) {
 
 			if (line.contains(
 					"com.liferay.portal.kernel.search.SearchException: " +
@@ -1064,6 +1070,14 @@ public class LiferaySeleniumHelper {
 		return PropsValues.TCAT_ENABLED;
 	}
 
+	public static boolean isTestName(String testName) {
+		if (testName.equals(PoshiRunnerContext.getTestCaseCommandName())) {
+			return true;
+		}
+
+		return false;
+	}
+
 	public static boolean isTextNotPresent(
 		LiferaySelenium liferaySelenium, String pattern) {
 
@@ -1142,6 +1156,16 @@ public class LiferaySeleniumHelper {
 		captureScreen(
 			_CURRENT_DIR_NAME + "test-results/functional/screenshots/" +
 				"ScreenshotBeforeAction" + _screenshotErrorCount + ".jpg");
+	}
+
+	public static void selectFieldText() {
+		Keyboard keyboard = new DesktopKeyboard();
+
+		keyboard.keyDown(KeyEvent.VK_CONTROL);
+
+		keyboard.type("a");
+
+		keyboard.keyUp(KeyEvent.VK_CONTROL);
 	}
 
 	public static void sendEmail(
@@ -1833,7 +1857,7 @@ public class LiferaySeleniumHelper {
 
 				sb.append("<value><![CDATA[");
 				sb.append(exception.getMessage());
-				sb.append(")]]></value>\n");
+				sb.append("]]></value>\n");
 			}
 		}
 
@@ -1843,7 +1867,7 @@ public class LiferaySeleniumHelper {
 
 				sb.append("<value><![CDATA[");
 				sb.append(exception.getMessage());
-				sb.append(")]]></value>\n");
+				sb.append("]]></value>\n");
 			}
 		}
 
@@ -1873,7 +1897,7 @@ public class LiferaySeleniumHelper {
 		return bufferedReader;
 	}
 
-	private static List<ScreenRegion> getScreenRegions(
+	private static List<ScreenRegion> _getScreenRegions(
 			LiferaySelenium liferaySelenium, String image)
 		throws Exception {
 
@@ -1896,7 +1920,7 @@ public class LiferaySeleniumHelper {
 	private static final List<Exception> _javaScriptExceptions =
 		new ArrayList<>();
 	private static final List<Exception> _liferayExceptions = new ArrayList<>();
-	private static int _screenshotCount = 0;
-	private static int _screenshotErrorCount = 0;
+	private static int _screenshotCount;
+	private static int _screenshotErrorCount;
 
 }

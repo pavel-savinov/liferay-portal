@@ -16,6 +16,11 @@ package com.liferay.portlet.messageboards.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.message.boards.kernel.exception.NoSuchThreadFlagException;
+import com.liferay.message.boards.kernel.model.MBThreadFlag;
+import com.liferay.message.boards.kernel.service.persistence.MBThreadFlagPersistence;
+
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
@@ -27,22 +32,20 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.persistence.CompanyProvider;
+import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
+import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
-import com.liferay.portal.model.CacheModel;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.ServiceContextThreadLocal;
-import com.liferay.portal.service.persistence.impl.BasePersistenceImpl;
 
-import com.liferay.portlet.messageboards.NoSuchThreadFlagException;
-import com.liferay.portlet.messageboards.model.MBThreadFlag;
 import com.liferay.portlet.messageboards.model.impl.MBThreadFlagImpl;
 import com.liferay.portlet.messageboards.model.impl.MBThreadFlagModelImpl;
-import com.liferay.portlet.messageboards.service.persistence.MBThreadFlagPersistence;
 
 import java.io.Serializable;
 
@@ -53,6 +56,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -64,7 +68,7 @@ import java.util.Set;
  *
  * @author Brian Wing Shun Chan
  * @see MBThreadFlagPersistence
- * @see com.liferay.portlet.messageboards.service.persistence.MBThreadFlagUtil
+ * @see com.liferay.message.boards.kernel.service.persistence.MBThreadFlagUtil
  * @generated
  */
 @ProviderType
@@ -196,7 +200,7 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBThreadFlag mbThreadFlag : list) {
-					if (!Validator.equals(uuid, mbThreadFlag.getUuid())) {
+					if (!Objects.equals(uuid, mbThreadFlag.getUuid())) {
 						list = null;
 
 						break;
@@ -210,7 +214,7 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -437,8 +441,9 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -668,8 +673,8 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 
 			msg.append(StringPool.CLOSE_CURLY_BRACE);
 
-			if (_log.isWarnEnabled()) {
-				_log.warn(msg.toString());
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
 			}
 
 			throw new NoSuchThreadFlagException(msg.toString());
@@ -713,7 +718,7 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 		if (result instanceof MBThreadFlag) {
 			MBThreadFlag mbThreadFlag = (MBThreadFlag)result;
 
-			if (!Validator.equals(uuid, mbThreadFlag.getUuid()) ||
+			if (!Objects.equals(uuid, mbThreadFlag.getUuid()) ||
 					(groupId != mbThreadFlag.getGroupId())) {
 				result = null;
 			}
@@ -1004,7 +1009,7 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 
 			if ((list != null) && !list.isEmpty()) {
 				for (MBThreadFlag mbThreadFlag : list) {
-					if (!Validator.equals(uuid, mbThreadFlag.getUuid()) ||
+					if (!Objects.equals(uuid, mbThreadFlag.getUuid()) ||
 							(companyId != mbThreadFlag.getCompanyId())) {
 						list = null;
 
@@ -1019,7 +1024,7 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 
 			if (orderByComparator != null) {
 				query = new StringBundler(4 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(4);
@@ -1265,11 +1270,12 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(5 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
-			query = new StringBundler(3);
+			query = new StringBundler(4);
 		}
 
 		query.append(_SQL_SELECT_MBTHREADFLAG_WHERE);
@@ -1592,7 +1598,7 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -1806,8 +1812,9 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -2093,7 +2100,7 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 
 			if (orderByComparator != null) {
 				query = new StringBundler(3 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 			}
 			else {
 				query = new StringBundler(3);
@@ -2309,8 +2316,9 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
-			query = new StringBundler(6 +
-					(orderByComparator.getOrderByFields().length * 6));
+			query = new StringBundler(4 +
+					(orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
 		}
 		else {
 			query = new StringBundler(3);
@@ -2510,8 +2518,8 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 
 			msg.append(StringPool.CLOSE_CURLY_BRACE);
 
-			if (_log.isWarnEnabled()) {
-				_log.warn(msg.toString());
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
 			}
 
 			throw new NoSuchThreadFlagException(msg.toString());
@@ -2898,6 +2906,8 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 
 		mbThreadFlag.setUuid(uuid);
 
+		mbThreadFlag.setCompanyId(companyProvider.getCompanyId());
+
 		return mbThreadFlag;
 	}
 
@@ -2933,8 +2943,8 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 					primaryKey);
 
 			if (mbThreadFlag == null) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+				if (_log.isDebugEnabled()) {
+					_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
 				throw new NoSuchThreadFlagException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
@@ -3160,7 +3170,7 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 	}
 
 	/**
-	 * Returns the message boards thread flag with the primary key or throws a {@link com.liferay.portal.NoSuchModelException} if it could not be found.
+	 * Returns the message boards thread flag with the primary key or throws a {@link com.liferay.portal.kernel.exception.NoSuchModelException} if it could not be found.
 	 *
 	 * @param primaryKey the primary key of the message boards thread flag
 	 * @return the message boards thread flag
@@ -3172,8 +3182,8 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 		MBThreadFlag mbThreadFlag = fetchByPrimaryKey(primaryKey);
 
 		if (mbThreadFlag == null) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			if (_log.isDebugEnabled()) {
+				_log.debug(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 			}
 
 			throw new NoSuchThreadFlagException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
@@ -3204,12 +3214,14 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 	 */
 	@Override
 	public MBThreadFlag fetchByPrimaryKey(Serializable primaryKey) {
-		MBThreadFlag mbThreadFlag = (MBThreadFlag)entityCache.getResult(MBThreadFlagModelImpl.ENTITY_CACHE_ENABLED,
+		Serializable serializable = entityCache.getResult(MBThreadFlagModelImpl.ENTITY_CACHE_ENABLED,
 				MBThreadFlagImpl.class, primaryKey);
 
-		if (mbThreadFlag == _nullMBThreadFlag) {
+		if (serializable == nullModel) {
 			return null;
 		}
+
+		MBThreadFlag mbThreadFlag = (MBThreadFlag)serializable;
 
 		if (mbThreadFlag == null) {
 			Session session = null;
@@ -3225,7 +3237,7 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 				}
 				else {
 					entityCache.putResult(MBThreadFlagModelImpl.ENTITY_CACHE_ENABLED,
-						MBThreadFlagImpl.class, primaryKey, _nullMBThreadFlag);
+						MBThreadFlagImpl.class, primaryKey, nullModel);
 				}
 			}
 			catch (Exception e) {
@@ -3279,18 +3291,20 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 		Set<Serializable> uncachedPrimaryKeys = null;
 
 		for (Serializable primaryKey : primaryKeys) {
-			MBThreadFlag mbThreadFlag = (MBThreadFlag)entityCache.getResult(MBThreadFlagModelImpl.ENTITY_CACHE_ENABLED,
+			Serializable serializable = entityCache.getResult(MBThreadFlagModelImpl.ENTITY_CACHE_ENABLED,
 					MBThreadFlagImpl.class, primaryKey);
 
-			if (mbThreadFlag == null) {
-				if (uncachedPrimaryKeys == null) {
-					uncachedPrimaryKeys = new HashSet<Serializable>();
-				}
+			if (serializable != nullModel) {
+				if (serializable == null) {
+					if (uncachedPrimaryKeys == null) {
+						uncachedPrimaryKeys = new HashSet<Serializable>();
+					}
 
-				uncachedPrimaryKeys.add(primaryKey);
-			}
-			else {
-				map.put(primaryKey, mbThreadFlag);
+					uncachedPrimaryKeys.add(primaryKey);
+				}
+				else {
+					map.put(primaryKey, (MBThreadFlag)serializable);
+				}
 			}
 		}
 
@@ -3332,7 +3346,7 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 
 			for (Serializable primaryKey : uncachedPrimaryKeys) {
 				entityCache.putResult(MBThreadFlagModelImpl.ENTITY_CACHE_ENABLED,
-					MBThreadFlagImpl.class, primaryKey, _nullMBThreadFlag);
+					MBThreadFlagImpl.class, primaryKey, nullModel);
 			}
 		}
 		catch (Exception e) {
@@ -3434,7 +3448,7 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 
 			if (orderByComparator != null) {
 				query = new StringBundler(2 +
-						(orderByComparator.getOrderByFields().length * 3));
+						(orderByComparator.getOrderByFields().length * 2));
 
 				query.append(_SQL_SELECT_MBTHREADFLAG);
 
@@ -3559,6 +3573,8 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
+	@BeanReference(type = CompanyProviderWrapper.class)
+	protected CompanyProvider companyProvider;
 	protected EntityCache entityCache = EntityCacheUtil.getEntityCache();
 	protected FinderCache finderCache = FinderCacheUtil.getFinderCache();
 	private static final String _SQL_SELECT_MBTHREADFLAG = "SELECT mbThreadFlag FROM MBThreadFlag mbThreadFlag";
@@ -3573,22 +3589,4 @@ public class MBThreadFlagPersistenceImpl extends BasePersistenceImpl<MBThreadFla
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
 				"uuid"
 			});
-	private static final MBThreadFlag _nullMBThreadFlag = new MBThreadFlagImpl() {
-			@Override
-			public Object clone() {
-				return this;
-			}
-
-			@Override
-			public CacheModel<MBThreadFlag> toCacheModel() {
-				return _nullMBThreadFlagCacheModel;
-			}
-		};
-
-	private static final CacheModel<MBThreadFlag> _nullMBThreadFlagCacheModel = new CacheModel<MBThreadFlag>() {
-			@Override
-			public MBThreadFlag toEntityModel() {
-				return _nullMBThreadFlag;
-			}
-		};
 }

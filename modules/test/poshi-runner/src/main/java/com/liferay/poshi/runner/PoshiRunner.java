@@ -33,6 +33,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import org.openqa.selenium.WebDriverException;
+
 /**
  * @author Brian Wing Shun Chan
  * @author Michael Hashimoto
@@ -67,7 +69,7 @@ public class PoshiRunner {
 				for (Element commandElement : commandElements) {
 					classCommandNames.add(
 						className + "#" +
-						commandElement.attributeValue("name"));
+							commandElement.attributeValue("name"));
 				}
 			}
 		}
@@ -89,13 +91,20 @@ public class PoshiRunner {
 		PoshiRunnerContext.setTestCaseCommandName(_testClassCommandName);
 		PoshiRunnerContext.setTestCaseName(_testClassName);
 
-		XMLLoggerHandler.generateXMLLog(classCommandName);
+		PoshiRunnerVariablesUtil.clear();
 
-		CommandLoggerHandler.startRunning();
+		try {
+			XMLLoggerHandler.generateXMLLog(classCommandName);
 
-		LoggerUtil.startLogger();
+			LoggerUtil.startLogger();
 
-		SeleniumUtil.startSelenium();
+			SeleniumUtil.startSelenium();
+		}
+		catch (WebDriverException wde) {
+			wde.printStackTrace();
+
+			throw wde;
+		}
 	}
 
 	@Test
@@ -114,6 +123,12 @@ public class PoshiRunner {
 
 			PoshiRunnerStackTraceUtil.emptyStackTrace();
 
+			e.printStackTrace();
+
+			if (PropsValues.TEST_PAUSE_ON_FAILURE) {
+				LoggerUtil.pauseFailedTest();
+			}
+
 			throw new Exception(e.getMessage(), e);
 		}
 		finally {
@@ -130,11 +145,13 @@ public class PoshiRunner {
 				PoshiRunnerStackTraceUtil.printStackTrace(e.getMessage());
 
 				PoshiRunnerStackTraceUtil.emptyStackTrace();
+
+				if (PropsValues.TEST_PAUSE_ON_FAILURE) {
+					LoggerUtil.pauseFailedTest();
+				}
 			}
 			finally {
 				LoggerUtil.stopLogger();
-
-				CommandLoggerHandler.stopRunning();
 
 				SeleniumUtil.stopSelenium();
 			}
@@ -150,13 +167,10 @@ public class PoshiRunner {
 		List<Element> varElements = rootElement.elements("var");
 
 		for (Element varElement : varElements) {
-			String name = varElement.attributeValue("name");
-			String value = varElement.attributeValue("value");
-
-			PoshiRunnerVariablesUtil.putIntoExecuteMap(name, value);
+			PoshiRunnerExecutor.runVarElement(varElement, false, false);
 		}
 
-		PoshiRunnerVariablesUtil.pushCommandMap();
+		PoshiRunnerVariablesUtil.pushCommandMap(true);
 
 		Element commandElement = PoshiRunnerContext.getTestCaseCommandElement(
 			classCommandName);
