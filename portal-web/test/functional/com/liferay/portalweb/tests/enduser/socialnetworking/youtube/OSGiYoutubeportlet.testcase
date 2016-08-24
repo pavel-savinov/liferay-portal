@@ -1,11 +1,13 @@
 <definition component-name="portal-plugins-osgi">
+	<property name="osgi.modules.includes" value="youtube-web" />
+	<property name="portal.release" value="true" />
 	<property name="plugins.deployment.type" value="osgi" />
 	<property name="testray.main.component.name" value="Social Networking" />
 
 	<set-up>
 		<execute macro="User#firstLoginPG" />
 
-		<execute macro="Page#addPG">
+		<execute macro="Page#add">
 			<var name="pageName" value="Test Page" />
 		</execute>
 	</set-up>
@@ -15,11 +17,9 @@
 	</tear-down>
 
 	<command name="YouTubePortletSmoke" priority="4">
-		<property name="portlet.plugins.includes" value="youtube-portlet" />
-
 		<var name="appName" value="YouTube" />
 
-		<execute macro="Page#gotoPG">
+		<execute macro="Navigator#gotoPage">
 			<var name="pageName" value="Test Page" />
 		</execute>
 

@@ -72,6 +72,30 @@ public class RubySassCompilerTest {
 	}
 
 	@Test
+	public void testCompileFileSassVariableWithUnicode() throws Exception {
+		SassCompiler sassCompiler = new RubySassCompiler();
+
+		File inputDir = new File(
+			"../sass-compiler-jni/src/test/resources/com/liferay/sass" +
+				"/compiler/jni/internal/dependencies/");
+
+		File inputFile = new File(inputDir, "/unicode/input.scss");
+
+		String actualOutput = sassCompiler.compileFile(
+			inputFile.getCanonicalPath(), "");
+
+		Assert.assertNotNull(actualOutput);
+
+		File expectedOutputFile = new File(
+			inputDir, "/unicode/expected_output.css");
+
+		String expectedOutput = read(expectedOutputFile.toPath());
+
+		Assert.assertEquals(
+			stripNewLines(expectedOutput), stripNewLines(actualOutput));
+	}
+
+	@Test
 	public void testCompileFileWithSourceMap() throws Exception {
 		SassCompiler sassCompiler = new RubySassCompiler();
 
@@ -118,6 +142,31 @@ public class RubySassCompilerTest {
 	}
 
 	@Test
+	public void testCompileStringSassVariableWithUnicode() throws Exception {
+		SassCompiler sassCompiler = new RubySassCompiler();
+
+		File inputDir = new File(
+			"../sass-compiler-jni/src/test/resources/com/liferay/sass" +
+				"/compiler/jni/internal/dependencies/");
+
+		File inputFile = new File(inputDir, "/unicode/input.scss");
+
+		String input = read(inputFile.toPath());
+
+		String actualOutput = sassCompiler.compileString(input, "");
+
+		Assert.assertNotNull(actualOutput);
+
+		File expectedOutputFile = new File(
+			inputDir, "/unicode/expected_output.css");
+
+		String expectedOutput = read(expectedOutputFile.toPath());
+
+		Assert.assertEquals(
+			stripNewLines(expectedOutput), stripNewLines(actualOutput));
+	}
+
+	@Test
 	public void testCompileStringWithSourceMap() throws Exception {
 		SassCompiler sassCompiler = new RubySassCompiler();
 
@@ -147,6 +196,27 @@ public class RubySassCompilerTest {
 			"expected_output.css");
 
 		String expectedOutput = read(expectedOutputFile.toPath());
+
+		Assert.assertEquals(
+			stripNewLines(expectedOutput), stripNewLines(actualOutput));
+	}
+
+	@Test
+	public void testSassPrecision() throws Exception {
+		SassCompiler sassCompiler = new RubySassCompiler(10);
+
+		String expectedOutput = ".foo { line-height: 1.428571429; }";
+		String actualOutput = sassCompiler.compileString(
+			"$val: 1.428571429;.foo { line-height: $val; }", "");
+
+		Assert.assertEquals(
+			stripNewLines(expectedOutput), stripNewLines(actualOutput));
+
+		sassCompiler = new RubySassCompiler(3);
+
+		expectedOutput = ".foo { line-height: 1.429; }";
+		actualOutput = sassCompiler.compileString(
+			"$val: 1.428571429;.foo { line-height: $val; }", "");
 
 		Assert.assertEquals(
 			stripNewLines(expectedOutput), stripNewLines(actualOutput));
