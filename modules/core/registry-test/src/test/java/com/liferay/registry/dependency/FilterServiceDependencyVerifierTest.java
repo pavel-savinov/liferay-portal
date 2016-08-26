@@ -59,7 +59,7 @@ public class FilterServiceDependencyVerifierTest {
 				"FilterServiceDependencyVerifierTest$TestInstance1)");
 
 		FilterServiceDependencyVerifier filterServiceDependencyVerifier1 =
-			new FilterServiceDependencyVerifier (filter1);
+			new FilterServiceDependencyVerifier(filter1);
 
 		Assert.assertTrue(
 			filterServiceDependencyVerifier1.verify(serviceReference));
@@ -80,10 +80,10 @@ public class FilterServiceDependencyVerifierTest {
 			filterServiceDependencyVerifier2.verify(serviceReference2));
 	}
 
-	private class TestInstance1 implements TestInterface1 {
+	private static class TestInstance1 implements TestInterface1 {
 	}
 
-	private class TestInstance2 implements TestInterface2 {
+	private static class TestInstance2 implements TestInterface2 {
 	}
 
 	private interface TestInterface1 {

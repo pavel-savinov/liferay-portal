@@ -1,0 +1,23 @@
+apply plugin: "com.liferay.xml.formatter"
+apply plugin: "java"
+
+task runGradleTest
+
+repositories {
+	mavenLocal()
+
+	maven {
+		url "https://cdn.lfrs.sl/repository.liferay.com/nexus/content/groups/public"
+	}
+}
+
+runGradleTest {
+	dependsOn formatXML
+
+	doLast {
+		File expectedSampleXmlFile = file("expected-sample.xml")
+		File sampleXmlFile = file("src/main/resources/sample.xml")
+
+		assert expectedSampleXmlFile.text.normalize() == sampleXmlFile.text.normalize()
+	}
+}

@@ -7,17 +7,19 @@
 			</then>
 		</if>
 
-		<execute function="Click#clickAtSidebarClickAtWaitForScript" locator1="Icon#ADD" value1="Add" />
+		<execute function="Click#clickAtSidebarClickAtWaitForScript" locator1="ControlMenu#ADD" value1="Add" />
 
-		<execute function="AssertClick" locator1="NavPill#PAGE" value1="Page" />
 		<execute function="Type" locator1="TextInput#NAME" value1="${pageName}" />
 
 		<if>
 			<isset var="pageType" />
 			<then>
-				<execute macro="Page#selectPageTypeRadioPG">
-					<var name="pageType" value="${pageType}" />
-					<var name="portletNameList" value="${portletNameList}" />
+				<execute macro="Page#_selectPageTypeRadio">
+					<var name="columnName" value="${columnName}" />
+					<var name="componentName" value="${componentName}" />
+					<var name="pageTypeDescription" value="${pageTypeDescription}" />
+					<var name="pageTypeURL" value="${pageTypeURL}" />
+					<var name="sitePageType" value="${pageType}" />
 				</execute>
 			</then>
 		</if>
@@ -123,7 +125,7 @@
 		<execute function="Click#pauseClickAt" locator1="SOUserBar#GO_TO_ADD_SITE_BUTTON" />
 
 		<execute function="SelectFrameTop" />
-		<execute function="Type#clickAtSendKeys" locator1="SOUserBarAddSite#NAME_FIELD" value1="${siteName}" />
+		<execute function="Type#clickAtType" locator1="SOUserBarAddSite#NAME_FIELD" value1="${siteName}" />
 		<execute function="Type" locator1="SOUserBarAddSite#DESCRIPTION_FIELD" value1="${siteDescription}" />
 		<execute function="Click" locator1="SOUserBarAddSite#NEXT_BUTTON" />
 
@@ -163,7 +165,7 @@
 		<if>
 			<condition function="IsElementPresent" locator1="SOUserBarAddSite#ERROR_MESSAGE" />
 			<then>
-				<execute function="Type#clickAtSendKeys" locator1="SOUserBarAddSite#NAME_FIELD" value1="${siteName}" />
+				<execute function="Type#clickAtType" locator1="SOUserBarAddSite#NAME_FIELD" value1="${siteName}" />
 				<execute function="Click" locator1="SOUserBarAddSite#SAVE_BUTTON" />
 			</then>
 		</if>

@@ -14,11 +14,13 @@
  */
 --%>
 
-<c:if test="<%= PropsValues.SEARCH_CONTAINER_SHOW_PAGINATION_BOTTOM && paginate %>">
-	<div class="taglib-search-iterator-page-iterator-bottom">
-		<liferay-ui:search-paginator id='<%= id + "PageIteratorBottom" %>' markupView="<%= markupView %>" searchContainer="<%= searchContainer %>" type="<%= type %>" />
+		<c:if test="<%= paginate %>">
+			<div class="taglib-search-iterator-page-iterator-bottom">
+				<liferay-ui:search-paginator id='<%= id + "PageIteratorBottom" %>' markupView="<%= markupView %>" searchContainer="<%= searchContainer %>" type="<%= type %>" />
+			</div>
+		</c:if>
 	</div>
-</c:if>
+</div>
 
 <c:if test="<%= Validator.isNotNull(id) %>">
 	<input id="<%= namespace + id %>PrimaryKeys" name="<%= namespace + id %>PrimaryKeys" type="hidden" value="" />
@@ -48,9 +50,16 @@
 		var rowSelector = '<%= rowHtmlTag %><%= rowCheckerRowSelector %>';
 
 		<c:if test="<%= rowChecker != null %>">
+			var rememberCheckBoxState = <%= rowChecker.isRememberCheckBoxState() %>;
+
+			<c:if test="<%= rowChecker.isRememberCheckBoxState() && Validator.isNotNull(rowChecker.getRememberCheckBoxStateURLRegex()) %>">
+				rememberCheckBoxState = '<%= rowChecker.getRememberCheckBoxStateURLRegex() %>';
+			</c:if>
+
 			plugins.push(
 				{
 					cfg: {
+						keepSelection: rememberCheckBoxState,
 						rowSelector: rowSelector
 					},
 					fn: A.Plugin.SearchContainerSelect

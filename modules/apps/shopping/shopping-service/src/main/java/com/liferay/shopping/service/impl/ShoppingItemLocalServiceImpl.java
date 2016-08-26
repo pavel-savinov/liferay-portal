@@ -15,6 +15,11 @@
 package com.liferay.shopping.service.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.permission.ModelPermissions;
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -22,10 +27,6 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.ResourceConstants;
-import com.liferay.portal.model.User;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.permission.ModelPermissions;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.shopping.exception.DuplicateItemFieldNameException;
 import com.liferay.shopping.exception.DuplicateItemSKUException;
@@ -424,9 +425,27 @@ public class ShoppingItemLocalServiceImpl
 	}
 
 	@Override
+	public List<ShoppingItem> search(
+		long groupId, long[] categoryIds, String keywords, int start, int end,
+		OrderByComparator<ShoppingItem> obc) {
+
+		return shoppingItemFinder.findByKeywords(
+			groupId, categoryIds, keywords, start, end, obc);
+	}
+
+	@Override
 	public int searchCount(long groupId, long[] categoryIds, String keywords) {
 		return shoppingItemFinder.countByKeywords(
 			groupId, categoryIds, keywords);
+	}
+
+	@Override
+	public int searchCount(
+		long groupId, long[] categoryIds, String keywords,
+		OrderByComparator<ShoppingItem> obc) {
+
+		return shoppingItemFinder.countByKeywords(
+			groupId, categoryIds, keywords, obc);
 	}
 
 	@Override
@@ -555,17 +574,9 @@ public class ShoppingItemLocalServiceImpl
 	}
 
 	protected String checkItemField(String value) {
-		return StringUtil.replace(
-			value,
-			new String[] {
-				StringPool.AMPERSAND, StringPool.APOSTROPHE, StringPool.EQUAL,
-				StringPool.PIPE, StringPool.QUOTE
-			},
-			new String[] {
-				StringPool.BLANK, StringPool.BLANK, StringPool.BLANK,
-				StringPool.BLANK, StringPool.BLANK
-			}
-		);
+		return StringUtil.removeChars(
+			value, CharPool.AMPERSAND, CharPool.APOSTROPHE, CharPool.EQUAL,
+			CharPool.PIPE, CharPool.QUOTE);
 	}
 
 	protected long getCategory(ShoppingItem item, long categoryId) {
@@ -662,7 +673,7 @@ public class ShoppingItemLocalServiceImpl
 			List<String> itemFieldNames = new ArrayList<>();
 			List<String> duplicateItemFieldNames = new ArrayList<>();
 
-			StringBundler sb = new StringBundler(itemFields.size());
+			StringBundler sb = new StringBundler(itemFields.size() * 2);
 
 			for (ShoppingItemField itemField : itemFields) {
 				if (itemFieldNames.contains(itemField.getName())) {

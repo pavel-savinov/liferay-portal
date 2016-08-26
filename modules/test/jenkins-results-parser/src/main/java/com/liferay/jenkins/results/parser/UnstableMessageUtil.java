@@ -33,12 +33,23 @@ public class UnstableMessageUtil {
 				buildURL + "testReport/api/json"));
 
 		int failCount = testReportJSONObject.getInt("failCount");
-		int totalCount = testReportJSONObject.getInt("totalCount");
+		int passCount = 0;
+		int totalCount = 0;
 
-		int passCount = totalCount - failCount;
+		if (!testReportJSONObject.has("passCount") &&
+			testReportJSONObject.has("totalCount")) {
 
-		sb.append("<h6>Job Results:</h6>");
-		sb.append("<p>");
+			totalCount = testReportJSONObject.getInt("totalCount");
+
+			passCount = totalCount - failCount;
+		}
+		else {
+			passCount = testReportJSONObject.getInt("passCount");
+
+			totalCount = failCount + passCount;
+		}
+
+		sb.append("<h6>Job Results:</h6><p>");
 		sb.append(passCount);
 		sb.append(" Test");
 
@@ -54,9 +65,7 @@ public class UnstableMessageUtil {
 			sb.append("s");
 		}
 
-		sb.append(" Failed.</p>");
-
-		sb.append("<ol>");
+		sb.append(" Failed.</p><ol>");
 
 		List<String> runBuildURLs = new ArrayList<>();
 
@@ -93,27 +102,81 @@ public class UnstableMessageUtil {
 			runBuildURLs.add(buildURL);
 		}
 
-		int failureCount = _getUnstableMessage(sb, runBuildURLs);
+		int failureCount = _getUnstableMessage(runBuildURLs, sb);
 
 		sb.append("</ol>");
 
 		if (failureCount > 3) {
-			sb.append("<p><strong>Click <a href=\\\"");
+			sb.append("<p><strong>Click <a href=\"");
 			sb.append(buildURL);
-			sb.append("/testReport/\\\">here</a> for more failures.</strong>");
+			sb.append("/testReport/\">here</a> for more failures.</strong>");
 			sb.append("</p>");
 		}
 
 		return sb.toString();
 	}
 
+	private static void _getFailureMessage(
+			String failureBuildURL, StringBuilder sb)
+		throws Exception {
+
+		sb.append("<li><strong><a href=\"");
+		sb.append(failureBuildURL);
+		sb.append("\">");
+
+		JSONObject failureJSONObject = JenkinsResultsParserUtil.toJSONObject(
+			JenkinsResultsParserUtil.getLocalURL(failureBuildURL + "api/json"));
+
+		sb.append(
+			JenkinsResultsParserUtil.fixJSON(
+				failureJSONObject.getString("fullDisplayName")));
+
+		sb.append("</a></strong>");
+
+		GenericFailureMessageGenerator genericFailureMessageGenerator =
+			new GenericFailureMessageGenerator();
+
+		String consoleOutput = JenkinsResultsParserUtil.toString(
+			JenkinsResultsParserUtil.getLocalURL(
+				failureBuildURL + "/logText/progressiveText"));
+
+		sb.append(
+			genericFailureMessageGenerator.getMessage(
+				failureBuildURL, consoleOutput, null));
+
+		sb.append("</li>");
+	}
+
 	private static int _getUnstableMessage(
-			StringBuilder sb, List<String> runBuildURLs)
+			List<String> runBuildURLs, StringBuilder sb)
 		throws Exception {
 
 		int failureCount = 0;
 
 		for (String runBuildURL : runBuildURLs) {
+			JSONObject runBuildURLJSONObject =
+				JenkinsResultsParserUtil.toJSONObject(
+					JenkinsResultsParserUtil.getLocalURL(
+						runBuildURL + "api/json"));
+
+			String result = runBuildURLJSONObject.getString("result");
+
+			if (result.equals("FAILURE")) {
+				if (failureCount == 3) {
+					failureCount++;
+
+					sb.append("<li>...</li>");
+
+					return failureCount;
+				}
+
+				_getFailureMessage(runBuildURL, sb);
+
+				failureCount++;
+
+				continue;
+			}
+
 			JSONObject testReportJSONObject =
 				JenkinsResultsParserUtil.toJSONObject(
 					JenkinsResultsParserUtil.getLocalURL(
@@ -147,7 +210,7 @@ public class UnstableMessageUtil {
 						return failureCount;
 					}
 
-					sb.append("<li><a href=\\\"");
+					sb.append("<li><a href=\"");
 
 					String runBuildHREF = runBuildURL;
 
@@ -190,15 +253,10 @@ public class UnstableMessageUtil {
 
 					sb.append(testMethodNameURL);
 
-					sb.append("\\\">");
+					sb.append("\">");
 					sb.append(testSimpleClassName);
 					sb.append(".");
 					sb.append(testMethodName);
-
-					JSONObject runBuildURLJSONObject =
-						JenkinsResultsParserUtil.toJSONObject(
-							JenkinsResultsParserUtil.getLocalURL(
-								runBuildURL + "api/json"));
 
 					String jobVariant = JenkinsResultsParserUtil.getJobVariant(
 						runBuildURLJSONObject);
@@ -226,15 +284,15 @@ public class UnstableMessageUtil {
 						if (description.length() > x) {
 							description = description.substring(x);
 
-							description = description.replace("\"", "\\\"");
+							description = description.replace("\"", "\"");
 
 							sb.append(description);
 							sb.append(" - ");
 						}
 
-						sb.append("<a href=\\\"");
+						sb.append("<a href=\"");
 						sb.append(runBuildURL);
-						sb.append("/console\\\">Console Output</a>");
+						sb.append("/console\">Console Output</a>");
 					}
 
 					sb.append("</li>");

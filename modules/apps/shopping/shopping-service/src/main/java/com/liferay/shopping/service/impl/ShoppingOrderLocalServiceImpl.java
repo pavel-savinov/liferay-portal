@@ -16,19 +16,18 @@ package com.liferay.shopping.service.impl;
 
 import com.liferay.portal.kernel.comment.CommentManagerUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
-import com.liferay.portal.kernel.module.configuration.ConfigurationFactory;
+import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
 import com.liferay.portal.kernel.settings.LocalizedValuesMap;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.PwdGenerator;
+import com.liferay.portal.kernel.util.SubscriptionSender;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.User;
-import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.spring.extender.service.ServiceReference;
-import com.liferay.portal.util.PropsValues;
-import com.liferay.portal.util.SubscriptionSender;
 import com.liferay.shopping.configuration.ShoppingGroupServiceOverriddenConfiguration;
 import com.liferay.shopping.constants.ShoppingConstants;
 import com.liferay.shopping.constants.ShoppingPortletKeys;
@@ -64,9 +63,9 @@ import com.liferay.shopping.model.ShoppingOrderConstants;
 import com.liferay.shopping.model.ShoppingOrderItem;
 import com.liferay.shopping.model.impl.ShoppingCartItemImpl;
 import com.liferay.shopping.service.base.ShoppingOrderLocalServiceBaseImpl;
+import com.liferay.shopping.util.CreditCard;
 import com.liferay.shopping.util.ShoppingUtil;
 import com.liferay.shopping.util.comparator.OrderDateComparator;
-import com.liferay.util.CreditCard;
 
 import java.util.Currency;
 import java.util.List;
@@ -139,13 +138,12 @@ public class ShoppingOrderLocalServiceImpl
 
 		shoppingOrderPersistence.update(order);
 
-		// Comment
+		// Resources
 
-		if (PropsValues.SHOPPING_ORDER_COMMENTS_ENABLED) {
-			CommentManagerUtil.addDiscussion(
-				userId, groupId, ShoppingOrder.class.getName(), orderId,
-				order.getUserName());
-		}
+		resourceLocalService.addResources(
+			order.getCompanyId(), order.getGroupId(), order.getUserId(),
+			ShoppingOrder.class.getName(), order.getOrderId(), false, true,
+			false);
 
 		return order;
 	}
@@ -210,7 +208,7 @@ public class ShoppingOrderLocalServiceImpl
 					try {
 						int quantity =
 							GetterUtil.getInteger(fieldsQuantities[rowPos]) -
-							orderItem.getQuantity();
+								orderItem.getQuantity();
 
 						fieldsQuantities[rowPos] = String.valueOf(quantity);
 
@@ -782,14 +780,14 @@ public class ShoppingOrderLocalServiceImpl
 		}
 	}
 
-	@ServiceReference(type = ConfigurationFactory.class)
-	protected ConfigurationFactory configurationFactory;
+	@ServiceReference(type = ConfigurationProvider.class)
+	protected ConfigurationProvider configurationProvider;
 
 	private ShoppingGroupServiceOverriddenConfiguration
 			_getShoppingGroupServiceOverriddenConfiguration(long groupId)
 		throws ConfigurationException {
 
-		return configurationFactory.getConfiguration(
+		return configurationProvider.getConfiguration(
 			ShoppingGroupServiceOverriddenConfiguration.class,
 			new GroupServiceSettingsLocator(
 				groupId, ShoppingConstants.SERVICE_NAME));

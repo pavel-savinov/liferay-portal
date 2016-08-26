@@ -15,9 +15,13 @@
 package com.liferay.portlet.usersadmin.util;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.service.UserServiceUtil;
 import com.liferay.portal.kernel.test.IdempotentRetryAssert;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -27,12 +31,7 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.model.User;
-import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.service.UserServiceUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.test.rule.MainServletTestRule;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -55,8 +54,7 @@ public class UserIndexerTest {
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-		new AggregateTestRule(
-			new LiferayIntegrationTestRule(), MainServletTestRule.INSTANCE);
+		new LiferayIntegrationTestRule();
 
 	@Before
 	public void setUp() throws Exception {
@@ -130,12 +128,9 @@ public class UserIndexerTest {
 		addUserNameFields(firstName, lastName, middleName);
 
 		assertHits("firstName", "\"Mary Watson\"", 0);
+		assertHits("firstName", "\"Mary Jane\" Missingword", 0);
 
 		User user = assertSearchOneUser("firstName", "Mary \"Jane Watson\"");
-
-		Assert.assertEquals(firstName, user.getFirstName());
-
-		user = assertSearchOneUser("firstName", "\"Mary Jane\" Trial");
 
 		Assert.assertEquals(firstName, user.getFirstName());
 	}
@@ -239,28 +234,18 @@ public class UserIndexerTest {
 	}
 
 	@Test
-	public void testScreenNamePrefix() throws Exception {
-		addUserScreenName("Open4Life");
-
-		User user = assertSearchOneUser("OPE");
-
-		Assert.assertEquals("open4life", user.getScreenName());
-	}
-
-	@Test
 	public void testScreenNameSubstring() throws Exception {
 		addUserScreenName("Open4Life");
 
-		User user = assertSearchOneUser("4lif");
+		User user = assertSearchOneUser("open lite");
 
 		Assert.assertEquals("open4life", user.getScreenName());
-	}
 
-	@Test
-	public void testScreenNameTwoWords() throws Exception {
-		addUserScreenName("Open4Life");
+		user = assertSearchOneUser("OPE");
 
-		User user = assertSearchOneUser("screenName", "open lite");
+		Assert.assertEquals("open4life", user.getScreenName());
+
+		user = assertSearchOneUser("4lif");
 
 		Assert.assertEquals("open4life", user.getScreenName());
 	}
