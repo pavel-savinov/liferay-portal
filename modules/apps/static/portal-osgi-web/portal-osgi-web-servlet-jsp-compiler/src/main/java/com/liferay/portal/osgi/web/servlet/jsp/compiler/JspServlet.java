@@ -296,6 +296,7 @@ public class JspServlet extends HttpServlet {
 			TagHandlerPool.OPTION_TAGPOOL, JspTagHandlerPool.class.getName());
 
 		Enumeration<String> names = servletConfig.getInitParameterNames();
+
 		Set<String> nameSet = new HashSet<>(Collections.list(names));
 
 		nameSet.addAll(defaults.keySet());
@@ -643,7 +644,12 @@ public class JspServlet extends HttpServlet {
 				Path parentPath = path.getParent();
 
 				if (parentPath != null) {
-					dirName += parentPath.toString() + "/";
+					String parentPathString = parentPath.toString();
+
+					parentPathString = parentPathString.replaceAll(
+						StringPool.UNDERLINE, "_005f");
+
+					dirName += parentPathString + "/";
 				}
 
 				Path fileNamePath = path.getFileName();
