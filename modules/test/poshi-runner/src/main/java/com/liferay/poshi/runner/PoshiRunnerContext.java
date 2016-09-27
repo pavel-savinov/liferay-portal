@@ -314,6 +314,14 @@ public class PoshiRunnerContext {
 			properties.setProperty(propertyName, propertyValue);
 		}
 
+		if (Validator.isNotNull(
+				commandElement.attributeValue("known-issues"))) {
+
+			String knownIssues = commandElement.attributeValue("known-issues");
+
+			properties.setProperty("known-issues", knownIssues);
+		}
+
 		if (Validator.isNotNull(commandElement.attributeValue("priority"))) {
 			String priority = commandElement.attributeValue("priority");
 
@@ -444,6 +452,18 @@ public class PoshiRunnerContext {
 			propertyQuery = sb.toString();
 		}
 
+		if (Validator.isNotNull(PropsValues.TEST_RUN_ENVIRONMENT)) {
+			StringBuilder sb = new StringBuilder();
+
+			sb.append(propertyQuery);
+			sb.append(" AND ");
+			sb.append("(test.run.environment == \"");
+			sb.append(PropsValues.TEST_RUN_ENVIRONMENT);
+			sb.append("\" OR test.run.environment == null)");
+
+			propertyQuery = sb.toString();
+		}
+
 		List<String> classCommandNames = new ArrayList<>();
 
 		PQLEntity pqlEntity = PQLEntityFactory.newPQLEntity(propertyQuery);
@@ -526,21 +546,21 @@ public class PoshiRunnerContext {
 
 		for (int i = 0; i < classCommandNameGroups.size(); i++) {
 			List<String> classCommandNameGroup = classCommandNameGroups.get(i);
-			int subGroupSize = PropsValues.TEST_BATCH_MAX_SUBGROUP_SIZE;
+			int subgroupSize = PropsValues.TEST_BATCH_MAX_SUBGROUP_SIZE;
 
-			int subGroupCount = MathUtil.quotient(
-				classCommandNameGroup.size(), subGroupSize, true);
+			int subgroupCount = MathUtil.quotient(
+				classCommandNameGroup.size(), subgroupSize, true);
 
 			sb.append("RUN_TEST_CASE_METHOD_GROUP_");
 			sb.append(i);
 			sb.append("=");
 
-			for (int j = 0; j < subGroupCount; j++) {
+			for (int j = 0; j < subgroupCount; j++) {
 				sb.append(i);
 				sb.append("_");
 				sb.append(j);
 
-				if (j < (subGroupCount - 1)) {
+				if (j < (subgroupCount - 1)) {
 					sb.append(" ");
 				}
 			}
@@ -548,15 +568,15 @@ public class PoshiRunnerContext {
 			sb.append("\n");
 
 			for (int j = 0; j < classCommandNameGroup.size(); j++) {
-				if ((j % subGroupSize) == 0) {
+				if ((j % subgroupSize) == 0) {
 					sb.append("RUN_TEST_CASE_METHOD_GROUP_");
 					sb.append(i);
 					sb.append("_");
-					sb.append(j / subGroupSize);
+					sb.append(j / subgroupSize);
 					sb.append("=");
 					sb.append(classCommandNameGroup.get(j));
 				}
-				else if (((j + 1) % subGroupSize) == 0) {
+				else if (((j + 1) % subgroupSize) == 0) {
 					sb.append(",");
 					sb.append(classCommandNameGroup.get(j));
 					sb.append("\n");
@@ -642,6 +662,7 @@ public class PoshiRunnerContext {
 		Element rootElement = getTestCaseRootElement(className);
 
 		List<Element> commandElements = rootElement.elements("command");
+
 		Set<String> commandNames = new TreeSet<>();
 
 		for (Element commandElement : commandElements) {
@@ -1082,6 +1103,7 @@ public class PoshiRunnerContext {
 					componentNameKey.replace("-", "_"));
 
 				sb.append(componentNameKey);
+
 				sb.append("=");
 
 				Set<String> classCommandNames = _componentClassCommandNames.get(
@@ -1198,6 +1220,7 @@ public class PoshiRunnerContext {
 					StringUtil.split(testCaseAvailablePropertyNames)));
 		}
 
+		_testCaseAvailablePropertyNames.add("known-issues");
 		_testCaseAvailablePropertyNames.add("priority");
 
 		String testCaseRequiredPropertyNames =
