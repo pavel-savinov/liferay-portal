@@ -76,6 +76,8 @@ import org.gradle.api.tasks.bundling.AbstractArchiveTask;
  */
 public class LiferayRelengPlugin implements Plugin<Project> {
 
+	public static final Plugin<Project> INSTANCE = new LiferayRelengPlugin();
+
 	public static final String PRINT_ARTIFACT_PUBLISH_COMMANDS =
 		"printArtifactPublishCommands";
 
@@ -99,8 +101,7 @@ public class LiferayRelengPlugin implements Plugin<Project> {
 	}
 
 	public static File getRelengDir(Project project) {
-		File rootDir = GradleUtil.getRootDir(
-			project.getRootProject(), ".releng");
+		File rootDir = GradleUtil.getRootDir(project, ".releng");
 
 		if (rootDir == null) {
 			return null;
@@ -667,6 +668,9 @@ public class LiferayRelengPlugin implements Plugin<Project> {
 		}
 
 		return false;
+	}
+
+	private LiferayRelengPlugin() {
 	}
 
 	private void _configureTaskEnabledIfDependenciesArePublished(Task task) {
