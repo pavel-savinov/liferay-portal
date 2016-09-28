@@ -40,6 +40,7 @@ import com.liferay.gradle.plugins.js.module.config.generator.ConfigJSModulesTask
 import com.liferay.gradle.plugins.js.module.config.generator.JSModuleConfigGeneratorPlugin;
 import com.liferay.gradle.plugins.node.tasks.PublishNodeModuleTask;
 import com.liferay.gradle.plugins.patcher.PatchTask;
+import com.liferay.gradle.plugins.service.builder.BuildServiceTask;
 import com.liferay.gradle.plugins.service.builder.ServiceBuilderPlugin;
 import com.liferay.gradle.plugins.test.integration.TestIntegrationBasePlugin;
 import com.liferay.gradle.plugins.tlddoc.builder.TLDDocBuilderPlugin;
@@ -102,14 +103,19 @@ import org.gradle.api.JavaVersion;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.artifacts.ComponentSelection;
+import org.gradle.api.artifacts.ComponentSelectionRules;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.artifacts.Dependency;
+import org.gradle.api.artifacts.DependencyResolveDetails;
 import org.gradle.api.artifacts.DependencySet;
 import org.gradle.api.artifacts.ModuleDependency;
+import org.gradle.api.artifacts.ModuleVersionSelector;
 import org.gradle.api.artifacts.ProjectDependency;
 import org.gradle.api.artifacts.ResolutionStrategy;
 import org.gradle.api.artifacts.ResolveException;
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier;
 import org.gradle.api.artifacts.dsl.ArtifactHandler;
 import org.gradle.api.artifacts.dsl.DependencyHandler;
 import org.gradle.api.artifacts.dsl.RepositoryHandler;
@@ -275,8 +281,9 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		addDependenciesPmd(project);
 
 		if (testProject || hasTests(project)) {
-			GradleUtil.applyPlugin(project, WhipDefaultsPlugin.class);
 			GradleUtil.applyPlugin(project, WhipPlugin.class);
+
+			WhipDefaultsPlugin.INSTANCE.apply(project);
 
 			Configuration portalConfiguration = GradleUtil.getConfiguration(
 				project, LiferayBasePlugin.PORTAL_CONFIGURATION_NAME);
@@ -368,6 +375,7 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 						project, portalRootDir,
 						ServiceBuilderPlugin.CONFIGURATION_NAME,
 						_SERVICE_BUILDER_PORTAL_TOOL_NAME);
+					_configureTaskBuildService(project);
 				}
 
 			});
@@ -518,6 +526,7 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		configuration.setVisible(false);
 
 		_configureConfigurationNoCache(configuration);
+		_configureConfigurationNoSnapshots(configuration);
 
 		return configuration;
 	}
@@ -831,6 +840,7 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 			project, JavaPlugin.RUNTIME_CONFIGURATION_NAME);
 
 		copy.from(configuration);
+
 		copy.into(libDir);
 		copy.rename(
 			new RenameDependencyClosure(project, configuration.getName()));
@@ -1273,7 +1283,7 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		bundleDefaultInstructions.put(Constants.BUNDLE_VENDOR, "Liferay, Inc.");
 		bundleDefaultInstructions.put(
 			Constants.DONOTCOPY,
-			"(" + LiferayOSGiExtension.DONOTCOPY_DEFAULT + "|.touch" + ")");
+			"(" + LiferayOSGiExtension.DONOTCOPY_DEFAULT + "|.touch)");
 		bundleDefaultInstructions.put(
 			Constants.FIXUPMESSAGES + ".deprecated",
 			"annotations are deprecated");
@@ -2415,6 +2425,45 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 			project.setVersion(bundleVersion);
 		}
 
+		ConfigurationContainer configurationContainer =
+			project.getConfigurations();
+
+		Action<Configuration> action = new Action<Configuration>() {
+
+			@Override
+			public void execute(Configuration configuration) {
+				ResolutionStrategy resolutionStrategy =
+					configuration.getResolutionStrategy();
+
+				resolutionStrategy.eachDependency(
+					new Action<DependencyResolveDetails>() {
+
+						@Override
+						public void execute(
+							DependencyResolveDetails dependencyResolveDetails) {
+
+							ModuleVersionSelector moduleVersionSelector =
+								dependencyResolveDetails.getRequested();
+
+							String key =
+								moduleVersionSelector.getGroup() +
+									_DEPENDENCY_KEY_SEPARATOR +
+										moduleVersionSelector.getName();
+
+							String version = versionOverrides.getProperty(key);
+
+							if (Validator.isNotNull(version)) {
+								dependencyResolveDetails.useVersion(version);
+							}
+						}
+
+					});
+			}
+
+		};
+
+		configurationContainer.all(action);
+
 		final Copy copy = (Copy)GradleUtil.getTask(
 			project, JavaPlugin.PROCESS_RESOURCES_TASK_NAME);
 
@@ -2464,6 +2513,33 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		resolutionStrategy.cacheDynamicVersionsFor(0, TimeUnit.SECONDS);
 	}
 
+	private void _configureConfigurationNoSnapshots(
+		Configuration configuration) {
+
+		ResolutionStrategy resolutionStrategy =
+			configuration.getResolutionStrategy();
+
+		ComponentSelectionRules componentSelectionRules =
+			resolutionStrategy.getComponentSelection();
+
+		componentSelectionRules.all(
+			new Action<ComponentSelection>() {
+
+				@Override
+				public void execute(ComponentSelection componentSelection) {
+					ModuleComponentIdentifier moduleComponentIdentifier =
+						componentSelection.getCandidate();
+
+					String version = moduleComponentIdentifier.getVersion();
+
+					if (version.endsWith(GradleUtil.SNAPSHOT_VERSION_SUFFIX)) {
+						componentSelection.reject("no snapshots are allowed");
+					}
+				}
+
+			});
+	}
+
 	private void _configureTaskBaselineSyncReleaseVersions(
 		Task task, final File versionOverrideFile) {
 
@@ -2509,15 +2585,48 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 
 					_removeDuplicates(versions, committedVersions);
 
+					// Re-add dependency version overrides
+
+					if (versionOverrideFile.exists()) {
+						Properties versionOverrides = GUtil.loadProperties(
+							versionOverrideFile);
+
+						for (String key :
+								versionOverrides.stringPropertyNames()) {
+
+							if (key.indexOf(_DEPENDENCY_KEY_SEPARATOR) == -1) {
+								continue;
+							}
+
+							versions.setProperty(
+								key, versionOverrides.getProperty(key));
+						}
+					}
+
 					// Save version override file
+
+					boolean addVersionOverrideFile = false;
+
+					String versionOverrideRelativePath = project.relativePath(
+						versionOverrideFile);
+
+					String gitResult = GitUtil.getGitResult(
+						project, "ls-files", versionOverrideRelativePath);
+
+					if (Validator.isNotNull(gitResult)) {
+						addVersionOverrideFile = true;
+					}
 
 					_saveVersions(
 						project.getProjectDir(), versions, versionOverrideFile);
 
 					if (versionOverrideFile.exists()) {
+						addVersionOverrideFile = true;
+					}
+
+					if (addVersionOverrideFile) {
 						GitUtil.executeGit(
-							project, "add",
-							project.relativePath(versionOverrideFile));
+							project, "add", versionOverrideRelativePath);
 					}
 				}
 				else if (hasPackageInfoFiles) {
@@ -2579,6 +2688,14 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 
 			verificationTask.setIgnoreFailures(true);
 		}
+	}
+
+	private void _configureTaskBuildService(Project project) {
+		BuildServiceTask buildServiceTask =
+			(BuildServiceTask)GradleUtil.getTask(
+				project, ServiceBuilderPlugin.BUILD_SERVICE_TASK_NAME);
+
+		buildServiceTask.setBuildNumberIncrement(false);
 	}
 
 	private void _configureTaskJavadocTitle(Javadoc javadoc) {
@@ -2843,7 +2960,9 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 			"src/main/resources");
 
 		for (String key : versions.stringPropertyNames()) {
-			if (key.equals(Constants.BUNDLE_VERSION)) {
+			if ((key.indexOf(_DEPENDENCY_KEY_SEPARATOR) != -1) ||
+				key.equals(Constants.BUNDLE_VERSION)) {
+
 				continue;
 			}
 
@@ -2937,7 +3056,9 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 			versions = _getVersions(project.getProjectDir(), versions);
 
 			for (String key : releaseVersions.stringPropertyNames()) {
-				if (!versions.containsKey(key)) {
+				if ((key.indexOf(_DEPENDENCY_KEY_SEPARATOR) != -1) ||
+					!versions.containsKey(key)) {
+
 					continue;
 				}
 
@@ -2976,6 +3097,8 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		Constants.BUNDLE_VERSION + ": (.+)(?:\\s|$)";
 
 	private static final String _CACHE_COMMIT_MESSAGE = "FAKE GRADLE CACHE";
+
+	private static final char _DEPENDENCY_KEY_SEPARATOR = '/';
 
 	private static final String _GROUP = "com.liferay";
 
