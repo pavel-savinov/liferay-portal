@@ -252,7 +252,8 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 		String projectName = rootElement.attributeValue("name");
 
 		if (!projectName.equals(expectedProjectName)) {
-			processMessage(fileName, "incorrect project name");
+			processMessage(
+				fileName, "Incorrect project name '" + projectName + "'");
 		}
 	}
 
@@ -276,7 +277,8 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 
 			if (!file.exists()) {
 				processMessage(
-					fileName, "Incorrect import file: " + matcher.group(1));
+					fileName,
+					"Incorrect import file '" + matcher.group(1) + "'");
 			}
 		}
 	}
@@ -414,7 +416,8 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 			newContent = formatDDLStructuresXML(newContent);
 		}
 		else if (fileName.endsWith("routes.xml")) {
-			newContent = formatFriendlyURLRoutesXML(fileName, newContent);
+			newContent = formatFriendlyURLRoutesXML(
+				fileName, absolutePath, newContent);
 		}
 		else if (fileName.endsWith("-hbm.xml")) {
 			formatHBMXML(fileName, newContent);
@@ -666,17 +669,17 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 			fileName, document.getRootElement(), "target", null,
 			new ElementComparator());
 
-		int x = content.lastIndexOf("</macrodef>");
-		int y = content.indexOf("<process-ivy");
+		int x = content.lastIndexOf("\n\t</macrodef>");
+		int y = content.indexOf("\n\t<process-ivy");
 
 		if ((y != -1) && (x > y)) {
-			processMessage(fileName, "macrodefs go before process-ivy");
+			processMessage(fileName, "Macrodefs go before process-ivy");
 		}
 
-		int z = content.indexOf("</target>");
+		int z = content.indexOf("\n\t</target>");
 
 		if ((z != -1) && (x > z)) {
-			processMessage(fileName, "macrodefs go before targets");
+			processMessage(fileName, "Macrodefs go before targets");
 		}
 
 		checkImportFiles(fileName, newContent);
@@ -709,8 +712,8 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 
 		processMessage(
 			fileName,
-			"LPS-51315 Avoid using WHERE ... NOT IN: " +
-				content.substring(y + 1, z));
+			"Avoid using WHERE ... NOT IN: " + content.substring(y + 1, z) +
+				", see LPS-51315");
 	}
 
 	protected String formatDDLStructuresXML(String content) throws Exception {
@@ -742,7 +745,8 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 		return Dom4jUtil.toString(document);
 	}
 
-	protected String formatFriendlyURLRoutesXML(String fileName, String content)
+	protected String formatFriendlyURLRoutesXML(
+			String fileName, String absolutePath, String content)
 		throws Exception {
 
 		Document document = readXML(content);
@@ -774,7 +778,7 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 		StringBundler sb = new StringBundler(9);
 
 		ComparableVersion mainReleaseComparableVersion =
-			getMainReleaseComparableVersion();
+			getMainReleaseComparableVersion(fileName, absolutePath, false);
 
 		String mainReleaseVersion = mainReleaseComparableVersion.toString();
 
@@ -870,7 +874,8 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 				if (!Validator.isNumber(portletNameText)) {
 					processMessage(
 						fileName,
-						"nonstandard portlet-name element " + portletNameText);
+						"Nonstandard portlet-name element '" + portletNameText +
+							"'");
 				}
 			}
 
@@ -1246,19 +1251,18 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 
 		String moduleOrPluginFolder = fileName.substring(0, pos);
 
-		if (portalSource) {
+		tablesContent = FileUtil.read(
+			new File(
+				moduleOrPluginFolder +
+					"/src/main/resources/META-INF/sql/tables.sql"));
+
+		if (tablesContent == null) {
 			tablesContent = FileUtil.read(
 				new File(
-					moduleOrPluginFolder +
-						"/src/main/resources/META-INF/sql/tables.sql"));
-
-			if (tablesContent == null) {
-				tablesContent = FileUtil.read(
-					new File(
-						moduleOrPluginFolder + "/src/META-INF/sql/tables.sql"));
-			}
+					moduleOrPluginFolder + "/src/META-INF/sql/tables.sql"));
 		}
-		else {
+
+		if (tablesContent == null) {
 			tablesContent = FileUtil.read(
 				new File(moduleOrPluginFolder + "/sql/tables.sql"));
 		}
@@ -1271,17 +1275,22 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 	}
 
 	protected List<String> getTargetNames(
-			String buildfileName, String fileName, List<String> targetNames,
+			String buildFileName, String fileName, List<String> targetNames,
 			boolean importFile)
 		throws Exception {
 
-		File file = new File(buildfileName);
+		if (buildFileName.contains(StringPool.OPEN_CURLY_BRACE)) {
+			return null;
+		}
+
+		File file = new File(buildFileName);
 
 		if (!file.exists()) {
 			if (!importFile) {
 				processMessage(
 					fileName,
-					"ant element pointing to non-existing " + buildfileName);
+					"Ant element points to non-existing build file '" +
+						buildFileName + "'");
 			}
 
 			return null;
@@ -1304,8 +1313,8 @@ public class XMLSourceProcessor extends BaseSourceProcessor {
 		List<Element> importElements = rootElement.elements("import");
 
 		for (Element importElement : importElements) {
-			String buildDirName = buildfileName.substring(
-				0, buildfileName.lastIndexOf(CharPool.SLASH) + 1);
+			String buildDirName = buildFileName.substring(
+				0, buildFileName.lastIndexOf(CharPool.SLASH) + 1);
 
 			String importFileName =
 				buildDirName + importElement.attributeValue("file");
