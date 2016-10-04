@@ -42,27 +42,33 @@ public class UpgradeMessageBoards extends UpgradeProcess {
 			sb.append("select messageId from MBMessage where threadId in (");
 			sb.append("select threadId from MBThread where categoryId = ");
 			sb.append(MBCategoryConstants.DISCUSSION_CATEGORY_ID);
-			sb.append(" and messagecount = 1)) and classNameId = ");
+			sb.append(" and messageCount = 1)) and classNameId = ");
 			sb.append(classNameId);
 
 			runSQL(sb.toString());
 
-			runSQL(
-				"delete from MBMessage where threadId in (" +
-					"select threadId from MBThread where categoryId = " +
-						MBCategoryConstants.DISCUSSION_CATEGORY_ID +
-							" and messagecount = 1)");
+			sb = new StringBundler(4);
 
-			runSQL(
-				"delete from MBDiscussion where threadId in (" +
-					"select threadId from MBThread where categoryId = " +
-						MBCategoryConstants.DISCUSSION_CATEGORY_ID +
-							" and messagecount = 1)");
+			sb.append("delete from MBDiscussion where threadId in (select ");
+			sb.append("threadId from MBThread where categoryId = ");
+			sb.append(MBCategoryConstants.DISCUSSION_CATEGORY_ID);
+			sb.append(" and messageCount = 1)");
+
+			runSQL(sb.toString());
+
+			sb = new StringBundler(4);
+
+			sb.append("delete from MBMessage where threadId in (select ");
+			sb.append("threadId from MBThread where categoryId = ");
+			sb.append(MBCategoryConstants.DISCUSSION_CATEGORY_ID);
+			sb.append(" and messageCount = 1)");
+
+			runSQL(sb.toString());
 
 			runSQL(
 				"delete from MBThread where categoryId = " +
 					MBCategoryConstants.DISCUSSION_CATEGORY_ID +
-						" and messagecount = 1");
+						" and messageCount = 1");
 		}
 		catch (Exception e) {
 			throw new UpgradeException(e);
