@@ -40,39 +40,6 @@ AUI.add(
 						instance._fieldEventHandlers = [];
 					},
 
-					generateFieldName: function(key) {
-						var instance = this;
-
-						var counter = 0;
-
-						var field = instance.get('field');
-
-						var builder = field.get('builder');
-
-						var existingField;
-
-						if (!key) {
-							key = field.get('context.type');
-						}
-
-						var name = key;
-
-						if (name) {
-							do {
-								if (counter > 0) {
-									name = key + counter;
-								}
-
-								existingField = builder.findField(name);
-
-								counter++;
-							}
-							while (existingField !== undefined && existingField !== field);
-						}
-
-						return name;
-					},
-
 					getEvaluationPayload: function() {
 						var instance = this;
 
@@ -119,7 +86,7 @@ AUI.add(
 					_afterLabelFieldNormalizeKey: function(key) {
 						var instance = this;
 
-						return new A.Do.AlterReturn(null, instance.generateFieldName(A.Do.originalRetVal));
+						return new A.Do.AlterReturn(null, instance.get('field').generateFieldName(A.Do.originalRetVal));
 					},
 
 					_afterSettingsFormRender: function() {
@@ -163,9 +130,9 @@ AUI.add(
 
 						var advancedSettingsNode = instance.getPageNode(2);
 
-						advancedSettingsNode.append(instance._getAutocompleteButtonTemplate());
+						advancedSettingsNode.append(instance._getAutocompleteCardActionTemplate());
 
-						advancedSettingsNode.one('.autocomplete-button').on('click', A.bind('_onClickAutocompleteButton', instance));
+						advancedSettingsNode.one('.autocomplete-action-panel').on('click', A.bind('_onClickAutocompleteButton', instance));
 					},
 
 					_createAutocompleteContainer: function() {
@@ -211,14 +178,17 @@ AUI.add(
 						instance.settingsTogglerNode = settingsTogglerNode;
 					},
 
-					_getAutocompleteButtonTemplate: function() {
+					_getAutocompleteCardActionTemplate: function() {
 						var instance = this;
 
-						var autocompleteButtonContainer;
+						var actionPanelRenderer = SoyTemplateUtil.getTemplateRenderer('ddl.autocomplete.actionPanel');
 
-						autocompleteButtonContainer = SoyTemplateUtil.getTemplateRenderer('ddl.autocomplete.button');
-
-						return autocompleteButtonContainer();
+						return actionPanelRenderer(
+							{
+								addAutoCompleteButton: Liferay.Util.getLexiconIconTpl('angle-right'),
+								label: Liferay.Language.get('autocomplete')
+							}
+						);
 					},
 
 					_getAutocompleteContainerTemplate: function() {
@@ -226,7 +196,12 @@ AUI.add(
 
 						var autocompleteContainerRenderer = SoyTemplateUtil.getTemplateRenderer('ddl.autocomplete.container');
 
-						var autocompleteContainer = autocompleteContainerRenderer({backButton: Liferay.Util.getLexiconIconTpl('angle-left', 'icon-monospaced')});
+						var autocompleteContainer = autocompleteContainerRenderer(
+							{
+								backButton: Liferay.Util.getLexiconIconTpl('angle-left', 'icon-monospaced'),
+								label: Liferay.Language.get('autocomplete')
+							}
+						);
 
 						return autocompleteContainer;
 					},
