@@ -2013,6 +2013,7 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 			int y = GetterUtil.getInteger(coords[1]);
 
 			actions.moveToElement(webElement, x, y);
+
 			actions.release();
 		}
 		else {
@@ -2152,8 +2153,8 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 		}
 
 		LiferaySeleniumHelper.captureScreen(
-			_CURRENT_DIR_NAME + "test-results/functional/screenshots/" +
-				"ScreenshotBeforeAction" + _screenshotErrorCount + ".jpg");
+			_CURRENT_DIR_NAME + "test-results/functional/screenshots" +
+				"/ScreenshotBeforeAction" + _screenshotErrorCount + ".jpg");
 	}
 
 	@Override
@@ -2752,6 +2753,7 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 		String idAttribute = getAttribute(locator + "@id");
 
 		int x = idAttribute.indexOf("cke__");
+
 		int y = idAttribute.indexOf("cke__", x + 1);
 
 		if (y == -1) {
