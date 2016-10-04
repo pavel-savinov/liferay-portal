@@ -108,6 +108,10 @@ public class JavaClass {
 				checkConstructor(javaTerm);
 			}
 
+			if (javaTerm.isClass()) {
+				_formatMissingLineBreak(javaTerm);
+			}
+
 			_formatBooleanStatements(javaTerm);
 			_formatReturnStatements(javaTerm);
 
@@ -248,20 +252,21 @@ public class JavaClass {
 			if (!matcher.find()) {
 				_javaSourceProcessor.processMessage(
 					_fileName,
-					"LPS-36303: Incorrect method name '" + methodName + "'");
+					"Incorrect method name '" + methodName +
+						"', see LPS-36303");
 			}
 			else if (javaTerm.getType() != requiredMethodType) {
 				_javaSourceProcessor.processMessage(
 					_fileName,
-					"LPS-36303: Incorrect method type for '" + methodName +
-						"'");
+					"Incorrect method type for '" + methodName +
+						"', see LPS-36303");
 			}
 		}
 		else if (matcher.find() && !javaTerm.hasAnnotation("Override")) {
 			_javaSourceProcessor.processMessage(
 				_fileName,
 				"Annotation @" + annotation + " required for '" + methodName +
-					"'");
+					"', see LPS-36303");
 		}
 	}
 
@@ -314,7 +319,8 @@ public class JavaClass {
 		if (!matcher.find()) {
 			_javaSourceProcessor.processMessage(
 				_fileName,
-				"LPS-66242: Initial value differs from value in cleanUp method",
+				"Initial value differs from value in cleanUp method, see " +
+					"LPS-66242",
 				javaTerm.getLineCount());
 		}
 	}
@@ -408,7 +414,9 @@ public class JavaClass {
 
 			if (previousPos > pos) {
 				_javaSourceProcessor.processMessage(
-					_fileName, "Constructor parameter order " + parameterName);
+					_fileName,
+					"Follow constructor parameter order '" + parameterName +
+						"'");
 
 				return;
 			}
@@ -547,8 +555,8 @@ public class JavaClass {
 
 			_javaSourceProcessor.processMessage(
 				_fileName,
-				"Create a new var for " + StringUtil.trim(matcher.group(1)) +
-					" for better readability",
+				"Create a new var for '" + StringUtil.trim(matcher.group(1)) +
+					"' for better readability",
 				lineCount);
 		}
 	}
@@ -568,8 +576,8 @@ public class JavaClass {
 
 			_javaSourceProcessor.processMessage(
 				_fileName,
-				"LPS-65690 Use Collator for locale-sensitive String " +
-					"comparison");
+				"Use Collator for locale-sensitive String comparison, see " +
+					"LPS-65690");
 		}
 	}
 
@@ -1581,6 +1589,20 @@ public class JavaClass {
 		}
 	}
 
+	private void _formatMissingLineBreak(JavaTerm javaTerm) {
+		String javaTermContent = javaTerm.getContent();
+
+		Matcher matcher = _missingEmptyLinePattern.matcher(javaTermContent);
+
+		if (matcher.find()) {
+			String newJavaTermContent = StringUtil.insert(
+				javaTermContent, "\n", matcher.start(1));
+
+			_classContent = StringUtil.replace(
+				_classContent, javaTermContent, newJavaTermContent);
+		}
+	}
+
 	private void _formatReturnStatement(
 		String javaTermContent, String returnStatement, String tabs,
 		String ifCondition, String trueValue, String falseValue) {
@@ -1802,6 +1824,8 @@ public class JavaClass {
 	private final Pattern _lineBreakPattern = Pattern.compile(
 		"\n(.*)\\(\n((.+,\n)*.*\\)) \\+\n");
 	private final int _lineCount;
+	private final Pattern _missingEmptyLinePattern = Pattern.compile(
+		"[^\n{](\n)\t*\\}\n*$");
 	private final String _name;
 	private final JavaClass _outerClass;
 	private String _packagePath;
