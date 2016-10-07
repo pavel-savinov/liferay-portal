@@ -20,7 +20,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -35,6 +34,7 @@ import java.util.regex.Pattern;
 
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.UncheckedIOException;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.file.FileTree;
 import org.gradle.api.specs.Spec;
@@ -46,8 +46,14 @@ import org.gradle.api.tasks.TaskInputs;
 public class FileUtil extends com.liferay.gradle.util.FileUtil {
 
 	public static boolean contains(File file, String s) throws IOException {
+		Path path = file.toPath();
+
+		if (Files.notExists(path)) {
+			return false;
+		}
+
 		String content = new String(
-			Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+			Files.readAllBytes(path), StandardCharsets.UTF_8);
 
 		if (content.contains(s)) {
 			return true;
