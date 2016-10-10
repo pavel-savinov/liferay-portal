@@ -19,12 +19,17 @@ AUI.add(
 			{
 				ATTRS: {
 					displayStyle: {
+						state: true,
 						value: 'singleline'
 					},
 
 					options: {
-						repaint: false,
 						value: []
+					},
+
+					placeholder: {
+						state: true,
+						value: ''
 					},
 
 					type: {

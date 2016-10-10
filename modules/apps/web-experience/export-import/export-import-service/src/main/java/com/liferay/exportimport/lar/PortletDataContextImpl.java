@@ -149,7 +149,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
+	 * @deprecated As of 3.0.0, replaced by {@link
 	 *             om.liferay.exportimport.kernel.lar.BaseStagedModelDataHandler#exportAssetCategories(
 	 *             PortletDataContext, StagedModel)}
 	 */
@@ -183,7 +183,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
+	 * @deprecated As of 3.0.0, replaced by {@link
 	 *             BaseStagedModelDataHandler#exportAssetTags(
 	 *             PortletDataContext, StagedModel)}
 	 */
@@ -236,6 +236,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 				addAssetLinks(clazz, classPK);
 				addAssetPriority(element, clazz, classPK);
+
 				addExpando(element, path, classedModel, clazz);
 				addLocks(clazz, String.valueOf(classPK));
 				addPermissions(clazz, classPK);
@@ -248,7 +249,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
+	 * @deprecated As of 3.0.0, replaced by {@link
 	 *             om.liferay.exportimport.kernel.lar.BaseStagedModelDataHandler#exportComments(
 	 *             PortletDataContext, StagedModel)}
 	 */
@@ -258,7 +259,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
+	 * @deprecated As of 3.0.0, replaced by {@link
 	 *             om.liferay.exportimport.kernel.lar.BaseStagedModelDataHandler#exportComments(
 	 *             PortletDataContext, StagedModel)}
 	 */
@@ -418,7 +419,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
+	 * @deprecated As of 3.0.0, replaced by {@link
 	 *             om.liferay.exportimport.kernel.lar.BaseStagedModelDataHandler#exportRatings(
 	 *             PortletDataContext, StagedModel)}
 	 */
@@ -428,7 +429,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
+	 * @deprecated As of 3.0.0, replaced by {@link
 	 *             om.liferay.exportimport.kernel.lar.BaseStagedModelDataHandler#exportRatings(
 	 *             PortletDataContext, StagedModel)}
 	 */
@@ -439,7 +440,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, with no direct replacement
+	 * @deprecated As of 3.0.0, with no direct replacement
 	 */
 	@Deprecated
 	@Override
@@ -656,7 +657,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, with no direct replacement
+	 * @deprecated As of 3.0.0, with no direct replacement
 	 */
 	@Deprecated
 	@Override
@@ -665,7 +666,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, with no direct replacement
+	 * @deprecated As of 3.0.0, with no direct replacement
 	 */
 	@Deprecated
 	@Override
@@ -679,7 +680,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #getAssetLinkIds()}
+	 * @deprecated As of 3.0.0, replaced by {@link #getAssetLinkIds()}
 	 */
 	@Deprecated
 	@Override
@@ -734,7 +735,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, with no direct replacement
+	 * @deprecated As of 3.0.0, with no direct replacement
 	 */
 	@Deprecated
 	@Override
@@ -807,7 +808,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
+	 * @deprecated As of 3.0.0, replaced by {@link
 	 *             #getExportDataElement(ClassedModel, String)}
 	 */
 	@Deprecated
@@ -923,6 +924,10 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return _layoutIds;
 	}
 
+	public String getLayoutSetPrototypeUuid() {
+		return _layoutSetPrototypeUuid;
+	}
+
 	@Override
 	public Map<String, Lock> getLocks() {
 		return _locksMap;
@@ -939,7 +944,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
+	 * @deprecated As of 3.0.0, replaced by {@link
 	 *             #getNewPrimaryKeysMap(String)}
 	 */
 	@Deprecated
@@ -972,7 +977,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, with no direct replacement
+	 * @deprecated As of 3.0.0, with no direct replacement
 	 */
 	@Deprecated
 	@Override
@@ -1006,7 +1011,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, with no direct replacement
+	 * @deprecated As of 3.0.0, with no direct replacement
 	 */
 	@Deprecated
 	@Override
@@ -1070,7 +1075,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, with no direct replacement
+	 * @deprecated As of 3.0.0, with no direct replacement
 	 */
 	@Deprecated
 	@Override
@@ -1176,7 +1181,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, with no direct replacement
+	 * @deprecated As of 3.0.0, with no direct replacement
 	 */
 	@Deprecated
 	@Override
@@ -1224,6 +1229,10 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return _startDate;
 	}
 
+	public String getType() {
+		return _type;
+	}
+
 	@Override
 	public long getUserId(String userUuid) {
 		return _userIdStrategy.getUserId(userUuid);
@@ -1240,7 +1249,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, with no direct replacement
+	 * @deprecated As of 3.0.0, with no direct replacement
 	 */
 	@Deprecated
 	@Override
@@ -1295,7 +1304,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, with no direct replacement
+	 * @deprecated As of 3.0.0, with no direct replacement
 	 */
 	@Deprecated
 	@Override
@@ -1401,7 +1410,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
+	 * @deprecated As of 3.0.0, replaced by {@link
 	 *             om.liferay.exportimport.kernel.lar.BaseStagedModelDataHandler#importComments(
 	 *             PortletDataContext, StagedModel)}
 	 */
@@ -1543,7 +1552,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
+	 * @deprecated As of 3.0.0, replaced by {@link
 	 *             om.liferay.exportimport.kernel.lar.BaseStagedModelDataHandler#importRatings(
 	 *             PortletDataContext, StagedModel)}
 	 */
@@ -1660,7 +1669,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, with no direct replacement
+	 * @deprecated As of 3.0.0, with no direct replacement
 	 */
 	@Deprecated
 	@Override
@@ -1768,6 +1777,10 @@ public class PortletDataContextImpl implements PortletDataContext {
 		_layoutIds = layoutIds;
 	}
 
+	public void setLayoutSetPrototypeUuid(String layoutSetPrototypeUuid) {
+		_layoutSetPrototypeUuid = layoutSetPrototypeUuid;
+	}
+
 	@Override
 	public void setManifestSummary(ManifestSummary manifestSummary) {
 		_manifestSummary = manifestSummary;
@@ -1799,7 +1812,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, with no direct replacement
+	 * @deprecated As of 3.0.0, with no direct replacement
 	 */
 	@Deprecated
 	@Override
@@ -1865,6 +1878,10 @@ public class PortletDataContextImpl implements PortletDataContext {
 	@Override
 	public void setStartDate(Date startDate) {
 		_startDate = startDate;
+	}
+
+	public void setType(String type) {
+		_type = type;
 	}
 
 	@Override
@@ -2541,6 +2558,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	private long _groupId;
 	private transient Element _importDataRootElement;
 	private transient long[] _layoutIds;
+	private String _layoutSetPrototypeUuid;
 	private final transient LockManager _lockManager;
 	private final transient Map<String, Lock> _locksMap = new HashMap<>();
 	private transient ManifestSummary _manifestSummary = new ManifestSummary();
@@ -2568,6 +2586,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 	private long _sourceGroupId;
 	private long _sourceUserPersonalSiteGroupId;
 	private Date _startDate;
+	private String _type;
 	private transient UserIdStrategy _userIdStrategy;
 	private long _userPersonalSiteGroupId;
 	private transient XStream _xStream;
