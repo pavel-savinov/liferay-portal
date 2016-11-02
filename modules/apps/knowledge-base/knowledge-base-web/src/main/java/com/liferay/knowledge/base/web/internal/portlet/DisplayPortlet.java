@@ -81,6 +81,7 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.header-portlet-css=/display/css/main.css",
 		"com.liferay.portlet.icon=/icons/display.png",
 		"com.liferay.portlet.scopeable=true",
+		"com.liferay.portlet.struts-path=knowledge_base",
 		"javax.portlet.display-name=Knowledge Base Display",
 		"javax.portlet.expiration-cache=0",
 		"javax.portlet.init-param.always-send-redirect=true",
@@ -116,11 +117,12 @@ public class DisplayPortlet extends BaseKBPortlet {
 
 			KBArticle kbArticle = kbArticleSelection.getKBArticle();
 
-			int status = getStatus(renderRequest, kbArticle);
+			if ((kbArticle != null) &&
+				(kbArticle.getStatus() != WorkflowConstants.STATUS_APPROVED)) {
 
-			if ((kbArticle != null) && (kbArticle.getStatus() != status)) {
 				kbArticle = _kbArticleLocalService.fetchLatestKBArticle(
-					kbArticle.getResourcePrimKey(), status);
+					kbArticle.getResourcePrimKey(),
+					WorkflowConstants.STATUS_APPROVED);
 			}
 
 			renderRequest.setAttribute(
@@ -130,7 +132,9 @@ public class DisplayPortlet extends BaseKBPortlet {
 				KBWebKeys.KNOWLEDGE_BASE_SEARCH_KEYWORDS,
 				kbArticleSelection.getKeywords());
 
-			renderRequest.setAttribute(KBWebKeys.KNOWLEDGE_BASE_STATUS, status);
+			renderRequest.setAttribute(
+				KBWebKeys.KNOWLEDGE_BASE_STATUS,
+				WorkflowConstants.STATUS_APPROVED);
 
 			if (!kbArticleSelection.isExactMatch()) {
 				HttpServletResponse response =
@@ -369,27 +373,6 @@ public class DisplayPortlet extends BaseKBPortlet {
 
 		return KBUtil.getPreferredKBFolderURLTitle(
 			portalPreferences, contentRootPrefix);
-	}
-
-	protected int getStatus(RenderRequest renderRequest, KBArticle kbArticle)
-		throws Exception {
-
-		if (kbArticle == null) {
-			return WorkflowConstants.STATUS_APPROVED;
-		}
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
-			KBWebKeys.THEME_DISPLAY);
-
-		if (KBArticlePermission.contains(
-				themeDisplay.getPermissionChecker(), kbArticle,
-				KBActionKeys.UPDATE)) {
-
-			return ParamUtil.getInteger(
-				renderRequest, "status", WorkflowConstants.STATUS_ANY);
-		}
-
-		return WorkflowConstants.STATUS_APPROVED;
 	}
 
 	@Reference(unbind = "-")

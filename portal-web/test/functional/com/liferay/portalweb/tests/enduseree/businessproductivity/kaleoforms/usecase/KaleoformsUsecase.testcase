@@ -479,7 +479,7 @@
 		</execute>
 
 		<execute macro="Role#addCP">
-			<var name="roleName" value="KaleoRegRole Name" />
+			<var name="roleTitle" value="KaleoRegRole Name" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
@@ -491,7 +491,7 @@
 			<var name="permissionDefinitionValue" value="Action" />
 			<var name="permissionNavigationKey" value="SITE_ADMIN_CONTENT_KALEO_FORMS_ADMIN" />
 			<var name="permissionNavigationValue" value="Kaleo Forms Admin" />
-			<var name="roleName" value="KaleoRegRole Name" />
+			<var name="roleTitle" value="KaleoRegRole Name" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
@@ -503,7 +503,7 @@
 			<var name="permissionDefinitionValue" value="Action" />
 			<var name="permissionNavigationKey" value="SITE_ADMIN_CONTENT_KALEO_FORMS_ADMIN" />
 			<var name="permissionNavigationValue" value="Kaleo Forms Admin" />
-			<var name="roleName" value="KaleoRegRole Name" />
+			<var name="roleTitle" value="KaleoRegRole Name" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
@@ -531,7 +531,7 @@
 		</execute>
 
 		<execute macro="Role#assignRegRoleCP">
-			<var name="roleName" value="KaleoRegRole Name" />
+			<var name="roleTitle" value="KaleoRegRole Name" />
 			<var name="userScreenName" value="usersn" />
 		</execute>
 
@@ -612,7 +612,7 @@
 			<var name="permissionDefinitionValue" value="View" />
 			<var name="permissionNavigationKey" value="SITE_ADMIN_CONTENT_KALEO_FORMS_ADMIN" />
 			<var name="permissionNavigationValue" value="Kaleo Forms Admin" />
-			<var name="roleName" value="Portal Content Reviewer" />
+			<var name="roleTitle" value="Portal Content Reviewer" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
@@ -624,7 +624,7 @@
 			<var name="permissionDefinitionValue" value="Update" />
 			<var name="permissionNavigationKey" value="SITE_ADMIN_CONTENT_KALEO_FORMS_ADMIN" />
 			<var name="permissionNavigationValue" value="Kaleo Forms Admin" />
-			<var name="roleName" value="Portal Content Reviewer" />
+			<var name="roleTitle" value="Portal Content Reviewer" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
@@ -652,7 +652,7 @@
 		</execute>
 
 		<execute macro="Role#assignRegRoleCP">
-			<var name="roleName" value="Portal Content Reviewer" />
+			<var name="roleTitle" value="Portal Content Reviewer" />
 			<var name="userScreenName" value="usersn" />
 		</execute>
 
@@ -805,7 +805,7 @@
 			<var name="permissionDefinitionValue" value="View" />
 			<var name="permissionNavigationKey" value="SITE_ADMIN_CONTENT_KALEO_FORMS_ADMIN" />
 			<var name="permissionNavigationValue" value="Kaleo Forms Admin" />
-			<var name="roleName" value="Portal Content Reviewer" />
+			<var name="roleTitle" value="Portal Content Reviewer" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
@@ -817,7 +817,7 @@
 			<var name="permissionDefinitionValue" value="Complete Form" />
 			<var name="permissionNavigationKey" value="SITE_ADMIN_CONTENT_KALEO_FORMS_ADMIN" />
 			<var name="permissionNavigationValue" value="Kaleo Forms Admin" />
-			<var name="roleName" value="Portal Content Reviewer" />
+			<var name="roleTitle" value="Portal Content Reviewer" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
@@ -845,7 +845,7 @@
 		</execute>
 
 		<execute macro="Role#assignRegRoleCP">
-			<var name="roleName" value="Portal Content Reviewer" />
+			<var name="roleTitle" value="Portal Content Reviewer" />
 			<var name="userScreenName" value="usersn" />
 		</execute>
 
@@ -1007,7 +1007,7 @@
 			<var name="permissionDefinitionValue" value="View" />
 			<var name="permissionNavigationKey" value="SITE_ADMIN_CONTENT_KALEO_FORMS_ADMIN" />
 			<var name="permissionNavigationValue" value="Kaleo Forms Admin" />
-			<var name="roleName" value="Portal Content Reviewer" />
+			<var name="roleTitle" value="Portal Content Reviewer" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
@@ -1019,7 +1019,7 @@
 			<var name="permissionDefinitionValue" value="Update" />
 			<var name="permissionNavigationKey" value="SITE_ADMIN_CONTENT_KALEO_FORMS_ADMIN" />
 			<var name="permissionNavigationValue" value="Kaleo Forms Admin" />
-			<var name="roleName" value="Portal Content Reviewer" />
+			<var name="roleTitle" value="Portal Content Reviewer" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
@@ -1047,7 +1047,7 @@
 		</execute>
 
 		<execute macro="Role#assignRegRoleCP">
-			<var name="roleName" value="Portal Content Reviewer" />
+			<var name="roleTitle" value="Portal Content Reviewer" />
 			<var name="userScreenName" value="usersn" />
 		</execute>
 
@@ -1203,7 +1203,7 @@
 		</execute>
 
 		<execute macro="Role#addCP">
-			<var name="roleName" value="KaleoRegRole Name" />
+			<var name="roleTitle" value="KaleoRegRole Name" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
@@ -1215,7 +1215,7 @@
 			<var name="permissionDefinitionValue" value="Access in Site Administration" />
 			<var name="permissionNavigationKey" value="SITE_ADMIN_CONTENT_KALEO_FORMS_ADMIN" />
 			<var name="permissionNavigationValue" value="Kaleo Forms Admin" />
-			<var name="roleName" value="KaleoRegRole Name" />
+			<var name="roleTitle" value="KaleoRegRole Name" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
@@ -1227,7 +1227,7 @@
 			<var name="permissionDefinitionValue" value="Submit" />
 			<var name="permissionNavigationKey" value="SITE_ADMIN_CONTENT_KALEO_FORMS_ADMIN" />
 			<var name="permissionNavigationValue" value="Kaleo Forms Admin" />
-			<var name="roleName" value="KaleoRegRole Name" />
+			<var name="roleTitle" value="KaleoRegRole Name" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
@@ -1239,7 +1239,7 @@
 			<var name="permissionDefinitionValue" value="View" />
 			<var name="permissionNavigationKey" value="SITE_ADMIN_CONTENT_KALEO_FORMS_ADMIN" />
 			<var name="permissionNavigationValue" value="Kaleo Forms Admin" />
-			<var name="roleName" value="KaleoRegRole Name" />
+			<var name="roleTitle" value="KaleoRegRole Name" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
@@ -1295,7 +1295,7 @@
 		</execute>
 
 		<execute macro="Role#assignRegRoleCP">
-			<var name="roleName" value="KaleoRegRole Name" />
+			<var name="roleTitle" value="KaleoRegRole Name" />
 			<var name="userScreenName" value="usersn" />
 		</execute>
 
@@ -1418,7 +1418,7 @@
 		</execute>
 
 		<execute macro="Role#addCP">
-			<var name="roleName" value="KaleoRegRole Name" />
+			<var name="roleTitle" value="KaleoRegRole Name" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
@@ -1430,7 +1430,7 @@
 			<var name="permissionDefinitionValue" value="View" />
 			<var name="permissionNavigationKey" value="SITE_ADMIN_CONTENT_KALEO_FORMS_ADMIN" />
 			<var name="permissionNavigationValue" value="Kaleo Forms Admin" />
-			<var name="roleName" value="KaleoRegRole Name" />
+			<var name="roleTitle" value="KaleoRegRole Name" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
@@ -1468,7 +1468,7 @@
 		</execute>
 
 		<execute macro="Role#assignRegRoleCP">
-			<var name="roleName" value="KaleoRegRole Name" />
+			<var name="roleTitle" value="KaleoRegRole Name" />
 			<var name="userScreenName" value="usersn" />
 		</execute>
 
@@ -1962,8 +1962,11 @@
 		</execute>
 	</command>
 
-	<command name="CompleteProcessAndViewEmailNotifications" priority="4">
+	<!-- LPS-66727 -->
+
+	<!--<command name="CompleteProcessAndViewEmailNotifications" priority="4">
 		<property name="test.assert.javascript.errors" value="false" />
+		<property name="test.smtp.server.enabled" value="true" />
 
 		<var method="TestPropsUtil#get('email.address.2')" name="user1EmailAddress" />
 		<var method="TestPropsUtil#get('email.address.3')" name="user2EmailAddress" />
@@ -1971,13 +1974,12 @@
 		<var method="TestPropsUtil#get('email.address.4')" name="user3EmailAddress" />
 		<var method="TestPropsUtil#get('email.password.4')" name="user3EmailPassword" />
 
-		<execute macro="ProductMenu#gotoControlPanelConfiguration">
-			<var name="portlet" value="Server Administration" />
+		<execute macro="ProductMenu#gotoControlPanelUsers">
+			<var name="portlet" value="Roles" />
 		</execute>
 
-		<execute macro="ServerAdministration#configureMailServerSettings">
-			<var method="TestPropsUtil#get('email.address.1')" name="userName" />
-			<var method="TestPropsUtil#get('email.password.1')" name="userPassword" />
+		<execute macro="Role#addCP">
+			<var name="roleTitle" value="Reviewer Name" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
@@ -1985,15 +1987,7 @@
 		</execute>
 
 		<execute macro="Role#addCP">
-			<var name="roleName" value="Reviewer Name" />
-		</execute>
-
-		<execute macro="ProductMenu#gotoControlPanelUsers">
-			<var name="portlet" value="Roles" />
-		</execute>
-
-		<execute macro="Role#addCP">
-			<var name="roleName" value="Updater Name" />
+			<var name="roleTitle" value="Updater Name" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
@@ -2021,7 +2015,7 @@
 		</execute>
 
 		<execute macro="Role#assignRegRoleCP">
-			<var name="roleName" value="Administrator" />
+			<var name="roleTitle" value="Administrator" />
 			<var name="userScreenName" value="creator" />
 		</execute>
 
@@ -2050,7 +2044,7 @@
 		</execute>
 
 		<execute macro="Role#assignRegRoleCP">
-			<var name="roleName" value="Administrator" />
+			<var name="roleTitle" value="Administrator" />
 			<var name="userScreenName" value="reviewer" />
 		</execute>
 
@@ -2059,7 +2053,7 @@
 		</execute>
 
 		<execute macro="Role#assignRegRoleCP">
-			<var name="roleName" value="Reviewer Name" />
+			<var name="roleTitle" value="Reviewer Name" />
 			<var name="userScreenName" value="reviewer" />
 		</execute>
 
@@ -2088,7 +2082,7 @@
 		</execute>
 
 		<execute macro="Role#assignRegRoleCP">
-			<var name="roleName" value="Administrator" />
+			<var name="roleTitle" value="Administrator" />
 			<var name="userScreenName" value="updater" />
 		</execute>
 
@@ -2097,7 +2091,7 @@
 		</execute>
 
 		<execute macro="Role#assignRegRoleCP">
-			<var name="roleName" value="Updater Name" />
+			<var name="roleTitle" value="Updater Name" />
 			<var name="userScreenName" value="updater" />
 		</execute>
 
@@ -2119,7 +2113,7 @@
 
 		<execute macro="KaleoDesigner#editNodeAssignments">
 			<var name="nodeAssignmentType" value="Role" />
-			<var name="roleName" value="Reviewer Name" />
+			<var name="roleTitle" value="Reviewer Name" />
 		</execute>
 
 		<execute macro="KaleoDesigner#editNodeNotifications">
@@ -2127,7 +2121,7 @@
 			<var name="nodeNotificationsName" value="Review Notification" />
 			<var name="nodeNotificationsRecipientType" value="Role" />
 			<var name="nodeNotificationsType" value="Email" />
-			<var name="roleName" value="Reviewer Name" />
+			<var name="roleTitle" value="Reviewer Name" />
 		</execute>
 
 		<execute macro="KaleoDesigner#selectNode">
@@ -2136,7 +2130,7 @@
 
 		<execute macro="KaleoDesigner#editNodeAssignments">
 			<var name="nodeAssignmentType" value="Role" />
-			<var name="roleName" value="Updater Name" />
+			<var name="roleTitle" value="Updater Name" />
 		</execute>
 
 		<execute macro="KaleoDesigner#editNodeNotifications">
@@ -2144,7 +2138,7 @@
 			<var name="nodeNotificationsName" value="Updater Modification Notification" />
 			<var name="nodeNotificationsRecipientType" value="Role" />
 			<var name="nodeNotificationsType" value="Email" />
-			<var name="roleName" value="Updater Name" />
+			<var name="roleTitle" value="Updater Name" />
 		</execute>
 
 		<execute macro="KaleoDesigner#publishWorkflowDefinitionViaWorkflowCP" />
@@ -2172,8 +2166,9 @@
 		<execute macro="KaleoFormsAdmin#next" />
 
 		<execute macro="KaleoFormsAdmin#chooseWorkflow">
+			<var name="edit" value="true" />
 			<var name="kfProcessName" value="Kaleo Forms Process" />
-			<var name="workflowDefinitionTitleEdit" value="Edited Workflow Definition" />
+			<var name="workflowDefinitionTitle" value="Edited Workflow Definition" />
 		</execute>
 
 		<execute macro="KaleoFormsAdmin#next" />
@@ -2231,28 +2226,12 @@
 
 		<execute macro="KaleoFormsAdmin#saveProcessRecord" />
 
-		<execute function="Pause" locator1="30000" />
-
-		<execute macro="Gmail#login">
-			<var name="userEmailAddress" value="${user2EmailAddress}" />
-			<var name="userPassword" value="${user2EmailPassword}" />
-		</execute>
-
-		<execute macro="Gmail#gotoHtmlMode" />
-
-		<execute macro="Gmail#viewMail">
-			<var name="emailFromUserName" value="Liferay Portal Workflow ." />
-			<var name="gmailAssetType" value="Review Notification Description" />
-			<var name="gmailMailTableMessageTitle" value="Review Notification Description - userfn Creator sent you a Kaleo Forms Process for review in the workflow." />
-			<var name="gmailMessageBody" value="userfn Creator sent you a Kaleo Forms Process for review in the workflow." />
-			<var name="gmailMessageBodyClosing" value="userfn Creator sent you a Kaleo Forms Process for review in the workflow." />
-			<var name="gmailMessageBodyGreeting" value="userfn Creator sent you a Kaleo Forms Process for review in the workflow." />
-			<var name="gmailMessageTitle" value="Review Notification Description" />
-		</execute>
-
-		<execute macro="Gmail#tearDown">
-			<var name="userEmailAddress" value="${user2EmailAddress}" />
-			<var name="userPassword" value="${user2EmailPassword}" />
+		<execute macro="MockMock#viewMail">
+			<var name="asset" value="Review Notification Description" />
+			<var name="content" value="userfn Creator sent you a Kaleo Forms Process for review in the workflow." />
+			<var name="recipient" value="userfn Reviewer" />
+			<var name="sender" value="Liferay Portal Workflow Notifications" />
+			<var name="subject" value="Review Notification Description" />
 		</execute>
 
 		<execute function="Open" locator1="http://localhost:8080" />
@@ -2272,32 +2251,6 @@
 			<var name="workflowTask" value="Review" />
 		</execute>
 
-		<execute function="Pause" locator1="30000" />
-
-		<execute macro="Gmail#login">
-			<var name="userEmailAddress" value="${user2EmailAddress}" />
-			<var name="userPassword" value="${user2EmailPassword}" />
-		</execute>
-
-		<execute macro="Gmail#gotoHtmlMode" />
-
-		<execute macro="Gmail#viewMail">
-			<var name="emailFromUserName" value="Liferay Portal Workflow ." />
-			<var name="gmailAssetType" value="Review Notification Description" />
-			<var name="gmailMailTableMessageTitle" value="Review Notification Description - userfn Creator sent you a Kaleo Forms Process for review in the workflow." />
-			<var name="gmailMessageBody" value="userfn Creator sent you a Kaleo Forms Process for review in the workflow." />
-			<var name="gmailMessageBodyClosing" value="userfn Creator sent you a Kaleo Forms Process for review in the workflow." />
-			<var name="gmailMessageBodyGreeting" value="userfn Creator sent you a Kaleo Forms Process for review in the workflow." />
-			<var name="gmailMessageTitle" value="Review Notification Description" />
-		</execute>
-
-		<execute macro="Gmail#tearDown">
-			<var name="userEmailAddress" value="${user2EmailAddress}" />
-			<var name="userPassword" value="${user2EmailPassword}" />
-		</execute>
-
-		<execute function="Open" locator1="http://localhost:8080" />
-
 		<execute macro="Workflow#rejectTaskByActions">
 			<var name="workflowAssetTitle" value="Kaleo Forms Process" />
 			<var name="workflowAssetType" value="Kaleo Forms Process" />
@@ -2308,29 +2261,20 @@
 			<var name="portletName" value="My Workflow Tasks" />
 		</execute>
 
-		<execute macro="Workflow#viewDefaultMyWorkflowTasksCP" />
+		<execute macro="Workflow#gotoAssignedToMe" />
 
-		<execute function="Pause" locator1="30000" />
-
-		<execute macro="Gmail#logoutAndLogin">
-			<var name="userEmailAddress" value="${user3EmailAddress}" />
-			<var name="userPassword" value="${user3EmailPassword}" />
+		<execute macro="Workflow#viewCompletedTask">
+			<var name="workflowAssetTitle" value="Kaleo Forms Process" />
+			<var name="workflowAssetType" value="Kaleo Forms Process" />
+			<var name="workflowTask" value="Review" />
 		</execute>
 
-		<execute macro="Gmail#gotoHtmlMode" />
-		<execute macro="Gmail#viewMail">
-			<var name="emailFromUserName" value="Liferay Portal Workflow ." />
-			<var name="gmailAssetType" value="Updater Modification Notification Description" />
-			<var name="gmailMailTableMessageTitle" value="Updater Modification Notification Description - Your submission was rejected by userfn Reviewer, please modify and resubmit." />
-			<var name="gmailMessageBody" value="Your submission was rejected by userfn Reviewer, please modify and resubmit." />
-			<var name="gmailMessageBodyClosing" value="Your submission was rejected by userfn Reviewer, please modify and resubmit." />
-			<var name="gmailMessageBodyGreeting" value="Your submission was rejected by userfn Reviewer, please modify and resubmit." />
-			<var name="gmailMessageTitle" value="Updater Modification Notification Description" />
-		</execute>
-
-		<execute macro="Gmail#tearDown">
-			<var name="userEmailAddress" value="${user3EmailAddress}" />
-			<var name="userPassword" value="${user3EmailPassword}" />
+		<execute macro="MockMock#viewMail">
+			<var name="asset" value="Updater Modification Notification Description" />
+			<var name="content" value="Your submission was rejected by userfn Reviewer, please modify and resubmit." />
+			<var name="recipient" value="userfn Updater" />
+			<var name="sender" value="Liferay Portal Workflow Notifications" />
+			<var name="subject" value="Updater Modification Notification Description" />
 		</execute>
 
 		<execute function="Open" locator1="http://localhost:8080" />
@@ -2356,28 +2300,12 @@
 			<var name="workflowTask" value="Update" />
 		</execute>
 
-		<execute function="Pause" locator1="30000" />
-
-		<execute macro="Gmail#logoutAndLogin">
-			<var name="userEmailAddress" value="${user2EmailAddress}" />
-			<var name="userPassword" value="${user2EmailPassword}" />
-		</execute>
-
-		<execute macro="Gmail#gotoHtmlMode" />
-
-		<execute macro="Gmail#viewMail">
-			<var name="emailFromUserName" value="Liferay Portal Workflow ." />
-			<var name="gmailAssetType" value="Review Notification Description" />
-			<var name="gmailMailTableMessageTitle" value="Review Notification Description - userfn Updater sent you a Kaleo Forms Process for review in the workflow." />
-			<var name="gmailMessageBody" value="userfn Updater sent you a Kaleo Forms Process for review in the workflow." />
-			<var name="gmailMessageBodyClosing" value="userfn Updater sent you a Kaleo Forms Process for review in the workflow." />
-			<var name="gmailMessageBodyGreeting" value="userfn Updater sent you a Kaleo Forms Process for review in the workflow." />
-			<var name="gmailMessageTitle" value="Review Notification Description" />
-		</execute>
-
-		<execute macro="Gmail#tearDown">
-			<var name="userEmailAddress" value="${user2EmailAddress}" />
-			<var name="userPassword" value="${user2EmailPassword}" />
+		<execute macro="MockMock#viewMail">
+			<var name="asset" value="Review Notification Description" />
+			<var name="content" value="userfn Updater sent you a Kaleo Forms Process for review in the workflow." />
+			<var name="recipient" value="userfn Reviewer" />
+			<var name="sender" value="Liferay Portal Workflow Notifications" />
+			<var name="subject" value="Review Notification Description" />
 		</execute>
 
 		<execute function="Open" locator1="http://localhost:8080" />
@@ -2403,11 +2331,6 @@
 			<var name="workflowTask" value="Review" />
 		</execute>
 
-		<execute macro="User#logoutAndLoginPG">
-			<var name="userLoginEmailAddress" value="${user1EmailAddress}" />
-			<var name="userLoginFullName" value="userfn Creator" />
-		</execute>
-
 		<execute macro="Page#gotoMyAccount">
 			<var name="portletName" value="My Workflow Tasks" />
 		</execute>
@@ -2426,7 +2349,7 @@
 			<var name="fieldLabel" value="Assigned To" />
 			<var name="fieldValue" value="Test Test" />
 		</execute>
-	</command>
+	</command>-->
 
 	<command name="CompleteProcessAndViewNotifications" priority="5">
 		<execute macro="Navigator#openURL" />
@@ -7055,7 +6978,10 @@
 		</execute>
 	</command>
 
-	<command name="ViewApprovedProcessNotificationWithComments" priority="3">
+	<!-- LPS-66727 -->
+
+	<!--<command name="ViewApprovedProcessNotificationWithComments" priority="3">
+
 		<execute macro="ProductMenu#gotoControlPanelConfiguration">
 			<var name="portlet" value="Kaleo Designer" />
 		</execute>
@@ -7197,7 +7123,7 @@
 		<execute macro="WorkflowAsset#viewNotification">
 			<var name="contentBody" value="Submission reviewed. The reviewer left the following: Process is approved." />
 		</execute>
-	</command>
+	</command>-->
 
 	<command name="ViewApprovedProcessRecords" priority="5">
 		<execute macro="Navigator#openURL" />
@@ -7434,7 +7360,7 @@
 		</execute>
 
 		<execute macro="Role#assignRegRoleCP">
-			<var name="roleName" value="Administrator" />
+			<var name="roleTitle" value="Administrator" />
 			<var name="userScreenName" value="usersn" />
 		</execute>
 
@@ -7628,11 +7554,14 @@
 		</execute>
 	</command>
 
-	<command name="ViewEmailNotificationSentToTaskAssignees" priority="4">
+	<!-- LPS-66727 -->
+
+	<!--<command name="ViewEmailNotificationSentToTaskAssignees" priority="4">
 		<description message="This is a use case for LPS-50688 and LPS-35263." />
 
 		<property name="test.assert.javascript.errors" value="false" />
 		<property name="test.name.skip.portal.instance" value="KaleoformsUsecase#ViewEmailNotificationSentToTaskAssignees" />
+		<property name="test.smtp.server.enabled" value="true" />
 
 		<var method="TestPropsUtil#get('email.address.2')" name="user1EmailAddress" />
 		<var method="TestPropsUtil#get('email.password.2')" name="user1EmailPassword" />
@@ -7641,13 +7570,12 @@
 		<var method="TestPropsUtil#get('email.address.4')" name="user3EmailAddress" />
 		<var method="TestPropsUtil#get('email.password.4')" name="user3EmailPassword" />
 
-		<execute macro="ProductMenu#gotoControlPanelConfiguration">
-			<var name="portlet" value="Server Administration" />
+		<execute macro="ProductMenu#gotoControlPanelUsers">
+			<var name="portlet" value="Roles" />
 		</execute>
 
-		<execute macro="ServerAdministration#configureMailServerSettings">
-			<var method="TestPropsUtil#get('email.address.1')" name="userName" />
-			<var method="TestPropsUtil#get('email.password.1')" name="userPassword" />
+		<execute macro="Role#addCP">
+			<var name="roleTitle" value="aleoSubmitRole Name" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
@@ -7655,15 +7583,7 @@
 		</execute>
 
 		<execute macro="Role#addCP">
-			<var name="roleName" value="aleoSubmitRole Name" />
-		</execute>
-
-		<execute macro="ProductMenu#gotoControlPanelUsers">
-			<var name="portlet" value="Roles" />
-		</execute>
-
-		<execute macro="Role#addCP">
-			<var name="roleName" value="KaleoReviewRole Name" />
+			<var name="roleTitle" value="KaleoReviewRole Name" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
@@ -7675,7 +7595,7 @@
 			<var name="permissionDefinitionValue" value="Submit" />
 			<var name="permissionNavigationKey" value="SITE_ADMIN_CONTENT_KALEO_FORMS_ADMIN" />
 			<var name="permissionNavigationValue" value="Kaleo Forms Admin" />
-			<var name="roleName" value="aleoSubmitRole Name" />
+			<var name="roleTitle" value="aleoSubmitRole Name" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelUsers">
@@ -7687,7 +7607,19 @@
 			<var name="permissionDefinitionValue" value="View" />
 			<var name="permissionNavigationKey" value="SITE_ADMIN_CONTENT_KALEO_FORMS_ADMIN" />
 			<var name="permissionNavigationValue" value="Kaleo Forms Admin" />
-			<var name="roleName" value="aleoSubmitRole Name" />
+			<var name="roleTitle" value="aleoSubmitRole Name" />
+		</execute>
+
+		<execute macro="ProductMenu#gotoControlPanelUsers">
+			<var name="portlet" value="Roles" />
+		</execute>
+
+		<execute macro="Role#definePermissionCmdCP">
+			<var name="permissionDefinitionKey" value="SITE_ADMIN_CONTENT_KALEO_FORMS_ADMIN_GENERAL_PERMISSIONS_ACCESS_IN_SITE_ADMINISTRATION" />
+			<var name="permissionDefinitionValue" value="Access in Site Administration" />
+			<var name="permissionNavigationKey" value="SITE_ADMIN_CONTENT_KALEO_FORMS_ADMIN" />
+			<var name="permissionNavigationValue" value="Kaleo Forms Admin" />
+			<var name="roleTitle" value="aleoSubmitRole Name" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoControlPanelConfiguration">
@@ -7708,7 +7640,7 @@
 
 		<execute macro="KaleoDesigner#editNodeAssignments">
 			<var name="nodeAssignmentType" value="Role" />
-			<var name="roleName" value="KaleoReviewRole Name" />
+			<var name="roleTitle" value="KaleoReviewRole Name" />
 		</execute>
 
 		<execute macro="KaleoDesigner#editNodeNotifications">
@@ -7745,7 +7677,7 @@
 		</execute>
 
 		<execute macro="Role#assignRegRoleCP">
-			<var name="roleName" value="aleoSubmitRole Name" />
+			<var name="roleTitle" value="aleoSubmitRole Name" />
 			<var name="userScreenName" value="kaloesubmitter" />
 		</execute>
 
@@ -7774,7 +7706,7 @@
 		</execute>
 
 		<execute macro="Role#assignRegRoleCP">
-			<var name="roleName" value="Administrator" />
+			<var name="roleTitle" value="Administrator" />
 			<var name="userScreenName" value="kaleoupdater" />
 		</execute>
 
@@ -7783,7 +7715,7 @@
 		</execute>
 
 		<execute macro="Role#assignRegRoleCP">
-			<var name="roleName" value="KaleoReviewRole Name" />
+			<var name="roleTitle" value="KaleoReviewRole Name" />
 			<var name="userScreenName" value="kaleoupdater" />
 		</execute>
 
@@ -7812,7 +7744,7 @@
 		</execute>
 
 		<execute macro="Role#assignRegRoleCP">
-			<var name="roleName" value="Administrator" />
+			<var name="roleTitle" value="Administrator" />
 			<var name="userScreenName" value="admin" />
 		</execute>
 
@@ -7852,8 +7784,9 @@
 		<execute macro="KaleoFormsAdmin#next" />
 
 		<execute macro="KaleoFormsAdmin#chooseWorkflow">
+			<var name="edit" value="true" />
 			<var name="kfProcessName" value="Kaleo Forms Process" />
-			<var name="workflowDefinitionTitleEdit" value="Edited Workflow Definition" />
+			<var name="workflowDefinitionTitle" value="Edited Workflow Definition" />
 		</execute>
 
 		<execute macro="KaleoFormsAdmin#next" />
@@ -7911,6 +7844,11 @@
 
 		<execute macro="KaleoFormsAdmin#saveProcessRecord" />
 
+		<execute macro="User#logoutAndLoginPG">
+			<var name="userLoginEmailAddress" value="${user2EmailAddress}" />
+			<var name="userLoginFullName" value="userfn2 Updater" />
+		</execute>
+
 		<execute macro="Page#gotoMyAccount">
 			<var name="portletName" value="My Workflow Tasks" />
 		</execute>
@@ -7944,48 +7882,19 @@
 			<var name="workflowTask" value="Review" />
 		</execute>
 
-		<execute macro="Gmail#login">
-			<var name="userEmailAddress" value="${user2EmailAddress}" />
-			<var name="userPassword" value="${user2EmailPassword}" />
+		<execute macro="MockMock#viewMail">
+			<var name="asset" value="Update Notification Description" />
+			<var name="content" value="Your submission was rejected by userfn3 Administrator, please modify and resubmit." />
+			<var name="recipient" value="userfn2 Updater" />
+			<var name="sender" value="Liferay Portal Workflow Notifications" />
+			<var name="subject" value="Update Notification Description" />
 		</execute>
 
-		<execute macro="Gmail#gotoHtmlMode" />
-
-		<execute macro="Gmail#viewMail">
-			<var name="emailFromUserName" value="Liferay Portal Workflow ." />
-			<var name="gmailAssetType" value="Update Notification Description" />
-			<var name="gmailMailTableMessageTitle" value="Update Notification Description" />
-			<var name="gmailMessageBody" value="Your submission was rejected by userfn3 Administrator, please modify and resubmit." />
-			<var name="gmailMessageTitle" value="Update Notification Description" />
+		<execute macro="MockMock#viewNoMailFromInbox">
+			<var name="asset" value="Update Notification Description" />
+			<var name="recipient" value="userfn1 Updater" />
 		</execute>
-
-		<execute macro="Gmail#tearDown">
-			<var name="userEmailAddress" value="${user2EmailAddress}" />
-			<var name="userPassword" value="${user2EmailPassword}" />
-		</execute>
-
-		<execute macro="Gmail#logoutAndLogin">
-			<var name="userEmailAddress" value="${user1EmailAddress}" />
-			<var name="userPassword" value="${user1EmailPassword}" />
-		</execute>
-
-		<execute macro="Gmail#gotoHtmlMode" />
-
-		<execute macro="Gmail#viewMailNotPresent">
-			<var name="gmailAssetType" value="Update Notification Description" />
-		</execute>
-
-		<execute macro="Gmail#logoutAndLogin">
-			<var name="userEmailAddress" value="${user3EmailAddress}" />
-			<var name="userPassword" value="${user3EmailPassword}" />
-		</execute>
-
-		<execute macro="Gmail#gotoHtmlMode" />
-
-		<execute macro="Gmail#viewMailNotPresent">
-			<var name="gmailAssetType" value="Update Notification Description" />
-		</execute>
-	</command>
+	</command>-->
 
 	<command name="ViewKaleoProcessNameOpenedViaNotifications" priority="3">
 		<description message="This is a use case for LPS-51098." />

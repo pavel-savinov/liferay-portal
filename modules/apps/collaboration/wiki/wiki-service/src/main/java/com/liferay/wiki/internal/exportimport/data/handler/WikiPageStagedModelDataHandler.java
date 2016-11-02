@@ -270,6 +270,12 @@ public class WikiPageStagedModelDataHandler
 								fileEntry);
 						}
 						catch (NoSuchFileException nsfe) {
+
+							// LPS-52675
+
+							if (_log.isDebugEnabled()) {
+								_log.debug(nsfe, nsfe);
+							}
 						}
 					}
 					else {
@@ -331,7 +337,7 @@ public class WikiPageStagedModelDataHandler
 	}
 
 	/**
-	 * @deprecated As of 7.0.0
+	 * @deprecated As of 1.2.0
 	 */
 	@Deprecated
 	protected void setWikiPageExportImportContentProcessor(

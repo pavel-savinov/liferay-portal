@@ -178,7 +178,7 @@ public class DDMTemplateLocalServiceImpl
 
 		// Template
 
-		User user = userPersistence.findByPrimaryKey(userId);
+		User user = userLocalService.getUser(userId);
 
 		if (Validator.isNull(templateKey)) {
 			templateKey = String.valueOf(counterLocalService.increment());
@@ -1343,7 +1343,7 @@ public class DDMTemplateLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = userPersistence.findByPrimaryKey(userId);
+		User user = userLocalService.getUser(userId);
 
 		script = formatScript(type, language, script);
 
@@ -1382,6 +1382,7 @@ public class DDMTemplateLocalServiceImpl
 			latestTemplateVersion.getVersion(), majorVersion);
 
 		template.setVersion(version);
+
 		template.setVersionUserId(user.getUserId());
 		template.setVersionUserName(user.getFullName());
 		template.setNameMap(nameMap);

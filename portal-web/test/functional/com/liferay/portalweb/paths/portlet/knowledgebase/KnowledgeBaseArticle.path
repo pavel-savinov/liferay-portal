@@ -133,7 +133,7 @@
 <!--EDIT-->
 <tr>
 	<td>EDIT_FRIENDLY_URL_FIELD</td>
-	<td>//input[contains(@id,'knowledge_base_web') and contains(@id, 'AdminPortlet_urlTitle')]</td>
+	<td>//input[contains(@id,'knowledge_base_web') and contains(@id,'urlTitle')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -214,8 +214,13 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CATEGORY_HEADER</td>
+	<td>//span[@class='taglib-asset-categories-summary']</td>
 	<td></td>
-	<td></td>
+</tr>
+<tr>
+	<td>CATEGORY_LINKS</td>
+	<td>//div[@class='kb-article-assets']/span/a[contains(.,'${key_categoryName}')]</td>
 	<td></td>
 </tr>
 </tbody>

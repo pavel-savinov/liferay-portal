@@ -594,6 +594,7 @@ public class DLFileEntryIndexer
 			});
 		indexableActionableDynamicQuery.setCompanyId(companyId);
 		indexableActionableDynamicQuery.setGroupId(groupId);
+		indexableActionableDynamicQuery.setInterval(_INTERVAL);
 		indexableActionableDynamicQuery.setPerformActionMethod(
 			new ActionableDynamicQuery.PerformActionMethod<DLFileEntry>() {
 
@@ -659,6 +660,7 @@ public class DLFileEntryIndexer
 				@Override
 				public void performAction(Group group) throws PortalException {
 					long groupId = group.getGroupId();
+
 					long folderId = groupId;
 
 					String[] newIds = {
@@ -673,6 +675,8 @@ public class DLFileEntryIndexer
 
 		actionableDynamicQuery.performActions();
 	}
+
+	private static final int _INTERVAL = 500;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DLFileEntryIndexer.class);
