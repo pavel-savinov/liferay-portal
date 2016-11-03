@@ -7,6 +7,8 @@ AUI.add(
 
 		var TPL_NAVBAR_WRAPER = '<nav class="navbar navbar-default navbar-no-collapse"></nav>';
 
+		var FieldTypes = Liferay.DDM.Renderer.FieldTypes;
+
 		var FormBuilderFieldsSettingsSidebar = A.Component.create(
 			{
 				ATTRS: {
@@ -19,7 +21,7 @@ AUI.add(
 					},
 
 					description: {
-						value: 'No description'
+						value: ''
 					},
 
 					field: {
@@ -27,7 +29,8 @@ AUI.add(
 					},
 
 					title: {
-						value: 'Untitle'
+						setter: '_setTitle',
+						value: ''
 					},
 
 					toolbar: {
@@ -45,14 +48,31 @@ AUI.add(
 					initializer: function() {
 						var instance = this;
 
-						var eventHandlers;
-
-						eventHandlers = [
+						instance._eventHandlers = [
+							A.getDoc().on('click', A.bind(instance._onClickDocument, instance)),
 							instance.after('open', instance._afterSidebarOpen),
 							instance.after('open:start', instance._afterOpenStart)
 						];
+					},
 
-						instance._eventHandlers = eventHandlers;
+					destructor: function() {
+						var instance = this;
+
+						var toolbar = instance.get('toolbar');
+
+						toolbar.destroy();
+
+						instance.destroyFieldSettingsForm();
+
+						(new A.EventHandle(instance._eventHandlers)).detach();
+					},
+
+					destroyFieldSettingsForm: function() {
+						var instance = this;
+
+						if (instance.settingsForm) {
+							instance.settingsForm.destroy();
+						}
 					},
 
 					getFieldSettings: function() {
@@ -62,15 +82,39 @@ AUI.add(
 
 						var settingsForm = instance.settingsForm;
 
-						var settings = field.getSettings(settingsForm);
+						return field.getSettings(settingsForm);
+					},
 
-						return settings;
+					getPreviousContext: function() {
+						var instance = this;
+
+						return instance._previousContext;
+					},
+
+					hasChanges: function() {
+						var instance = this;
+
+						var previousContext = instance.getPreviousContext();
+
+						var currentFieldSettings = instance.getFieldSettings();
+
+						return JSON.stringify(previousContext) !== JSON.stringify(currentFieldSettings.context);
 					},
 
 					_afterOpenStart: function() {
 						var instance = this;
 
 						instance._showLoading();
+					},
+
+					_afterPressEscapeKey: function() {
+						var instance = this;
+
+						if (instance.isOpen()) {
+							var field = instance.get('field');
+
+							instance.get('builder').cancelFieldEdition(field);
+						}
 					},
 
 					_afterSidebarOpen: function() {
@@ -80,14 +124,29 @@ AUI.add(
 
 						var toolbar = instance.get('toolbar');
 
-						instance._showLoading();
+						var fieldType = FieldTypes.get(field.get('type'));
 
-						instance.set('description', field.get('type'));
-						instance.set('title', field.get('context').label);
+						instance.set('description', fieldType.get('label'));
+						instance.set('title', field.get('context.label'));
 
 						instance._loadFieldSettingsForm(field);
 
 						toolbar.set('field', field);
+					},
+
+					_bindSettingsFormEvents: function() {
+						var instance = this;
+
+						var settingsForm = instance.settingsForm;
+
+						var labelField = settingsForm.getField('label');
+
+						labelField.after(
+							'valueChange',
+							function() {
+								instance.set('title', labelField.getValue());
+							}
+						);
 					},
 
 					_configureSideBar: function() {
@@ -96,8 +155,6 @@ AUI.add(
 						var settingsForm = instance.settingsForm;
 
 						var settingsFormContainer = settingsForm.get('container');
-
-						instance._hideSettingsForm();
 
 						instance.set('bodyContent', settingsFormContainer);
 
@@ -108,18 +165,17 @@ AUI.add(
 							}
 						);
 
-						var evaluator = settingsForm.get('evaluator');
-
-						evaluator.after(
-							'evaluationStarted',
-							function() {
-								instance.set('title', settingsForm.getField('label').getValue());
-							}
-						);
+						instance._bindSettingsFormEvents();
 
 						settingsForm.render();
 
 						settingsForm.getFirstPageField().focus();
+					},
+
+					_containsNode: function(node) {
+						var instance = this;
+
+						return instance.get('boundingBox').contains(node);
 					},
 
 					_createToolbar: function() {
@@ -134,14 +190,6 @@ AUI.add(
 						return toolbar;
 					},
 
-					_hideSettingsForm: function() {
-						var instance = this;
-
-						var container = instance.settingsForm.get('container');
-
-						container.addClass('invisible');
-					},
-
 					_loadFieldSettingsForm: function(field) {
 						var instance = this;
 
@@ -153,7 +201,6 @@ AUI.add(
 
 								settingsForm.evaluate(
 									function() {
-										instance._showSettingsForm();
 										instance._removeLoading();
 									}
 								);
@@ -173,12 +220,24 @@ AUI.add(
 						);
 					},
 
+					_onClickDocument: function(event) {
+						var instance = this;
+
+						var settingsForm = instance.settingsForm;
+
+						var target = event.target;
+
+						if (instance.get('open') && !instance._containsNode(target) && !settingsForm.hasFocus()) {
+							instance.close();
+						}
+					},
+
 					_removeLoading: function() {
 						var instance = this;
 
 						var boundingBox = instance.get('boundingBox');
 
-						boundingBox.one('.loading-icon').remove();
+						boundingBox.removeClass('loading-data');
 					},
 
 					_saveCurrentContext: function() {
@@ -201,25 +260,21 @@ AUI.add(
 						}
 					},
 
+					_setTitle: function(value) {
+						return value || Liferay.Language.get('unlabeled');
+					},
+
 					_showLoading: function() {
 						var instance = this;
 
+						var boundingBox = instance.get('boundingBox');
 						var contentBox = instance.get('contentBox');
-
-						instance.set('description', '');
-						instance.set('title', '');
 
 						if (!contentBox.one('.loading-icon')) {
 							contentBox.append(TPL_LOADING);
 						}
-					},
 
-					_showSettingsForm: function() {
-						var instance = this;
-
-						var container = instance.settingsForm.get('container');
-
-						container.removeClass('invisible');
+						boundingBox.addClass('loading-data');
 					}
 				}
 			}
@@ -229,6 +284,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-tabview', 'liferay-ddl-form-builder-sidebar']
+		requires: ['aui-tabview', 'liferay-ddl-form-builder-sidebar', 'liferay-ddm-form-renderer-types']
 	}
 );

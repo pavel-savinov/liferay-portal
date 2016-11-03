@@ -423,13 +423,12 @@ public class DDMTemplateStagedModelDataHandler
 				}
 				else {
 					importedTemplate = _ddmTemplateLocalService.updateTemplate(
-						userId, existingTemplate.getTemplateId(),
-						template.getClassPK(), template.getNameMap(),
-						template.getDescriptionMap(), template.getType(),
-						template.getMode(), template.getLanguage(),
-						template.getScript(), template.isCacheable(),
-						template.isSmallImage(), template.getSmallImageURL(),
-						smallFile, serviceContext);
+						userId, existingTemplate.getTemplateId(), classPK,
+						template.getNameMap(), template.getDescriptionMap(),
+						template.getType(), template.getMode(),
+						template.getLanguage(), template.getScript(),
+						template.isCacheable(), template.isSmallImage(),
+						template.getSmallImageURL(), smallFile, serviceContext);
 				}
 			}
 			else {
@@ -484,7 +483,7 @@ public class DDMTemplateStagedModelDataHandler
 	}
 
 	/**
-	 * @deprecated As of 7.0.0
+	 * @deprecated As of 1.0.0
 	 */
 	@Deprecated
 	protected void setDDMTemplateExportImportContentProcessor(

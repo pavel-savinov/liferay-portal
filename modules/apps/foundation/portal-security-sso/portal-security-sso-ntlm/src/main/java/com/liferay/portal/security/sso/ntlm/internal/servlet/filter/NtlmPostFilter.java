@@ -107,12 +107,14 @@ public class NtlmPostFilter extends BaseFilter {
 
 			if (src[8] == 1) {
 				Type1Message type1 = new Type1Message(src);
+
 				Type2Message type2 = new Type2Message(type1, new byte[8], null);
 
 				authorization = Base64.encode(type2.toByteArray());
 
 				response.setHeader(
 					HttpHeaders.WWW_AUTHENTICATE, "NTLM " + authorization);
+
 				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 				response.setContentLength(0);
 
