@@ -633,6 +633,8 @@ public interface PropsKeys {
 
 	public static final String DL_FILE_ENTRY_PREVIEW_FORK_PROCESS_ENABLED = "dl.file.entry.preview.fork.process.enabled";
 
+	public static final String DL_FILE_ENTRY_PREVIEW_GENERATION_DECRYPT_PASSWORDS_PDFBOX = "dl.file.entry.preview.generation.decrypt.passwords.pdfbox";
+
 	public static final String DL_FILE_ENTRY_PREVIEW_GENERATION_TIMEOUT_GHOSTSCRIPT = "dl.file.entry.preview.generation.timeout.ghostscript";
 
 	public static final String DL_FILE_ENTRY_PREVIEW_GENERATION_TIMEOUT_PDFBOX = "dl.file.entry.preview.generation.timeout.pdfbox";
@@ -1785,6 +1787,8 @@ public interface PropsKeys {
 
 	public static final String REQUEST_SHARED_ATTRIBUTES = "request.shared.attributes";
 
+	public static final String REQUEST_UNWRAP_PACKAGES = "request.unwrap.packages";
+
 	public static final String RESOURCE_ACTIONS_CONFIGS = "resource.actions.configs";
 
 	public static final String RESOURCE_ACTIONS_READ_PORTLET_RESOURCES = "resource.actions.read.portlet.resources";
@@ -2074,6 +2078,8 @@ public interface PropsKeys {
 	public static final String SPRING_HIBERNATE_SESSION_FACTORY = "spring.hibernate.session.factory";
 
 	public static final String SPRING_HIBERNATE_SESSION_FACTORY_PRELOAD_CLASSLOADER_CLASSES = "spring.hibernate.session.factory.preload.classloader.classes";
+
+	public static final String SPRING_HIBERNATE_SESSION_FACTORY_VERIFY = "spring.hibernate.session.factory.verify";
 
 	public static final String SPRING_INFRASTRUCTURE_CONFIGS = "spring.infrastructure.configs";
 

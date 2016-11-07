@@ -38,7 +38,6 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.Sync;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
-import com.liferay.portal.kernel.test.rule.TransactionalTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -77,8 +76,7 @@ public class JournalFeedStagedModelDataHandlerTest
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
 			new LiferayIntegrationTestRule(),
-			SynchronousDestinationTestRule.INSTANCE,
-			TransactionalTestRule.INSTANCE);
+			SynchronousDestinationTestRule.INSTANCE);
 
 	@Before
 	@Override
@@ -106,6 +104,9 @@ public class JournalFeedStagedModelDataHandlerTest
 			PortletPreferencesFactoryUtil.getPortalPreferences(
 				TestPropsValues.getUserId(), true);
 
+		_originalPortalPreferencesXML = PortletPreferencesFactoryUtil.toXML(
+			portalPreferenceces);
+
 		portalPreferenceces.setValue(
 			"", "publishToLiveByDefaultEnabled", "true");
 		portalPreferenceces.setValue(
@@ -122,11 +123,10 @@ public class JournalFeedStagedModelDataHandlerTest
 		portalPreferenceces.setValue(
 			"", "journalArticlePageBreakToken", "@page_break@");
 
-		_portalPreferences =
-			PortalPreferencesLocalServiceUtil.addPortalPreferences(
-				TestPropsValues.getCompanyId(),
-				PortletKeys.PREFS_OWNER_TYPE_COMPANY,
-				PortletPreferencesFactoryUtil.toXML(portalPreferenceces));
+		PortalPreferencesLocalServiceUtil.updatePreferences(
+			TestPropsValues.getCompanyId(),
+			PortletKeys.PREFS_OWNER_TYPE_COMPANY,
+			PortletPreferencesFactoryUtil.toXML(portalPreferenceces));
 	}
 
 	@After
@@ -134,8 +134,10 @@ public class JournalFeedStagedModelDataHandlerTest
 	public void tearDown() throws Exception {
 		super.tearDown();
 
-		PortalPreferencesLocalServiceUtil.deletePortalPreferences(
-			_portalPreferences);
+		PortalPreferencesLocalServiceUtil.updatePreferences(
+			TestPropsValues.getCompanyId(),
+			PortletKeys.PREFS_OWNER_TYPE_COMPANY,
+			_originalPortalPreferencesXML);
 	}
 
 	@Override
@@ -314,7 +316,6 @@ public class JournalFeedStagedModelDataHandlerTest
 	}
 
 	private Layout _layout;
-	private com.liferay.portal.kernel.model.PortalPreferences
-		_portalPreferences;
+	private String _originalPortalPreferencesXML;
 
 }

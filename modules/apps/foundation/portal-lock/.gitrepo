@@ -1,10 +1,9 @@
 ;
-; Do not manually edit this file. See
-; https://github.com/git-commands/git-subrepo#readme for more information.
+; Do not manually edit this file.
 ;
 [subrepo]
 	cmdver = liferay
-	commit = 5fcf0a362b668f6961612556c1c2caa917d225cc
+	commit = c047f63b9c27a95a08ac98c0a380709388076c74
 	mode = push
-	parent = 0d6c7828eb6dcbb50008e1732e88a2f65b4b48ce
+	parent = b909cc8ee3c43e6309425da45b11a199bcfee11f
 	remote = git@github.com:liferay/com-liferay-portal-lock.git
