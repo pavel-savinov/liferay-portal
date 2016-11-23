@@ -31,48 +31,59 @@ import org.osgi.service.component.annotations.Component;
 public class RelatedAssetPublisherCustomizer
 	extends DefaultAssetPublisherCustomizer {
 
+	@Override
 	public String getPortletId() {
 		return AssetPublisherPortletKeys.RELATED_ASSETS;
 	}
 
+	@Override
 	public boolean isEnablePermissions(HttpServletRequest request) {
 		return true;
 	}
 
+	@Override
 	public boolean isOrderingAndGroupingEnabled(HttpServletRequest request) {
 		return true;
 	}
 
+	@Override
 	public boolean isOrderingByTitleEnabled(HttpServletRequest request) {
 		return false;
 	}
 
+	@Override
 	public boolean isSelectionStyleEnabled(HttpServletRequest request) {
 		return false;
 	}
 
+	@Override
 	public boolean isShowAssetEntryQueryProcessor(
 		AssetEntryQueryProcessor assetEntryQueryProcessor) {
 
 		return true;
 	}
 
+	@Override
 	public boolean isShowEnableAddContentButton(HttpServletRequest request) {
 		return true;
 	}
 
+	@Override
 	public boolean isShowEnableRelatedAssets(HttpServletRequest request) {
 		return false;
 	}
 
+	@Override
 	public boolean isShowScopeSelector(HttpServletRequest request) {
 		return false;
 	}
 
+	@Override
 	public boolean isShowSubtypeFieldsFilter(HttpServletRequest request) {
 		return false;
 	}
 
+	@Override
 	public void setAssetEntryQueryOptions(
 		AssetEntryQuery assetEntryQuery, HttpServletRequest request) {
 

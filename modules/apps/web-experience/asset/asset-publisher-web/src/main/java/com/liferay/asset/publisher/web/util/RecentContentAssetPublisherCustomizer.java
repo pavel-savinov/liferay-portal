@@ -35,22 +35,27 @@ import org.osgi.service.component.annotations.Component;
 public class RecentContentAssetPublisherCustomizer
 	extends DefaultAssetPublisherCustomizer {
 
+	@Override
 	public Integer getDelta(HttpServletRequest request) {
 		return PropsValues.RECENT_CONTENT_MAX_DISPLAY_ITEMS;
 	}
 
+	@Override
 	public String getPortletId() {
 		return AssetPublisherPortletKeys.RECENT_CONTENT;
 	}
 
+	@Override
 	public boolean isEnablePermissions(HttpServletRequest request) {
 		return true;
 	}
 
+	@Override
 	public boolean isOrderingAndGroupingEnabled(HttpServletRequest request) {
 		return true;
 	}
 
+	@Override
 	public boolean isOrderingByTitleEnabled(HttpServletRequest request) {
 		if (!AssetPublisherWebConfigurationValues.SEARCH_WITH_INDEX) {
 			return false;
@@ -59,32 +64,39 @@ public class RecentContentAssetPublisherCustomizer
 		return true;
 	}
 
+	@Override
 	public boolean isSelectionStyleEnabled(HttpServletRequest request) {
 		return true;
 	}
 
+	@Override
 	public boolean isShowAssetEntryQueryProcessor(
 		AssetEntryQueryProcessor assetEntryQueryProcessor) {
 
 		return true;
 	}
 
+	@Override
 	public boolean isShowEnableAddContentButton(HttpServletRequest request) {
 		return true;
 	}
 
+	@Override
 	public boolean isShowEnableRelatedAssets(HttpServletRequest request) {
 		return true;
 	}
 
+	@Override
 	public boolean isShowScopeSelector(HttpServletRequest request) {
 		return true;
 	}
 
+	@Override
 	public boolean isShowSubtypeFieldsFilter(HttpServletRequest request) {
 		return true;
 	}
 
+	@Override
 	public void setAssetEntryQueryOptions(
 		AssetEntryQuery assetEntryQuery, HttpServletRequest request) {
 

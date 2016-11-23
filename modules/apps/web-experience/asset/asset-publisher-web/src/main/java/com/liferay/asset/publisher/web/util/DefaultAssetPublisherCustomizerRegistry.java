@@ -29,6 +29,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 public class DefaultAssetPublisherCustomizerRegistry
 	implements AssetPublisherCustomizerRegistry {
 
+	@Override
 	public AssetPublisherCustomizer getAssetPublisherCustomizer(
 		String portletId) {
 

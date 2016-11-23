@@ -35,10 +35,12 @@ import org.osgi.service.component.annotations.Component;
 public class MostViewedAssetPublisherCustomizer
 	extends DefaultAssetPublisherCustomizer {
 
+	@Override
 	public String getPortletId() {
 		return AssetPublisherPortletKeys.MOST_VIEWED_ASSETS;
 	}
 
+	@Override
 	public boolean isEnablePermissions(HttpServletRequest request) {
 		if (!AssetPublisherWebConfigurationValues.
 				PERMISSION_CHECKING_CONFIGURABLE) {
@@ -54,10 +56,12 @@ public class MostViewedAssetPublisherCustomizer
 		return enablePermissions;
 	}
 
+	@Override
 	public boolean isOrderingAndGroupingEnabled(HttpServletRequest request) {
 		return false;
 	}
 
+	@Override
 	public boolean isOrderingByTitleEnabled(HttpServletRequest request) {
 		if (!AssetPublisherWebConfigurationValues.SEARCH_WITH_INDEX) {
 			return false;
@@ -66,28 +70,34 @@ public class MostViewedAssetPublisherCustomizer
 		return true;
 	}
 
+	@Override
 	public boolean isSelectionStyleEnabled(HttpServletRequest request) {
 		return false;
 	}
 
+	@Override
 	public boolean isShowAssetEntryQueryProcessor(
 		AssetEntryQueryProcessor assetEntryQueryProcessor) {
 
 		return true;
 	}
 
+	@Override
 	public boolean isShowEnableAddContentButton(HttpServletRequest request) {
 		return false;
 	}
 
+	@Override
 	public boolean isShowEnableRelatedAssets(HttpServletRequest request) {
 		return true;
 	}
 
+	@Override
 	public boolean isShowScopeSelector(HttpServletRequest request) {
 		return true;
 	}
 
+	@Override
 	public boolean isShowSubtypeFieldsFilter(HttpServletRequest request) {
 		if (!AssetPublisherWebConfigurationValues.SEARCH_WITH_INDEX) {
 			return false;
@@ -96,6 +106,7 @@ public class MostViewedAssetPublisherCustomizer
 		return true;
 	}
 
+	@Override
 	public void setAssetEntryQueryOptions(
 		AssetEntryQuery assetEntryQuery, HttpServletRequest request) {
 
