@@ -1135,21 +1135,23 @@ public class AssetPublisherExportImportTest
 		mockHttpServletRequest.setAttribute(
 			WebKeys.THEME_DISPLAY, themeDisplay);
 
-		portletRequest.setPreferences(portletPreferences);
+		AssetPublisherCustomizer assetPublisherCustomizer =
+			new DefaultAssetPublisherCustomizer();
+
+		mockHttpServletRequest.setAttribute(
+			"assetPublisherCustomizer", assetPublisherCustomizer);
 
 		portletRequest.setAttribute(
 			PortletServlet.PORTLET_SERVLET_REQUEST, mockHttpServletRequest);
 
+		portletRequest.setPreferences(portletPreferences);
+
 		mockHttpServletRequest.setAttribute(
 			JavaConstants.JAVAX_PORTLET_REQUEST, portletRequest);
 
-		AssetPublisherCustomizer assetPublisherCustomizer =
-			new DefaultAssetPublisherCustomizer();
-
 		AssetPublisherDisplayContext assetPublisherDisplayContext =
 			new AssetPublisherDisplayContext(
-				assetPublisherCustomizer, portletRequest,
-				new MockPortletResponse(), portletPreferences);
+				portletRequest, new MockPortletResponse(), portletPreferences);
 
 		SearchContainer<AssetEntry> searchContainer = new SearchContainer<>();
 

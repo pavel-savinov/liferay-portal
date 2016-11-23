@@ -207,14 +207,9 @@ public class AssetRSSUtil {
 
 		SearchContainer searchContainer = new SearchContainer();
 
-		AssetPublisherCustomizer assetPublisherCustomizer =
-			(AssetPublisherCustomizer)portletRequest.getAttribute(
-				"assetPublisherCustomizer");
-
 		AssetPublisherDisplayContext assetPublisherDisplayContext =
 			new AssetPublisherDisplayContext(
-				assetPublisherCustomizer, portletRequest, portletResponse,
-				portletPreferences);
+				portletRequest, portletResponse, portletPreferences);
 
 		searchContainer.setDelta(assetPublisherDisplayContext.getRSSDelta());
 

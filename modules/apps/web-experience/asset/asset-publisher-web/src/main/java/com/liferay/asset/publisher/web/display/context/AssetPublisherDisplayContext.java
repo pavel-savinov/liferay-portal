@@ -90,25 +90,10 @@ public class AssetPublisherDisplayContext {
 		PAGINATION_TYPE_NONE, PAGINATION_TYPE_REGULAR, PAGINATION_TYPE_SIMPLE
 	};
 
-	public AssetPublisherDisplayContext(
-		AssetPublisherCustomizer assetPublisherCustomizer,
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		PortletPreferences portletPreferences) {
-
-		_request = PortalUtil.getHttpServletRequest(portletRequest);
-
-		_assetPublisherCustomizer = assetPublisherCustomizer;
-
-		_portletRequest = portletRequest;
-		_portletResponse = portletResponse;
-
-		_portletPreferences = portletPreferences;
-	}
-
 	/**
 	 * @deprecated As of 2.0.0, replaced by {@link
-	 *             #AssetPublisherDisplayContext(AssetPublisherCustomizer,
-	 *             PortletRequest,PortletResponse, PortletPreferences)}
+	 *             #AssetPublisherDisplayContext(PortletRequest,
+	 *             PortletResponse, PortletPreferences)}
 	 */
 	@Deprecated
 	public AssetPublisherDisplayContext(
@@ -118,6 +103,22 @@ public class AssetPublisherDisplayContext {
 			"This constructor is deprecated and replaced by " +
 				"#AssetPublisherDisplayContext(PortletRequest, " +
 					"PortletResponse, PortletPreferences)");
+	}
+
+	public AssetPublisherDisplayContext(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		PortletPreferences portletPreferences) {
+
+		_request = PortalUtil.getHttpServletRequest(portletRequest);
+
+		_assetPublisherCustomizer =
+			(AssetPublisherCustomizer)_request.getAttribute(
+				"assetPublisherCustomizer");
+
+		_portletRequest = portletRequest;
+		_portletResponse = portletResponse;
+
+		_portletPreferences = portletPreferences;
 	}
 
 	public int getAbstractLength() {
