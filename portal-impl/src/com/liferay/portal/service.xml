@@ -633,6 +633,10 @@
 			<finder-column name="groupId" />
 			<finder-column name="privateLayout" />
 		</finder>
+		<finder name="P_I" return-type="Layout">
+			<finder-column name="privateLayout" />
+			<finder-column name="iconImageId" />
+		</finder>
 		<finder name="G_P_L" return-type="Layout" unique="true">
 			<finder-column name="groupId" />
 			<finder-column name="privateLayout" />
@@ -680,6 +684,7 @@
 		<reference entity="ResourcePermission" package-path="com.liferay.portal" />
 		<reference entity="Subscription" package-path="com.liferay.portal" />
 		<reference entity="User" package-path="com.liferay.portal" />
+		<reference entity="UserGroup" package-path="com.liferay.portal" />
 		<reference entity="AssetCategory" package-path="com.liferay.portlet.asset" />
 		<reference entity="AssetEntry" package-path="com.liferay.portlet.asset" />
 		<reference entity="AssetTag" package-path="com.liferay.portlet.asset" />
@@ -988,6 +993,10 @@
 		<finder name="G_P" return-type="LayoutSet" unique="true">
 			<finder-column name="groupId" />
 			<finder-column name="privateLayout" />
+		</finder>
+		<finder name="P_L" return-type="Layout">
+			<finder-column name="privateLayout" />
+			<finder-column name="logoId" />
 		</finder>
 
 		<!-- References -->
@@ -1753,8 +1762,11 @@
 
 		<!-- References -->
 
+		<reference entity="Layout" package-path="com.liferay.portal" />
+		<reference entity="LayoutRevision" package-path="com.liferay.portal" />
 		<reference entity="Portlet" package-path="com.liferay.portal" />
 		<reference entity="PortletItem" package-path="com.liferay.portal" />
+		<reference entity="User" package-path="com.liferay.portal" />
 	</entity>
 	<entity local-service="true" name="RecentLayoutBranch" remote-service="false" uuid="false">
 
@@ -2388,6 +2400,10 @@
 			<finder-column name="buildNamespace" />
 			<finder-column name="buildNumber" />
 		</finder>
+
+		<!-- References -->
+
+		<reference entity="Release" package-path="com.liferay.portal" />
 	</entity>
 	<entity local-service="true" name="Subscription" remote-service="false">
 
