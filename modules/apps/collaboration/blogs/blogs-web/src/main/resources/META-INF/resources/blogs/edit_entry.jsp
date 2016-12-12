@@ -44,12 +44,14 @@ String coverImageCaption = BeanParamUtil.getString(entry, request, "coverImageCa
 long coverImageFileEntryId = BeanParamUtil.getLong(entry, request, "coverImageFileEntryId");
 long smallImageFileEntryId = BeanParamUtil.getLong(entry, request, "smallImageFileEntryId");
 
-boolean portletTitleBasedNavigation = GetterUtil.getBoolean(portletConfig.getInitParameter("portlet-title-based-navigation"));
-
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);
 
-renderResponse.setTitle((entry != null) ? entry.getTitle() : LanguageUtil.get(request, "new-blog-entry"));
+boolean portletTitleBasedNavigation = GetterUtil.getBoolean(portletConfig.getInitParameter("portlet-title-based-navigation"));
+
+if (portletTitleBasedNavigation) {
+	renderResponse.setTitle((entry != null) ? BlogsEntryUtil.getDisplayTitle(resourceBundle, entry) : LanguageUtil.get(request, "new-blog-entry"));
+}
 %>
 
 <liferay-util:buffer var="saveStatus">
@@ -87,6 +89,7 @@ renderResponse.setTitle((entry != null) ? entry.getTitle() : LanguageUtil.get(re
 		</c:if>
 
 		<div class="lfr-form-content">
+			<liferay-ui:error exception="<%= DuplicateFriendlyURLException.class %>" message="the-url-title-is-already-in-use-please-enter-a-unique-url-title" />
 			<liferay-ui:error exception="<%= EntryContentException.class %>" message="please-enter-valid-content" />
 			<liferay-ui:error exception="<%= EntryCoverImageCropException.class %>" message="an-error-occurred-while-cropping-the-cover-image" />
 			<liferay-ui:error exception="<%= EntryDescriptionException.class %>" message="please-enter-a-valid-abstract" />
@@ -153,7 +156,7 @@ renderResponse.setTitle((entry != null) ? entry.getTitle() : LanguageUtil.get(re
 
 					<div class="col-md-8 col-md-offset-2">
 						<div class="entry-title">
-							<h1><liferay-ui:input-editor contents="<%= HtmlUtil.escape(title) %>" editorName="alloyeditor" name="titleEditor" placeholder="title" showSource="<%= false %>" /></h1>
+							<h1><liferay-ui:input-editor contents="<%= HtmlUtil.escape(title) %>" editorName="alloyeditor" name="titleEditor" onChangeMethod="OnChangeTitle" placeholder="title" showSource="<%= false %>" /></h1>
 						</div>
 
 						<aui:input name="title" type="hidden" />
@@ -193,7 +196,33 @@ renderResponse.setTitle((entry != null) ? entry.getTitle() : LanguageUtil.get(re
 					String friendlyURLPrefix = StringUtil.shorten("/-/" + portlet.getFriendlyURLMapping(), 40) + StringPool.SLASH;
 					%>
 
-					<aui:input cssClass="input-medium" data-customUrl="<%= false %>" helpMessage='<%= LanguageUtil.format(resourceBundle, "for-example-x", "<em>one-day-in-the-life-of-marion-cotillard</em>") %>' ignoreRequestValue="<%= true %>" label="blog-entry-url" name="urlTitle" prefix="<%= friendlyURLPrefix %>" type="text" value="<%= urlTitle %>" />
+					<div class="clearfix form-group">
+
+						<%
+						boolean automaticURL;
+
+						if (entry == null) {
+							automaticURL = Validator.isNull(urlTitle);
+						}
+						else {
+							String uniqueUrlTitle = BlogsEntryLocalServiceUtil.getUniqueUrlTitle(entry);
+
+							automaticURL = uniqueUrlTitle.equals(urlTitle);
+						}
+						%>
+
+						<h4>
+							<liferay-ui:message key="url" />
+						</h4>
+
+						<div class="form-group" id="<portlet:namespace />urlOptions">
+							<aui:input checked="<%= automaticURL %>" helpMessage="the-url-will-be-based-on-the-entry-title" label="automatic" name="automaticURL" type="radio" value="<%= true %>" />
+
+							<aui:input checked="<%= !automaticURL %>" label="custom" name="automaticURL" type="radio" value="<%= false %>" />
+						</div>
+
+						<aui:input cssClass="input-medium" disabled="<%= automaticURL %>" helpMessage='<%= LanguageUtil.format(resourceBundle, "for-example-x", "<em>one-day-in-the-life-of-marion-cotillard</em>") %>' ignoreRequestValue="<%= true %>" label="blog-entry-url" name="urlTitle" prefix="<%= friendlyURLPrefix %>" type="text" value="<%= urlTitle %>" />
+					</div>
 
 					<div class="clearfix form-group">
 						<label><liferay-ui:message key="abstract" /> <liferay-ui:icon-help message="an-abstract-is-a-brief-summary-of-a-blog-entry" /></label>
@@ -355,6 +384,14 @@ renderResponse.setTitle((entry != null) ? entry.getTitle() : LanguageUtil.get(re
 		}
 	}
 
+	function <portlet:namespace />OnChangeTitle(title) {
+		var blogs = Liferay.component('<portlet:namespace />Blogs');
+
+		if (blogs) {
+			blogs.updateFriendlyURL(title);
+		}
+	}
+
 	function <portlet:namespace />OnDescriptionEditorInit() {
 		<c:if test="<%= !customAbstract %>">
 			document.getElementById('<portlet:namespace />descriptionEditor').setAttribute('contenteditable', false);
@@ -400,14 +437,6 @@ renderResponse.setTitle((entry != null) ? entry.getTitle() : LanguageUtil.get(re
 		)
 	);
 
-	var clearSaveDraftHandle = function(event) {
-		if (event.portletId === '<%= portletDisplay.getRootPortletId() %>') {
-			blogs.destroy();
-
-			Liferay.detach('destroyPortlet', clearSaveDraftHandle);
-		}
-	};
-
 	var createAbstractEditor = function() {
 		var descriptionEditor = window['<portlet:namespace />descriptionEditor'];
 
@@ -418,7 +447,7 @@ renderResponse.setTitle((entry != null) ? entry.getTitle() : LanguageUtil.get(re
 		}
 	};
 
-	var configurationContentHeader = AUI.$('#configurationContent');
+	var configurationContentHeader = AUI.$('#<portlet:namespace />configurationContent');
 
 	if (configurationContentHeader.hasClass('in')) {
 		createAbstractEditor();
@@ -427,16 +456,13 @@ renderResponse.setTitle((entry != null) ? entry.getTitle() : LanguageUtil.get(re
 		configurationContentHeader.on('show.bs.collapse', createAbstractEditor);
 	}
 
-	var form = A.one('#<portlet:namespace />fm');
+	var clearSaveDraftHandle = function(event) {
+		if (event.portletId === '<%= portletDisplay.getRootPortletId() %>') {
+			blogs.destroy();
 
-	var urlTitleInput = form.one('#<portlet:namespace />urlTitle');
-
-	urlTitleInput.on(
-		'input',
-		function(event) {
-			event.currentTarget.setAttribute('data-customUrl', urlTitleInput.val() != '');
+			Liferay.detach('destroyPortlet', clearSaveDraftHandle);
 		}
-	);
+	};
 
 	Liferay.on('destroyPortlet', clearSaveDraftHandle);
 </aui:script>
@@ -448,7 +474,7 @@ if (entry != null) {
 	portletURL.setParameter("mvcRenderCommandName", "/blogs/view_entry");
 	portletURL.setParameter("entryId", String.valueOf(entry.getEntryId()));
 
-	PortalUtil.addPortletBreadcrumbEntry(request, entry.getTitle(), portletURL.toString());
+	PortalUtil.addPortletBreadcrumbEntry(request, BlogsEntryUtil.getDisplayTitle(resourceBundle, entry), portletURL.toString());
 	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "edit"), currentURL);
 }
 else {

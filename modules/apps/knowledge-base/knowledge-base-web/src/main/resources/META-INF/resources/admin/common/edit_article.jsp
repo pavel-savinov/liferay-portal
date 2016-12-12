@@ -92,6 +92,7 @@ if (portletTitleBasedNavigation) {
 
 			<liferay-ui:error exception="<%= DuplicateFileException.class %>" message="please-enter-a-unique-document-name" />
 			<liferay-ui:error exception="<%= FileNameException.class %>" message="please-enter-a-file-with-a-valid-file-name" />
+			<liferay-ui:error exception="<%= KBArticleStatusException.class %>" message="this-article-cannot-be-published-because-its-parent-has-not-been-published" />
 			<liferay-ui:error exception="<%= KBArticleUrlTitleException.MustNotBeDuplicate.class %>" message="please-enter-a-unique-friendly-url" />
 
 			<%
@@ -285,15 +286,7 @@ if (portletTitleBasedNavigation) {
 			var customUrl = urlTitleInput.getAttribute('data-customUrl');
 
 			if (customUrl === 'false') {
-				html = html.replace(/[^a-zA-Z0-9_-]/g, '-');
-
-				if (html[0] === '-') {
-					html = html.replace(/^-+/, '');
-				}
-
-				html = html.replace(/--+/g, '-');
-
-				urlTitleInput.value = html.toLowerCase();
+				urlTitleInput.value = Liferay.Util.normalizeFriendlyURL(html);
 			}
 		}
 	</c:if>
