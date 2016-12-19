@@ -1,10 +1,9 @@
 ;
-; Do not manually edit this file. See
-; https://github.com/git-commands/git-subrepo#readme for more information.
+; Do not manually edit this file.
 ;
 [subrepo]
 	cmdver = liferay
-	commit = fcb52ab0ed670cc05d779dca13875847c40e88c2
+	commit = e4a32ae29806c520d889b13bc71a60af36506520
 	mode = push
-	parent = b3dc06172826b083549fe20ffdd2ba7b5d0567c7
+	parent = 2fff3719c8ac7460515f4baa4dd7ac387309866b
 	remote = git@github.com:liferay/com-liferay-trash.git
