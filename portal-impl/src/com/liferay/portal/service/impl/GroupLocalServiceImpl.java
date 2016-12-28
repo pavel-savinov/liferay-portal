@@ -316,7 +316,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 				friendlyName, "");
 		}
 
-		groupFriendlyURLLocalService.addGroupFriendlyURLs(
+		groupFriendlyURLLocalService.updateGroupFriendlyURLs(
 			userId, user.getCompanyId(), groupId, friendlyURLMap,
 			serviceContext);
 
@@ -714,6 +714,11 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 				throw new PendingBackgroundTaskException(
 					"Unable to delete group with pending background tasks");
 			}
+
+			// Group friendly URLs
+
+			groupFriendlyURLLocalService.deleteGroupFriendlyURLs(
+				group.getCompanyId(), group.getGroupId());
 
 			// Background tasks
 
@@ -4051,6 +4056,12 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 			if (nameMap != null) {
 				friendlyName = nameMap.get(locale);
+			}
+
+			if (Validator.isNull(friendlyURL) &&
+				!locale.equals(LocaleUtil.getSiteDefault())) {
+
+				continue;
 			}
 
 			friendlyURL = getFriendlyURL(
