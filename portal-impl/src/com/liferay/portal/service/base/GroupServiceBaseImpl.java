@@ -42,6 +42,7 @@ import com.liferay.portal.kernel.service.persistence.AccountPersistence;
 import com.liferay.portal.kernel.service.persistence.ClassNamePersistence;
 import com.liferay.portal.kernel.service.persistence.CompanyPersistence;
 import com.liferay.portal.kernel.service.persistence.GroupFinder;
+import com.liferay.portal.kernel.service.persistence.GroupFriendlyURLPersistence;
 import com.liferay.portal.kernel.service.persistence.GroupPersistence;
 import com.liferay.portal.kernel.service.persistence.LayoutFinder;
 import com.liferay.portal.kernel.service.persistence.LayoutPersistence;
@@ -669,18 +670,18 @@ public abstract class GroupServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
-	 * Returns the d l app local service.
+	 * Returns the dl app local service.
 	 *
-	 * @return the d l app local service
+	 * @return the dl app local service
 	 */
 	public com.liferay.document.library.kernel.service.DLAppLocalService getDLAppLocalService() {
 		return dlAppLocalService;
 	}
 
 	/**
-	 * Sets the d l app local service.
+	 * Sets the dl app local service.
 	 *
-	 * @param dlAppLocalService the d l app local service
+	 * @param dlAppLocalService the dl app local service
 	 */
 	public void setDLAppLocalService(
 		com.liferay.document.library.kernel.service.DLAppLocalService dlAppLocalService) {
@@ -688,18 +689,18 @@ public abstract class GroupServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
-	 * Returns the d l app remote service.
+	 * Returns the dl app remote service.
 	 *
-	 * @return the d l app remote service
+	 * @return the dl app remote service
 	 */
 	public com.liferay.document.library.kernel.service.DLAppService getDLAppService() {
 		return dlAppService;
 	}
 
 	/**
-	 * Sets the d l app remote service.
+	 * Sets the dl app remote service.
 	 *
-	 * @param dlAppService the d l app remote service
+	 * @param dlAppService the dl app remote service
 	 */
 	public void setDLAppService(
 		com.liferay.document.library.kernel.service.DLAppService dlAppService) {
@@ -1141,6 +1142,44 @@ public abstract class GroupServiceBaseImpl extends BaseServiceImpl
 	public void setTrashEntryPersistence(
 		TrashEntryPersistence trashEntryPersistence) {
 		this.trashEntryPersistence = trashEntryPersistence;
+	}
+
+	/**
+	 * Returns the group friendly url local service.
+	 *
+	 * @return the group friendly url local service
+	 */
+	public com.liferay.portal.kernel.service.GroupFriendlyURLLocalService getGroupFriendlyURLLocalService() {
+		return groupFriendlyURLLocalService;
+	}
+
+	/**
+	 * Sets the group friendly url local service.
+	 *
+	 * @param groupFriendlyURLLocalService the group friendly url local service
+	 */
+	public void setGroupFriendlyURLLocalService(
+		com.liferay.portal.kernel.service.GroupFriendlyURLLocalService groupFriendlyURLLocalService) {
+		this.groupFriendlyURLLocalService = groupFriendlyURLLocalService;
+	}
+
+	/**
+	 * Returns the group friendly url persistence.
+	 *
+	 * @return the group friendly url persistence
+	 */
+	public GroupFriendlyURLPersistence getGroupFriendlyURLPersistence() {
+		return groupFriendlyURLPersistence;
+	}
+
+	/**
+	 * Sets the group friendly url persistence.
+	 *
+	 * @param groupFriendlyURLPersistence the group friendly url persistence
+	 */
+	public void setGroupFriendlyURLPersistence(
+		GroupFriendlyURLPersistence groupFriendlyURLPersistence) {
+		this.groupFriendlyURLPersistence = groupFriendlyURLPersistence;
 	}
 
 	/**
@@ -2656,6 +2695,10 @@ public abstract class GroupServiceBaseImpl extends BaseServiceImpl
 	protected com.liferay.trash.kernel.service.TrashEntryService trashEntryService;
 	@BeanReference(type = TrashEntryPersistence.class)
 	protected TrashEntryPersistence trashEntryPersistence;
+	@BeanReference(type = com.liferay.portal.kernel.service.GroupFriendlyURLLocalService.class)
+	protected com.liferay.portal.kernel.service.GroupFriendlyURLLocalService groupFriendlyURLLocalService;
+	@BeanReference(type = GroupFriendlyURLPersistence.class)
+	protected GroupFriendlyURLPersistence groupFriendlyURLPersistence;
 	@BeanReference(type = com.liferay.portal.kernel.service.LayoutLocalService.class)
 	protected com.liferay.portal.kernel.service.LayoutLocalService layoutLocalService;
 	@BeanReference(type = com.liferay.portal.kernel.service.LayoutService.class)
