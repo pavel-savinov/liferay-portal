@@ -4053,6 +4053,12 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 				friendlyName = nameMap.get(locale);
 			}
 
+			if (Validator.isNull(friendlyURL) &&
+				!locale.equals(LocaleUtil.getSiteDefault())) {
+
+				continue;
+			}
+
 			friendlyURL = getFriendlyURL(
 				companyId, groupId, classNameId, classPK, friendlyName,
 				friendlyURL);
