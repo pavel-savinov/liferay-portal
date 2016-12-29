@@ -765,8 +765,8 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 					_log.warn(
 						"Portlet with the name " + portletId +
-							" is described in portlet.xml but does not " +
-								"have a matching entry in liferay-portlet.xml");
+							" is described in portlet.xml but does not have " +
+								"a matching entry in liferay-portlet.xml");
 				}
 			}
 
@@ -855,8 +855,8 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 				_log.warn(
 					"Portlet with the name " + portletId +
-						" is described in portlet.xml but does not " +
-							"have a matching entry in liferay-portlet.xml");
+						" is described in portlet.xml but does not have a " +
+							"matching entry in liferay-portlet.xml");
 			}
 		}
 
@@ -866,8 +866,8 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 			if (_log.isWarnEnabled() && !portletsMap.containsKey(portletId)) {
 				_log.warn(
 					"Portlet with the name " + portletId +
-						" is described in liferay-portlet.xml but does " +
-							"not have a matching entry in portlet.xml");
+						" is described in liferay-portlet.xml but does not " +
+							"have a matching entry in portlet.xml");
 			}
 		}
 
@@ -1632,8 +1632,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 		List<String> userNotificationHandlerClasses = new ArrayList<>();
 
 		for (Element userNotificationHandlerClassElement :
-				portletElement.elements(
-					"user-notification-handler-class")) {
+				portletElement.elements("user-notification-handler-class")) {
 
 			userNotificationHandlerClasses.add(
 				userNotificationHandlerClassElement.getText());
@@ -1955,10 +1954,6 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 			GetterUtil.getString(
 				portletElement.elementText("css-class-wrapper"),
 				portletModel.getCssClassWrapper()));
-		portletModel.setFacebookIntegration(
-			GetterUtil.getString(
-				portletElement.elementText("facebook-integration"),
-				portletModel.getFacebookIntegration()));
 		portletModel.setAddDefaultResource(
 			GetterUtil.getBoolean(
 				portletElement.elementText("add-default-resource"),
@@ -2310,8 +2305,8 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 			if (publicRenderParameter == null) {
 				_log.error(
-					"Supported public render parameter references " +
-						"unknown identifier " + identifier);
+					"Supported public render parameter references unknown " +
+						"identifier " + identifier);
 
 				continue;
 			}
