@@ -4407,6 +4407,8 @@ Export-Package: com.liferay.ibm.icu;version="4.0.1",com.liferay.ibm.ic
  rsion="1.0.0",org.apache.xml.serializer;version="2.7.1",org.objectweb
  .asm.attrs;version="5.0.1",sun.misc;version="1.0.0",sun.net.util;vers
  ion="1.0.0",sun.security.provider;version="1.0.0"
+Git-Descriptor: 79fc87d-dirty
+Git-SHA: 79fc87d63083675ca54ec07c15db3389610f3980
 Javac-Debug: on
 Javac-Deprecation: off
 Javac-Encoding: UTF-8
