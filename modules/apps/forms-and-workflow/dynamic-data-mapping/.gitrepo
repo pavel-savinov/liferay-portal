@@ -1,10 +1,9 @@
 ;
-; Do not manually edit this file. See
-; https://github.com/git-commands/git-subrepo#readme for more information.
+; Do not manually edit this file.
 ;
 [subrepo]
 	cmdver = liferay
-	commit = ad78dd323627a54d515f70a787d8a127759fd8a2
+	commit = 51ae9e61e189dc2acd4c9ccba871379c681cce77
 	mode = push
-	parent = d3cd43d978e42fd6838b833cad01aed677993950
+	parent = b8d31fe2f20830c8798f0a5fee28f48d7a665492
 	remote = git@github.com:liferay/com-liferay-dynamic-data-mapping.git
