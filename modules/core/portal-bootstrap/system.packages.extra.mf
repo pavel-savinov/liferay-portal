@@ -2522,7 +2522,7 @@ Export-Package: com.liferay.ibm.icu;version="4.0.1",com.liferay.ibm.ic
  ortal.kernel.portlet,com.liferay.portal.kernel.theme",com.liferay.por
  tal.kernel.events;version="6.3.0";uses:="com.liferay.portal.kernel.ex
  ception,javax.portlet,javax.servlet.http",com.liferay.portal.kernel.e
- xception;version="7.0.0";uses:="com.liferay.portal.kernel.model,com.l
+ xception;version="7.1.0";uses:="com.liferay.portal.kernel.model,com.l
  iferay.portal.kernel.security.auth,com.liferay.portal.kernel.util",co
  m.liferay.portal.kernel.executor;version="7.0.0";uses:="com.liferay.p
  ortal.kernel.concurrent,com.liferay.portal.kernel.util",com.liferay.p
@@ -2579,7 +2579,7 @@ Export-Package: com.liferay.ibm.icu;version="4.0.1",com.liferay.ibm.ic
  l,com.liferay.portal.kernel.xml",com.liferay.portal.kernel.microsoftt
  ranslator;version="6.2.0";uses:="com.liferay.portal.kernel.exception"
  ,com.liferay.portal.kernel.mobile.device;version="7.0.1";uses:="javax
- .servlet.http",com.liferay.portal.kernel.model;version="1.0.1";uses:=
+ .servlet.http",com.liferay.portal.kernel.model;version="1.1.0";uses:=
  "com.liferay.asset.kernel.model,com.liferay.expando.kernel.model,com.
  liferay.exportimport.kernel.lar,com.liferay.portal.kernel.annotation,
  com.liferay.portal.kernel.application.type,com.liferay.portal.kernel.
@@ -3273,7 +3273,7 @@ Export-Package: com.liferay.ibm.icu;version="4.0.1",com.liferay.ibm.ic
  ecurity.permission,com.liferay.portal.kernel.service.persistence,com.
  liferay.portal.kernel.service.persistence.impl,com.liferay.portal.ker
  nel.util,com.liferay.portal.model.impl";version="1.0.0",com.liferay.p
- ortal.servlet;version="1.2.0";uses:="com.liferay.portal.facebook,com.
+ ortal.servlet;version="2.0.0";uses:="com.liferay.portal.facebook,com.
  liferay.portal.kernel.exception,com.liferay.portal.kernel.model,com.l
  iferay.portal.kernel.plugin,com.liferay.portal.kernel.security.pacl,c
  om.liferay.portal.kernel.servlet,com.liferay.portal.kernel.struts,com
@@ -4406,6 +4406,8 @@ Export-Package: com.liferay.ibm.icu;version="4.0.1",com.liferay.ibm.ic
  ache.xml.serializer;version="2.7.1",org.objectweb.asm.attrs;version="
  5.0.1",sun.misc;version="1.0.0",sun.net.util;version="1.0.0",sun.secu
  rity.provider;version="1.0.0"
+Git-Descriptor: 7f5ea24-dirty
+Git-SHA: 7f5ea241f2feaa5229b306eff9fd398174325c04
 Javac-Debug: on
 Javac-Deprecation: off
 Javac-Encoding: UTF-8
