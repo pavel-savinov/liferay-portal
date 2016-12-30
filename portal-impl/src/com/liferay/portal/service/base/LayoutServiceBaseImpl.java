@@ -53,6 +53,8 @@ import com.liferay.portal.kernel.service.persistence.ResourcePermissionFinder;
 import com.liferay.portal.kernel.service.persistence.ResourcePermissionPersistence;
 import com.liferay.portal.kernel.service.persistence.SubscriptionPersistence;
 import com.liferay.portal.kernel.service.persistence.UserFinder;
+import com.liferay.portal.kernel.service.persistence.UserGroupFinder;
+import com.liferay.portal.kernel.service.persistence.UserGroupPersistence;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.util.PortalUtil;
 
@@ -755,18 +757,18 @@ public abstract class LayoutServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
-	 * Returns the layout friendly u r l local service.
+	 * Returns the layout friendly url local service.
 	 *
-	 * @return the layout friendly u r l local service
+	 * @return the layout friendly url local service
 	 */
 	public com.liferay.portal.kernel.service.LayoutFriendlyURLLocalService getLayoutFriendlyURLLocalService() {
 		return layoutFriendlyURLLocalService;
 	}
 
 	/**
-	 * Sets the layout friendly u r l local service.
+	 * Sets the layout friendly url local service.
 	 *
-	 * @param layoutFriendlyURLLocalService the layout friendly u r l local service
+	 * @param layoutFriendlyURLLocalService the layout friendly url local service
 	 */
 	public void setLayoutFriendlyURLLocalService(
 		com.liferay.portal.kernel.service.LayoutFriendlyURLLocalService layoutFriendlyURLLocalService) {
@@ -774,18 +776,18 @@ public abstract class LayoutServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
-	 * Returns the layout friendly u r l persistence.
+	 * Returns the layout friendly url persistence.
 	 *
-	 * @return the layout friendly u r l persistence
+	 * @return the layout friendly url persistence
 	 */
 	public LayoutFriendlyURLPersistence getLayoutFriendlyURLPersistence() {
 		return layoutFriendlyURLPersistence;
 	}
 
 	/**
-	 * Sets the layout friendly u r l persistence.
+	 * Sets the layout friendly url persistence.
 	 *
-	 * @param layoutFriendlyURLPersistence the layout friendly u r l persistence
+	 * @param layoutFriendlyURLPersistence the layout friendly url persistence
 	 */
 	public void setLayoutFriendlyURLPersistence(
 		LayoutFriendlyURLPersistence layoutFriendlyURLPersistence) {
@@ -1303,6 +1305,81 @@ public abstract class LayoutServiceBaseImpl extends BaseServiceImpl
 		this.userFinder = userFinder;
 	}
 
+	/**
+	 * Returns the user group local service.
+	 *
+	 * @return the user group local service
+	 */
+	public com.liferay.portal.kernel.service.UserGroupLocalService getUserGroupLocalService() {
+		return userGroupLocalService;
+	}
+
+	/**
+	 * Sets the user group local service.
+	 *
+	 * @param userGroupLocalService the user group local service
+	 */
+	public void setUserGroupLocalService(
+		com.liferay.portal.kernel.service.UserGroupLocalService userGroupLocalService) {
+		this.userGroupLocalService = userGroupLocalService;
+	}
+
+	/**
+	 * Returns the user group remote service.
+	 *
+	 * @return the user group remote service
+	 */
+	public com.liferay.portal.kernel.service.UserGroupService getUserGroupService() {
+		return userGroupService;
+	}
+
+	/**
+	 * Sets the user group remote service.
+	 *
+	 * @param userGroupService the user group remote service
+	 */
+	public void setUserGroupService(
+		com.liferay.portal.kernel.service.UserGroupService userGroupService) {
+		this.userGroupService = userGroupService;
+	}
+
+	/**
+	 * Returns the user group persistence.
+	 *
+	 * @return the user group persistence
+	 */
+	public UserGroupPersistence getUserGroupPersistence() {
+		return userGroupPersistence;
+	}
+
+	/**
+	 * Sets the user group persistence.
+	 *
+	 * @param userGroupPersistence the user group persistence
+	 */
+	public void setUserGroupPersistence(
+		UserGroupPersistence userGroupPersistence) {
+		this.userGroupPersistence = userGroupPersistence;
+	}
+
+	/**
+	 * Returns the user group finder.
+	 *
+	 * @return the user group finder
+	 */
+	public UserGroupFinder getUserGroupFinder() {
+		return userGroupFinder;
+	}
+
+	/**
+	 * Sets the user group finder.
+	 *
+	 * @param userGroupFinder the user group finder
+	 */
+	public void setUserGroupFinder(UserGroupFinder userGroupFinder) {
+		this.userGroupFinder = userGroupFinder;
+	}
+
 	public void afterPropertiesSet() {
 	}
 
@@ -1481,4 +1558,12 @@ public abstract class LayoutServiceBaseImpl extends BaseServiceImpl
 	protected UserPersistence userPersistence;
 	@BeanReference(type = UserFinder.class)
 	protected UserFinder userFinder;
+	@BeanReference(type = com.liferay.portal.kernel.service.UserGroupLocalService.class)
+	protected com.liferay.portal.kernel.service.UserGroupLocalService userGroupLocalService;
+	@BeanReference(type = com.liferay.portal.kernel.service.UserGroupService.class)
+	protected com.liferay.portal.kernel.service.UserGroupService userGroupService;
+	@BeanReference(type = UserGroupPersistence.class)
+	protected UserGroupPersistence userGroupPersistence;
+	@BeanReference(type = UserGroupFinder.class)
+	protected UserGroupFinder userGroupFinder;
 }

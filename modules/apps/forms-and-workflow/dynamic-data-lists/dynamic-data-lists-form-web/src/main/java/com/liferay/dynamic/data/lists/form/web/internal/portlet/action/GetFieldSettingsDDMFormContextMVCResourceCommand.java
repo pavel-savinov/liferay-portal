@@ -14,7 +14,7 @@
 
 package com.liferay.dynamic.data.lists.form.web.internal.portlet.action;
 
-import com.liferay.dynamic.data.lists.form.web.internal.constants.DDLFormPortletKeys;
+import com.liferay.dynamic.data.lists.form.web.constants.DDLFormPortletKeys;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
@@ -150,6 +150,7 @@ public class GetFieldSettingsDDMFormContextMVCResourceCommand
 		return ddmFormValues;
 	}
 
+	@Override
 	protected void doServeResource(
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws Exception {

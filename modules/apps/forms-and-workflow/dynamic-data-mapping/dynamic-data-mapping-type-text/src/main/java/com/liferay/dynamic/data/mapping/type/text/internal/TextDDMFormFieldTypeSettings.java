@@ -20,7 +20,6 @@ import com.liferay.dynamic.data.mapping.annotations.DDMFormLayout;
 import com.liferay.dynamic.data.mapping.annotations.DDMFormLayoutColumn;
 import com.liferay.dynamic.data.mapping.annotations.DDMFormLayoutPage;
 import com.liferay.dynamic.data.mapping.annotations.DDMFormLayoutRow;
-import com.liferay.dynamic.data.mapping.annotations.DDMFormRule;
 import com.liferay.dynamic.data.mapping.form.field.type.DefaultDDMFormFieldTypeSettings;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
@@ -28,13 +27,7 @@ import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 /**
  * @author Lino Alves
  */
-@DDMForm(
-	rules = {
-		@DDMFormRule(
-			actions = {"set(fieldAt(\"tooltip\", 0), \"visible\", false)"}
-		)
-	}
-)
+@DDMForm
 @DDMFormLayout(
 	paginationMode = com.liferay.dynamic.data.mapping.model.DDMFormLayout.TABBED_MODE,
 	value = {
@@ -102,7 +95,8 @@ public interface TextDDMFormFieldTypeSettings
 
 	@DDMFormField(
 		dataType = "ddm-options", label = "%options",
-		properties = {"showLabel=false"}, required = false, type = "options",
+		properties = {"showLabel=false", "allowEmptyOptions=true"},
+		required = false, type = "options",
 		visibilityExpression = "equals(dataSourceType, \"manual\")"
 	)
 	public DDMFormFieldOptions options();
@@ -117,7 +111,7 @@ public interface TextDDMFormFieldTypeSettings
 	)
 	public LocalizedValue placeholder();
 
-	@DDMFormField
+	@DDMFormField(visibilityExpression = "FALSE")
 	public LocalizedValue tooltip();
 
 }
