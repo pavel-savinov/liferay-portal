@@ -25,7 +25,10 @@ import com.liferay.portal.template.TemplateContextHelper;
 import java.util.List;
 import java.util.Map;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -67,6 +70,16 @@ public class SoyManager extends BaseMultiTemplateManager {
 		super.setTemplateContextHelper(templateContextHelper);
 	}
 
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		SoyTemplateResourcesTracker.open(bundleContext);
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		SoyTemplateResourcesTracker.close();
+	}
+
 	@Override
 	protected Template doGetTemplate(
 		List<TemplateResource> templateResources,
@@ -75,7 +88,7 @@ public class SoyManager extends BaseMultiTemplateManager {
 
 		Template template = new SoyTemplate(
 			templateResources, errorTemplateResource, helperUtilities,
-			templateContextHelper, privileged);
+			(SoyTemplateContextHelper)templateContextHelper, privileged);
 
 		if (restricted) {
 			template = new RestrictedTemplate(
