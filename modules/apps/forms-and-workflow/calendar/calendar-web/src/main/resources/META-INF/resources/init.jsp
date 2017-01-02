@@ -20,6 +20,7 @@
 
 <%@ taglib uri="http://liferay.com/tld/asset" prefix="liferay-asset" %><%@
 taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+taglib uri="http://liferay.com/tld/expando" prefix="liferay-expando" %><%@
 taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
 taglib uri="http://liferay.com/tld/security" prefix="liferay-security" %><%@
@@ -30,7 +31,6 @@ taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 <%@ page import="com.liferay.asset.kernel.model.AssetEntry" %><%@
 page import="com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil" %><%@
 page import="com.liferay.calendar.constants.CalendarActionKeys" %><%@
-page import="com.liferay.calendar.constants.CalendarWebKeys" %><%@
 page import="com.liferay.calendar.exception.CalendarBookingDurationException" %><%@
 page import="com.liferay.calendar.exception.CalendarBookingRecurrenceException" %><%@
 page import="com.liferay.calendar.exception.CalendarNameException" %><%@
@@ -66,6 +66,8 @@ page import="com.liferay.calendar.util.ColorUtil" %><%@
 page import="com.liferay.calendar.util.JCalendarUtil" %><%@
 page import="com.liferay.calendar.util.RecurrenceUtil" %><%@
 page import="com.liferay.calendar.util.comparator.CalendarNameComparator" %><%@
+page import="com.liferay.calendar.web.internal.constants.CalendarWebKeys" %><%@
+page import="com.liferay.calendar.web.internal.display.context.CalendarDisplayContext" %><%@
 page import="com.liferay.calendar.web.internal.search.CalendarResourceDisplayTerms" %><%@
 page import="com.liferay.calendar.web.internal.search.CalendarResourceSearch" %><%@
 page import="com.liferay.calendar.workflow.CalendarBookingWorkflowConstants" %><%@
@@ -205,16 +207,10 @@ long[] calendarIds = StringUtil.split(SessionClicks.get(request, "com.liferay.ca
 
 Calendar defaultCalendar = null;
 
-for (long calendarId : calendarIds) {
-	Calendar calendar = CalendarServiceUtil.fetchCalendar(calendarId);
+CalendarDisplayContext calendarDisplayContext = (CalendarDisplayContext)renderRequest.getAttribute(CalendarWebKeys.CALENDAR_DISPLAY_CONTEXT);
 
-	if (calendar != null) {
-		CalendarResource calendarResource = calendar.getCalendarResource();
-
-		if (calendarResource.isActive()) {
-			otherCalendars.add(calendar);
-		}
-	}
+if (calendarDisplayContext != null) {
+	otherCalendars = calendarDisplayContext.getOtherCalendars(calendarIds);
 }
 
 for (Calendar groupCalendar : groupCalendars) {
