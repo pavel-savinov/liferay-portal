@@ -6,5 +6,8 @@ Export-Package:\
 	com.liferay.portal.cache,\
 	com.liferay.portal.cache.configuration,\
 	com.liferay.portal.cache.io
+Import-Package:\
+	com.liferay.portal.kernel.exception; version="[7.0.0,8)",\
+	com.liferay.portal.kernel.model; version="[1.0.0,2)"
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Cache Engines

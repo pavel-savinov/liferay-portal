@@ -1,5 +1,9 @@
 Bundle-Name: Liferay Message Boards Comment
 Bundle-SymbolicName: com.liferay.message.boards.comment
 Bundle-Version: 2.0.7
+Import-Package:\
+	com.liferay.portal.kernel.exception; version="[7.0.0,8)",\
+	com.liferay.portal.kernel.model; version="[1.0.0,2)",\
+	*
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Message Boards

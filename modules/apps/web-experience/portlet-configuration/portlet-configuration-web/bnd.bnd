@@ -1,5 +1,9 @@
 Bundle-Name: Liferay Portlet Configuration Web
 Bundle-SymbolicName: com.liferay.portlet.configuration.web
 Bundle-Version: 1.0.13
+Import-Package:\
+	com.liferay.portal.kernel.exception; version="[7.0.0,8)",\
+	com.liferay.portal.kernel.model; version="[1.0.0,2)",\
+	*
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Site Management
