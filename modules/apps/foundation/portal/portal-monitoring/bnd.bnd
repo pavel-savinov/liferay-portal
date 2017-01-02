@@ -6,6 +6,11 @@ Export-Package:\
 	com.liferay.portal.monitoring.configuration,\
 	com.liferay.portal.monitoring.constants,\
 	com.liferay.portal.monitoring.statistics
-Import-Package: com.liferay.portal.kernel.portlet;version="${range;[=,=+)}",*
+Import-Package:\
+	com.liferay.portal.kernel.exception; version="[7.0.0,8)",\
+	com.liferay.portal.kernel.model; version="[1.0.0,2)",\
+	com.liferay.portal.kernel.portlet;version="${range;[=,=+)}",\
+	com.liferay.portal.kernel.search;version="${range;[=,=+)}",\
+	*
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title:
