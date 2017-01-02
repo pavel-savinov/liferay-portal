@@ -21,6 +21,8 @@ import com.liferay.exportimport.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.NoSuchGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
@@ -84,8 +86,9 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 			long parentGroupId, long liveGroupId, Map<Locale, String> nameMap,
 			Map<Locale, String> descriptionMap, int type,
 			boolean manualMembership, int membershipRestriction,
-			String friendlyURL, boolean site, boolean inheritContent,
-			boolean active, ServiceContext serviceContext)
+			Map<Locale, String> friendlyURLMap, boolean site,
+			boolean inheritContent, boolean active,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		if (parentGroupId == GroupConstants.DEFAULT_PARENT_GROUP_ID) {
@@ -101,13 +104,32 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 		Group group = groupLocalService.addGroup(
 			getUserId(), parentGroupId, null, 0, liveGroupId, nameMap,
 			descriptionMap, type, manualMembership, membershipRestriction,
-			friendlyURL, site, inheritContent, active, serviceContext);
+			friendlyURLMap, site, inheritContent, active, serviceContext);
 
 		if (site) {
 			SiteMembershipPolicyUtil.verifyPolicy(group);
 		}
 
 		return group;
+	}
+
+	@Override
+	public Group addGroup(
+			long parentGroupId, long liveGroupId, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap, int type,
+			boolean manualMembership, int membershipRestriction,
+			String friendlyURL, boolean site, boolean inheritContent,
+			boolean active, ServiceContext serviceContext)
+		throws PortalException {
+
+		Map<Locale, String> friendlyURLMap = new HashMap<Locale, String>();
+
+		friendlyURLMap.put(LocaleUtil.getSiteDefault(), friendlyURL);
+
+		return addGroup(
+			parentGroupId, liveGroupId, nameMap, descriptionMap, type,
+			manualMembership, membershipRestriction, friendlyURLMap, site,
+			inheritContent, active, serviceContext);
 	}
 
 	@Override
@@ -602,7 +624,9 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 
 			if (ArrayUtil.contains(classNames, Group.class.getName())) {
 				for (Group group : userBag.getUserGroups()) {
-					if (group.isActive() && group.isSite()) {
+					if (groupLocalService.isLiveGroupActive(group) &&
+						group.isSite()) {
+
 						if (userSiteGroups.add(group) &&
 							(userSiteGroups.size() == max)) {
 
@@ -619,7 +643,9 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 
 			if (ArrayUtil.contains(classNames, Organization.class.getName())) {
 				for (Group group : userBag.getUserOrgGroups()) {
-					if (group.isActive() && group.isSite()) {
+					if (groupLocalService.isLiveGroupActive(group) &&
+						group.isSite()) {
+
 						if (userSiteGroups.add(group) &&
 							(userSiteGroups.size() == max)) {
 
@@ -718,6 +744,13 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 				getPermissionChecker(), userId, ActionKeys.VIEW);
 		}
 		catch (PrincipalException pe) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe, pe);
+			}
+
 			GroupPermissionUtil.check(
 				getPermissionChecker(), groupId, ActionKeys.VIEW_MEMBERS);
 		}
@@ -871,6 +904,25 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 	}
 
 	/**
+	 * Updates the group's friendly URLs map.
+	 *
+	 * @param  groupId the primary key of the group
+	 * @param  friendlyURLMap the group's localized friendlyURL map
+	 * @return the group
+	 * @throws PortalException if a portal exception occurred
+	 */
+	@Override
+	public Group updateFriendlyURL(
+			long groupId, Map<Locale, String> friendlyURLMap)
+		throws PortalException {
+
+		GroupPermissionUtil.check(
+			getPermissionChecker(), groupId, ActionKeys.UPDATE);
+
+		return groupLocalService.updateFriendlyURL(groupId, friendlyURLMap);
+	}
+
+	/**
 	 * Updates the group's friendly URL.
 	 *
 	 * @param  groupId the primary key of the group
@@ -894,8 +946,8 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 			long groupId, long parentGroupId, Map<Locale, String> nameMap,
 			Map<Locale, String> descriptionMap, int type,
 			boolean manualMembership, int membershipRestriction,
-			String friendlyURL, boolean inheritContent, boolean active,
-			ServiceContext serviceContext)
+			Map<Locale, String> friendlyURLMap, boolean inheritContent,
+			boolean active, ServiceContext serviceContext)
 		throws PortalException {
 
 		Group group = groupPersistence.findByPrimaryKey(groupId);
@@ -932,7 +984,7 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 
 			group = groupLocalService.updateGroup(
 				groupId, parentGroupId, nameMap, descriptionMap, type,
-				manualMembership, membershipRestriction, friendlyURL,
+				manualMembership, membershipRestriction, friendlyURLMap,
 				inheritContent, active, serviceContext);
 
 			SiteMembershipPolicyUtil.verifyPolicy(
@@ -944,9 +996,28 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 		else {
 			return groupLocalService.updateGroup(
 				groupId, parentGroupId, nameMap, descriptionMap, type,
-				manualMembership, membershipRestriction, friendlyURL,
+				manualMembership, membershipRestriction, friendlyURLMap,
 				inheritContent, active, serviceContext);
 		}
+	}
+
+	@Override
+	public Group updateGroup(
+			long groupId, long parentGroupId, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap, int type,
+			boolean manualMembership, int membershipRestriction,
+			String friendlyURL, boolean inheritContent, boolean active,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		Map<Locale, String> friendlyURLMap = new HashMap<Locale, String>();
+
+		friendlyURLMap.put(LocaleUtil.getSiteDefault(), friendlyURL);
+
+		return updateGroup(
+			groupId, parentGroupId, nameMap, descriptionMap, type,
+			manualMembership, membershipRestriction, friendlyURLMap,
+			inheritContent, active, serviceContext);
 	}
 
 	/**
@@ -1078,5 +1149,8 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 
 		return map;
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		GroupServiceImpl.class);
 
 }
