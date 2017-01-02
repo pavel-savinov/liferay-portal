@@ -1,6 +1,10 @@
 Bundle-Name: Liferay Screens API
 Bundle-SymbolicName: com.liferay.screens.api
-Bundle-Version: 3.1.1
+Bundle-Version: 3.2.1
 Export-Package: com.liferay.screens.service
+Import-Package:\
+	com.liferay.portal.kernel.exception; version="[7.0.0,8)",\
+	com.liferay.portal.kernel.model; version="[1.0.0,2)",\
+	*
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title:
