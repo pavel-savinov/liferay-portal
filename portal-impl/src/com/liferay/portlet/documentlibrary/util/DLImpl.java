@@ -902,7 +902,7 @@ public class DLImpl implements DL {
 			group = themeDisplay.getScopeGroup();
 		}
 
-		webDavURL.append(group.getFriendlyURL());
+		webDavURL.append(group.getFriendlyURL(themeDisplay.getLocale()));
 		webDavURL.append("/document_library");
 
 		StringBuilder sb = new StringBuilder();
@@ -1127,6 +1127,12 @@ public class DLImpl implements DL {
 				break;
 			}
 			catch (PortalException pe) {
+
+				// LPS-52675
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(pe, pe);
+				}
 			}
 		}
 

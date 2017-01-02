@@ -1,11 +1,15 @@
 Bundle-Name: Liferay Knowledge Base Service
 Bundle-SymbolicName: com.liferay.knowledge.base.service
-Bundle-Version: 1.1.6
+Bundle-Version: 1.1.18
 Export-Package:\
 	com.liferay.knowledge.base.configuration,\
 	com.liferay.knowledge.base.model.impl,\
 	com.liferay.knowledge.base.service.permission,\
 	com.liferay.knowledge.base.service.util
+Import-Package:\
+	com.liferay.portal.kernel.exception; version="[7.0.0,8)",\
+	com.liferay.portal.kernel.model; version="[1.0.0,2)",\
+	*
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Knowledge Base
 Liferay-Require-SchemaVersion: 2.0.0
