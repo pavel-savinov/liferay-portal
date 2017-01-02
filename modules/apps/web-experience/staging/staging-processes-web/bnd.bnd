@@ -1,6 +1,10 @@
 Bundle-Name: Liferay Staging Processes Web
 Bundle-SymbolicName: com.liferay.staging.processes.web
 Bundle-Version: 1.0.12
+Import-Package:\
+	com.liferay.portal.kernel.exception; version="[7.0.0,8)",\
+	com.liferay.portal.kernel.model; version="[1.0.0,2)",\
+	*
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Data Management
 Web-ContextPath: /staging-processes
