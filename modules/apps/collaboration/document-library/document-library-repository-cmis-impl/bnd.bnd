@@ -43,6 +43,9 @@ Import-Package:\
 	!org.osgi.service.blueprint.*,\
 	\
 	!org.relaxng.datatype.*,\
+	\
+	com.liferay.portal.kernel.exception; version="[7.0.0,8)",\
+	com.liferay.portal.kernel.model; version="[1.0.0,2)",\
 	*
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Document Library
