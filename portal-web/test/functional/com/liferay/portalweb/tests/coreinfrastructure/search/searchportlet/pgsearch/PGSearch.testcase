@@ -1,5 +1,6 @@
 <definition component-name="portal-search">
 	<property name="portal.release" value="true" />
+	<property name="portal.upstream" value="true" />
 	<property name="testray.main.component.name" value="Web Search" />
 
 	<var name="searchPageName" value="Test Page" />
@@ -139,34 +140,46 @@
 			<var name="searchAssetType" value="Blogs Entry" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="Blogs1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Blogs Entry Content" />
 			<var name="searchAssetTitle" value="Blogs Entry Title" />
-			<var name="searchAssetType" value="Blogs Entry" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="Blogs1" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="Entry1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Blogs Entry Content" />
 			<var name="searchAssetTitle" value="Blogs Entry Title" />
-			<var name="searchAssetType" value="Blogs Entry" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="Entry1" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="Content1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Blogs Entry Content" />
 			<var name="searchAssetTitle" value="Blogs Entry Title" />
-			<var name="searchAssetType" value="Blogs Entry" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="Content1" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="Title1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Blogs Entry Content" />
 			<var name="searchAssetTitle" value="Blogs Entry Title" />
-			<var name="searchAssetType" value="Blogs Entry" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="Title1" />
 		</execute>
@@ -235,18 +248,24 @@
 			<var name="searchAssetType" value="Blogs Entry" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="Category1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Blogs Entry Content" />
 			<var name="searchAssetTitle" value="Blogs Entry Title" />
-			<var name="searchAssetType" value="Blogs Entry" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="Category1" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="Name1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Blogs Entry Content" />
 			<var name="searchAssetTitle" value="Blogs Entry Title" />
-			<var name="searchAssetType" value="Blogs Entry" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="Name1" />
 		</execute>
@@ -315,26 +334,35 @@
 			<var name="searchAssetType" value="Blogs Entry" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm">"Category Name1"</var>
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Blogs Entry Content" />
 			<var name="searchAssetTitle" value="Blogs Entry Title" />
-			<var name="searchAssetType" value="Blogs Entry" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm">"Category Name1"</var>
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm">"Category1"</var>
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Blogs Entry Content" />
 			<var name="searchAssetTitle" value="Blogs Entry Title" />
-			<var name="searchAssetType" value="Blogs Entry" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm">"Category1"</var>
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm">"Name1"</var>
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Blogs Entry Content" />
 			<var name="searchAssetTitle" value="Blogs Entry Title" />
-			<var name="searchAssetType" value="Blogs Entry" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm">"Name1"</var>
 		</execute>
@@ -446,58 +474,79 @@
 			<var name="searchAssetType" value="Blogs Entry" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm">"Blogs Content"</var>
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Blogs Entry Content" />
 			<var name="searchAssetTitle" value="Blogs Entry Title" />
-			<var name="searchAssetType" value="Blogs Entry" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm">"Blogs Content"</var>
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm">"Blogs1"</var>
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Blogs Entry Content" />
 			<var name="searchAssetTitle" value="Blogs Entry Title" />
-			<var name="searchAssetType" value="Blogs Entry" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm">"Blogs1"</var>
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm">"Entry1"</var>
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Blogs Entry Content" />
 			<var name="searchAssetTitle" value="Blogs Entry Title" />
-			<var name="searchAssetType" value="Blogs Entry" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm">"Entry1"</var>
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm">"Title1"</var>
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Blogs Entry Content" />
 			<var name="searchAssetTitle" value="Blogs Entry Title" />
-			<var name="searchAssetType" value="Blogs Entry" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm">"Title1"</var>
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm">"Content1"</var>
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Blogs Entry Content" />
 			<var name="searchAssetTitle" value="Blogs Entry Title" />
-			<var name="searchAssetType" value="Blogs Entry" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm">"Content1"</var>
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm">"Blogs Entry Title1"</var>
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Blogs Entry Content" />
 			<var name="searchAssetTitle" value="Blogs Entry Title" />
-			<var name="searchAssetType" value="Blogs Entry" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm">"Blogs Entry Title1"</var>
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm">"Blogs Entry Content1"</var>
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Blogs Entry Content" />
 			<var name="searchAssetTitle" value="Blogs Entry Title" />
-			<var name="searchAssetType" value="Blogs Entry" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm">"Blogs Entry Content1"</var>
 		</execute>
@@ -550,18 +599,24 @@
 			<var name="searchAssetType" value="Blogs Entry" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="tag1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Blogs Entry Content" />
 			<var name="searchAssetTitle" value="Blogs Entry Title" />
-			<var name="searchAssetType" value="Blogs Entry" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="tag1" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="name1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Blogs Entry Content" />
 			<var name="searchAssetTitle" value="Blogs Entry Title" />
-			<var name="searchAssetType" value="Blogs Entry" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="name1" />
 		</execute>
@@ -614,26 +669,35 @@
 			<var name="searchAssetType" value="Blogs Entry" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm">"tag name1"</var>
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Blogs Entry Content" />
 			<var name="searchAssetTitle" value="Blogs Entry Title" />
-			<var name="searchAssetType" value="Blogs Entry" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm">"tag name1"</var>
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm">"tag1"</var>
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Blogs Entry Content" />
 			<var name="searchAssetTitle" value="Blogs Entry Title" />
-			<var name="searchAssetType" value="Blogs Entry" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm">"tag1"</var>
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm">"name1"</var>
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Blogs Entry Content" />
 			<var name="searchAssetTitle" value="Blogs Entry Title" />
-			<var name="searchAssetType" value="Blogs Entry" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm">"name1"</var>
 		</execute>
@@ -720,23 +784,32 @@
 			<var name="searchAssetType" value="Document" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="DM1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetTitle" value="DM Document Title" />
-			<var name="searchAssetType" value="Document" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="DM1" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="Document1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetTitle" value="DM Document Title" />
-			<var name="searchAssetType" value="Document" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="Document1" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="Title1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetTitle" value="DM Document Title" />
-			<var name="searchAssetType" value="Document" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="Title1" />
 		</execute>
@@ -838,42 +911,57 @@
 			<var name="searchAssetType" value="Message Boards Message" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="MB1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="MB Thread Message Body" />
 			<var name="searchAssetTitle" value="MB Thread Message Subject" />
-			<var name="searchAssetType" value="Message Boards Message" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="MB1" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="Thread1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="MB Thread Message Body" />
 			<var name="searchAssetTitle" value="MB Thread Message Subject" />
-			<var name="searchAssetType" value="Message Boards Message" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="Thread1" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="Message1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="MB Thread Message Body" />
 			<var name="searchAssetTitle" value="MB Thread Message Subject" />
-			<var name="searchAssetType" value="Message Boards Message" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="Message1" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="Subject1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="MB Thread Message Body" />
 			<var name="searchAssetTitle" value="MB Thread Message Subject" />
-			<var name="searchAssetType" value="Message Boards Message" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="Subject1" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="Body1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="MB Thread Message Body" />
 			<var name="searchAssetTitle" value="MB Thread Message Subject" />
-			<var name="searchAssetType" value="Message Boards Message" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="Body1" />
 		</execute>
@@ -945,22 +1033,30 @@
 			<var name="searchAssetType" value="User" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
-			<var name="searchAssetTitle" value="userfn userln" />
-			<var name="searchAssetType" value="User" />
+		<execute macro="Search#searchPG">
 			<var name="searchTerm" value="userfn1" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetTitle" value="userfn userln" />
-			<var name="searchAssetType" value="User" />
+		</execute>
+
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="userln1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
+			<var name="searchAssetTitle" value="userfn userln" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="userln1" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="usersn1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetTitle" value="userfn userln" />
-			<var name="searchAssetType" value="User" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="usersn1" />
 		</execute>
@@ -1099,44 +1195,52 @@
 			<var name="searchAssetType" value="Web Content Article" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="WC1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="WC WebContent Content" />
 			<var name="searchAssetTitle" value="WC WebContent Title" />
-			<var name="searchAssetType" value="Web Content Article" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="WC1" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="WebContent1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="WC WebContent Content" />
 			<var name="searchAssetTitle" value="WC WebContent Title" />
-			<var name="searchAssetType" value="Web Content Article" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="WebContent1" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="Title1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="WC WebContent Content" />
 			<var name="searchAssetTitle" value="WC WebContent Title" />
-			<var name="searchAssetType" value="Web Content Article" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="Title1" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="Content1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="WC WebContent Content" />
 			<var name="searchAssetTitle" value="WC WebContent Title" />
-			<var name="searchAssetType" value="Web Content Article" />
+			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="Content1" />
 		</execute>
 	</command>
 
 	<command name="SearchWikiPage" priority="4">
-		<var name="pageName" value="Wiki Test Page" />
-		<var name="portletName" value="Wiki" />
-		<var name="wikiPageContent" value="Wiki Page Content" />
-		<var name="wikiPageTitle" value="Wiki Page Title" />
-
 		<execute macro="Page#add">
 			<var name="pageName" value="Wiki Test Page" />
 		</execute>
@@ -1225,34 +1329,47 @@
 			<var name="searchAssetType" value="Wiki Page" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="Wiki1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Wiki Page Content" />
 			<var name="searchAssetTitle" value="Wiki Page Title" />
-			<var name="searchAssetType" value="Wiki Page" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="Wiki1" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="Page1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Wiki Page Content" />
 			<var name="searchAssetTitle" value="Wiki Page Title" />
-			<var name="searchAssetType" value="Wiki Page" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="Page1" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="Title1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Wiki Page Content" />
 			<var name="searchAssetTitle" value="Wiki Page Title" />
-			<var name="searchAssetType" value="Wiki Page" />
 			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="Title1" />
 		</execute>
 
-		<execute macro="Search#searchNoPG">
+		<execute macro="Search#searchPG">
+			<var name="searchTerm" value="Content1" />
+		</execute>
+
+		<execute macro="Search#viewSearchNoPG">
 			<var name="searchAssetSummary" value="Wiki Page Content" />
 			<var name="searchAssetTitle" value="Wiki Page Title" />
-			<var name="searchAssetType" value="Wiki Page" />
+			<var name="searchNoResults" value="true" />
 			<var name="searchTerm" value="Content1" />
 		</execute>
 	</command>
