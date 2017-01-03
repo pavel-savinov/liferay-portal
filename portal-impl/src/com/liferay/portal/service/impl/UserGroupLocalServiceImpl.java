@@ -167,7 +167,7 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 			UserGroup.class.getName(), userGroup.getUserGroupId(),
 			GroupConstants.DEFAULT_LIVE_GROUP_ID,
 			getLocalizationMap(String.valueOf(userGroupId)), null, 0, true,
-			GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, null, false, true,
+			GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, "", false, true,
 			null);
 
 		// Resources
@@ -299,8 +299,14 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 		throws PortalException {
 
 		if (!CompanyThreadLocal.isDeleteInProcess()) {
-			int count = userLocalService.getUserGroupUsersCount(
-				userGroup.getUserGroupId(), WorkflowConstants.STATUS_APPROVED);
+			LinkedHashMap<String, Object> params = new LinkedHashMap<>();
+
+			params.put(
+				"usersUserGroups", Long.valueOf(userGroup.getUserGroupId()));
+
+			int count = userFinder.countByKeywords(
+				userGroup.getCompanyId(), null,
+				WorkflowConstants.STATUS_APPROVED, params);
 
 			if (count > 0) {
 				throw new RequiredUserGroupException();

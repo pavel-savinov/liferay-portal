@@ -116,7 +116,7 @@ public class GroupServiceTest {
 			companyGroup.getDescriptionMap(), companyGroup.getType(),
 			companyGroup.isManualMembership(),
 			companyGroup.getMembershipRestriction(),
-			companyGroup.getFriendlyURL(), false, companyGroup.isActive(),
+			companyGroup.getFriendlyURLMap(), false, companyGroup.isActive(),
 			serviceContext);
 
 		Assert.assertTrue(companyStagingGroup.isCompanyStagingGroup());
@@ -296,7 +296,7 @@ public class GroupServiceTest {
 			initialTagsCount + 1,
 			AssetTagLocalServiceUtil.getGroupTagsCount(group.getGroupId()));
 
-		User user = UserTestUtil.addUser(group.getGroupId());
+		UserTestUtil.addUser(group.getGroupId());
 
 		GroupLocalServiceUtil.deleteGroup(group.getGroupId());
 
@@ -408,6 +408,7 @@ public class GroupServiceTest {
 
 		Assert.assertEquals(1, groups.size());
 		Assert.assertEquals(group, groups.get(0));
+
 		Assert.assertEquals(
 			1, GroupLocalServiceUtil.getRoleGroupsCount(roleId));
 
@@ -657,7 +658,7 @@ public class GroupServiceTest {
 			Layout.class.getName(), layout.getPlid(),
 			GroupConstants.DEFAULT_LIVE_GROUP_ID, nameMap,
 			(Map<Locale, String>)null, 0, true,
-			GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, null, false, true,
+			GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, "", false, true,
 			null);
 
 		Assert.assertFalse(scope.isRoot());
@@ -721,7 +722,7 @@ public class GroupServiceTest {
 			stagingGroup.getNameMap(), stagingGroup.getDescriptionMap(),
 			stagingGroup.getType(), stagingGroup.isManualMembership(),
 			stagingGroup.getMembershipRestriction(),
-			stagingGroup.getFriendlyURL(), stagingGroup.isInheritContent(),
+			stagingGroup.getFriendlyURLMap(), stagingGroup.isInheritContent(),
 			stagingGroup.isActive(),
 			ServiceContextTestUtil.getServiceContext());
 	}
@@ -734,8 +735,8 @@ public class GroupServiceTest {
 			group.getGroupId(), group.getGroupId(), group.getNameMap(),
 			group.getDescriptionMap(), group.getType(),
 			group.isManualMembership(), group.getMembershipRestriction(),
-			group.getFriendlyURL(), group.isInheritContent(), group.isActive(),
-			ServiceContextTestUtil.getServiceContext());
+			group.getFriendlyURLMap(), group.isInheritContent(),
+			group.isActive(), ServiceContextTestUtil.getServiceContext());
 	}
 
 	@Test
@@ -883,8 +884,8 @@ public class GroupServiceTest {
 				GroupConstants.DEFAULT_PARENT_GROUP_ID, Layout.class.getName(),
 				scopeLayout.getPlid(), GroupConstants.DEFAULT_LIVE_GROUP_ID,
 				nameMap, (Map<Locale, String>)null, 0, true,
-				GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, null, false,
-				true, null);
+				GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, "", false, true,
+				null);
 		}
 		else if (layoutPrototype) {
 			Group group = GroupTestUtil.addGroup();

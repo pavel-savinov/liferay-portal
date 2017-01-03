@@ -93,7 +93,7 @@ public class StagedGroupImpl implements StagedGroup {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
+	 * @deprecated As of 1.0.0, replaced by {@link
 	 *             #getChildrenWithLayouts(boolean, int, int,
 	 *             OrderByComparator)}
 	 */
@@ -242,6 +242,21 @@ public class StagedGroupImpl implements StagedGroup {
 	@Override
 	public String getFriendlyURL() {
 		return _group.getFriendlyURL();
+	}
+
+	@Override
+	public String getFriendlyURL(Locale locale) {
+		return _group.getFriendlyURL(locale);
+	}
+
+	@Override
+	public Map<Locale, String> getFriendlyURLMap() {
+		return _group.getFriendlyURLMap();
+	}
+
+	@Override
+	public String getFriendlyURLsXML() {
+		return _group.getFriendlyURLsXML();
 	}
 
 	@Override
@@ -544,7 +559,7 @@ public class StagedGroupImpl implements StagedGroup {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #hasAncestor}
+	 * @deprecated As of 1.0.0, replaced by {@link #hasAncestor}
 	 */
 	@Deprecated
 	@Override
