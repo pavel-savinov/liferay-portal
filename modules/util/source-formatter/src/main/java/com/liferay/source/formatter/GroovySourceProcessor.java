@@ -36,13 +36,12 @@ public class GroovySourceProcessor extends JavaSourceProcessor {
 	}
 
 	@Override
-	protected void checkPackagePath(
-		String content, String fileName, String packagePath) {
+	protected void checkPackagePath(String fileName, String packagePath) {
 	}
 
 	@Override
 	protected List<String> doGetFileNames() throws Exception {
-		if (!portalSource) {
+		if (!portalSource && !subrepository) {
 			return new ArrayList<>();
 		}
 
@@ -61,6 +60,10 @@ public class GroovySourceProcessor extends JavaSourceProcessor {
 		}
 
 		return content;
+	}
+
+	@Override
+	protected void postFormat() throws Exception {
 	}
 
 	private static final String[] _INCLUDES = new String[] {"**/*.groovy"};

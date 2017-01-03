@@ -108,6 +108,7 @@ public class SiteMembershipPolicyMembershipsTest
 		Assert.assertEquals(
 			initialGroupUsersCount + 2,
 			UserLocalServiceUtil.getGroupUsersCount(requiredGroupIds[0]));
+
 		Assert.assertTrue(isPropagateMembership());
 	}
 
@@ -258,6 +259,7 @@ public class SiteMembershipPolicyMembershipsTest
 		Assert.assertEquals(
 			initialUserGroupCount - 1,
 			UserLocalServiceUtil.getGroupUsersCount(standardGroupIds[0]));
+
 		Assert.assertTrue(isPropagateMembership());
 	}
 
@@ -292,8 +294,8 @@ public class SiteMembershipPolicyMembershipsTest
 			group.getGroupId(), group.getParentGroupId(), nameMap,
 			group.getDescriptionMap(), group.getType(),
 			group.isManualMembership(), group.getMembershipRestriction(),
-			group.getFriendlyURL(), group.isInheritContent(), group.isActive(),
-			ServiceContextTestUtil.getServiceContext());
+			group.getFriendlyURLMap(), group.isInheritContent(),
+			group.isActive(), ServiceContextTestUtil.getServiceContext());
 
 		Assert.assertTrue(isVerify());
 	}

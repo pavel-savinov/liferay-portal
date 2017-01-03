@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -53,6 +54,8 @@ public class GradleUtil extends com.liferay.gradle.util.GradleUtil {
 
 	public static final String SNAPSHOT_PROPERTY_NAME = "snapshot";
 
+	public static final String SNAPSHOT_VERSION_SUFFIX = "-SNAPSHOT";
+
 	public static <T extends Task> T addTask(
 		Project project, String name, Class<T> clazz, boolean overwrite) {
 
@@ -62,6 +65,25 @@ public class GradleUtil extends com.liferay.gradle.util.GradleUtil {
 		args.put(Task.TASK_TYPE, clazz);
 
 		return (T)project.task(args, name);
+	}
+
+	public static void excludeTasksWithProperty(
+		Project project, String propertyName, boolean defaultValue,
+		String... taskNames) {
+
+		if (!project.hasProperty(propertyName) ||
+			!getProperty(project, propertyName, defaultValue)) {
+
+			return;
+		}
+
+		for (String taskName : taskNames) {
+			Task task = getTask(project, taskName);
+
+			task.setDependsOn(Collections.emptySet());
+			task.setEnabled(false);
+			task.setFinalizedBy(Collections.emptySet());
+		}
 	}
 
 	public static String getArchivesBaseName(Project project) {
@@ -200,7 +222,17 @@ public class GradleUtil extends com.liferay.gradle.util.GradleUtil {
 	public static boolean isSnapshot(Project project) {
 		String version = String.valueOf(project.getVersion());
 
-		if (version.endsWith(_SNAPSHOT_VERSION_SUFFIX)) {
+		if (version.endsWith(SNAPSHOT_VERSION_SUFFIX)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public static boolean isTestProject(Project project) {
+		String projectName = project.getName();
+
+		if (projectName.endsWith("-test")) {
 			return true;
 		}
 
@@ -230,8 +262,8 @@ public class GradleUtil extends com.liferay.gradle.util.GradleUtil {
 
 		String version = String.valueOf(project.getVersion());
 
-		if (snapshot && !version.endsWith(_SNAPSHOT_VERSION_SUFFIX)) {
-			project.setVersion(version + _SNAPSHOT_VERSION_SUFFIX);
+		if (snapshot && !version.endsWith(SNAPSHOT_VERSION_SUFFIX)) {
+			project.setVersion(version + SNAPSHOT_VERSION_SUFFIX);
 		}
 	}
 
@@ -242,7 +274,5 @@ public class GradleUtil extends com.liferay.gradle.util.GradleUtil {
 
 		pluginContainer.withType(pluginClass, action);
 	}
-
-	private static final String _SNAPSHOT_VERSION_SUFFIX = "-SNAPSHOT";
 
 }

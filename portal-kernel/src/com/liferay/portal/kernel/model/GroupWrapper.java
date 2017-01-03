@@ -701,13 +701,23 @@ public class GroupWrapper implements Group, ModelWrapper<Group> {
 	}
 
 	/**
-	* Returns the friendly u r l of this group.
+	* Returns the friendly url of this group.
 	*
-	* @return the friendly u r l of this group
+	* @return the friendly url of this group
 	*/
 	@Override
 	public java.lang.String getFriendlyURL() {
 		return _group.getFriendlyURL();
+	}
+
+	@Override
+	public java.lang.String getFriendlyURL(java.util.Locale locale) {
+		return _group.getFriendlyURL(locale);
+	}
+
+	@Override
+	public java.lang.String getFriendlyURLsXML() {
+		return _group.getFriendlyURLsXML();
 	}
 
 	/**
@@ -943,6 +953,16 @@ public class GroupWrapper implements Group, ModelWrapper<Group> {
 	}
 
 	/**
+	* Returns the friendly URLs for all configured locales.
+	*
+	* @return the friendly URLs for all configured locales
+	*/
+	@Override
+	public Map<java.util.Locale, java.lang.String> getFriendlyURLMap() {
+		return _group.getFriendlyURLMap();
+	}
+
+	/**
 	* Returns a map of the locales and localized names of this group.
 	*
 	* @return the locales and localized names of this group
@@ -963,9 +983,9 @@ public class GroupWrapper implements Group, ModelWrapper<Group> {
 	}
 
 	/**
-	* Returns the class p k of this group.
+	* Returns the class pk of this group.
 	*
-	* @return the class p k of this group
+	* @return the class pk of this group
 	*/
 	@Override
 	public long getClassPK() {
@@ -1116,9 +1136,9 @@ public class GroupWrapper implements Group, ModelWrapper<Group> {
 	}
 
 	/**
-	* Sets the class p k of this group.
+	* Sets the class pk of this group.
 	*
-	* @param classPK the class p k of this group
+	* @param classPK the class pk of this group
 	*/
 	@Override
 	public void setClassPK(long classPK) {
@@ -1235,9 +1255,9 @@ public class GroupWrapper implements Group, ModelWrapper<Group> {
 	}
 
 	/**
-	* Sets the friendly u r l of this group.
+	* Sets the friendly url of this group.
 	*
-	* @param friendlyURL the friendly u r l of this group
+	* @param friendlyURL the friendly url of this group
 	*/
 	@Override
 	public void setFriendlyURL(java.lang.String friendlyURL) {
