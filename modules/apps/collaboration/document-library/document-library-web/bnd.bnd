@@ -8,6 +8,9 @@ Export-Package:\
 	com.liferay.document.library.web.social,\
 	com.liferay.document.library.web.webdav
 Import-Package:\
+	com.liferay.portal.kernel.exception; version="[7.0.0,8)",\
+	com.liferay.portal.kernel.model; version="[1.0.0,2)",\
+	\
 	org.apache.xerces.parsers,\
 	*
 Liferay-JS-Config: /META-INF/resources/document_library/js/config.js
