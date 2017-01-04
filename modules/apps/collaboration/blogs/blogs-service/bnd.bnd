@@ -7,6 +7,10 @@ Export-Package:\
 	com.liferay.blogs.settings,\
 	com.liferay.blogs.social,\
 	com.liferay.blogs.util
+Import-Package:\
+	com.liferay.portal.kernel.exception; version="[7.0.0,8)",\
+	com.liferay.portal.kernel.model; version="[1.0.0,2)",\
+	*
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Blogs
 Liferay-Require-SchemaVersion: 1.1.0

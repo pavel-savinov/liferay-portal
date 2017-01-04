@@ -13,6 +13,9 @@ Export-Package:\
 	com.liferay.users.admin.web.theme.contributor,\
 	com.liferay.users.admin.web.util.comparator
 Import-Package:\
+	com.liferay.portal.kernel.exception; version="[7.0.0,8)",\
+	com.liferay.portal.kernel.model; version="[1.0.0,2)",\
+	\
 	javax.net.ssl,\
 	*
 Liferay-Releng-Module-Group-Description:
