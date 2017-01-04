@@ -221,6 +221,21 @@ public class TestGroup implements Group {
 	}
 
 	@Override
+	public String getFriendlyURL(Locale locale) {
+		return null;
+	}
+
+	@Override
+	public Map<Locale, String> getFriendlyURLMap() {
+		return null;
+	}
+
+	@Override
+	public String getFriendlyURLsXML() {
+		return null;
+	}
+
+	@Override
 	public long getGroupId() {
 		return 0;
 	}

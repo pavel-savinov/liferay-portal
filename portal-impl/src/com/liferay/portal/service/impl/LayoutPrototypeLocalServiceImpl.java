@@ -142,7 +142,8 @@ public class LayoutPrototypeLocalServiceImpl
 
 		// Group
 
-		if (layoutPersistence.countByLayoutPrototypeUuid(
+		if (layoutPersistence.countByC_L(
+				layoutPrototype.getCompanyId(),
 				layoutPrototype.getUuid()) > 0) {
 
 			throw new RequiredLayoutPrototypeException();
@@ -253,6 +254,7 @@ public class LayoutPrototypeLocalServiceImpl
 		Layout layout = layoutPrototype.getLayout();
 
 		layout.setModifiedDate(layoutPrototype.getModifiedDate());
+
 		layout.setNameMap(nameMap);
 
 		layoutPersistence.update(layout);
