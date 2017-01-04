@@ -55,8 +55,8 @@ MBThread thread = (MBThread)request.getAttribute("edit_message.jsp-thread");
 				String userDisplayText = LanguageUtil.format(request, "x-modified-x-ago", new Object[] {messageUserName, modifiedDateDescription});
 				%>
 
-				<h5 class="message-user-display text-default" title="<%= userDisplayText %>">
-					<%= userDisplayText %>
+				<h5 class="message-user-display text-default" title="<%= HtmlUtil.escapeAttribute(userDisplayText) %>">
+					<%= HtmlUtil.escape(userDisplayText) %>
 				</h5>
 
 				<h4 title="<%= HtmlUtil.escape(message.getSubject()) %>">
@@ -380,16 +380,16 @@ MBThread thread = (MBThread)request.getAttribute("edit_message.jsp-thread");
 			/>
 		</div>
 
-		<liferay-ui:custom-attributes-available className="<%= MBMessage.class.getName() %>">
+		<liferay-expando:custom-attributes-available className="<%= MBMessage.class.getName() %>">
 			<div class="card-row card-row-padded custom-attributes">
-				<liferay-ui:custom-attribute-list
+				<liferay-expando:custom-attribute-list
 					className="<%= MBMessage.class.getName() %>"
 					classPK="<%= (message != null) ? message.getMessageId() : 0 %>"
 					editable="<%= false %>"
 					label="<%= true %>"
 				/>
 			</div>
-		</liferay-ui:custom-attributes-available>
+		</liferay-expando:custom-attributes-available>
 
 		<div class="card-row card-row-padded entry-links">
 			<liferay-ui:asset-links

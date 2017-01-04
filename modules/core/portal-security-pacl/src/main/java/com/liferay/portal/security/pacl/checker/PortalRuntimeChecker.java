@@ -303,8 +303,7 @@ public class PortalRuntimeChecker extends BaseChecker {
 		String callerClassName = callerClass.getName();
 
 		if (callerClassName.equals(PortalClassLoaderUtil.class.getName()) ||
-			callerClassName.equals(
-				PortletClassLoaderUtil.class.getName())) {
+			callerClassName.equals(PortletClassLoaderUtil.class.getName())) {
 
 			callerClass = Reflection.getCallerClass(stackIndex + 1);
 		}
@@ -434,6 +433,7 @@ public class PortalRuntimeChecker extends BaseChecker {
 			}
 
 			int x = key.indexOf("[");
+
 			int y = key.indexOf("]", x);
 
 			String servletContextName = key.substring(x + 1, y);
@@ -533,6 +533,7 @@ public class PortalRuntimeChecker extends BaseChecker {
 			}
 
 			int x = key.indexOf("[");
+
 			int y = key.indexOf("]", x);
 
 			String servletContextName = key.substring(x + 1, y);
