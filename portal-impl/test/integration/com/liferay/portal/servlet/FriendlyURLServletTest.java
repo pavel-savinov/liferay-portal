@@ -63,6 +63,7 @@ public class FriendlyURLServletTest {
 
 	@Before
 	public void setUp() throws Exception {
+		PropsValues.LOCALES = new String[] {"en_US", "hu_HU", "en_GB"};
 		PropsValues.LOCALES_ENABLED = new String[] {"en_US", "hu_HU", "en_GB"};
 		PropsValues.LOCALE_USE_DEFAULT_IF_NOT_AVAILABLE = true;
 
@@ -88,6 +89,7 @@ public class FriendlyURLServletTest {
 	public void tearDown() throws Exception {
 		ServiceContextThreadLocal.popServiceContext();
 
+		PropsValues.LOCALES = PropsUtil.getArray(PropsKeys.LOCALES);
 		PropsValues.LOCALES_ENABLED = PropsUtil.getArray(
 			PropsKeys.LOCALES_ENABLED);
 		PropsValues.LOCALE_USE_DEFAULT_IF_NOT_AVAILABLE = GetterUtil.getBoolean(
