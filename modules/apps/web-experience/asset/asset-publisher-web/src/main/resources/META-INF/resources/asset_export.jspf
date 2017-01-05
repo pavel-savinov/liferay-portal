@@ -18,16 +18,23 @@
 PortletURL exportAssetURL = assetRenderer.getURLExport(liferayPortletRequest, liferayPortletResponse);
 
 exportAssetURL.setWindowState(LiferayWindowState.EXCLUSIVE);
+exportAssetURL.setParameter("portletResource", portletDisplay.getId());
+exportAssetURL.setParameter("plid", String.valueOf(portletDisplay.getThemeDisplay().getPlid()));
 %>
 
 <liferay-ui:icon-list>
 
 	<%
 	for (String extension : assetPublisherDisplayContext.getExtensions(assetRenderer)) {
+		Map<String, Object> data = new HashMap<String, Object>();
+
 		exportAssetURL.setParameter("targetExtension", extension);
+
+		data.put("resource-href", exportAssetURL.toString());
 	%>
 
 		<liferay-ui:icon
+			data="<%= data %>"
 			iconCssClass="<%= DLUtil.getFileIconCssClass(extension) %>"
 			label="<%= true %>"
 			message='<%= LanguageUtil.format(request, "x-convert-x-to-x", new Object[] {"hide-accessible", assetRenderer.getTitle(locale), StringUtil.toUpperCase(HtmlUtil.escape(extension))}, false) %>'
