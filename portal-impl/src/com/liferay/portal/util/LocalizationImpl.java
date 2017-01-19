@@ -191,19 +191,22 @@ public class LocalizationImpl implements Localization {
 		String xml, String requestedLanguageId, boolean useDefault,
 		String defaultValue) {
 
-		String systemDefaultLanguageId = LocaleUtil.toLanguageId(
-			LocaleUtil.getSiteDefault());
-
 		if (!Validator.isXml(xml)) {
-			if (useDefault ||
-				requestedLanguageId.equals(systemDefaultLanguageId)) {
+			if (useDefault) {
+				return xml;
+			}
+
+			if (requestedLanguageId.equals(
+					LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()))) {
 
 				return xml;
 			}
-			else {
-				return defaultValue;
-			}
+
+			return defaultValue;
 		}
+
+		String systemDefaultLanguageId = LocaleUtil.toLanguageId(
+			LocaleUtil.getSiteDefault());
 
 		String value = _getCachedValue(xml, requestedLanguageId, useDefault);
 
@@ -576,6 +579,7 @@ public class LocalizationImpl implements Localization {
 		String xml = null;
 
 		Locale defaultLocale = LocaleUtil.getSiteDefault();
+
 		String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
 
 		for (Locale locale : LanguageUtil.getAvailableLocales()) {

@@ -351,6 +351,13 @@ public class PortletContainerImpl implements PortletContainer {
 			Portlet portlet)
 		throws Exception {
 
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
+		portletDisplay.setId(portlet.getPortletId());
+
 		Layout layout = (Layout)request.getAttribute(WebKeys.LAYOUT);
 
 		WindowState windowState = WindowStateFactory.getWindowState(
@@ -400,8 +407,7 @@ public class PortletContainerImpl implements PortletContainer {
 
 			ActionResponseImpl actionResponseImpl =
 				ActionResponseFactory.create(
-					actionRequestImpl, response, portlet.getPortletId(), user,
-					layout, windowState, portletMode);
+					actionRequestImpl, response, user, layout);
 
 			actionRequestImpl.defineObjects(portletConfig, actionResponseImpl);
 
@@ -546,8 +552,7 @@ public class PortletContainerImpl implements PortletContainer {
 		Layout requestLayout = (Layout)request.getAttribute(WebKeys.LAYOUT);
 
 		EventResponseImpl eventResponseImpl = EventResponseFactory.create(
-			eventRequestImpl, response, portlet.getPortletId(), user,
-			requestLayout);
+			eventRequestImpl, response, user, requestLayout);
 
 		eventRequestImpl.defineObjects(portletConfig, eventResponseImpl);
 
@@ -789,12 +794,8 @@ public class PortletContainerImpl implements PortletContainer {
 			request, portlet, invokerPortlet, portletContext, windowState,
 			portletMode, portletPreferences, layout.getPlid());
 
-		long companyId = PortalUtil.getCompanyId(request);
-
 		ResourceResponseImpl resourceResponseImpl =
-			ResourceResponseFactory.create(
-				resourceRequestImpl, response, portlet.getPortletId(),
-				companyId);
+			ResourceResponseFactory.create(resourceRequestImpl, response);
 
 		resourceRequestImpl.defineObjects(portletConfig, resourceResponseImpl);
 

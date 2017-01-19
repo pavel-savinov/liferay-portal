@@ -1,10 +1,9 @@
 ;
-; Do not manually edit this file. See
-; https://github.com/git-commands/git-subrepo#readme for more information.
+; Do not manually edit this file.
 ;
 [subrepo]
 	cmdver = liferay
-	commit = 9788d04aa18a01cc82181495200737101f359a57
+	commit = 39322b228db85d58bd889381d57f5ca03b36c10b
 	mode = push
-	parent = ea2234436584461730aa988254ee282fd99bd98c
+	parent = 66f443419c9a12aa8843619db1b0da929cdaf42b
 	remote = git@github.com:liferay/com-liferay-frontend-taglib.git

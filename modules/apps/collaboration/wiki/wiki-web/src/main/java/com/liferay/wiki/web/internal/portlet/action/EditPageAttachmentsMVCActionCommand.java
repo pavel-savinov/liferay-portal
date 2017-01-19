@@ -46,7 +46,7 @@ import com.liferay.portal.kernel.upload.UploadRequestSizeException;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
@@ -54,7 +54,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.taglib.util.RestoreEntryUtil;
 import com.liferay.trash.kernel.util.TrashUtil;
 import com.liferay.wiki.constants.WikiPortletKeys;
 import com.liferay.wiki.exception.NoSuchNodeException;
@@ -144,15 +143,6 @@ public class EditPageAttachmentsMVCActionCommand extends BaseMVCActionCommand {
 			else if (cmd.equals(Constants.ADD)) {
 				_wikiAttachmentsHelper.addAttachments(actionRequest);
 			}
-			else if (cmd.equals(Constants.CHECK)) {
-				JSONObject jsonObject = RestoreEntryUtil.checkEntry(
-					actionRequest);
-
-				JSONPortletResponseUtil.writeJSON(
-					actionRequest, actionResponse, jsonObject);
-
-				return;
-			}
 			else if (cmd.equals(Constants.DELETE)) {
 				deleteAttachment(actionRequest, false);
 			}
@@ -161,9 +151,6 @@ public class EditPageAttachmentsMVCActionCommand extends BaseMVCActionCommand {
 			}
 			else if (cmd.equals(Constants.MOVE_TO_TRASH)) {
 				deleteAttachment(actionRequest, true);
-			}
-			else if (cmd.equals(Constants.RENAME)) {
-				_wikiAttachmentsHelper.restoreRename(actionRequest);
 			}
 			else if (cmd.equals(Constants.RESTORE)) {
 				_wikiAttachmentsHelper.restoreEntries(actionRequest);
@@ -174,9 +161,6 @@ public class EditPageAttachmentsMVCActionCommand extends BaseMVCActionCommand {
 				if (Validator.isNotNull(redirect)) {
 					actionResponse.sendRedirect(redirect);
 				}
-			}
-			else if (cmd.equals(Constants.OVERRIDE)) {
-				_wikiAttachmentsHelper.restoreOverride(actionRequest);
 			}
 		}
 		catch (NoSuchNodeException | NoSuchPageException |
@@ -256,8 +240,8 @@ public class EditPageAttachmentsMVCActionCommand extends BaseMVCActionCommand {
 				e instanceof FileSizeException ||
 				e instanceof UploadRequestSizeException) {
 
-				HttpServletResponse response =
-					PortalUtil.getHttpServletResponse(actionResponse);
+				HttpServletResponse response = _portal.getHttpServletResponse(
+					actionResponse);
 
 				response.setContentType(ContentTypes.TEXT_HTML);
 				response.setStatus(HttpServletResponse.SC_OK);
@@ -274,6 +258,7 @@ public class EditPageAttachmentsMVCActionCommand extends BaseMVCActionCommand {
 						(AntivirusScannerException)e;
 
 					errorMessage = themeDisplay.translate(ase.getMessageKey());
+
 					errorType =
 						ServletResponseConstants.SC_FILE_ANTIVIRUS_EXCEPTION;
 				}
@@ -308,8 +293,8 @@ public class EditPageAttachmentsMVCActionCommand extends BaseMVCActionCommand {
 					}
 
 					errorMessage = themeDisplay.translate(
-						"please-enter-a-file-with-a-valid-file-size-no-larger" +
-							"-than-x",
+						"please-enter-a-file-with-a-valid-file-size-no-" +
+							"larger-than-x",
 						TextFormatter.formatStorageSize(
 							fileMaxSize, themeDisplay.getLocale()));
 
@@ -361,6 +346,9 @@ public class EditPageAttachmentsMVCActionCommand extends BaseMVCActionCommand {
 			}
 		}
 	}
+
+	@Reference
+	private Portal _portal;
 
 	private WikiAttachmentsHelper _wikiAttachmentsHelper;
 

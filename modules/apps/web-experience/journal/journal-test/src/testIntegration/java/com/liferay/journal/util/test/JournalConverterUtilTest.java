@@ -27,9 +27,8 @@ import com.liferay.dynamic.data.mapping.storage.Field;
 import com.liferay.dynamic.data.mapping.storage.Fields;
 import com.liferay.dynamic.data.mapping.storage.StorageType;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestHelper;
+import com.liferay.dynamic.data.mapping.util.DDM;
 import com.liferay.dynamic.data.mapping.util.DDMXML;
-import com.liferay.dynamic.data.mapping.util.impl.DDMImpl;
-import com.liferay.dynamic.data.mapping.util.impl.DDMXMLImpl;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.journal.util.JournalConverter;
@@ -47,7 +46,6 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.xml.Document;
@@ -55,7 +53,6 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.util.test.LayoutTestUtil;
-import com.liferay.portal.xml.XMLSchemaImpl;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 
@@ -160,16 +157,19 @@ public class JournalConverterUtilTest {
 
 		fields.put(linkToLayoutField);
 
+		StringBundler sb = new StringBundler(8);
+
+		sb.append("link_to_layout_INSTANCE_MiO7vIJu,");
+		sb.append("link_to_layout_INSTANCE_9FLzJNUX,");
+		sb.append("link_to_layout_INSTANCE_WqABvmxw,");
+		sb.append("link_to_layout_INSTANCE_31abnWkB,");
+		sb.append("link_to_layout_INSTANCE_pWIUF15B,");
+		sb.append("link_to_layout_INSTANCE_OGQypdcj,");
+		sb.append("link_to_layout_INSTANCE_TB2XZ3wn,");
+		sb.append("link_to_layout_INSTANCE_3IRNS4jM");
+
 		Field fieldsDisplayField = getFieldsDisplayField(
-			_ddmStructure.getStructureId(),
-			"link_to_layout_INSTANCE_MiO7vIJu," +
-			"link_to_layout_INSTANCE_9FLzJNUX," +
-			"link_to_layout_INSTANCE_WqABvmxw," +
-			"link_to_layout_INSTANCE_31abnWkB," +
-			"link_to_layout_INSTANCE_pWIUF15B," +
-			"link_to_layout_INSTANCE_OGQypdcj," +
-			"link_to_layout_INSTANCE_TB2XZ3wn," +
-			"link_to_layout_INSTANCE_3IRNS4jM");
+			_ddmStructure.getStructureId(), sb.toString());
 
 		fields.put(fieldsDisplayField);
 
@@ -620,7 +620,7 @@ public class JournalConverterUtilTest {
 		Field fieldsDisplayField = new Field();
 
 		fieldsDisplayField.setDDMStructureId(ddmStructureId);
-		fieldsDisplayField.setName(DDMImpl.FIELDS_DISPLAY_NAME);
+		fieldsDisplayField.setName(DDM.FIELDS_DISPLAY_NAME);
 		fieldsDisplayField.setValue(value);
 
 		return fieldsDisplayField;
@@ -783,13 +783,16 @@ public class JournalConverterUtilTest {
 
 		fields.put(ext);
 
+		StringBundler sb = new StringBundler(5);
+
+		sb.append("contact_INSTANCE_RF3do1m5,phone_INSTANCE_QK6B0wK9,");
+		sb.append("ext_INSTANCE_L67MPqQf,ext_INSTANCE_8uxzZl41,");
+		sb.append("ext_INSTANCE_S58K861T,contact_INSTANCE_CUeFxcrA,");
+		sb.append("phone_INSTANCE_lVTcTviF,ext_INSTANCE_cZalDSll,");
+		sb.append("ext_INSTANCE_HDrK2Um5");
+
 		Field fieldsDisplayField = new Field(
-			ddmStructureId, DDMImpl.FIELDS_DISPLAY_NAME,
-			"contact_INSTANCE_RF3do1m5,phone_INSTANCE_QK6B0wK9," +
-			"ext_INSTANCE_L67MPqQf,ext_INSTANCE_8uxzZl41," +
-			"ext_INSTANCE_S58K861T,contact_INSTANCE_CUeFxcrA," +
-			"phone_INSTANCE_lVTcTviF,ext_INSTANCE_cZalDSll," +
-			"ext_INSTANCE_HDrK2Um5");
+			ddmStructureId, DDM.FIELDS_DISPLAY_NAME, sb.toString());
 
 		fields.put(fieldsDisplayField);
 
@@ -913,17 +916,6 @@ public class JournalConverterUtilTest {
 		Registry registry = RegistryUtil.getRegistry();
 
 		_ddmXML = registry.getService(DDMXML.class);
-
-		XMLSchemaImpl xmlSchema = new XMLSchemaImpl();
-
-		xmlSchema.setSchemaLanguage("http://www.w3.org/2001/XMLSchema");
-		xmlSchema.setSystemId(
-			"http://www.liferay.com/dtd/liferay-ddm-structure_6_2_0.xsd");
-
-		java.lang.reflect.Field field = ReflectionUtil.getDeclaredField(
-			DDMXMLImpl.class, "_xmlSchema");
-
-		field.set(_ddmXML, xmlSchema);
 	}
 
 	protected void udpateFieldsMap(
