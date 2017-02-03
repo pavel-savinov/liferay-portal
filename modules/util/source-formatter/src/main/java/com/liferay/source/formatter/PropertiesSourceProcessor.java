@@ -100,7 +100,7 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 		String[] includes = new String[] {"**/Language_*.properties"};
 
 		List<String> translationFileNames = getFileNames(
-			dirName, null, new String[0], includes);
+			dirName, null, new String[0], includes, true);
 
 		for (String translationFileName : translationFileNames) {
 			translationFileName = StringUtil.replace(
@@ -231,7 +231,8 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 		String newContent = content;
 
 		if (portalSource && !fileName.contains("/samples/") &&
-			fileName.endsWith("Language.properties")) {
+			fileName.endsWith("Language.properties") &&
+			!isExcludedPath(LANGUAGE_KEYS_CHECK_EXCLUDES, absolutePath)) {
 
 			checkLanguageProperties(fileName);
 		}
@@ -245,7 +246,9 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 		else if (fileName.endsWith("source-formatter.properties")) {
 			formatSourceFormatterProperties(fileName, content);
 		}
-		else if (!portalSource || !fileName.endsWith("portal.properties")) {
+		else if ((!portalSource && !subrepository) ||
+				 !fileName.endsWith("portal.properties")) {
+
 			formatPortalProperties(fileName, content);
 		}
 
@@ -376,7 +379,10 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 				}
 
 				if (pos < previousPos) {
-					processMessage(fileName, "sort", lineCount);
+					processMessage(
+						fileName,
+						"Follow order as in portal-impl/src/portal.properties",
+						lineCount);
 				}
 
 				previousPos = pos;
@@ -389,11 +395,10 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 
 		if (!content.contains("include-and-override=portlet-ext.properties")) {
 			content =
-				"include-and-override=portlet-ext.properties" + "\n\n" +
-					content;
+				"include-and-override=portlet-ext.properties\n\n" + content;
 		}
 
-		if (!portalSource) {
+		if (!portalSource && !subrepository) {
 			return content;
 		}
 
@@ -437,7 +442,9 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 				if (Validator.isNotNull(previousProperty) &&
 					(previousProperty.compareToIgnoreCase(property) > 0)) {
 
-					processMessage(fileName, "sort", lineCount);
+					processMessage(
+						fileName, "Unsorted property '" + property + "'",
+						lineCount);
 				}
 
 				previousProperty = property;
@@ -492,15 +499,9 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 			String fileName, String content)
 		throws Exception {
 
-		String path = StringPool.BLANK;
-
-		int pos = fileName.lastIndexOf(CharPool.SLASH);
-
-		if (pos != -1) {
-			path = fileName.substring(0, pos + 1);
-		}
-
 		boolean hasPrivateAppsDir = false;
+
+		int level = PLUGINS_MAX_DIR_LEVEL;
 
 		if (portalSource) {
 			File privateAppsDir = getFile(
@@ -509,6 +510,8 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 			if (privateAppsDir != null) {
 				hasPrivateAppsDir = true;
 			}
+
+			level = PORTAL_MAX_DIR_LEVEL;
 		}
 
 		Properties properties = new Properties();
@@ -537,30 +540,27 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 				value, StringPool.COMMA);
 
 			for (String propertyFileName : propertyFileNames) {
-				if (propertyFileName.startsWith("**") ||
-					propertyFileName.endsWith("**")) {
+				if (propertyFileName.contains(StringPool.STAR) ||
+					propertyFileName.endsWith("-ext.properties") ||
+					(portalSource && !hasPrivateAppsDir &&
+					 propertyFileName.contains("/private/apps/"))) {
 
 					continue;
 				}
 
-				pos = propertyFileName.indexOf(CharPool.AT);
+				int pos = propertyFileName.indexOf(CharPool.AT);
 
 				if (pos != -1) {
 					propertyFileName = propertyFileName.substring(0, pos);
 				}
 
-				if (portalSource && !hasPrivateAppsDir &&
-					propertyFileName.contains("/private/apps/")) {
+				File file = getFile(propertyFileName, level);
 
-					continue;
-				}
-
-				File file = new File(path + propertyFileName);
-
-				if (!file.exists()) {
+				if (file == null) {
 					processMessage(
 						fileName,
-						"Incorrect property value: " + propertyFileName);
+						"Property value '" + propertyFileName +
+							"' points to file that does not exist");
 				}
 			}
 		}
@@ -663,10 +663,14 @@ public class PropertiesSourceProcessor extends BaseSourceProcessor {
 		String[] includes = new String[] {"**/Language.properties"};
 
 		List<String> modulesLanguagePropertiesNames = getFileNames(
-			sourceFormatterArgs.getBaseDirName(), null, new String[0],
-			includes);
+			sourceFormatterArgs.getBaseDirName(), null, new String[0], includes,
+			true);
 
 		for (String fileName : modulesLanguagePropertiesNames) {
+			if (isExcludedPath(LANGUAGE_KEYS_CHECK_EXCLUDES, fileName)) {
+				continue;
+			}
+
 			Properties properties = new Properties();
 
 			fileName = StringUtil.replace(

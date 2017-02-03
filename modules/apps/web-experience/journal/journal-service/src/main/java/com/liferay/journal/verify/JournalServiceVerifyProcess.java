@@ -62,7 +62,7 @@ import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LoggingTimer;
-import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -333,17 +333,24 @@ public class JournalServiceVerifyProcess extends VerifyLayout {
 		long folderId = GetterUtil.getLong(pathArray[3]);
 		String title = HttpUtil.decodeURL(HtmlUtil.escape(pathArray[4]));
 
+		FileEntry fileEntry = null;
+
 		try {
-			FileEntry fileEntry = _dlAppLocalService.getFileEntry(
+			fileEntry = _dlAppLocalService.getFileEntry(
 				groupId, folderId, title);
-
-			Node node = dynamicContentElement.node(0);
-
-			node.setText(
-				context + path + StringPool.SLASH + fileEntry.getUuid());
 		}
 		catch (PortalException pe) {
+			_log.error(
+				"Unable to get file entry with group ID " + groupId +
+					", folder ID " + folderId + ", and title " + title,
+				pe);
+
+			return;
 		}
+
+		Node node = dynamicContentElement.node(0);
+
+		node.setText(context + path + StringPool.SLASH + fileEntry.getUuid());
 	}
 
 	protected void updateDynamicElements(JournalArticle article)
@@ -354,8 +361,7 @@ public class JournalServiceVerifyProcess extends VerifyLayout {
 		}
 
 		DDMStructure ddmStructure = _ddmStructureLocalService.getStructure(
-			article.getGroupId(),
-			PortalUtil.getClassNameId(JournalArticle.class),
+			article.getGroupId(), _portal.getClassNameId(JournalArticle.class),
 			article.getDDMStructureKey(), true);
 
 		Locale originalefaultLocale = LocaleThreadLocal.getDefaultLocale();
@@ -367,8 +373,9 @@ public class JournalServiceVerifyProcess extends VerifyLayout {
 				article.getCompanyId());
 
 			LocaleThreadLocal.setDefaultLocale(company.getLocale());
+
 			LocaleThreadLocal.setSiteDefaultLocale(
-				PortalUtil.getSiteDefaultLocale(article.getGroupId()));
+				_portal.getSiteDefaultLocale(article.getGroupId()));
 
 			Fields ddmFields = _journalConverter.getDDMFields(
 				ddmStructure, article.getContent());
@@ -411,8 +418,8 @@ public class JournalServiceVerifyProcess extends VerifyLayout {
 		throws Exception {
 
 		try (PreparedStatement ps = connection.prepareStatement(
-				"update JournalArticle set expirationDate = ? where " +
-					"groupId = ? and articleId = ? and status = ?")) {
+				"update JournalArticle set expirationDate = ? where groupId " +
+					"= ? and articleId = ? and status = ?")) {
 
 			ps.setTimestamp(1, expirationDate);
 			ps.setLong(2, groupId);
@@ -605,8 +612,8 @@ public class JournalServiceVerifyProcess extends VerifyLayout {
 		try (LoggingTimer loggingTimer = new LoggingTimer();
 			PreparedStatement ps = connection.prepareStatement(
 				"select id_ from JournalArticle where (content like " +
-					"'%document_library%' or content like '%link_to_layout%')" +
-						" and DDMStructureKey != ''");
+					"'%document_library%' or content like " +
+						"'%link_to_layout%') and DDMStructureKey != ''");
 			ResultSet rs = ps.executeQuery()) {
 
 			while (rs.next()) {
@@ -704,8 +711,8 @@ public class JournalServiceVerifyProcess extends VerifyLayout {
 				long count = actionableDynamicQuery.performCount();
 
 				_log.debug(
-					"Processing " + count + " articles for invalid structures" +
-						" and dynamic elements");
+					"Processing " + count + " articles for invalid " +
+						"structures and dynamic elements");
 			}
 
 			actionableDynamicQuery.setPerformActionMethod(
@@ -925,6 +932,7 @@ public class JournalServiceVerifyProcess extends VerifyLayout {
 							groupId, articleId, normalizedURLTitle);
 
 					ps2.setString(1, normalizedURLTitle);
+
 					ps2.setString(2, urlTitle);
 
 					ps2.addBatch();
@@ -955,6 +963,10 @@ public class JournalServiceVerifyProcess extends VerifyLayout {
 	private JournalContentSearchLocalService _journalContentSearchLocalService;
 	private JournalConverter _journalConverter;
 	private JournalFolderLocalService _journalFolderLocalService;
+
+	@Reference
+	private Portal _portal;
+
 	private ResourceLocalService _resourceLocalService;
 	private SystemEventLocalService _systemEventLocalService;
 	private final VerifyResourcePermissions _verifyResourcePermissions =

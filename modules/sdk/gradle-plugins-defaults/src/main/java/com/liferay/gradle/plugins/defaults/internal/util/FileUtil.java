@@ -20,21 +20,25 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.UncheckedIOException;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.file.FileTree;
 import org.gradle.api.specs.Spec;
@@ -46,14 +50,49 @@ import org.gradle.api.tasks.TaskInputs;
 public class FileUtil extends com.liferay.gradle.util.FileUtil {
 
 	public static boolean contains(File file, String s) throws IOException {
+		Path path = file.toPath();
+
+		if (Files.notExists(path)) {
+			return false;
+		}
+
 		String content = new String(
-			Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+			Files.readAllBytes(path), StandardCharsets.UTF_8);
 
 		if (content.contains(s)) {
 			return true;
 		}
 
 		return false;
+	}
+
+	public static File findFile(File dir, final String fileName)
+		throws IOException {
+
+		final AtomicReference<File> file = new AtomicReference<>(null);
+
+		Files.walkFileTree(
+			dir.toPath(),
+			new SimpleFileVisitor<Path>() {
+
+				@Override
+				public FileVisitResult preVisitDirectory(
+					Path dirPath, BasicFileAttributes basicFileAttributes) {
+
+					Path path = dirPath.resolve(fileName);
+
+					if (Files.isRegularFile(path)) {
+						file.set(path.toFile());
+
+						return FileVisitResult.TERMINATE;
+					}
+
+					return FileVisitResult.CONTINUE;
+				}
+
+			});
+
+		return file.get();
 	}
 
 	public static File[] getDirectories(File dir) {

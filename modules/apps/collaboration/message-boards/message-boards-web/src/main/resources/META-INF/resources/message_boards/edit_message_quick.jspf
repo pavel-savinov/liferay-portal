@@ -32,11 +32,11 @@ if (threadId > 0) {
 		curParentMessage = MBMessageLocalServiceUtil.getMessage(parentMessageId);
 
 		if (Validator.isNull(subject)) {
-			if (curParentMessage.getSubject().startsWith("RE: ")) {
+			if (curParentMessage.getSubject().startsWith(MBMessageConstants.MESSAGE_SUBJECT_PREFIX_RE)) {
 				subject = curParentMessage.getSubject();
 			}
 			else {
-				subject = "RE: " + curParentMessage.getSubject();
+				subject = MBMessageConstants.MESSAGE_SUBJECT_PREFIX_RE + curParentMessage.getSubject();
 			}
 		}
 	}
@@ -74,7 +74,7 @@ Boolean showPermanentLink = (Boolean)request.getAttribute("edit-message.jsp-show
 				<div class="card-col-content card-col-gutters">
 
 					<%
-					String userDisplayText = LanguageUtil.format(request, "x-replying", new Object[] {PortalUtil.getUserName(themeDisplay.getUserId(), StringPool.BLANK)});
+					String userDisplayText = LanguageUtil.format(request, "x-replying", new Object[] {HtmlUtil.escape(PortalUtil.getUserName(themeDisplay.getUserId(), StringPool.BLANK))});
 					%>
 
 					<h5 class="message-user-display text-default" title="<%= userDisplayText %>">
@@ -143,11 +143,17 @@ Boolean showPermanentLink = (Boolean)request.getAttribute("edit-message.jsp-show
 						editorName="<%= editorName %>"
 						name='<%= "replyMessageBody" + replyToMessageId %>'
 						onChangeMethod='<%= "replyMessageOnChange" + replyToMessageId %>'
-						placeholder='<%= LanguageUtil.get(request, "type-here-your-reply") %>'
+						placeholder='<%= LanguageUtil.get(request, "type-your-reply") %>'
 						showSource="<%= false %>"
 					/>
 
 					<aui:input name="body" type="hidden" />
+
+					<c:if test="<%= PropsValues.CAPTCHA_CHECK_PORTLET_MESSAGE_BOARDS_EDIT_MESSAGE %>">
+						<portlet:resourceURL id="/message_boards/captcha" var="captchaURL" />
+
+						<liferay-captcha:captcha url="<%= captchaURL %>" />
+					</c:if>
 
 					<aui:button cssClass="advanced-reply btn btn-link btn-sm" onClick='<%= liferayPortletResponse.getNamespace() + "advancedReply" + replyToMessageId + "();" %>' value="advanced-reply" />
 
@@ -155,14 +161,14 @@ Boolean showPermanentLink = (Boolean)request.getAttribute("edit-message.jsp-show
 						<aui:input helpMessage="message-boards-message-subscribe-me-help" label="subscribe-me" name="subscribe" type='<%= (mbGroupServiceSettings.isEmailMessageAddedEnabled() || mbGroupServiceSettings.isEmailMessageUpdatedEnabled()) ? "checkbox" : "hidden" %>' value="<%= subscribeByDefault %>" />
 					</c:if>
 
-					<liferay-ui:custom-attributes-available className="<%= MBMessage.class.getName() %>">
-						<liferay-ui:custom-attribute-list
+					<liferay-expando:custom-attributes-available className="<%= MBMessage.class.getName() %>">
+						<liferay-expando:custom-attribute-list
 							className="<%= MBMessage.class.getName() %>"
 							classPK="<%= (message != null) ? message.getMessageId() : 0 %>"
 							editable="<%= true %>"
 							label="<%= true %>"
 						/>
-					</liferay-ui:custom-attributes-available>
+					</liferay-expando:custom-attributes-available>
 
 					<aui:button-row>
 

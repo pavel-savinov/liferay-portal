@@ -36,9 +36,15 @@ AssetRendererFactory<JournalArticle> assetRendererFactory = AssetRendererFactory
 						<liferay-ui:message key="this-application-is-not-visible-to-users-yet" />
 					</div>
 
-					<div>
-						<aui:a href="javascript:;" onClick="<%= portletDisplay.getURLConfigurationJS() %>"><liferay-ui:message key="select-web-content-to-make-it-visible" /></aui:a>
-					</div>
+					<%
+					Group scopeGroup = themeDisplay.getScopeGroup();
+					%>
+
+					<c:if test="<%= !scopeGroup.isStaged() || scopeGroup.isStagingGroup() %>">
+						<div>
+							<aui:a href="javascript:;" onClick="<%= portletDisplay.getURLConfigurationJS() %>"><liferay-ui:message key="select-web-content-to-make-it-visible" /></aui:a>
+						</div>
+					</c:if>
 				</div>
 			</c:when>
 			<c:otherwise>
@@ -88,7 +94,7 @@ AssetRendererFactory<JournalArticle> assetRendererFactory = AssetRendererFactory
 							</c:otherwise>
 						</c:choose>
 					</c:when>
-					<c:when test="<%= (articleDisplay != null) %>">
+					<c:when test="<%= articleDisplay != null %>">
 						<div class="text-right user-tool-asset-addon-entries">
 							<liferay-ui:asset-addon-entry-display assetAddonEntries="<%= journalContentDisplayContext.getSelectedUserToolAssetAddonEntries() %>" />
 						</div>

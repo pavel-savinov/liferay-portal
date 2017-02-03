@@ -15,6 +15,7 @@
 package com.liferay.dynamic.data.mapping.util;
 
 import com.liferay.dynamic.data.mapping.BaseDDMTestCase;
+import com.liferay.dynamic.data.mapping.internal.util.DDMImpl;
 import com.liferay.dynamic.data.mapping.io.DDMFormValuesJSONDeserializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormValuesJSONSerializer;
 import com.liferay.dynamic.data.mapping.io.internal.DDMFormValuesJSONDeserializerImpl;
@@ -28,7 +29,6 @@ import com.liferay.dynamic.data.mapping.model.DDMFormLayoutRow;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.storage.Field;
 import com.liferay.dynamic.data.mapping.storage.Fields;
-import com.liferay.dynamic.data.mapping.util.impl.DDMImpl;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ReflectionUtil;
@@ -506,6 +506,7 @@ public class DDMImplTest extends BaseDDMTestCase {
 		Assert.assertNotNull(fieldsDisplayField);
 
 		String fieldsDisplayValue = (String)fieldsDisplayField.getValue();
+
 		String[] fieldsDisplayValues = StringUtil.split(fieldsDisplayValue);
 
 		testValues(
@@ -659,6 +660,7 @@ public class DDMImplTest extends BaseDDMTestCase {
 
 		Assert.assertEquals(
 			expectedDDMFormFieldName, actualDDMFormFieldNames.get(0));
+
 		Assert.assertEquals(
 			DDMFormLayoutColumn.FULL, actualDDMFormLayoutColumn.getSize());
 	}
