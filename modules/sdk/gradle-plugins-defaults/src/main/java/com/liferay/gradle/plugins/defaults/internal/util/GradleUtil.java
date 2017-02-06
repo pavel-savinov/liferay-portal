@@ -23,10 +23,12 @@ import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.gradle.StartParameter;
@@ -43,6 +45,7 @@ import org.gradle.api.file.SourceDirectorySet;
 import org.gradle.api.invocation.Gradle;
 import org.gradle.api.plugins.BasePluginConvention;
 import org.gradle.api.plugins.PluginContainer;
+import org.gradle.util.GUtil;
 
 /**
  * @author Andrea Di Giorgi
@@ -52,6 +55,8 @@ public class GradleUtil extends com.liferay.gradle.util.GradleUtil {
 	public static final String PORTAL_TOOL_GROUP = "com.liferay";
 
 	public static final String SNAPSHOT_PROPERTY_NAME = "snapshot";
+
+	public static final String SNAPSHOT_VERSION_SUFFIX = "-SNAPSHOT";
 
 	public static <T extends Task> T addTask(
 		Project project, String name, Class<T> clazz, boolean overwrite) {
@@ -64,11 +69,45 @@ public class GradleUtil extends com.liferay.gradle.util.GradleUtil {
 		return (T)project.task(args, name);
 	}
 
+	public static void excludeTasksWithProperty(
+		Project project, String propertyName, boolean defaultValue,
+		String... taskNames) {
+
+		if (!project.hasProperty(propertyName) ||
+			!getProperty(project, propertyName, defaultValue)) {
+
+			return;
+		}
+
+		for (String taskName : taskNames) {
+			Task task = getTask(project, taskName);
+
+			task.setDependsOn(Collections.emptySet());
+			task.setEnabled(false);
+			task.setFinalizedBy(Collections.emptySet());
+		}
+	}
+
 	public static String getArchivesBaseName(Project project) {
 		BasePluginConvention basePluginConvention = getConvention(
 			project, BasePluginConvention.class);
 
 		return basePluginConvention.getArchivesBaseName();
+	}
+
+	public static String getGradlePropertiesValue(
+		Project project, String key, String defaultValue) {
+
+		File dir = getRootDir(project, "gradle.properties");
+
+		if (dir == null) {
+			return defaultValue;
+		}
+
+		Properties properties = GUtil.loadProperties(
+			new File(dir, "gradle.properties"));
+
+		return properties.getProperty(key, defaultValue);
 	}
 
 	public static Project getProject(Project rootProject, String name) {
@@ -200,7 +239,17 @@ public class GradleUtil extends com.liferay.gradle.util.GradleUtil {
 	public static boolean isSnapshot(Project project) {
 		String version = String.valueOf(project.getVersion());
 
-		if (version.endsWith(_SNAPSHOT_VERSION_SUFFIX)) {
+		if (version.endsWith(SNAPSHOT_VERSION_SUFFIX)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public static boolean isTestProject(Project project) {
+		String projectName = project.getName();
+
+		if (projectName.endsWith("-test")) {
 			return true;
 		}
 
@@ -230,8 +279,8 @@ public class GradleUtil extends com.liferay.gradle.util.GradleUtil {
 
 		String version = String.valueOf(project.getVersion());
 
-		if (snapshot && !version.endsWith(_SNAPSHOT_VERSION_SUFFIX)) {
-			project.setVersion(version + _SNAPSHOT_VERSION_SUFFIX);
+		if (snapshot && !version.endsWith(SNAPSHOT_VERSION_SUFFIX)) {
+			project.setVersion(version + SNAPSHOT_VERSION_SUFFIX);
 		}
 	}
 
@@ -242,7 +291,5 @@ public class GradleUtil extends com.liferay.gradle.util.GradleUtil {
 
 		pluginContainer.withType(pluginClass, action);
 	}
-
-	private static final String _SNAPSHOT_VERSION_SUFFIX = "-SNAPSHOT";
 
 }

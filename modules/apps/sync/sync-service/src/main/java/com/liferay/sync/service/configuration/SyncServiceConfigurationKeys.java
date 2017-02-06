@@ -55,6 +55,10 @@ public class SyncServiceConfigurationKeys {
 	public static final String SYNC_FILE_CHECKSUM_THRESHOLD_SIZE =
 		"sync.file.checksum.threshold.size";
 
+	/**
+	 * @deprecated As of 1.3.0, with no direct replacement
+	 */
+	@Deprecated
 	public static final String SYNC_FILE_DIFF_CACHE_DELETE_INTERVAL =
 		"sync.file.diff.cache.delete.interval";
 
@@ -63,6 +67,8 @@ public class SyncServiceConfigurationKeys {
 
 	public static final String SYNC_FILE_DIFF_CACHE_EXPIRATION_TIME =
 		"sync.file.diff.cache.expiration.time";
+
+	public static final String SYNC_LAN_ENABLED = "sync.lan.enabled";
 
 	public static final String SYNC_MAC_PACKAGE_FOLDER_EXTENSIONS =
 		"sync.mac.package.folder.extensions";

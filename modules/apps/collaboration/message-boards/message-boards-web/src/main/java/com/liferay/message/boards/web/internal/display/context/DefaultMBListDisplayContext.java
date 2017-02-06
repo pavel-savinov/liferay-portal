@@ -16,9 +16,9 @@ package com.liferay.message.boards.web.internal.display.context;
 
 import com.liferay.message.boards.display.context.MBListDisplayContext;
 import com.liferay.message.boards.kernel.model.MBMessage;
-import com.liferay.message.boards.kernel.service.MBCategoryLocalServiceUtil;
 import com.liferay.message.boards.kernel.service.MBCategoryServiceUtil;
 import com.liferay.message.boards.kernel.service.MBThreadServiceUtil;
+import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.search.Hits;
@@ -100,6 +100,13 @@ public class DefaultMBListDisplayContext implements MBListDisplayContext {
 		String keywords = ParamUtil.getString(_request, "keywords");
 
 		if (Validator.isNotNull(keywords)) {
+			return true;
+		}
+
+		String mvcRenderCommandName = ParamUtil.getString(
+			_request, "mvcRenderCommandName");
+
+		if (mvcRenderCommandName.equals("/message_boards/search")) {
 			return true;
 		}
 
@@ -198,6 +205,7 @@ public class DefaultMBListDisplayContext implements MBListDisplayContext {
 				MBThreadServiceUtil.getGroupThreads(
 					themeDisplay.getScopeGroupId(), groupThreadsUserId, status,
 					searchContainer.getStart(), searchContainer.getEnd()));
+
 			searchContainer.setEmptyResultsMessage("you-do-not-have-any-posts");
 		}
 		else {
@@ -213,13 +221,19 @@ public class DefaultMBListDisplayContext implements MBListDisplayContext {
 				status = WorkflowConstants.STATUS_ANY;
 			}
 
+			QueryDefinition<?> queryDefinition = new QueryDefinition<>(
+				status, themeDisplay.getUserId(), true,
+				searchContainer.getStart(), searchContainer.getEnd(),
+				searchContainer.getOrderByComparator());
+
 			searchContainer.setTotal(
-				MBCategoryLocalServiceUtil.getCategoriesAndThreadsCount(
-					themeDisplay.getScopeGroupId(), _categoryId, status));
+				MBCategoryServiceUtil.getCategoriesAndThreadsCount(
+					themeDisplay.getScopeGroupId(), _categoryId,
+					queryDefinition));
 			searchContainer.setResults(
 				MBCategoryServiceUtil.getCategoriesAndThreads(
-					themeDisplay.getScopeGroupId(), _categoryId, status,
-					searchContainer.getStart(), searchContainer.getEnd()));
+					themeDisplay.getScopeGroupId(), _categoryId,
+					queryDefinition));
 		}
 	}
 

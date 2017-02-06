@@ -20,6 +20,8 @@ import com.liferay.journal.model.JournalArticleConstants;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.configuration.icon.BasePortletConfigurationIcon;
 import com.liferay.portal.kernel.portlet.configuration.icon.PortletConfigurationIcon;
 import com.liferay.portal.kernel.theme.PortletDisplay;
@@ -27,7 +29,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.AggregateResourceBundle;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -88,7 +90,7 @@ public class ViewJournalSourcePortletConfigurationIcon
 			"content.Language", locale, getClass());
 
 		return new AggregateResourceBundle(
-			classResourceBundle, PortalUtil.getResourceBundle(locale));
+			classResourceBundle, _portal.getResourceBundle(locale));
 	}
 
 	@Override
@@ -127,6 +129,7 @@ public class ViewJournalSourcePortletConfigurationIcon
 
 		long groupId = ParamUtil.getLong(
 			request, "groupId", themeDisplay.getScopeGroupId());
+
 		long classNameId = ParamUtil.getLong(request, "classNameId");
 		long classPK = ParamUtil.getLong(request, "classPK");
 		String articleId = ParamUtil.getString(request, "articleId");
@@ -142,13 +145,20 @@ public class ViewJournalSourcePortletConfigurationIcon
 		else if ((classNameId > 0) &&
 				 (classPK > JournalArticleConstants.CLASSNAME_ID_DEFAULT)) {
 
-			String className = PortalUtil.getClassName(classNameId);
+			String className = _portal.getClassName(classNameId);
 
 			try {
 				article = _journalArticleLocalService.getLatestArticle(
 					groupId, className, classPK);
 			}
 			catch (PortalException pe) {
+
+				// LPS-52675
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(pe, pe);
+				}
+
 				return null;
 			}
 		}
@@ -157,8 +167,8 @@ public class ViewJournalSourcePortletConfigurationIcon
 	}
 
 	protected JournalArticle getArticle(PortletRequest request) {
-		HttpServletRequest httpServletRequest =
-			PortalUtil.getHttpServletRequest(request);
+		HttpServletRequest httpServletRequest = _portal.getHttpServletRequest(
+			request);
 
 		return getArticle(httpServletRequest);
 	}
@@ -192,6 +202,7 @@ public class ViewJournalSourcePortletConfigurationIcon
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
 		sb.append(HtmlUtil.escape(portletDisplay.getNamespace()));
+
 		sb.append("viewSource', namespace: '");
 		sb.append(portletDisplay.getNamespace());
 		sb.append("', portlet: '#p_p_id_");
@@ -214,6 +225,12 @@ public class ViewJournalSourcePortletConfigurationIcon
 		_journalArticleLocalService = journalArticleLocalService;
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		ViewJournalSourcePortletConfigurationIcon.class);
+
 	private JournalArticleLocalService _journalArticleLocalService;
+
+	@Reference
+	private Portal _portal;
 
 }
