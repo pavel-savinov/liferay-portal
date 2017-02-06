@@ -275,12 +275,12 @@ public class FriendlyURLLocalizationLocalServiceUtil {
 		return getService().getFriendlyURLLocalizations(start, end);
 	}
 
-	public static java.util.List<com.liferay.friendly.url.model.FriendlyURLLocalization> updateFriendlyURLLocaliozations(
+	public static java.util.List<com.liferay.friendly.url.model.FriendlyURLLocalization> updateFriendlyURLLocalizations(
 		long companyId, long groupId, long friendlyURLId,
 		java.util.Map<java.util.Locale, java.lang.String> urlTitleMap)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService()
-				   .updateFriendlyURLLocaliozations(companyId, groupId,
+				   .updateFriendlyURLLocalizations(companyId, groupId,
 			friendlyURLId, urlTitleMap);
 	}
 

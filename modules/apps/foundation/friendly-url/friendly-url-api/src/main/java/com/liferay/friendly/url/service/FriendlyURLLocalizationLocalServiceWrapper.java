@@ -283,11 +283,11 @@ public class FriendlyURLLocalizationLocalServiceWrapper
 	}
 
 	@Override
-	public java.util.List<com.liferay.friendly.url.model.FriendlyURLLocalization> updateFriendlyURLLocaliozations(
+	public java.util.List<com.liferay.friendly.url.model.FriendlyURLLocalization> updateFriendlyURLLocalizations(
 		long companyId, long groupId, long friendlyURLId,
 		java.util.Map<java.util.Locale, java.lang.String> urlTitleMap)
 		throws com.liferay.portal.kernel.exception.PortalException {
-		return _friendlyURLLocalizationLocalService.updateFriendlyURLLocaliozations(companyId,
+		return _friendlyURLLocalizationLocalService.updateFriendlyURLLocalizations(companyId,
 			groupId, friendlyURLId, urlTitleMap);
 	}
 

@@ -242,7 +242,7 @@ public interface FriendlyURLLocalizationLocalService extends BaseLocalService,
 	public List<FriendlyURLLocalization> getFriendlyURLLocalizations(
 		int start, int end);
 
-	public List<FriendlyURLLocalization> updateFriendlyURLLocaliozations(
+	public List<FriendlyURLLocalization> updateFriendlyURLLocalizations(
 		long companyId, long groupId, long friendlyURLId,
 		Map<Locale, java.lang.String> urlTitleMap) throws PortalException;
 
