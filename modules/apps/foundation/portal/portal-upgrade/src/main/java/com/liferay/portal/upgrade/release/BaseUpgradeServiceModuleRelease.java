@@ -14,8 +14,11 @@
 
 package com.liferay.portal.upgrade.release;
 
+import com.liferay.portal.kernel.model.dao.ReleaseDAO;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.CharPool;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -26,10 +29,11 @@ import java.sql.SQLException;
  */
 public abstract class BaseUpgradeServiceModuleRelease extends UpgradeProcess {
 
+	@Override
 	protected void doUpgrade() throws Exception {
 		try (PreparedStatement ps = connection.prepareStatement(
-				"select buildNumber from Release_ where " +
-					"servletContextName = ?")) {
+				"select buildNumber from Release_ where servletContextName = " +
+					"?")) {
 
 			ps.setString(1, getOldBundleSymbolicName());
 
@@ -39,13 +43,47 @@ public abstract class BaseUpgradeServiceModuleRelease extends UpgradeProcess {
 
 					_updateRelease(_toSchemaVersion(buildNumber));
 				}
+				else if (_hasServiceComponent()) {
+					_createRelease();
+				}
 			}
 		}
+	}
+
+	protected String getNamespace() {
+		return StringPool.BLANK;
 	}
 
 	protected abstract String getNewBundleSymbolicName();
 
 	protected abstract String getOldBundleSymbolicName();
+
+	private void _createRelease() throws SQLException {
+		ReleaseDAO releaseDAO = new ReleaseDAO();
+
+		releaseDAO.addRelease(connection, getNewBundleSymbolicName());
+	}
+
+	private boolean _hasServiceComponent() throws SQLException {
+		if (Validator.isNull(getNamespace())) {
+			return false;
+		}
+
+		try (PreparedStatement ps = connection.prepareStatement(
+				"select serviceComponentId from ServiceComponent where " +
+					"buildNamespace = ?")) {
+
+			ps.setString(1, getNamespace());
+
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
 
 	private String _toSchemaVersion(String buildNumber) {
 		StringBuilder sb = new StringBuilder(2 * buildNumber.length());
@@ -64,8 +102,8 @@ public abstract class BaseUpgradeServiceModuleRelease extends UpgradeProcess {
 
 	private void _updateRelease(String schemaVersion) throws SQLException {
 		try (PreparedStatement ps = connection.prepareStatement(
-				"update Release_ set servletContextName = ?, " +
-					"schemaVersion = ? where servletContextName = ?")) {
+				"update Release_ set servletContextName = ?, schemaVersion = " +
+					"? where servletContextName = ?")) {
 
 			ps.setString(1, getNewBundleSymbolicName());
 			ps.setString(2, schemaVersion);

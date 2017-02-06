@@ -32,10 +32,9 @@ import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidation;
 	rules = {
 		@DDMFormRule(
 			actions = {
-				"set(fieldAt(\"ddmDataProviderInstanceId\", 0), \"visible\", equals(get(fieldAt(\"dataSourceType\", 0), \"value\"), \"data-provider\"))",
-				"set(fieldAt(\"options\", 0), \"visible\", equals(get(fieldAt(\"dataSourceType\", 0), \"value\"), \"manual\"))",
-				"set(fieldAt(\"validation\", 0), \"visible\", false)"
-			}
+				"call('getDataProviderInstanceOutputParameters', 'dataProviderInstanceId=ddmDataProviderInstanceId', 'ddmDataProviderInstanceOutput={key: outputParameterName, value: outputParameterName}')"
+			},
+			condition = "not(equals(getValue('ddmDataProviderInstanceId'), 0))"
 		)
 	}
 )
@@ -51,7 +50,8 @@ import com.liferay.dynamic.data.mapping.model.DDMFormFieldValidation;
 							size = 12,
 							value = {
 								"label", "tip", "required", "dataSourceType",
-								"options", "ddmDataProviderInstanceId"
+								"options", "ddmDataProviderInstanceId",
+								"ddmDataProviderInstanceOutput"
 							}
 						)
 					}
@@ -90,20 +90,35 @@ public interface SelectDDMFormFieldTypeSettings
 	public String dataSourceType();
 
 	@DDMFormField(
-		label = "%choose-a-data-provider", required = true, type = "select"
+		label = "%choose-a-data-provider", required = true, type = "select",
+		visibilityExpression = "equals(dataSourceType, \"data-provider\")"
 	)
 	public long ddmDataProviderInstanceId();
 
-	@DDMFormField(label = "%multiple", properties = {"showAsSwitcher=true"})
+	@DDMFormField(
+		label = "%choose-an-output-parameter",
+		properties = {
+			"tooltip=%choose-an-output-parameter-for-a-data-provider-previously-created"
+		},
+		required = true, type = "select",
+		visibilityExpression = "equals(dataSourceType, \"data-provider\")"
+	)
+	public String ddmDataProviderInstanceOutput();
+
+	@DDMFormField(
+		label = "%allow-multiple-selections",
+		properties = {"showAsSwitcher=true"}
+	)
 	public boolean multiple();
 
 	@DDMFormField(
 		dataType = "ddm-options", label = "%options",
-		properties = {"showLabel=false"}, required = true, type = "options"
+		properties = {"showLabel=false"}, required = true, type = "options",
+		visibilityExpression = "equals(dataSourceType, \"manual\")"
 	)
 	public DDMFormFieldOptions options();
 
-	@DDMFormField
+	@DDMFormField(visibilityExpression = "FALSE")
 	@Override
 	public DDMFormFieldValidation validation();
 

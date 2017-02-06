@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.exportimport.service.impl;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
 import com.liferay.document.library.kernel.exception.NoSuchFolderException;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
@@ -45,6 +47,8 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.route.model.GroupFriendlyURL;
+import com.liferay.portal.kernel.route.service.GroupFriendlyURLLocalServiceUtil;
 import com.liferay.portal.kernel.security.auth.HttpPrincipal;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.auth.RemoteAuthException;
@@ -88,6 +92,7 @@ import javax.portlet.PortletRequest;
  * @author Mate Thurzo
  * @author Vilmos Papp
  */
+@ProviderType
 public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 
 	@Override
@@ -564,13 +569,26 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			parentGroupId = parentGroup.getGroupId();
 		}
 
+		Map<Locale, String> groupFriendlyURLMap = new HashMap<>();
+
+		List<GroupFriendlyURL> groupFriendlyURLs =
+			GroupFriendlyURLLocalServiceUtil.getGroupFriendlyURLs(
+				liveGroup.getCompanyId(), liveGroup.getGroupId());
+
+		for (GroupFriendlyURL groupFriendlyURL : groupFriendlyURLs) {
+			groupFriendlyURLMap.put(
+				LocaleUtil.fromLanguageId(
+					groupFriendlyURL.getLanguageId()),
+				groupFriendlyURL.getFriendlyURL());
+		}
+
 		Group stagingGroup = groupLocalService.addGroup(
 			userId, parentGroupId, liveGroup.getClassName(),
 			liveGroup.getClassPK(), liveGroup.getGroupId(),
 			liveGroup.getNameMap(), liveGroup.getDescriptionMap(),
 			liveGroup.getType(), liveGroup.isManualMembership(),
-			liveGroup.getMembershipRestriction(), liveGroup.getFriendlyURL(),
-			false, liveGroup.isActive(), serviceContext);
+			liveGroup.getMembershipRestriction(), groupFriendlyURLMap,
+			false, true, serviceContext);
 
 		if (LanguageUtil.isInheritLocales(liveGroup.getGroupId())) {
 			return stagingGroup;
@@ -697,6 +715,13 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			}
 		}
 		catch (PrincipalException pe) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe, pe);
+			}
+
 			RemoteExportException ree = new RemoteExportException(
 				RemoteExportException.NO_PERMISSIONS);
 
@@ -705,11 +730,25 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			throw ree;
 		}
 		catch (RemoteAuthException rae) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(rae, rae);
+			}
+
 			rae.setURL(remoteURL);
 
 			throw rae;
 		}
 		catch (SystemException se) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(se, se);
+			}
+
 			if (!forceDisable) {
 				RemoteExportException ree = new RemoteExportException(
 					RemoteExportException.BAD_CONNECTION);
@@ -741,6 +780,13 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			GroupServiceHttp.enableStaging(httpPrincipal, remoteGroupId);
 		}
 		catch (NoSuchGroupException nsge) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(nsge, nsge);
+			}
+
 			RemoteExportException ree = new RemoteExportException(
 				RemoteExportException.NO_GROUP);
 
@@ -749,6 +795,13 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			throw ree;
 		}
 		catch (PrincipalException pe) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe, pe);
+			}
+
 			RemoteExportException ree = new RemoteExportException(
 				RemoteExportException.NO_PERMISSIONS);
 
@@ -757,11 +810,25 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			throw ree;
 		}
 		catch (RemoteAuthException rae) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(rae, rae);
+			}
+
 			rae.setURL(remoteURL);
 
 			throw rae;
 		}
 		catch (SystemException se) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(se, se);
+			}
+
 			RemoteExportException ree = new RemoteExportException(
 				RemoteExportException.BAD_CONNECTION);
 
@@ -781,6 +848,13 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 				getAssembledFileName(stagingRequestId));
 		}
 		catch (NoSuchFileEntryException nsfee) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(nsfee, nsfee);
+			}
+
 			return null;
 		}
 	}
@@ -957,6 +1031,13 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 				httpPrincipal, remoteGroupId, stagedPortletIds);
 		}
 		catch (NoSuchGroupException nsge) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(nsge, nsge);
+			}
+
 			RemoteExportException ree = new RemoteExportException(
 				RemoteExportException.NO_GROUP);
 
@@ -965,6 +1046,13 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			throw ree;
 		}
 		catch (PrincipalException pe) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe, pe);
+			}
+
 			RemoteExportException ree = new RemoteExportException(
 				RemoteExportException.NO_PERMISSIONS);
 
@@ -973,11 +1061,25 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			throw ree;
 		}
 		catch (RemoteAuthException rae) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(rae, rae);
+			}
+
 			rae.setURL(remoteURL);
 
 			throw rae;
 		}
 		catch (SystemException se) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(se, se);
+			}
+
 			RemoteExportException ree = new RemoteExportException(
 				RemoteExportException.BAD_CONNECTION);
 

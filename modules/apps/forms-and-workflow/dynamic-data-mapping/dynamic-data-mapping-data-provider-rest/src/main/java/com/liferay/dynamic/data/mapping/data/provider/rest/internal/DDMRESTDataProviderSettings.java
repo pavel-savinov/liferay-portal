@@ -20,11 +20,23 @@ import com.liferay.dynamic.data.mapping.annotations.DDMFormLayout;
 import com.liferay.dynamic.data.mapping.annotations.DDMFormLayoutColumn;
 import com.liferay.dynamic.data.mapping.annotations.DDMFormLayoutPage;
 import com.liferay.dynamic.data.mapping.annotations.DDMFormLayoutRow;
+import com.liferay.dynamic.data.mapping.annotations.DDMFormRule;
+import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderParameterSettings;
 
 /**
  * @author Marcellus Tavares
  */
-@DDMForm
+@DDMForm(
+	rules = {
+		@DDMFormRule(
+			actions = {
+				"setVisible('filterParameterName', true)",
+				"setRequired('filterParameterName', true)"
+			},
+			condition = "equals(getValue('filterable'), true)"
+		)
+	}
+)
 @DDMFormLayout(
 	{
 		@DDMFormLayoutPage(
@@ -34,8 +46,9 @@ import com.liferay.dynamic.data.mapping.annotations.DDMFormLayoutRow;
 						@DDMFormLayoutColumn(
 							size = 12,
 							value = {
-								"url", "key", "value", "username", "password",
-								"cacheable"
+								"url", "username", "password", "filterable",
+								"filterParameterName", "cacheable",
+								"inputParameters", "outputParameters"
 							}
 						)
 					}
@@ -44,7 +57,8 @@ import com.liferay.dynamic.data.mapping.annotations.DDMFormLayoutRow;
 		)
 	}
 )
-public interface DDMRESTDataProviderSettings {
+public interface DDMRESTDataProviderSettings
+	extends DDMDataProviderParameterSettings {
 
 	@DDMFormField(
 		label = "%cache-data-on-the-first-request",
@@ -53,14 +67,19 @@ public interface DDMRESTDataProviderSettings {
 	public boolean cacheable();
 
 	@DDMFormField(
-		label = "%displayed-json-attribute",
-		properties = {
-			"placeholder=%enter-the-attribute-to-be-displayed",
-			"tooltip=%the-attribute-whose-value-is-displayed-to-the-end-user-for-selection"
-		},
-		required = true
+		label = "%support-filtering-by-keyword",
+		properties = "showAsSwitcher=true"
 	)
-	public String key();
+	public boolean filterable();
+
+	@DDMFormField(
+		label = "%filter-parameter-name",
+		properties = {
+			"placeholder=%enter-a-name-that-matches-one-of-the-rest-providers-parameters",
+			"tooltip=%the-parameter-whose-value-will-be-used-as-a-filter-by-the-rest-provider"
+		}
+	)
+	public String filterParameterName();
 
 	@DDMFormField(
 		label = "%password",
@@ -86,15 +105,5 @@ public interface DDMRESTDataProviderSettings {
 		}
 	)
 	public String username();
-
-	@DDMFormField(
-		label = "%stored-json-attribute",
-		properties = {
-			"placeholder=%enter-the-attribute-to-be-stored",
-			"tooltip=%the-attribute-whose-value-is-stored-in-the-database-when-selected-by-a-user"
-		},
-		required = true
-	)
-	public String value();
 
 }

@@ -23,6 +23,7 @@ import com.liferay.dynamic.data.mapping.exception.StructureDefinitionException;
 import com.liferay.dynamic.data.mapping.exception.StructureDuplicateElementException;
 import com.liferay.dynamic.data.mapping.exception.StructureDuplicateStructureKeyException;
 import com.liferay.dynamic.data.mapping.exception.StructureNameException;
+import com.liferay.dynamic.data.mapping.internal.util.DDMFormTemplateSynchonizer;
 import com.liferay.dynamic.data.mapping.io.DDMFormJSONDeserializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormJSONSerializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormXSDDeserializer;
@@ -42,7 +43,6 @@ import com.liferay.dynamic.data.mapping.service.permission.DDMStructurePermissio
 import com.liferay.dynamic.data.mapping.storage.StorageType;
 import com.liferay.dynamic.data.mapping.util.DDM;
 import com.liferay.dynamic.data.mapping.util.DDMXML;
-import com.liferay.dynamic.data.mapping.util.impl.DDMFormTemplateSynchonizer;
 import com.liferay.dynamic.data.mapping.validator.DDMFormValidationException;
 import com.liferay.dynamic.data.mapping.validator.DDMFormValidator;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
@@ -127,7 +127,7 @@ public class DDMStructureLocalServiceImpl
 
 		// Structure
 
-		User user = userPersistence.findByPrimaryKey(userId);
+		User user = userLocalService.getUser(userId);
 
 		if (Validator.isNull(structureKey)) {
 			structureKey = String.valueOf(counterLocalService.increment());
@@ -220,7 +220,7 @@ public class DDMStructureLocalServiceImpl
 	 *             UUID, creation date, modification date, guest permissions,
 	 *             and group permissions for the structure.
 	 * @return     the structure
-	 * @deprecated As of 7.0.0, replaced by {@link #addStructure(long, long,
+	 * @deprecated As of 2.1.0, replaced by {@link #addStructure(long, long,
 	 *             long, long, String, Map, Map, DDMForm, DDMFormLayout, String,
 	 *             int, ServiceContext)}
 	 */
@@ -276,7 +276,7 @@ public class DDMStructureLocalServiceImpl
 	 *             UUID, creation date, modification date, guest permissions,
 	 *             and group permissions for the structure.
 	 * @return     the structure
-	 * @deprecated As of 7.0.0, replaced by {@link #addStructure(long, long,
+	 * @deprecated As of 2.1.0, replaced by {@link #addStructure(long, long,
 	 *             long, Map, Map, DDMForm, DDMFormLayout, ServiceContext)}
 	 */
 	@Deprecated
@@ -343,7 +343,7 @@ public class DDMStructureLocalServiceImpl
 	 *             UUID, creation date, modification date, guest permissions and
 	 *             group permissions for the structure.
 	 * @return     the structure
-	 * @deprecated As of 7.0.0, replaced by {@link #addStructure(long, long,
+	 * @deprecated As of 2.1.0, replaced by {@link #addStructure(long, long,
 	 *             String, long, String, Map, Map, DDMForm, DDMFormLayout,
 	 *             String, int, ServiceContext)}
 	 */
@@ -1005,6 +1005,41 @@ public class DDMStructureLocalServiceImpl
 			groupId, classNameId, start, end, orderByComparator);
 	}
 
+	/**
+	 * Returns an ordered range of all the structures matching the group,
+	 * class name ID, name, and description.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end -
+	 * start</code> instances. <code>start</code> and <code>end</code> are not
+	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
+	 * refers to the first result in the set. Setting both <code>start</code>
+	 * and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
+	 * result set.
+	 * </p>
+	 *
+	 * @param  groupId the primary key of the group
+	 * @param  classNameId the primary key of the class name for the structure's
+	 *         related model
+	 * @param  name the name keywords
+	 * @param  description the description keywords
+	 * @param  start the lower bound of the range of structures to return
+	 * @param  end the upper bound of the range of structures to return (not
+	 *         inclusive)
+	 * @param  orderByComparator the comparator to order the structures
+	 *         (optionally <code>null</code>)
+	 * @return the range of matching structures ordered by the comparator
+	 */
+	@Override
+	public List<DDMStructure> getStructures(
+		long groupId, long classNameId, String name, String description,
+		int start, int end, OrderByComparator<DDMStructure> orderByComparator) {
+
+		return ddmStructurePersistence.findByG_C_N_D(
+			groupId, classNameId, name, description, start, end,
+			orderByComparator);
+	}
+
 	@Override
 	public List<DDMStructure> getStructures(
 		long groupId, String name, String description) {
@@ -1341,7 +1376,7 @@ public class DDMStructureLocalServiceImpl
 	 * @param      serviceContext the service context to be applied. Can set the
 	 *             structure's modification date.
 	 * @return     the updated structure
-	 * @deprecated As of 7.0.0, replaced by {@link #updateStructure(long, long,
+	 * @deprecated As of 2.1.0, replaced by {@link #updateStructure(long, long,
 	 *             long, long, String, Map, Map, DDMForm, DDMFormLayout,
 	 *             ServiceContext)}
 	 */
@@ -1386,7 +1421,7 @@ public class DDMStructureLocalServiceImpl
 	 * @param      serviceContext the service context to be applied. Can set the
 	 *             structure's modification date.
 	 * @return     the updated structure
-	 * @deprecated As of 7.0.0, replaced by {@link #updateStructure(long, long,
+	 * @deprecated As of 2.1.0, replaced by {@link #updateStructure(long, long,
 	 *             long, Map, Map, DDMForm, DDMFormLayout, ServiceContext)}
 	 */
 	@Deprecated
@@ -1423,7 +1458,7 @@ public class DDMStructureLocalServiceImpl
 	 * @param      serviceContext the service context to be applied. Can set the
 	 *             structure's modification date.
 	 * @return     the updated structure
-	 * @deprecated As of 7.0.0, replaced by {@link #updateStructure(long,
+	 * @deprecated As of 2.1.0, replaced by {@link #updateStructure(long,
 	 *             DDMForm, DDMFormLayout, ServiceContext)}
 	 */
 	@Deprecated
@@ -1540,7 +1575,7 @@ public class DDMStructureLocalServiceImpl
 
 		// Structure
 
-		User user = userPersistence.findByPrimaryKey(userId);
+		User user = userLocalService.getUser(userId);
 
 		DDMForm parentDDMForm = getParentDDMForm(parentStructureId);
 
@@ -1560,6 +1595,7 @@ public class DDMStructureLocalServiceImpl
 			latestStructureVersion.getVersion(), majorVersion);
 
 		structure.setVersion(version);
+
 		structure.setNameMap(nameMap);
 		structure.setVersionUserId(user.getUserId());
 		structure.setVersionUserName(user.getFullName());
@@ -1946,7 +1982,7 @@ public class DDMStructureLocalServiceImpl
 	protected DDMXML ddmXML;
 
 	private final Pattern _callFunctionPattern = Pattern.compile(
-		"call\\(\\s*([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-" +
-			"[0-9a-f]{12})");
+		"call\\(\\s*\"([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-" +
+			"[0-9a-f]{12})\"\\s*,\\s*\"(.*)\"\\s*,\\s*\"(.*)\"\\s*\\)");
 
 }

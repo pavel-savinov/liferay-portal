@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
+import com.liferay.portal.kernel.route.service.persistence.GroupFriendlyURLPersistence;
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.GroupService;
 import com.liferay.portal.kernel.service.persistence.AccountPersistence;
@@ -64,7 +65,6 @@ import com.liferay.portal.kernel.service.persistence.ResourceTypePermissionFinde
 import com.liferay.portal.kernel.service.persistence.ResourceTypePermissionPersistence;
 import com.liferay.portal.kernel.service.persistence.RoleFinder;
 import com.liferay.portal.kernel.service.persistence.RolePersistence;
-import com.liferay.portal.kernel.service.persistence.SubscriptionPersistence;
 import com.liferay.portal.kernel.service.persistence.TeamFinder;
 import com.liferay.portal.kernel.service.persistence.TeamPersistence;
 import com.liferay.portal.kernel.service.persistence.UserFinder;
@@ -369,6 +369,44 @@ public abstract class GroupServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
+	 * Returns the group friendly url local service.
+	 *
+	 * @return the group friendly url local service
+	 */
+	public com.liferay.portal.kernel.route.service.GroupFriendlyURLLocalService getGroupFriendlyURLLocalService() {
+		return groupFriendlyURLLocalService;
+	}
+
+	/**
+	 * Sets the group friendly url local service.
+	 *
+	 * @param groupFriendlyURLLocalService the group friendly url local service
+	 */
+	public void setGroupFriendlyURLLocalService(
+		com.liferay.portal.kernel.route.service.GroupFriendlyURLLocalService groupFriendlyURLLocalService) {
+		this.groupFriendlyURLLocalService = groupFriendlyURLLocalService;
+	}
+
+	/**
+	 * Returns the group friendly url persistence.
+	 *
+	 * @return the group friendly url persistence
+	 */
+	public GroupFriendlyURLPersistence getGroupFriendlyURLPersistence() {
+		return groupFriendlyURLPersistence;
+	}
+
+	/**
+	 * Sets the group friendly url persistence.
+	 *
+	 * @param groupFriendlyURLPersistence the group friendly url persistence
+	 */
+	public void setGroupFriendlyURLPersistence(
+		GroupFriendlyURLPersistence groupFriendlyURLPersistence) {
+		this.groupFriendlyURLPersistence = groupFriendlyURLPersistence;
+	}
+
+	/**
 	 * Returns the asset category local service.
 	 *
 	 * @return the asset category local service
@@ -669,18 +707,18 @@ public abstract class GroupServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
-	 * Returns the d l app local service.
+	 * Returns the dl app local service.
 	 *
-	 * @return the d l app local service
+	 * @return the dl app local service
 	 */
 	public com.liferay.document.library.kernel.service.DLAppLocalService getDLAppLocalService() {
 		return dlAppLocalService;
 	}
 
 	/**
-	 * Sets the d l app local service.
+	 * Sets the dl app local service.
 	 *
-	 * @param dlAppLocalService the d l app local service
+	 * @param dlAppLocalService the dl app local service
 	 */
 	public void setDLAppLocalService(
 		com.liferay.document.library.kernel.service.DLAppLocalService dlAppLocalService) {
@@ -688,18 +726,18 @@ public abstract class GroupServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
-	 * Returns the d l app remote service.
+	 * Returns the dl app remote service.
 	 *
-	 * @return the d l app remote service
+	 * @return the dl app remote service
 	 */
 	public com.liferay.document.library.kernel.service.DLAppService getDLAppService() {
 		return dlAppService;
 	}
 
 	/**
-	 * Sets the d l app remote service.
+	 * Sets the dl app remote service.
 	 *
-	 * @param dlAppService the d l app remote service
+	 * @param dlAppService the dl app remote service
 	 */
 	public void setDLAppService(
 		com.liferay.document.library.kernel.service.DLAppService dlAppService) {
@@ -2049,44 +2087,6 @@ public abstract class GroupServiceBaseImpl extends BaseServiceImpl
 	}
 
 	/**
-	 * Returns the subscription local service.
-	 *
-	 * @return the subscription local service
-	 */
-	public com.liferay.portal.kernel.service.SubscriptionLocalService getSubscriptionLocalService() {
-		return subscriptionLocalService;
-	}
-
-	/**
-	 * Sets the subscription local service.
-	 *
-	 * @param subscriptionLocalService the subscription local service
-	 */
-	public void setSubscriptionLocalService(
-		com.liferay.portal.kernel.service.SubscriptionLocalService subscriptionLocalService) {
-		this.subscriptionLocalService = subscriptionLocalService;
-	}
-
-	/**
-	 * Returns the subscription persistence.
-	 *
-	 * @return the subscription persistence
-	 */
-	public SubscriptionPersistence getSubscriptionPersistence() {
-		return subscriptionPersistence;
-	}
-
-	/**
-	 * Sets the subscription persistence.
-	 *
-	 * @param subscriptionPersistence the subscription persistence
-	 */
-	public void setSubscriptionPersistence(
-		SubscriptionPersistence subscriptionPersistence) {
-		this.subscriptionPersistence = subscriptionPersistence;
-	}
-
-	/**
 	 * Returns the team local service.
 	 *
 	 * @return the team local service
@@ -2574,6 +2574,10 @@ public abstract class GroupServiceBaseImpl extends BaseServiceImpl
 	protected com.liferay.portal.kernel.service.CompanyService companyService;
 	@BeanReference(type = CompanyPersistence.class)
 	protected CompanyPersistence companyPersistence;
+	@BeanReference(type = com.liferay.portal.kernel.route.service.GroupFriendlyURLLocalService.class)
+	protected com.liferay.portal.kernel.route.service.GroupFriendlyURLLocalService groupFriendlyURLLocalService;
+	@BeanReference(type = GroupFriendlyURLPersistence.class)
+	protected GroupFriendlyURLPersistence groupFriendlyURLPersistence;
 	@BeanReference(type = com.liferay.asset.kernel.service.AssetCategoryLocalService.class)
 	protected com.liferay.asset.kernel.service.AssetCategoryLocalService assetCategoryLocalService;
 	@BeanReference(type = com.liferay.asset.kernel.service.AssetCategoryService.class)
@@ -2752,10 +2756,6 @@ public abstract class GroupServiceBaseImpl extends BaseServiceImpl
 	protected RolePersistence rolePersistence;
 	@BeanReference(type = RoleFinder.class)
 	protected RoleFinder roleFinder;
-	@BeanReference(type = com.liferay.portal.kernel.service.SubscriptionLocalService.class)
-	protected com.liferay.portal.kernel.service.SubscriptionLocalService subscriptionLocalService;
-	@BeanReference(type = SubscriptionPersistence.class)
-	protected SubscriptionPersistence subscriptionPersistence;
 	@BeanReference(type = com.liferay.portal.kernel.service.TeamLocalService.class)
 	protected com.liferay.portal.kernel.service.TeamLocalService teamLocalService;
 	@BeanReference(type = com.liferay.portal.kernel.service.TeamService.class)

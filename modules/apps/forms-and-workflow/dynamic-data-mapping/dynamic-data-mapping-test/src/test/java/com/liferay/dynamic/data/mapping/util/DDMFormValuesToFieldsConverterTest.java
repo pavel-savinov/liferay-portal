@@ -15,6 +15,8 @@
 package com.liferay.dynamic.data.mapping.util;
 
 import com.liferay.dynamic.data.mapping.BaseDDMTestCase;
+import com.liferay.dynamic.data.mapping.internal.util.DDMFormValuesToFieldsConverterImpl;
+import com.liferay.dynamic.data.mapping.internal.util.DDMImpl;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
@@ -26,8 +28,6 @@ import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.storage.Field;
 import com.liferay.dynamic.data.mapping.storage.Fields;
-import com.liferay.dynamic.data.mapping.util.impl.DDMFormValuesToFieldsConverterImpl;
-import com.liferay.dynamic.data.mapping.util.impl.DDMImpl;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringPool;
 
@@ -109,6 +109,7 @@ public class DDMFormValuesToFieldsConverterTest extends BaseDDMTestCase {
 		Class<?> clazz = value.getClass();
 
 		Assert.assertEquals(true, clazz.isAssignableFrom(Boolean.class));
+
 		Assert.assertEquals(true, value);
 
 		Field fieldsDisplayField = fields.get(DDMImpl.FIELDS_DISPLAY_NAME);

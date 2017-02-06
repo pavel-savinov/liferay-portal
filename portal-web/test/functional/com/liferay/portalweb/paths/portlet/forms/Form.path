@@ -9,8 +9,13 @@
 </thead>
 <tbody>
 <tr>
-	<td>SAVE_BUTTON</td>
-	<td>//div[@class='button-holder ddl-form-builder-buttons']//button[contains(.,'Save') and not (contains(@class,'disabled'))]</td>
+	<td>SAVE_NOTIFICATION</td>
+	<td>//div[contains(@class,'autosave-bar')]/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SAVE_FORM_BUTTON</td>
+	<td>//div[@class='button-holder ddl-form-builder-buttons']//button[contains(.,'Save Form') and not (contains(@class,'disabled'))]</td>
 	<td></td>
 </tr>
 <tr>
@@ -46,6 +51,11 @@
 <tr>
 	<td>PAGE_DESCRIPTION_FIELD</td>
 	<td>//textarea[contains(@class,'form-builder-page-header-description')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FORM_PAGE</td>
+	<td>//ul[contains(@class,'multi-step-progress-bar')]//li/div[contains(.,'${key_formPageName}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -123,6 +133,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>PUBLISH_URL_FORM_PAGE</td>
+	<td>//div[contains(@class,'form-builder-app')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -131,6 +146,16 @@
 <tr>
 	<td>SETTINGS_TAB_EMAIL_NOTIFICATIONS</td>
 	<td>//a[contains(@class,'tab-content') and contains(.,'Email Notifications')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SETTINGS_TAB_WORKFLOW_CONFIGURATION_FIELD</td>
+	<td>//div[contains(@data-fieldname,'workflowDefinition')]//a[contains(@id,'workflowDefinition')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SETTINGS_TAB_WORKFLOW_CONFIGURATION</td>
+	<td>//div[contains(@data-fieldname,'workflowDefinition')]//a[contains(@id,'workflowDefinition')]/following-sibling::div[@class='drop-chosen']//li[contains(.,'${key_workflowDefinition}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -150,6 +175,11 @@
 	<td></td>
 </tr>
 <!--SIDEBAR -->
+<tr>
+	<td>SIDEBAR_HEADER</td>
+	<td>//h4[contains(@class,'form-builder-sidebar-title')]</td>
+	<td></td>
+</tr>
 <tr>
 	<td>SIDEBAR_PROPERTIES_TAB</td>
 	<td>//a[contains(@class,'tab') and .='properties']</td>
@@ -173,6 +203,52 @@
 <tr>
 	<td>SIDEBAR_CLOSE</td>
 	<td>//div[contains(@class,'sidebar-header')]//a[contains(@class,'close')]</td>
+	<td></td>
+</tr>
+<!--DATA_PROVIDER_OUTPUT_PARAMETER-->
+<tr>
+	<td>DATA_PROVIDER_OUTPUT_PARAMETER_PATH_FIELD</td>
+	<td>//div[contains(@data-fieldname,'outputParameters')]//input[@type='text' and contains(@id,'outputParameters') and contains(@placeholder,'path')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DATA_PROVIDER_OUTPUT_PARAMETER_PATH_FIELD_2</td>
+	<td>//div[contains(@data-fieldname,'outputParameters')]/../following-sibling::div/div//input[@type='text' and contains(@id,'outputParameters') and contains(@placeholder,'path')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DATA_PROVIDER_OUTPUT_PARAMETER_NAME_FIELD</td>
+	<td>//div[contains(@data-fieldname,'outputParameters')]//input[@type='text' and contains(@id,'outputParameters') and contains(@placeholder,'name')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DATA_PROVIDER_OUTPUT_PARAMETER_NAME_FIELD_2</td>
+	<td>//div[contains(@data-fieldname,'outputParameters')]/../following-sibling::div/div//input[@type='text' and contains(@id,'outputParameters') and contains(@placeholder,'name')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DATA_PROVIDER_OUTPUT_PARAMETER_TYPE_FIELD</td>
+	<td>//div[contains(@data-fieldname,'outputParameters')]//div[contains(@class,'select-field')]//a[contains(@id,'outputParameterType')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DATA_PROVIDER_OUTPUT_PARAMETER_TYPE_FIELD_2</td>
+	<td>//div[contains(@data-fieldname,'outputParameters')]/../following-sibling::div//div[contains(@class,'select-field')]//a[contains(@id,'outputParameterType')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DATA_PROVIDER_OUTPUT_PARAMETER_TYPE_FIELD_OPTIONS_LIST</td>
+	<td>//div[contains(@data-fieldname,'outputParameters')]//div[contains(@class,'select-field')]//ul[@class='results-chosen']//li[contains(.,'${key_outputParameterType}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DATA_PROVIDER_OUTPUT_PARAMETER_TYPE_FIELD_OPTIONS_LIST_2</td>
+	<td>//div[contains(@data-fieldname,'outputParameters')]/../following-sibling::div//div[contains(@class,'select-field')]//ul[@class='results-chosen']//li[contains(.,'${key_outputParameterType}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DATA_PROVIDER_OUTPUT_PARAMETER_REPEAT_ICON</td>
+	<td>//div[contains(@data-fieldname,'outputParameters')]/following-sibling::div[contains(@class,'field-repeatable')]//a[contains(@class,'add-button')]</td>
 	<td></td>
 </tr>
 </tbody>
