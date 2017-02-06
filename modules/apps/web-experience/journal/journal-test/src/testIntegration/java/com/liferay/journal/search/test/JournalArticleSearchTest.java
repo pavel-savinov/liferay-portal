@@ -49,7 +49,6 @@ import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.PortalPreferencesLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.test.IdempotentRetryAssert;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.Sync;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
@@ -71,8 +70,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -116,13 +113,15 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 			PortletPreferencesFactoryUtil.getPortalPreferences(
 				TestPropsValues.getUserId(), true);
 
+		_originalPortalPreferencesXML = PortletPreferencesFactoryUtil.toXML(
+			portalPreferenceces);
+
 		portalPreferenceces.setValue("", "articleCommentsEnabled", "true");
 
-		_portalPreferences =
-			PortalPreferencesLocalServiceUtil.addPortalPreferences(
-				TestPropsValues.getCompanyId(),
-				PortletKeys.PREFS_OWNER_TYPE_COMPANY,
-				PortletPreferencesFactoryUtil.toXML(portalPreferenceces));
+		PortalPreferencesLocalServiceUtil.updatePreferences(
+			TestPropsValues.getCompanyId(),
+			PortletKeys.PREFS_OWNER_TYPE_COMPANY,
+			PortletPreferencesFactoryUtil.toXML(portalPreferenceces));
 
 		_journalServiceConfiguration =
 			ConfigurationProviderUtil.getCompanyConfiguration(
@@ -134,8 +133,10 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 
 	@After
 	public void tearDown() throws Exception {
-		PortalPreferencesLocalServiceUtil.deletePortalPreferences(
-			_portalPreferences);
+		PortalPreferencesLocalServiceUtil.updatePreferences(
+			TestPropsValues.getCompanyId(),
+			PortletKeys.PREFS_OWNER_TYPE_COMPANY,
+			_originalPortalPreferencesXML);
 	}
 
 	@Test
@@ -358,25 +359,12 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 	}
 
 	protected void assertEquals(
-			final long length, final BooleanQuery query,
-			final SearchContext searchContext)
+			long length, BooleanQuery query, SearchContext searchContext)
 		throws Exception {
 
-		IdempotentRetryAssert.retryAssert(
-			3, TimeUnit.SECONDS,
-			new Callable<Void>() {
+		Hits hits = IndexSearcherHelperUtil.search(searchContext, query);
 
-				@Override
-				public Void call() throws Exception {
-					Hits hits = IndexSearcherHelperUtil.search(
-						searchContext, query);
-
-					Assert.assertEquals(length, hits.getLength());
-
-					return null;
-				}
-
-			});
+		Assert.assertEquals(hits.toString(), length, hits.getLength());
 	}
 
 	@Override
@@ -488,14 +476,12 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 	}
 
 	@Override
-	protected long searchGroupEntriesCount(long groupId, long creatorUserId)
+	protected Hits searchGroupEntries(long groupId, long creatorUserId)
 		throws Exception {
 
-		Hits hits = JournalArticleServiceUtil.search(
+		return JournalArticleServiceUtil.search(
 			groupId, creatorUserId, WorkflowConstants.STATUS_APPROVED,
 			QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-
-		return hits.getLength();
 	}
 
 	protected void setUpDDMIndexer() {
@@ -611,7 +597,6 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 	private DDMIndexer _ddmIndexer;
 	private DDMStructure _ddmStructure;
 	private JournalServiceConfiguration _journalServiceConfiguration;
-	private com.liferay.portal.kernel.model.PortalPreferences
-		_portalPreferences;
+	private String _originalPortalPreferencesXML;
 
 }

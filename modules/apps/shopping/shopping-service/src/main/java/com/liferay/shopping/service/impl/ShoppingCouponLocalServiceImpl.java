@@ -60,10 +60,10 @@ public class ShoppingCouponLocalServiceImpl
 			double discount, String discountType, ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = userPersistence.findByPrimaryKey(userId);
+		User user = userLocalService.getUser(userId);
 		long groupId = serviceContext.getScopeGroupId();
 
-		code = StringUtil.toUpperCase(code.trim());
+		code = StringUtil.toUpperCase(StringUtil.trim(code));
 
 		if (autoCode) {
 			code = getCode();
@@ -146,7 +146,7 @@ public class ShoppingCouponLocalServiceImpl
 
 	@Override
 	public ShoppingCoupon getCoupon(String code) throws PortalException {
-		code = StringUtil.toUpperCase(code.trim());
+		code = StringUtil.toUpperCase(StringUtil.trim(code));
 
 		return shoppingCouponPersistence.findByCode(code);
 	}
@@ -181,7 +181,7 @@ public class ShoppingCouponLocalServiceImpl
 			String discountType, ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = userPersistence.findByPrimaryKey(userId);
+		User user = userLocalService.getUser(userId);
 
 		ShoppingCoupon coupon = shoppingCouponPersistence.findByPrimaryKey(
 			couponId);

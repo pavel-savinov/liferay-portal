@@ -31,7 +31,10 @@ import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 @DDMForm(
 	rules = {
 		@DDMFormRule(
-			actions = {"set(fieldAt(\"tooltip\", 0), \"visible\", false)"}
+			actions = {
+				"call('getDataProviderInstanceOutputParameters', 'dataProviderInstanceId=ddmDataProviderInstanceId', 'ddmDataProviderInstanceOutput={key: outputParameterName, value: outputParameterName}')"
+			},
+			condition = "not(equals(getValue('ddmDataProviderInstanceId'), 0))"
 		)
 	}
 )
@@ -60,7 +63,8 @@ import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 							size = 12,
 							value = {
 								"predefinedValue", "dataSourceType",
-								"ddmDataProviderInstanceId", "options",
+								"ddmDataProviderInstanceId",
+								"ddmDataProviderInstanceOutput", "options",
 								"placeholder", "visibilityExpression",
 								"validation", "fieldNamespace", "indexType",
 								"localizable", "readOnly", "dataType", "type",
@@ -92,6 +96,16 @@ public interface TextDDMFormFieldTypeSettings
 	public long ddmDataProviderInstanceId();
 
 	@DDMFormField(
+		label = "%choose-an-output-parameter",
+		properties = {
+			"tooltip=%choose-an-output-parameter-for-a-data-provider-previously-created"
+		},
+		type = "select",
+		visibilityExpression = "equals(dataSourceType, \"data-provider\")"
+	)
+	public String ddmDataProviderInstanceOutput();
+
+	@DDMFormField(
 		label = "%my-text-field-has",
 		optionLabels = {"%a-single-line", "%multiple-lines"},
 		optionValues = {"singleline", "multiline"},
@@ -102,7 +116,8 @@ public interface TextDDMFormFieldTypeSettings
 
 	@DDMFormField(
 		dataType = "ddm-options", label = "%options",
-		properties = {"showLabel=false"}, required = false, type = "options",
+		properties = {"showLabel=false", "allowEmptyOptions=true"},
+		required = false, type = "options",
 		visibilityExpression = "equals(dataSourceType, \"manual\")"
 	)
 	public DDMFormFieldOptions options();
@@ -117,7 +132,7 @@ public interface TextDDMFormFieldTypeSettings
 	)
 	public LocalizedValue placeholder();
 
-	@DDMFormField
+	@DDMFormField(visibilityExpression = "FALSE")
 	public LocalizedValue tooltip();
 
 }

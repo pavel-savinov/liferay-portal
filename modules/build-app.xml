@@ -2,6 +2,8 @@
 <!DOCTYPE project>
 
 <project name="build-app">
+	<extension-point name="release-tool-dependencies" />
+
 	<property file="../app.server.${user.name}.properties" />
 	<property file="../app.server.${env.COMPUTERNAME}.properties" />
 	<property file="../app.server.${env.HOST}.properties" />
@@ -12,19 +14,6 @@
 
 	<property location="${modules.dir}/../bundles" name="liferay.home" />
 	<property location="${modules.dir}/.." name="project.dir" />
-
-	<condition property="liferay.releng.ee">
-		<or>
-			<istrue value="${ee.override}" />
-			<matches pattern="ee-.+" string="${liferay.releng.branch}" />
-		</or>
-	</condition>
-
-	<condition else="Liferay" property="liferay.releng.app.title.prefix" value="Liferay CE">
-		<not>
-			<istrue value="${liferay.releng.ee}" />
-		</not>
-	</condition>
 
 	<property name="portal.lib.dir" value="${app.server.tomcat.lib.portal.dir}" />
 
@@ -38,7 +27,7 @@
 		</sequential>
 	</macrodef>
 
-	<target depends="dist-module-artifacts,write-app-change-log" name="build-app">
+	<target depends="dist-module-artifacts,update-app-marketplace-verson,write-app-change-log" name="build-app">
 		<delete file="${dist.dir}/ticket.list.tmp" />
 	</target>
 
@@ -80,6 +69,13 @@
 
 		<condition property="current.branch.private">
 			<contains string="${liferay.releng.branch}" substring="ee-" />
+		</condition>
+
+		<condition else="Liferay CE" property="liferay.releng.app.title.prefix" value="Liferay">
+			<or>
+				<istrue value="${ee.override}" />
+				<istrue value="${current.branch.private}" />
+			</or>
 		</condition>
 	</target>
 
@@ -280,6 +276,7 @@
 		<java
 			classname="com.liferay.portal.tools.target.platform.indexer.client.TargetPlatformIndexerClient"
 			classpathref="target.platform.indexer.classpath"
+			failonerror="true"
 			fork="true"
 			newenvironment="true"
 		>
@@ -418,7 +415,21 @@
 		</subant>
 	</target>
 
-	<target depends="dist-module-artifacts,get-app-artifacts,get-app-change-log,get-app-change-log-header,get-app-git-id" name="write-app-change-log">
+	<target depends="get-app-version,get-artifact-versions-previous-release" name="update-app-marketplace-verson">
+		<echo message="app.version.previous.release = ${app.version.previous.release}" />
+
+		<echo message="app.version = ${app.version}" />
+
+		<replaceregexp
+			file="${releng.app.dir}/app.properties"
+			flags="m"
+			match="app.marketplace.version=.*$"
+			replace="app.marketplace.version=${app.version}"
+			byline="true"
+		/>
+	</target>
+
+	<target depends="dist-module-artifacts,get-app-artifacts,get-app-change-log,get-app-change-log-header,get-app-git-id,release-tool-dependencies" name="write-app-change-log">
 		<property name="double.space" value="${line.separator}${line.separator}" />
 
 		<echo append="true" file="${releng.app.dir}/app.changelog" message="${app.change.log.header}" />

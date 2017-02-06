@@ -43,15 +43,49 @@
 
 	<target depends="build-common-java.deploy" name="deploy">
 		<if>
-			<equals arg1="${app.server.type}" arg2="tomcat" />
+			<equals arg1="${build.profile}" arg2="slim" />
 			<then>
-				<copy file="${jar.file}.jar" preservelastmodified="true" todir="${deploy.dir}" />
-
-				<copy preservelastmodified="true" todir="${app.server.portal.dir}/WEB-INF/tld">
-					<fileset dir="classes/META-INF" includes="*.tld" />
-				</copy>
 			</then>
+			<elseif>
+				<equals arg1="${app.server.type}" arg2="tomcat" />
+				<then>
+					<copy file="${jar.file}.jar" preservelastmodified="true" todir="${deploy.dir}" />
+
+					<copy preservelastmodified="true" todir="${app.server.portal.dir}/WEB-INF/tld">
+						<fileset dir="classes/META-INF" includes="*.tld" />
+					</copy>
+				</then>
+			</elseif>
 		</if>
+	</target>
+
+	<target depends="build-common-java.init-jar" name="init-jar">
+		<for param="file">
+			<path>
+				<fileset dir="classes/META-INF" includes="*.tld" />
+			</path>
+
+			<sequential>
+				<local name="filename" />
+
+				<basename file="@{file}" property="filename" suffix=".tld" />
+
+				<if>
+					<available file="../modules/core/util-taglib-compat/tld/${filename}-compat" />
+					<then>
+						<local name="content" />
+
+						<loadfile property="content" srcFile="../modules/core/util-taglib-compat/tld/${filename}-compat" />
+
+						<replace file="@{file}" value="${content}">
+							<replacetoken><![CDATA[</taglib>]]></replacetoken>
+						</replace>
+
+						<concat append="true" destfile="@{file}"><![CDATA[</taglib>]]></concat>
+					</then>
+				</if>
+			</sequential>
+		</for>
 	</target>
 
 	<target depends="build-common-java.jar" name="jar">
