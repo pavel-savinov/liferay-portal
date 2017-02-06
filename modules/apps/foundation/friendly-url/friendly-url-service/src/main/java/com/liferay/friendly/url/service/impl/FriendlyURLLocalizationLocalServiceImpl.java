@@ -124,7 +124,7 @@ public class FriendlyURLLocalizationLocalServiceImpl
 	}
 
 	@Override
-	public List<FriendlyURLLocalization> updateFriendlyURLLocaliozations(
+	public List<FriendlyURLLocalization> updateFriendlyURLLocalizations(
 			long companyId, long groupId, long friendlyURLId,
 			Map<Locale, String> urlTitleMap)
 		throws PortalException {
