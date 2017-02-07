@@ -1,5 +1,6 @@
 <definition component-name="portal-collaboration">
 	<property name="portal.release" value="true" />
+	<property name="portal.upstream" value="true" />
 	<property name="testray.main.component.name" value="Mentions" />
 
 	<set-up>
@@ -59,7 +60,6 @@
 		<execute macro="Mentions#addMentionViaMessageBoardThread">
 			<var name="mentionsUserFullName" value="userfn userln" />
 			<var name="mentionsUserScreenName" value="usersn" />
-			<var name="threadBody" value="Thread Body" />
 			<var name="threadSubject" value="Thread Subject" />
 		</execute>
 
@@ -69,9 +69,7 @@
 			<var name="portlet" value="Message Boards" />
 		</execute>
 
-		<execute macro="MessageboardsThread#viewCP">
-			<var name="postsNumber" value="1" />
-			<var name="threadBody" value="Thread Body" />
+		<execute macro="MessageboardsThread#gotoCP">
 			<var name="threadSubject" value="Thread Subject" />
 		</execute>
 

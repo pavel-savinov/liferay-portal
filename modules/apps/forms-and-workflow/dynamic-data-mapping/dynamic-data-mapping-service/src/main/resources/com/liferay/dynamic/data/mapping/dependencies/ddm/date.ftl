@@ -6,8 +6,8 @@
 	YEAR = staticUtil["java.util.Calendar"].YEAR
 />
 
-<#if fieldValue != "">
-	<#if (hasFieldValue)>
+<#if validator.isNotNull(fieldValue)>
+	<#if hasFieldValue>
 		<#assign
 			dateValue = fieldRawValue?date["yyyy-MM-dd"]
 
@@ -35,11 +35,21 @@
 		year = fieldValue.get(YEAR)
 	/>
 <#else>
-	<#assign
-		day = 0
-		month = -1
-		year = 0
-	/>
+	<#if required>
+		<#assign
+			calendar = calendarFactory.getCalendar(timeZone)
+
+			day = calendar.get(DATE)
+			month = calendar.get(MONTH)
+			year = calendar.get(YEAR)
+		/>
+	<#else>
+		<#assign
+			day = 0
+			month = -1
+			year = 0
+		/>
+	</#if>
 </#if>
 
 <#assign

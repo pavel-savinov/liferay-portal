@@ -88,15 +88,15 @@ public class PQLOperatorTest extends TestCase {
 		_validateGetPQLResult("test", "==", "test", Boolean.TRUE);
 		_validateGetPQLResult(null, "==", "test", Boolean.FALSE);
 		_validateGetPQLResult("test", "==", null, Boolean.FALSE);
-		_validateGetPQLResult(null, "==", null, Boolean.FALSE);
+		_validateGetPQLResult(null, "==", null, Boolean.TRUE);
 		_validateGetPQLResult("test1", "==", "test2", Boolean.FALSE);
 	}
 
 	@Test
 	public void testGetPQLResultEqualityOperatorNotEquals() throws Exception {
 		_validateGetPQLResult("test", "!=", "test", Boolean.FALSE);
-		_validateGetPQLResult(null, "!=", "test", Boolean.FALSE);
-		_validateGetPQLResult("test", "!=", null, Boolean.FALSE);
+		_validateGetPQLResult(null, "!=", "test", Boolean.TRUE);
+		_validateGetPQLResult("test", "!=", null, Boolean.TRUE);
 		_validateGetPQLResult(null, "!=", null, Boolean.FALSE);
 		_validateGetPQLResult("test1", "!=", "test2", Boolean.TRUE);
 	}
@@ -220,8 +220,8 @@ public class PQLOperatorTest extends TestCase {
 	public void testGetPQLResultStringOperatorErrors() throws Exception {
 		Set<String> conditionalOperators = new HashSet<>();
 
-		conditionalOperators.add("~");
 		conditionalOperators.add("!~");
+		conditionalOperators.add("~");
 
 		for (String operator : conditionalOperators) {
 			String expectedError =

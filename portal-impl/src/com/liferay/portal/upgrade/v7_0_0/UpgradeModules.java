@@ -58,8 +58,8 @@ public class UpgradeModules extends UpgradeProcess {
 		throws SQLException {
 
 		try (PreparedStatement ps = connection.prepareStatement(
-				"select serviceComponentId from ServiceComponent " +
-					"where buildNamespace = ?")) {
+				"select serviceComponentId from ServiceComponent where " +
+					"buildNamespace = ?")) {
 
 			ps.setString(1, buildNamespace);
 
@@ -83,8 +83,8 @@ public class UpgradeModules extends UpgradeProcess {
 				String buildNamespace = convertedLegacyModule[2];
 
 				try (PreparedStatement ps = connection.prepareStatement(
-						"select servletContextName, buildNumber from Release_" +
-							" where servletContextName = ?")) {
+						"select servletContextName, buildNumber from " +
+							"Release_ where servletContextName = ?")) {
 
 					ps.setString(1, oldServletContextName);
 
@@ -177,13 +177,16 @@ public class UpgradeModules extends UpgradeProcess {
 
 	private static final String[][] _CONVERTED_LEGACY_MODULES = {
 		{"calendar-portlet", "com.liferay.calendar.service", "Calendar"},
+		{"chat-portlet", "com.liferay.chat.service", "Chat"},
+		{"contacts-portlet", "com.liferay.contacts.service", "Contacts"},
 		{
 			"kaleo-designer-portlet",
-			"com.liferay.portal.workflow.kaleo.designer.web", "KaleoDesigner"
+			"com.liferay.portal.workflow.kaleo.designer.service",
+			"KaleoDesigner"
 		},
 		{
 			"kaleo-forms-portlet",
-			"com.liferay.portal.workflow.kaleo.forms.web", "KaleoForms"
+			"com.liferay.portal.workflow.kaleo.forms.service", "KaleoForms"
 		},
 		{"kaleo-web", "com.liferay.portal.workflow.kaleo.service", "Kaleo"},
 		{
@@ -191,6 +194,10 @@ public class UpgradeModules extends UpgradeProcess {
 			"Marketplace"
 		},
 		{"microblogs-portlet", "com.liferay.microblogs.service", "Microblogs"},
+		{
+			"private-messaging-portlet",
+			"com.liferay.social.privatemessaging.service", "PM"
+		},
 		{"so-portlet", "com.liferay.invitation.invite.members.service", "SO"},
 		{
 			"social-networking-portlet",

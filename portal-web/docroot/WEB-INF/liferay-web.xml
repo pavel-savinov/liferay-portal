@@ -166,7 +166,7 @@
 		</init-param>
 		<init-param>
 			<param-name>Cache-Control</param-name>
-			<param-value>max-age=315360000, no-cache="Set-Cookie", public</param-value>
+			<param-value>max-age=315360000, public</param-value>
 		</init-param>
 		<init-param>
 			<param-name>Expires</param-name>
@@ -428,6 +428,11 @@
 	<filter-mapping>
 		<filter-name>Thread Local Filter</filter-name>
 		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>Thread Local Filter</filter-name>
+		<url-pattern>/c/portal/j_login</url-pattern>
+		<dispatcher>FORWARD</dispatcher>
 	</filter-mapping>
 	<filter-mapping>
 		<filter-name>Thread Local Filter</filter-name>

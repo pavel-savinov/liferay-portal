@@ -14,14 +14,12 @@
 
 package com.liferay.portal.spring.hibernate;
 
-import com.liferay.portal.kernel.util.CentralizedThreadLocal;
-import com.liferay.portal.kernel.util.InitialThreadLocal;
 import com.liferay.portal.kernel.util.ReflectionUtil;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 
-import org.springframework.core.NamedThreadLocal;
+import org.apache.commons.logging.Log;
+
 import org.springframework.orm.hibernate3.HibernateTransactionManager;
 import org.springframework.orm.hibernate3.SessionHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -35,8 +33,7 @@ public class LastSessionRecorderHibernateTransactionManager
 	@Override
 	protected Object doGetTransaction() {
 		SessionHolder sessionHolder =
-			(SessionHolder)TransactionSynchronizationManager.getResource(
-				getSessionFactory());
+			SpringHibernateThreadLocalUtil.getResource(getSessionFactory());
 
 		if (sessionHolder != null) {
 			LastSessionRecorderUtil.setLastSession(sessionHolder.getSession());
@@ -47,35 +44,94 @@ public class LastSessionRecorderHibernateTransactionManager
 
 	static {
 		try {
-			Field nameField = ReflectionUtil.getDeclaredField(
-				NamedThreadLocal.class, "name");
+			Class.forName(SpringHibernateThreadLocalUtil.class.getName());
 
-			for (Field field : ReflectionUtil.getDeclaredFields(
-					TransactionSynchronizationManager.class)) {
+			Field loggerField = ReflectionUtil.getDeclaredField(
+				TransactionSynchronizationManager.class, "logger");
 
-				if (Modifier.isStatic(field.getModifiers()) &&
-					ThreadLocal.class.isAssignableFrom(field.getType())) {
+			loggerField.set(
+				null,
+				new Log() {
 
-					ThreadLocal<Object> threadLocal =
-						(ThreadLocal<Object>)field.get(null);
-
-					Object value = threadLocal.get();
-
-					if (threadLocal instanceof NamedThreadLocal) {
-						threadLocal = new InitialThreadLocal<>(
-							(String)nameField.get(threadLocal), null);
-					}
-					else {
-						threadLocal = new CentralizedThreadLocal<>(false);
+					@Override
+					public void debug(Object object) {
 					}
 
-					if (value != null) {
-						threadLocal.set(value);
+					@Override
+					public void debug(Object object, Throwable throwable) {
 					}
 
-					field.set(null, threadLocal);
-				}
-			}
+					@Override
+					public void error(Object object) {
+					}
+
+					@Override
+					public void error(Object object, Throwable throwable) {
+					}
+
+					@Override
+					public void fatal(Object object) {
+					}
+
+					@Override
+					public void fatal(Object object, Throwable throwable) {
+					}
+
+					@Override
+					public void info(Object object) {
+					}
+
+					@Override
+					public void info(Object object, Throwable throwable) {
+					}
+
+					@Override
+					public boolean isDebugEnabled() {
+						return false;
+					}
+
+					@Override
+					public boolean isErrorEnabled() {
+						return false;
+					}
+
+					@Override
+					public boolean isFatalEnabled() {
+						return false;
+					}
+
+					@Override
+					public boolean isInfoEnabled() {
+						return false;
+					}
+
+					@Override
+					public boolean isTraceEnabled() {
+						return false;
+					}
+
+					@Override
+					public boolean isWarnEnabled() {
+						return false;
+					}
+
+					@Override
+					public void trace(Object object) {
+					}
+
+					@Override
+					public void trace(Object object, Throwable throwable) {
+					}
+
+					@Override
+					public void warn(Object object) {
+					}
+
+					@Override
+					public void warn(Object object, Throwable throwable) {
+					}
+
+				});
 		}
 		catch (Exception e) {
 			throw new ExceptionInInitializerError(e);

@@ -43,7 +43,7 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -103,7 +103,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.portlet-info.short-title=Web Form",
 		"javax.portlet.portlet-info.title=Web Form",
 		"javax.portlet.preferences=classpath:/META-INF/portlet-preferences/default-portlet-preferences.xml",
-		"javax.portlet.resource-bundle=contnt.Language",
+		"javax.portlet.resource-bundle=content.Language",
 		"javax.portlet.security-role-ref=administrator,guest,power-user,user",
 		"javax.portlet.supports.mime-type=text/html"
 	},
@@ -118,7 +118,7 @@ public class WebFormPortlet extends MVCPortlet {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		String portletId = PortalUtil.getPortletId(actionRequest);
+		String portletId = _portal.getPortletId(actionRequest);
 
 		PortletPermissionUtil.check(
 			themeDisplay.getPermissionChecker(), themeDisplay.getPlid(),
@@ -144,7 +144,7 @@ public class WebFormPortlet extends MVCPortlet {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		String portletId = PortalUtil.getPortletId(actionRequest);
+		String portletId = _portal.getPortletId(actionRequest);
 
 		PortletPreferences preferences =
 			PortletPreferencesFactoryUtil.getPortletSetup(
@@ -168,6 +168,13 @@ public class WebFormPortlet extends MVCPortlet {
 				CaptchaUtil.check(actionRequest);
 			}
 			catch (CaptchaTextException cte) {
+
+				// LPS-52675
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(cte, cte);
+				}
+
 				SessionErrors.add(
 					actionRequest, CaptchaTextException.class.getName());
 
@@ -316,6 +323,7 @@ public class WebFormPortlet extends MVCPortlet {
 			String fieldValue = fieldsMap.get(fieldLabel);
 
 			sb.append(getCSVFormattedValue(fieldValue));
+
 			sb.append(_webFormGroupServiceConfiguration.csvSeparator());
 		}
 
@@ -331,7 +339,7 @@ public class WebFormPortlet extends MVCPortlet {
 		ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		String portletId = PortalUtil.getPortletId(resourceRequest);
+		String portletId = _portal.getPortletId(resourceRequest);
 
 		PortletPermissionUtil.check(
 			themeDisplay.getPermissionChecker(), themeDisplay.getPlid(),
@@ -382,6 +390,7 @@ public class WebFormPortlet extends MVCPortlet {
 						fieldName, row.getClassPK(), StringPool.BLANK);
 
 					sb.append(getCSVFormattedValue(data));
+
 					sb.append(_webFormGroupServiceConfiguration.csvSeparator());
 				}
 
@@ -567,8 +576,10 @@ public class WebFormPortlet extends MVCPortlet {
 		for (int i = 0; i < fieldsMap.size(); i++) {
 			String fieldType = preferences.getValue(
 				"fieldType" + (i + 1), StringPool.BLANK);
+
 			String fieldLabel = preferences.getValue(
 				"fieldLabel" + (i + 1), StringPool.BLANK);
+
 			String fieldValue = fieldsMap.get(fieldLabel);
 
 			boolean fieldOptional = GetterUtil.getBoolean(
@@ -615,6 +626,9 @@ public class WebFormPortlet extends MVCPortlet {
 	private static ExpandoTableLocalService _expandoTableLocalService;
 	private static ExpandoValueLocalService _expandoValueLocalService;
 	private static MailService _mailService;
+
+	@Reference
+	private Portal _portal;
 
 	private WebFormGroupServiceConfiguration _webFormGroupServiceConfiguration;
 

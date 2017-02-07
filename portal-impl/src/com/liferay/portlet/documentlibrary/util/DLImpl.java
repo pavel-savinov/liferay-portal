@@ -48,6 +48,8 @@ import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.route.model.GroupFriendlyURL;
+import com.liferay.portal.kernel.route.service.GroupFriendlyURLLocalServiceUtil;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
@@ -64,6 +66,7 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
@@ -461,6 +464,10 @@ public class DLImpl implements DL {
 		return sb.toString();
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public Set<Long> getFileEntryTypeSubscriptionClassPKs(long userId) {
 		List<Subscription> subscriptions =
@@ -902,7 +909,19 @@ public class DLImpl implements DL {
 			group = themeDisplay.getScopeGroup();
 		}
 
-		webDavURL.append(group.getFriendlyURL());
+		String friendlyURL = group.getFriendlyURL();
+
+		String languageId = LocaleUtil.toLanguageId(themeDisplay.getLocale());
+
+		GroupFriendlyURL groupFriendlyURL =
+			GroupFriendlyURLLocalServiceUtil.fetchGroupFriendlyURL(
+				themeDisplay.getCompanyId(), group.getGroupId(), languageId);
+
+		if (groupFriendlyURL != null) {
+			friendlyURL = groupFriendlyURL.getFriendlyURL();
+		}
+
+		webDavURL.append(friendlyURL);
 		webDavURL.append("/document_library");
 
 		StringBuilder sb = new StringBuilder();
@@ -989,6 +1008,13 @@ public class DLImpl implements DL {
 		return ArrayUtil.contains(_MICROSOFT_OFFICE_EXTENSIONS, extension);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             com.liferay.document.library.web.internal.util.
+	 *             DLSubscriptionUtil#isSubscribedToFileEntryType(
+	 *             long, long, long, long)}
+	 */
+	@Deprecated
 	@Override
 	public boolean isSubscribedToFileEntryType(
 		long companyId, long groupId, long userId, long fileEntryTypeId) {
@@ -1004,6 +1030,13 @@ public class DLImpl implements DL {
 			fileEntryTypeId);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             com.liferay.document.library.web.internal.util.
+	 *             DLSubscriptionUtil#isSubscribedToFolder(
+	 *             long, long, long, long)}
+	 */
+	@Deprecated
 	@Override
 	public boolean isSubscribedToFolder(
 			long companyId, long groupId, long userId, long folderId)
@@ -1012,6 +1045,13 @@ public class DLImpl implements DL {
 		return isSubscribedToFolder(companyId, groupId, userId, folderId, true);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             com.liferay.document.library.web.internal.util.
+	 *             DLSubscriptionUtil#isSubscribedToFolder(
+	 *             long, long, long, long, boolean)}
+	 */
+	@Deprecated
 	@Override
 	public boolean isSubscribedToFolder(
 			long companyId, long groupId, long userId, long folderId,
@@ -1127,6 +1167,12 @@ public class DLImpl implements DL {
 				break;
 			}
 			catch (PortalException pe) {
+
+				// LPS-52675
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(pe, pe);
+				}
 			}
 		}
 

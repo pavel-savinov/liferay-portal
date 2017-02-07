@@ -48,6 +48,7 @@ import com.liferay.portal.kernel.model.Account;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
+import com.liferay.portal.kernel.route.model.GroupFriendlyURL;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutPrototype;
@@ -86,6 +87,7 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.GroupThreadLocal;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -137,18 +139,18 @@ import java.util.Set;
  * Groups are also the entity to which LayoutSets are generally associated.
  * Since LayoutSets are the parent entities of Layouts (i.e. pages), no entity
  * can have associated pages without also having an associated Group. This
- * relationship can be depicted as ... Layout -> LayoutSet -> Group[type] [->
- * Entity]. Note, the Entity part is optional.
+ * relationship can be depicted as ... Layout -> LayoutSet -> Group[type] ->
+ * [Entity]. Note, the Entity part is optional.
  * </p>
  *
  * <p>
  * Group has a "type" definition that is typically identified by two fields of
- * the entity - <code>String className</code>, and <code>int type </code>.
+ * the entity - <code>String className</code>, and <code>int type</code>.
  * </p>
  *
  * <p>
  * The <code>className</code> field helps create the group's association with
- * other entities (e.g. Organization, User, Company, UserGroup, ... etc.). The
+ * other entities (e.g. Organization, User, Company, UserGroup, etc.). The
  * value of <code>className</code> is the full name of the entity's class and
  * the primary key of the associated entity instance. A site has
  * <code>className="Group"</code> and has no associated entity.
@@ -161,7 +163,7 @@ import java.util.Set;
  * </p>
  *
  * <p>
- * Here is a listing of how Group is related to some portal entities ...
+ * Here is a listing of how Group is related to some portal entities:
  * </p>
  *
  * <ul>
@@ -169,28 +171,28 @@ import java.util.Set;
  * Site is a Group with <code>className="Group"</code>
  * </li>
  * <li>
- * Company has 1 Group (this is the global scope, but never has pages)
+ * Company has one Group (this is the global scope, but never has pages)
  * </li>
  * <li>
- * User has 1 Group (pages are optional based on the behavior configuration for
+ * User has one Group (pages are optional based on the behavior configuration for
  * personal pages)
  * </li>
  * <li>
- * Layout Template (<code>LayoutPrototype</code>) has 1 Group which uses only 1
- * of it's 2 LayoutSets to store a single page which can later be used to
+ * Layout Template (<code>LayoutPrototype</code>) has 1 Group which uses only one
+ * of its two LayoutSets to store a single page which can later be used to
  * derive a single page in any Site
  * </li>
  * <li>
  * Site Template (<code>LayoutSetPrototype</code>) has 1 Group which uses only
- * 1 of it's 2 LayoutSets to store many pages which can later be used to derive
+ * one of its two LayoutSets to store many pages which can later be used to derive
  * entire Sites or pulled into an existing Site
  * </li>
  * <li>
- * Organization has 1 Group, but can also be associated to a Site at any point
- * in it's life cycle in order to support having pages
+ * Organization has one Group, but can also be associated to a Site at any point
+ * in its life cycle in order to support having pages
  * </li>
  * <li>
- * UserGroup has 1 Group that can have pages in both of the group's LayoutSets
+ * UserGroup has one Group that can have pages in both of the group's LayoutSets
  * which are later inherited by users assigned to the UserGroup
  * </li>
  * </ul>
@@ -220,14 +222,17 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			long liveGroupId, Map<Locale, String> nameMap,
 			Map<Locale, String> descriptionMap, int type,
 			boolean manualMembership, int membershipRestriction,
-			String friendlyURL, boolean site, boolean inheritContent,
-			boolean active, ServiceContext serviceContext)
+			Map<Locale, String> friendlyURLMap, boolean site,
+			boolean inheritContent, boolean active,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		// Group
 
 		User user = userPersistence.findByPrimaryKey(userId);
+
 		className = GetterUtil.getString(className);
+
 		long classNameId = classNameLocalService.getClassNameId(className);
 
 		String groupKey = StringPool.BLANK;
@@ -280,9 +285,9 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			parentGroupId = layout.getGroupId();
 		}
 
-		friendlyURL = getFriendlyURL(
-			user.getCompanyId(), groupId, classNameId, classPK, friendlyName,
-			friendlyURL);
+		friendlyURLMap = getFriendlyURLMap(
+			user.getCompanyId(), groupId, classNameId, classPK, friendlyURLMap,
+			nameMap, false);
 
 		if (staging) {
 			groupKey = groupKey.concat("-staging");
@@ -298,8 +303,22 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 					entry.getKey(), name.concat(ORGANIZATION_STAGING_SUFFIX));
 			}
 
-			friendlyURL = getFriendlyURL(friendlyURL.concat("-staging"));
+			friendlyURLMap = getFriendlyURLMap(
+				user.getCompanyId(), groupId, classNameId, classPK,
+				friendlyURLMap, nameMap, true);
 		}
+
+		String friendlyURL = friendlyURLMap.get(LocaleUtil.getSiteDefault());
+
+		if (Validator.isNull(friendlyURL)) {
+			friendlyURL = getFriendlyURL(
+				user.getCompanyId(), groupId, classNameId, classPK,
+				friendlyName, "");
+		}
+
+		groupFriendlyURLLocalService.updateGroupFriendlyURLs(
+			userId, user.getCompanyId(), groupId, friendlyURLMap,
+			serviceContext);
 
 		if (parentGroupId == GroupConstants.DEFAULT_PARENT_GROUP_ID) {
 			membershipRestriction =
@@ -413,6 +432,42 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			long liveGroupId, Map<Locale, String> nameMap,
 			Map<Locale, String> descriptionMap, int type,
 			boolean manualMembership, int membershipRestriction,
+			Map<Locale, String> friendlyURLMap, boolean site, boolean active,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		return addGroup(
+			userId, parentGroupId, className, classPK, liveGroupId, nameMap,
+			descriptionMap, type, manualMembership, membershipRestriction,
+			friendlyURLMap, site, false, active, serviceContext);
+	}
+
+	@Override
+	public Group addGroup(
+			long userId, long parentGroupId, String className, long classPK,
+			long liveGroupId, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap, int type,
+			boolean manualMembership, int membershipRestriction,
+			String friendlyURL, boolean site, boolean inheritContent,
+			boolean active, ServiceContext serviceContext)
+		throws PortalException {
+
+		Map<Locale, String> friendlyURLMap = new HashMap<Locale, String>();
+
+		friendlyURLMap.put(LocaleUtil.getSiteDefault(), friendlyURL);
+
+		return addGroup(
+			userId, parentGroupId, className, classPK, liveGroupId, nameMap,
+			descriptionMap, type, manualMembership, membershipRestriction,
+			friendlyURLMap, site, inheritContent, active, serviceContext);
+	}
+
+	@Override
+	public Group addGroup(
+			long userId, long parentGroupId, String className, long classPK,
+			long liveGroupId, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap, int type,
+			boolean manualMembership, int membershipRestriction,
 			String friendlyURL, boolean site, boolean active,
 			ServiceContext serviceContext)
 		throws PortalException {
@@ -514,7 +569,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			userId, GroupConstants.DEFAULT_PARENT_GROUP_ID,
 			Layout.class.getName(), layout.getPlid(),
 			GroupConstants.DEFAULT_LIVE_GROUP_ID, nameMap, null, 0, true,
-			GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, null, false, true,
+			GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, "", false, true,
 			null);
 
 		return scopeGroup;
@@ -660,6 +715,11 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 					"Unable to delete group with pending background tasks");
 			}
 
+			// Group friendly URLs
+
+			groupFriendlyURLLocalService.deleteGroupFriendlyURLs(
+				group.getCompanyId(), group.getGroupId());
+
 			// Background tasks
 
 			BackgroundTaskManagerUtil.deleteGroupBackgroundTasks(
@@ -682,6 +742,12 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 					group.getGroupId(), true, serviceContext);
 			}
 			catch (NoSuchLayoutSetException nslse) {
+
+				// LPS-52675
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(nslse, nslse);
+				}
 			}
 
 			try {
@@ -689,6 +755,12 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 					group.getGroupId(), false, serviceContext);
 			}
 			catch (NoSuchLayoutSetException nslse) {
+
+				// LPS-52675
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(nslse, nslse);
+				}
 			}
 
 			// Membership requests
@@ -972,9 +1044,23 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			return null;
 		}
 
-		friendlyURL = getFriendlyURL(friendlyURL);
+		friendlyURL = getFriendlyURL(HttpUtil.decodePath(friendlyURL));
+
+		GroupFriendlyURL groupFriendlyURL =
+			groupFriendlyURLPersistence.fetchByC_F(companyId, friendlyURL);
+
+		if (groupFriendlyURL != null) {
+			return groupPersistence.fetchByPrimaryKey(
+				groupFriendlyURL.getGroupId());
+		}
 
 		return groupPersistence.fetchByC_F(companyId, friendlyURL);
+	}
+
+	@Override
+	@ThreadLocalCachable
+	public Group fetchGroup(long groupId) {
+		return groupPersistence.fetchByPrimaryKey(groupId);
 	}
 
 	/**
@@ -1883,6 +1969,25 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 		else {
 			return false;
 		}
+	}
+
+	@Override
+	public boolean isLiveGroupActive(Group group) {
+		if (group == null) {
+			return false;
+		}
+
+		if (!group.isStagingGroup()) {
+			return group.isActive();
+		}
+
+		Group liveGroup = group.getLiveGroup();
+
+		if (liveGroup == null) {
+			return false;
+		}
+
+		return liveGroup.isActive();
 	}
 
 	/**
@@ -3041,6 +3146,41 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			null, null, null, 0, 0, null);
 	}
 
+	@Override
+	public Group updateFriendlyURL(
+			long groupId, Map<Locale, String> friendlyURLMap)
+		throws PortalException {
+
+		Group group = groupPersistence.findByPrimaryKey(groupId);
+
+		String friendlyURL = friendlyURLMap.get(LocaleUtil.getSiteDefault());
+
+		updateFriendlyURL(groupId, friendlyURL);
+
+		friendlyURLMap = getFriendlyURLMap(
+			group.getCompanyId(), groupId, group.getClassNameId(),
+			group.getClassPK(), friendlyURLMap, new HashMap<Locale, String>(),
+			group.isStagingGroup());
+
+		for (Locale locale : friendlyURLMap.keySet()) {
+			String languageId = LocaleUtil.toLanguageId(locale);
+
+			GroupFriendlyURL groupFriendlyURL =
+				groupFriendlyURLPersistence.fetchByC_G_L(
+					group.getCompanyId(), groupId, languageId);
+
+			if (groupFriendlyURL == null) {
+				continue;
+			}
+
+			groupFriendlyURL.setFriendlyURL(friendlyURLMap.get(locale));
+
+			groupFriendlyURLPersistence.update(groupFriendlyURL);
+		}
+
+		return group;
+	}
+
 	/**
 	 * Updates the group's friendly URL.
 	 *
@@ -3086,8 +3226,8 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			long groupId, long parentGroupId, Map<Locale, String> nameMap,
 			Map<Locale, String> descriptionMap, int type,
 			boolean manualMembership, int membershipRestriction,
-			String friendlyURL, boolean inheritContent, boolean active,
-			ServiceContext serviceContext)
+			Map<Locale, String> friendlyURLMap, boolean inheritContent,
+			boolean active, ServiceContext serviceContext)
 		throws PortalException {
 
 		Group group = groupPersistence.findByPrimaryKey(groupId);
@@ -3098,15 +3238,17 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 		String groupKey = group.getGroupKey();
 
+		friendlyURLMap = getFriendlyURLMap(
+			group.getCompanyId(), groupId, classNameId, classPK, friendlyURLMap,
+			nameMap, group.isStagingGroup());
+
+		String friendlyURL = friendlyURLMap.get(LocaleUtil.getSiteDefault());
+
 		if ((nameMap != null) &&
 			Validator.isNotNull(nameMap.get(LocaleUtil.getDefault()))) {
 
 			groupKey = nameMap.get(LocaleUtil.getDefault());
 		}
-
-		friendlyURL = getFriendlyURL(
-			group.getCompanyId(), groupId, classNameId, classPK,
-			StringPool.BLANK, friendlyURL);
 
 		if ((classNameId <= 0) || className.equals(Group.class.getName())) {
 			validateGroupKey(
@@ -3156,6 +3298,12 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 		groupPersistence.update(group);
 
+		// Group friendly URLs
+
+		groupFriendlyURLLocalService.updateGroupFriendlyURLs(
+			group.getCreatorUserId(), group.getCompanyId(), groupId,
+			friendlyURLMap, serviceContext);
+
 		// Asset
 
 		if ((serviceContext == null) || !group.isSite()) {
@@ -3180,6 +3328,40 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			serviceContext.getAssetTagNames());
 
 		return group;
+	}
+
+	@Override
+	public Group updateGroup(
+			long groupId, long parentGroupId, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap, int type,
+			boolean manualMembership, int membershipRestriction,
+			String friendlyURL, boolean inheritContent, boolean active,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		Map<Locale, String> friendlyURLMap = new HashMap<Locale, String>();
+
+		friendlyURLMap.put(LocaleUtil.getSiteDefault(), friendlyURL);
+
+		return updateGroup(
+			groupId, parentGroupId, nameMap, descriptionMap, type,
+			manualMembership, membershipRestriction, friendlyURLMap,
+			inheritContent, active, serviceContext);
+	}
+
+	@Override
+	public Group updateGroup(
+			long groupId, long parentGroupId, String name, String description,
+			int type, boolean manualMembership, int membershipRestriction,
+			Map<Locale, String> friendlyURLMap, boolean inheritContent,
+			boolean active, ServiceContext serviceContext)
+		throws PortalException {
+
+		return updateGroup(
+			groupId, parentGroupId, getLocalizationMap(name),
+			getLocalizationMap(description), type, manualMembership,
+			membershipRestriction, friendlyURLMap, inheritContent, active,
+			serviceContext);
 	}
 
 	/**
@@ -3579,7 +3761,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			// Filter by active
 
 			if (active != null) {
-				if (active != group.isActive()) {
+				if (active != isLiveGroupActive(group)) {
 					iterator.remove();
 
 					continue;
@@ -3719,8 +3901,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 						if ((resourcePermission.getRoleId() ==
 								rolePermissions.getRoleId()) &&
-							resourcePermission.hasAction(
-								resourceAction)) {
+							resourcePermission.hasAction(resourceAction)) {
 
 							Group group = groupPersistence.fetchByPrimaryKey(
 								GetterUtil.getLong(
@@ -3827,6 +4008,10 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			return friendlyURL;
 		}
 
+		if (Validator.isNull(getFriendlyURL(friendlyName))) {
+			return "";
+		}
+
 		friendlyURL = StringPool.SLASH + getFriendlyURL(friendlyName);
 
 		String originalFriendlyURL = friendlyURL;
@@ -3856,7 +4041,45 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	}
 
 	protected String getFriendlyURL(String friendlyURL) {
-		return FriendlyURLNormalizerUtil.normalize(friendlyURL);
+		return FriendlyURLNormalizerUtil.normalizeWithEncoding(friendlyURL);
+	}
+
+	protected Map<Locale, String> getFriendlyURLMap(
+			long companyId, long groupId, long classNameId, long classPK,
+			Map<Locale, String> friendlyURLMap, Map<Locale, String> nameMap,
+			boolean staging)
+		throws PortalException {
+
+		for (Locale locale : LanguageUtil.getAvailableLocales(groupId)) {
+			String friendlyURL = friendlyURLMap.get(locale);
+			String friendlyName = StringPool.BLANK;
+
+			if (nameMap != null) {
+				friendlyName = nameMap.get(locale);
+			}
+
+			if (Validator.isNull(friendlyURL) &&
+				!locale.equals(LocaleUtil.getSiteDefault())) {
+
+				continue;
+			}
+
+			friendlyURL = getFriendlyURL(
+				companyId, groupId, classNameId, classPK, friendlyName,
+				friendlyURL);
+
+			if (Validator.isNull(friendlyURL)) {
+				continue;
+			}
+
+			if (staging) {
+				friendlyURL += "-staging";
+			}
+
+			friendlyURLMap.put(locale, friendlyURL);
+		}
+
+		return friendlyURLMap;
 	}
 
 	protected String getOrgGroupName(String name) {
@@ -4272,6 +4495,12 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			}
 		}
 		catch (NoSuchGroupException nsge) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(nsge, nsge);
+			}
 		}
 
 		if (site) {

@@ -15,8 +15,8 @@
 package com.liferay.journal.configuration;
 
 /**
- * @author Eduardo Garcia
- * @deprecated As of 7.0.0, see {@link JournalServiceConfiguration}
+ * @author     Eduardo Garcia
+ * @deprecated As of 4.0.0, see {@link JournalServiceConfiguration}
  */
 @Deprecated
 public class JournalServiceConfigurationKeys {
@@ -59,7 +59,7 @@ public class JournalServiceConfigurationKeys {
 		"journal.folder.icon.check.count";
 
 	/**
-	 * @deprecated As of 7.0.0, with no direct replacement
+	 * @deprecated As of 4.0.0, with no direct replacement
 	 */
 	@Deprecated
 	public static final String LAR_CREATION_STRATEGY = "lar.creation.strategy";
@@ -80,7 +80,7 @@ public class JournalServiceConfigurationKeys {
 		"terms.of.use.journal.article.id";
 
 	/**
-	 * @deprecated As of 7.0.0, with no direct replacement
+	 * @deprecated As of 4.0.0, with no direct replacement
 	 */
 	@Deprecated
 	public static final String TRANSFORMER_LISTENER = "transformer.listener";

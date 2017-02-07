@@ -67,6 +67,7 @@ public class JSONSourceProcessor extends BaseSourceProcessor {
 					line, StringPool.DOUBLE_SPACE, StringPool.SPACE);
 
 				sb.append(line);
+
 				sb.append("\n");
 			}
 		}
@@ -81,7 +82,8 @@ public class JSONSourceProcessor extends BaseSourceProcessor {
 
 		if (matcher.find()) {
 			processMessage(
-				fileName, "line break", getLineCount(content, matcher.start()));
+				fileName, "There should be a line break after '}'",
+				getLineCount(content, matcher.start()));
 		}
 		else {
 			content = sort(content);

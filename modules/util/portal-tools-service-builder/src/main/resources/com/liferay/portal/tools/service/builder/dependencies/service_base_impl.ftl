@@ -17,6 +17,7 @@ import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.Conjunction;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Disjunction;
@@ -72,18 +73,18 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 </#if>
 
 <#list referenceList as tempEntity>
-	<#if tempEntity.hasColumns() && ((entity.name == "Counter") || (tempEntity.name != "Counter"))>
+	<#if tempEntity.hasColumns() && (stringUtil.equals(entity.name, "Counter") || !stringUtil.equals(tempEntity.name, "Counter"))>
 		import ${tempEntity.apiPackagePath}.service.persistence.${tempEntity.name}Persistence;
 		import ${tempEntity.apiPackagePath}.service.persistence.${tempEntity.name}Util;
 	</#if>
 
-	<#if tempEntity.hasFinderClass() && ((entity.name == "Counter") || (tempEntity.name != "Counter"))>
+	<#if tempEntity.hasFinderClass() && (stringUtil.equals(entity.name, "Counter") || !stringUtil.equals(tempEntity.name, "Counter"))>
 		import ${tempEntity.apiPackagePath}.service.persistence.${tempEntity.name}Finder;
 		import ${tempEntity.apiPackagePath}.service.persistence.${tempEntity.name}FinderUtil;
 	</#if>
 </#list>
 
-<#if sessionTypeName == "Local">
+<#if stringUtil.equals(sessionTypeName, "Local")>
 /**
  * Provides the base implementation for the ${entity.humanName} local service.
  *
@@ -142,7 +143,7 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 		 */
 </#if>
 
-	<#if (sessionTypeName == "Local") && entity.hasColumns()>
+	<#if stringUtil.equals(sessionTypeName, "Local") && entity.hasColumns()>
 		<#assign serviceBaseExceptions = serviceBuilder.getServiceBaseExceptions(methods, "add" + entity.name, [apiPackagePath + ".model." + entity.name], []) />
 
 		/**
@@ -181,7 +182,7 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 		 * @param ${entity.PKVarName} the primary key of the ${entity.humanName}
 		 * @return the ${entity.humanName} that was removed
 		<#list serviceBaseExceptions as exception>
-		<#if exception == "PortalException">
+		<#if stringUtil.equals(exception, "PortalException")>
 		 * @throws PortalException if a ${entity.humanName} with the primary key could not be found
 		<#else>
 		 * @throws ${exception}
@@ -294,7 +295,7 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 			return ${entity.varName}Persistence.fetchByPrimaryKey(${entity.PKVarName});
 		}
 
-		<#if entity.hasUuid() && entity.hasColumn("companyId") && (!entity.hasColumn("groupId") || (entity.name == "Group"))>
+		<#if entity.hasUuid() && entity.hasColumn("companyId") && (!entity.hasColumn("groupId") || stringUtil.equals(entity.name, "Group"))>
 			/**
 			 * Returns the ${entity.humanName} with the matching UUID and company.
 			 *
@@ -311,8 +312,8 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 			}
 		</#if>
 
-		<#if entity.hasUuid() && entity.hasColumn("groupId") && (entity.name != "Group")>
-			<#if entity.name == "Layout">
+		<#if entity.hasUuid() && entity.hasColumn("groupId") && !stringUtil.equals(entity.name, "Group")>
+			<#if stringUtil.equals(entity.name, "Layout")>
 				/**
 				 * Returns the ${entity.humanName} matching the UUID, group, and privacy.
 				 *
@@ -354,7 +355,7 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 		 * @param ${entity.PKVarName} the primary key of the ${entity.humanName}
 		 * @return the ${entity.humanName}
 		<#list serviceBaseExceptions as exception>
-		<#if exception == "PortalException">
+		<#if stringUtil.equals(exception, "PortalException")>
 		 * @throws PortalException if a ${entity.humanName} with the primary key could not be found
 		<#else>
 		 * @throws ${exception}
@@ -387,7 +388,7 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 					actionableDynamicQuery.setPrimaryKeyPropertyName("primaryKey.${pkColumn.name}");
 
 					<#list entity.getPKList() as pkColumn>
-						<#if pkColumn.name == "groupId">
+						<#if stringUtil.equals(pkColumn.name, "groupId")>
 							actionableDynamicQuery.setGroupIdPropertyName("primaryKey.groupId");
 						</#if>
 					</#list>
@@ -416,7 +417,7 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 					indexableActionableDynamicQuery.setPrimaryKeyPropertyName("primaryKey.${pkColumn.name}");
 
 					<#list entity.getPKList() as pkColumn>
-						<#if pkColumn.name == "groupId">
+						<#if stringUtil.equals(pkColumn.name, "groupId")>
 							indexableActionableDynamicQuery.setGroupIdPropertyName("primaryKey.groupId");
 						</#if>
 					</#list>
@@ -442,7 +443,7 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 					actionableDynamicQuery.setPrimaryKeyPropertyName("primaryKey.${pkColumn.name}");
 
 					<#list entity.getPKList() as pkColumn>
-						<#if pkColumn.name == "groupId">
+						<#if stringUtil.equals(pkColumn.name, "groupId")>
 							actionableDynamicQuery.setGroupIdPropertyName("primaryKey.groupId");
 						</#if>
 					</#list>
@@ -488,6 +489,27 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 							public void addCriteria(DynamicQuery dynamicQuery) {
 								<#if entity.isWorkflowEnabled()>
 									Criterion modifiedDateCriterion = portletDataContext.getDateRangeCriteria("modifiedDate");
+
+									<#if entity.isStagedGroupedModel()>
+										if (modifiedDateCriterion != null) {
+											Conjunction conjunction = RestrictionsFactoryUtil.conjunction();
+
+											conjunction.add(modifiedDateCriterion);
+
+											Disjunction disjunction = RestrictionsFactoryUtil.disjunction();
+
+											disjunction.add(RestrictionsFactoryUtil.gtProperty("modifiedDate", "lastPublishDate"));
+
+											Property lastPublishDateProperty = PropertyFactoryUtil.forName("lastPublishDate");
+
+											disjunction.add(lastPublishDateProperty.isNull());
+
+											conjunction.add(disjunction);
+
+											modifiedDateCriterion = conjunction;
+										}
+									</#if>
+
 									Criterion statusDateCriterion = portletDataContext.getDateRangeCriteria("statusDate");
 
 									if ((modifiedDateCriterion != null) && (statusDateCriterion != null)) {
@@ -573,7 +595,7 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 		}
 
 		<#if entity.hasUuid() && entity.hasColumn("companyId")>
-			<#if entity.hasColumn("groupId") && (entity.name != "Group")>
+			<#if entity.hasColumn("groupId") && !stringUtil.equals(entity.name, "Group")>
 				/**
 				 * Returns all the ${entity.humanNames} matching the UUID and company.
 				 *
@@ -608,7 +630,7 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 				 * @param companyId the primary key of the company
 				 * @return the matching ${entity.humanName}
 				<#list serviceBaseExceptions as exception>
-				<#if exception == "PortalException">
+				<#if stringUtil.equals(exception, "PortalException")>
 				 * @throws PortalException if a matching ${entity.humanName} could not be found
 				<#else>
 				 * @throws ${exception}
@@ -622,8 +644,8 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 			</#if>
 		</#if>
 
-		<#if entity.hasUuid() && entity.hasColumn("groupId") && (entity.name != "Group")>
-			<#if entity.name == "Layout">
+		<#if entity.hasUuid() && entity.hasColumn("groupId") && !stringUtil.equals(entity.name, "Group")>
+			<#if stringUtil.equals(entity.name, "Layout")>
 				/**
 				 * Returns the ${entity.humanName} matching the UUID, group, and privacy.
 				 *
@@ -632,7 +654,7 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 				 * @param privateLayout whether the ${entity.humanName} is private to the group
 				 * @return the matching ${entity.humanName}
 				<#list serviceBaseExceptions as exception>
-				<#if exception == "PortalException">
+				<#if stringUtil.equals(exception, "PortalException")>
 				 * @throws PortalException if a matching ${entity.humanName} could not be found
 				<#else>
 				 * @throws ${exception}
@@ -651,7 +673,7 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 				 * @param groupId the primary key of the group
 				 * @return the matching ${entity.humanName}
 				<#list serviceBaseExceptions as exception>
-				<#if exception == "PortalException">
+				<#if stringUtil.equals(exception, "PortalException")>
 				 * @throws PortalException if a matching ${entity.humanName} could not be found
 				<#else>
 				 * @throws ${exception}
@@ -972,7 +994,7 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 			}
 		</#if>
 
-		<#if (sessionTypeName != "Local") && tempEntity.hasRemoteService()>
+		<#if !stringUtil.equals(sessionTypeName, "Local") && tempEntity.hasRemoteService()>
 			/**
 			 * Returns the ${tempEntity.humanName} remote service.
 			 *
@@ -1002,7 +1024,7 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 			}
 		</#if>
 
-		<#if tempEntity.hasColumns() && ((entity.name == "Counter") || (tempEntity.name != "Counter"))>
+		<#if tempEntity.hasColumns() && (stringUtil.equals(entity.name, "Counter") || !stringUtil.equals(tempEntity.name, "Counter"))>
 			/**
 			 * Returns the ${tempEntity.humanName} persistence.
 			 *
@@ -1022,7 +1044,7 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 			}
 		</#if>
 
-		<#if tempEntity.hasFinderClass() && ((entity.name == "Counter") || (tempEntity.name != "Counter"))>
+		<#if tempEntity.hasFinderClass() && (stringUtil.equals(entity.name, "Counter") || !stringUtil.equals(tempEntity.name, "Counter"))>
 			/**
 			 * Returns the ${tempEntity.humanName} finder.
 			 *
@@ -1044,14 +1066,14 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 	</#list>
 
 	public void afterPropertiesSet() {
-		<#if pluginName != "">
+		<#if validator.isNotNull(pluginName)>
 			Class<?> clazz = getClass();
 
 			_classLoader = clazz.getClassLoader();
 		</#if>
 
-		<#if (sessionTypeName == "Local") && entity.hasColumns()>
-			<#if pluginName != "">
+		<#if stringUtil.equals(sessionTypeName, "Local") && entity.hasColumns()>
+			<#if validator.isNotNull(pluginName)>
 				PersistedModelLocalServiceRegistryUtil.register("${apiPackagePath}.model.${entity.name}", ${entity.varName}LocalService);
 			<#else>
 				persistedModelLocalServiceRegistry.register("${apiPackagePath}.model.${entity.name}", ${entity.varName}LocalService);
@@ -1060,8 +1082,8 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 	}
 
 	public void destroy() {
-		<#if (sessionTypeName == "Local") && entity.hasColumns()>
-			<#if pluginName != "">
+		<#if stringUtil.equals(sessionTypeName, "Local") && entity.hasColumns()>
+			<#if validator.isNotNull(pluginName)>
 				PersistedModelLocalServiceRegistryUtil.unregister("${apiPackagePath}.model.${entity.name}");
 			<#else>
 				persistedModelLocalServiceRegistry.unregister("${apiPackagePath}.model.${entity.name}");
@@ -1076,14 +1098,14 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 	 */
 	@Override
 	public String getOSGiServiceIdentifier() {
-		<#if sessionTypeName == "Local">
+		<#if stringUtil.equals(sessionTypeName, "Local")>
 			return ${entity.name}LocalService.class.getName();
 		<#else>
 			return ${entity.name}Service.class.getName();
 		</#if>
 	}
 
-	<#if pluginName != "">
+	<#if validator.isNotNull(pluginName)>
 		@Override
 		public Object invokeMethod(
 				String name, String[] parameterTypes, Object[] arguments)
@@ -1160,7 +1182,7 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 			protected ${tempEntity.apiPackagePath}.service.${tempEntity.name}LocalService ${tempEntity.varName}LocalService;
 		</#if>
 
-		<#if (sessionTypeName != "Local") && tempEntity.hasRemoteService()>
+		<#if !stringUtil.equals(sessionTypeName, "Local") && tempEntity.hasRemoteService()>
 			<#if osgiModule && (tempEntity.apiPackagePath != apiPackagePath)>
 				@ServiceReference(type = ${tempEntity.apiPackagePath}.service.${tempEntity.name}Service.class)
 			<#else>
@@ -1174,7 +1196,7 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 			protected ${tempEntity.apiPackagePath}.service.${tempEntity.name}Service ${tempEntity.varName}Service;
 		</#if>
 
-		<#if tempEntity.hasColumns() && ((entity.name == "Counter") || (tempEntity.name != "Counter"))>
+		<#if tempEntity.hasColumns() && (stringUtil.equals(entity.name, "Counter") || !stringUtil.equals(tempEntity.name, "Counter"))>
 			<#if osgiModule && (tempEntity.apiPackagePath != apiPackagePath)>
 				@ServiceReference(type = ${tempEntity.name}Persistence.class)
 			<#else>
@@ -1184,7 +1206,7 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 			protected ${tempEntity.name}Persistence ${tempEntity.varName}Persistence;
 		</#if>
 
-		<#if tempEntity.hasFinderClass() && ((entity.name == "Counter") || (tempEntity.name != "Counter"))>
+		<#if tempEntity.hasFinderClass() && (stringUtil.equals(entity.name, "Counter") || !stringUtil.equals(tempEntity.name, "Counter"))>
 			<#if osgiModule && (tempEntity.apiPackagePath != apiPackagePath)>
 				@ServiceReference(type = ${tempEntity.name}Finder.class)
 			<#else>
@@ -1195,8 +1217,8 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 		</#if>
 	</#list>
 
-	<#if (sessionTypeName == "Local") && entity.hasColumns()>
-		<#if pluginName == "">
+	<#if stringUtil.equals(sessionTypeName, "Local") && entity.hasColumns()>
+		<#if validator.isNull(pluginName)>
 			<#if osgiModule>
 				@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 			<#else>
@@ -1207,7 +1229,7 @@ import ${apiPackagePath}.service.${entity.name}${sessionTypeName}Service;
 		</#if>
 	</#if>
 
-	<#if pluginName != "">
+	<#if validator.isNotNull(pluginName)>
 		private ClassLoader _classLoader;
 		private ${entity.name}${sessionTypeName}ServiceClpInvoker _clpInvoker = new ${entity.name}${sessionTypeName}ServiceClpInvoker();
 	</#if>

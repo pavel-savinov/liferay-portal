@@ -15,6 +15,8 @@
 package com.liferay.sync.internal.configurator;
 
 import com.liferay.document.library.kernel.service.DLSyncEventLocalService;
+import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
+import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Destination;
@@ -22,9 +24,14 @@ import com.liferay.portal.kernel.messaging.DestinationConfiguration;
 import com.liferay.portal.kernel.messaging.DestinationFactory;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.sender.SingleDestinationMessageSenderFactory;
+import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.util.HashMapDictionary;
-import com.liferay.sync.internal.messaging.SyncDLFileVersionDiffMessageListener;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
+import com.liferay.sync.internal.messaging.SyncMaintenanceMessageListener;
+import com.liferay.sync.service.configuration.SyncServiceConfigurationKeys;
 import com.liferay.sync.service.configuration.SyncServiceConfigurationValues;
+import com.liferay.sync.util.SyncUtil;
 import com.liferay.sync.util.VerifyUtil;
 
 import java.util.Dictionary;
@@ -39,8 +46,25 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Shinn Lok
  */
-@Component(immediate = true, service = SyncConfigurator.class)
-public class SyncConfigurator {
+@Component(immediate = true, service = PortalInstanceLifecycleListener.class)
+public class SyncConfigurator extends BasePortalInstanceLifecycleListener {
+
+	@Override
+	public void portalInstanceRegistered(Company company) throws Exception {
+		boolean lanEnabled = PrefsPropsUtil.getBoolean(
+			company.getCompanyId(),
+			SyncServiceConfigurationKeys.SYNC_LAN_ENABLED,
+			SyncServiceConfigurationValues.SYNC_LAN_ENABLED);
+
+		if (lanEnabled) {
+			try {
+				SyncUtil.enableLanSync(company.getCompanyId());
+			}
+			catch (Exception e) {
+				_log.error(e, e);
+			}
+		}
+	}
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
@@ -55,22 +79,29 @@ public class SyncConfigurator {
 			_log.error(e, e);
 		}
 
-		_serviceRegistration = registerMessageListener(
+		_dlSyncEventProcessorServiceRegistration = registerMessageListener(
 			DestinationNames.DOCUMENT_LIBRARY_SYNC_EVENT_PROCESSOR);
 
-		if (SyncServiceConfigurationValues.SYNC_FILE_DIFF_CACHE_ENABLED) {
-			registerMessageListener(
-				SyncDLFileVersionDiffMessageListener.DESTINATION_NAME);
-		}
+		_syncMaintenanceProcessorServiceRegistration = registerMessageListener(
+			SyncMaintenanceMessageListener.DESTINATION_NAME);
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		if (_serviceRegistration != null) {
+		if (_dlSyncEventProcessorServiceRegistration != null) {
 			Destination destination = _bundleContext.getService(
-				_serviceRegistration.getReference());
+				_dlSyncEventProcessorServiceRegistration.getReference());
 
-			_serviceRegistration.unregister();
+			_dlSyncEventProcessorServiceRegistration.unregister();
+
+			destination.destroy();
+		}
+
+		if (_syncMaintenanceProcessorServiceRegistration != null) {
+			Destination destination = _bundleContext.getService(
+				_syncMaintenanceProcessorServiceRegistration.getReference());
+
+			_syncMaintenanceProcessorServiceRegistration.unregister();
 
 			destination.destroy();
 		}
@@ -99,6 +130,13 @@ public class SyncConfigurator {
 	}
 
 	@Reference(unbind = "-")
+	protected void setCompanyLocalService(
+		CompanyLocalService companyLocalService) {
+
+		_companyLocalService = companyLocalService;
+	}
+
+	@Reference(unbind = "-")
 	protected void setDLSyncEventLocalService(
 		DLSyncEventLocalService dlSyncEventLocalService) {
 
@@ -109,15 +147,20 @@ public class SyncConfigurator {
 		SyncConfigurator.class);
 
 	private volatile BundleContext _bundleContext;
+	private CompanyLocalService _companyLocalService;
 
 	@Reference
 	private DestinationFactory _destinationFactory;
 
 	private DLSyncEventLocalService _dlSyncEventLocalService;
-	private ServiceRegistration<Destination> _serviceRegistration;
+	private ServiceRegistration<Destination>
+		_dlSyncEventProcessorServiceRegistration;
 
 	@Reference
 	private SingleDestinationMessageSenderFactory
 		_singleDestinationMessageSenderFactory;
+
+	private ServiceRegistration<Destination>
+		_syncMaintenanceProcessorServiceRegistration;
 
 }

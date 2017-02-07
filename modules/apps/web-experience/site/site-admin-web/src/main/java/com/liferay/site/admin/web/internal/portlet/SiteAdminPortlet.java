@@ -37,6 +37,8 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.RemoteOptionsException;
 import com.liferay.portal.kernel.exception.RequiredGroupException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.Layout;
@@ -49,6 +51,8 @@ import com.liferay.portal.kernel.model.Team;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.route.model.GroupFriendlyURL;
+import com.liferay.portal.kernel.route.service.GroupFriendlyURLLocalServiceUtil;
 import com.liferay.portal.kernel.security.auth.AuthException;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.auth.RemoteAuthException;
@@ -77,9 +81,10 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropertiesParamUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -98,6 +103,7 @@ import com.liferay.sites.kernel.util.SitesUtil;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -228,7 +234,7 @@ public class SiteAdminPortlet extends MVCPortlet {
 				SiteAdminPortletKeys.SITE_SETTINGS + "requestProcessed");
 		}
 
-		PortletURL siteAdministrationURL = PortalUtil.getControlPanelPortletURL(
+		PortletURL siteAdministrationURL = portal.getControlPanelPortletURL(
 			actionRequest, group, SiteAdminPortletKeys.SITE_SETTINGS, 0, 0,
 			PortletRequest.RENDER_PHASE);
 
@@ -392,6 +398,12 @@ public class SiteAdminPortlet extends MVCPortlet {
 			refererGroupId = refererLayout.getGroupId();
 		}
 		catch (NoSuchLayoutException nsle) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(nsle, nsle);
+			}
 		}
 
 		return refererGroupId;
@@ -571,11 +583,24 @@ public class SiteAdminPortlet extends MVCPortlet {
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			Group.class.getName(), actionRequest);
 
+		List<GroupFriendlyURL> groupFriendlyURLs =
+			GroupFriendlyURLLocalServiceUtil.getGroupFriendlyURLs(
+				group.getCompanyId(), group.getGroupId());
+
+		Map<Locale, String> groupFriendlyURLMap = new HashMap<>();
+
+		for (GroupFriendlyURL groupFriendlyURL : groupFriendlyURLs) {
+			groupFriendlyURLMap.put(
+				LocaleUtil.fromLanguageId(
+					groupFriendlyURL.getLanguageId()),
+				groupFriendlyURL.getFriendlyURL());
+		}
+
 		groupService.updateGroup(
 			groupId, group.getParentGroupId(), group.getNameMap(),
 			group.getDescriptionMap(), group.getType(),
 			group.isManualMembership(), group.getMembershipRestriction(),
-			group.getFriendlyURL(), group.isInheritContent(), active,
+			groupFriendlyURLMap, group.isInheritContent(), active,
 			serviceContext);
 	}
 
@@ -583,7 +608,7 @@ public class SiteAdminPortlet extends MVCPortlet {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		long userId = PortalUtil.getUserId(actionRequest);
+		long userId = portal.getUserId(actionRequest);
 
 		long liveGroupId = ParamUtil.getLong(actionRequest, "liveGroupId");
 
@@ -593,7 +618,7 @@ public class SiteAdminPortlet extends MVCPortlet {
 		Map<Locale, String> nameMap = null;
 		Map<Locale, String> descriptionMap = null;
 		int type = 0;
-		String friendlyURL = null;
+		Map<Locale, String> friendlyURLMap = null;
 		boolean inheritContent = false;
 		boolean active = false;
 		boolean manualMembership = true;
@@ -627,7 +652,8 @@ public class SiteAdminPortlet extends MVCPortlet {
 			descriptionMap = LocalizationUtil.getLocalizationMap(
 				actionRequest, "description");
 			type = ParamUtil.getInteger(actionRequest, "type");
-			friendlyURL = ParamUtil.getString(actionRequest, "friendlyURL");
+			friendlyURLMap = LocalizationUtil.getLocalizationMap(
+				actionRequest, "friendlyURL");
 			manualMembership = ParamUtil.getBoolean(
 				actionRequest, "manualMembership");
 			inheritContent = ParamUtil.getBoolean(
@@ -637,7 +663,7 @@ public class SiteAdminPortlet extends MVCPortlet {
 			liveGroup = groupService.addGroup(
 				parentGroupId, GroupConstants.DEFAULT_LIVE_GROUP_ID, nameMap,
 				descriptionMap, type, manualMembership, membershipRestriction,
-				friendlyURL, true, inheritContent, active, serviceContext);
+				friendlyURLMap, true, inheritContent, active, serviceContext);
 
 			LiveUsers.joinGroup(
 				themeDisplay.getCompanyId(), liveGroup.getGroupId(), userId);
@@ -648,6 +674,19 @@ public class SiteAdminPortlet extends MVCPortlet {
 
 			liveGroup = groupLocalService.getGroup(liveGroupId);
 
+			List<GroupFriendlyURL> groupFriendlyURLs =
+				GroupFriendlyURLLocalServiceUtil.getGroupFriendlyURLs(
+					liveGroup.getCompanyId(), liveGroup.getGroupId());
+
+			Map<Locale, String> groupFriendlyURLMap = new HashMap<>();
+
+			for (GroupFriendlyURL groupFriendlyURL : groupFriendlyURLs) {
+				groupFriendlyURLMap.put(
+					LocaleUtil.fromLanguageId(
+						groupFriendlyURL.getLanguageId()),
+					groupFriendlyURL.getFriendlyURL());
+			}
+
 			nameMap = LocalizationUtil.getLocalizationMap(
 				actionRequest, "name", liveGroup.getNameMap());
 			descriptionMap = LocalizationUtil.getLocalizationMap(
@@ -657,8 +696,8 @@ public class SiteAdminPortlet extends MVCPortlet {
 			manualMembership = ParamUtil.getBoolean(
 				actionRequest, "manualMembership",
 				liveGroup.isManualMembership());
-			friendlyURL = ParamUtil.getString(
-				actionRequest, "friendlyURL", liveGroup.getFriendlyURL());
+			friendlyURLMap = LocalizationUtil.getLocalizationMap(
+				actionRequest, "friendlyURL", groupFriendlyURLMap);
 			inheritContent = ParamUtil.getBoolean(
 				actionRequest, "inheritContent", liveGroup.getInheritContent());
 			active = ParamUtil.getBoolean(
@@ -666,7 +705,7 @@ public class SiteAdminPortlet extends MVCPortlet {
 
 			liveGroup = groupService.updateGroup(
 				liveGroupId, parentGroupId, nameMap, descriptionMap, type,
-				manualMembership, membershipRestriction, friendlyURL,
+				manualMembership, membershipRestriction, friendlyURLMap,
 				inheritContent, active, serviceContext);
 
 			if (type == GroupConstants.TYPE_SITE_OPEN) {
@@ -808,12 +847,24 @@ public class SiteAdminPortlet extends MVCPortlet {
 		if (liveGroup.hasStagingGroup()) {
 			Group stagingGroup = liveGroup.getStagingGroup();
 
-			friendlyURL = ParamUtil.getString(
-				actionRequest, "stagingFriendlyURL",
-				stagingGroup.getFriendlyURL());
+			List<GroupFriendlyURL> groupFriendlyURLs =
+				GroupFriendlyURLLocalServiceUtil.getGroupFriendlyURLs(
+					stagingGroup.getCompanyId(), stagingGroup.getGroupId());
+
+			Map<Locale, String> groupFriendlyURLMap = new HashMap<>();
+
+			for (GroupFriendlyURL groupFriendlyURL : groupFriendlyURLs) {
+				groupFriendlyURLMap.put(
+					LocaleUtil.fromLanguageId(
+						groupFriendlyURL.getLanguageId()),
+					groupFriendlyURL.getFriendlyURL());
+			}
+
+			friendlyURLMap = LocalizationUtil.getLocalizationMap(
+				actionRequest, "stagingFriendlyURL", groupFriendlyURLMap);
 
 			groupService.updateFriendlyURL(
-				stagingGroup.getGroupId(), friendlyURL);
+				stagingGroup.getGroupId(), friendlyURLMap);
 
 			LayoutSet stagingPublicLayoutSet =
 				stagingGroup.getPublicLayoutSet();
@@ -867,7 +918,7 @@ public class SiteAdminPortlet extends MVCPortlet {
 				actionRequest, "layoutSetVisibility");
 			boolean layoutSetPrototypeLinkEnabled = ParamUtil.getBoolean(
 				actionRequest, "layoutSetPrototypeLinkEnabled",
-				(layoutSetPrototypeId > 0));
+				layoutSetPrototypeId > 0);
 
 			if (layoutSetVisibility == _LAYOUT_SET_VISIBILITY_PRIVATE) {
 				privateLayoutSetPrototypeId = layoutSetPrototypeId;
@@ -919,12 +970,19 @@ public class SiteAdminPortlet extends MVCPortlet {
 	protected LayoutSetService layoutSetService;
 	protected MembershipRequestLocalService membershipRequestLocalService;
 	protected MembershipRequestService membershipRequestService;
+
+	@Reference
+	protected Portal portal;
+
 	protected RoleLocalService roleLocalService;
 	protected TeamLocalService teamLocalService;
 	protected UserLocalService userLocalService;
 	protected UserService userService;
 
 	private static final int _LAYOUT_SET_VISIBILITY_PRIVATE = 1;
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		SiteAdminPortlet.class);
 
 	private static final TransactionConfig _transactionConfig =
 		TransactionConfig.Factory.create(

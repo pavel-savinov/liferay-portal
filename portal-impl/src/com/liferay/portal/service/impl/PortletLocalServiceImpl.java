@@ -333,23 +333,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 		clearCache();
 
-		List<String> portletActions =
-			ResourceActionsUtil.getPortletResourceActions(
-				portlet.getPortletId());
-
-		resourceActionLocalService.checkResourceActions(
-			portlet.getPortletId(), portletActions);
-
-		List<String> modelNames = ResourceActionsUtil.getPortletModelResources(
-			portlet.getPortletId());
-
-		for (String modelName : modelNames) {
-			List<String> modelActions =
-				ResourceActionsUtil.getModelResourceActions(modelName);
-
-			resourceActionLocalService.checkResourceActions(
-				modelName, modelActions);
-		}
+		ResourceActionsUtil.check(portlet.getPortletId());
 
 		PortletCategory portletCategory = (PortletCategory)WebAppPool.get(
 			portlet.getCompanyId(), WebKeys.PORTLET_CATEGORY);
@@ -765,8 +749,8 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 					_log.warn(
 						"Portlet with the name " + portletId +
-							" is described in portlet.xml but does not " +
-								"have a matching entry in liferay-portlet.xml");
+							" is described in portlet.xml but does not have " +
+								"a matching entry in liferay-portlet.xml");
 				}
 			}
 
@@ -855,8 +839,8 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 				_log.warn(
 					"Portlet with the name " + portletId +
-						" is described in portlet.xml but does not " +
-							"have a matching entry in liferay-portlet.xml");
+						" is described in portlet.xml but does not have a " +
+							"matching entry in liferay-portlet.xml");
 			}
 		}
 
@@ -866,8 +850,8 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 			if (_log.isWarnEnabled() && !portletsMap.containsKey(portletId)) {
 				_log.warn(
 					"Portlet with the name " + portletId +
-						" is described in liferay-portlet.xml but does " +
-							"not have a matching entry in portlet.xml");
+						" is described in liferay-portlet.xml but does not " +
+							"have a matching entry in portlet.xml");
 			}
 		}
 
@@ -1184,8 +1168,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 		}
 
 		updatePortlet(
-			portlet.getCompanyId(), portlet.getPortletId(), StringPool.BLANK,
-			portlet.isActive());
+			portlet.getCompanyId(), portlet.getPortletId(), StringPool.BLANK);
 	}
 
 	protected void initPortletDefaultPermissions(Portlet portlet)
@@ -1632,8 +1615,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 		List<String> userNotificationHandlerClasses = new ArrayList<>();
 
 		for (Element userNotificationHandlerClassElement :
-				portletElement.elements(
-					"user-notification-handler-class")) {
+				portletElement.elements("user-notification-handler-class")) {
 
 			userNotificationHandlerClasses.add(
 				userNotificationHandlerClassElement.getText());
@@ -1955,10 +1937,6 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 			GetterUtil.getString(
 				portletElement.elementText("css-class-wrapper"),
 				portletModel.getCssClassWrapper()));
-		portletModel.setFacebookIntegration(
-			GetterUtil.getString(
-				portletElement.elementText("facebook-integration"),
-				portletModel.getFacebookIntegration()));
 		portletModel.setAddDefaultResource(
 			GetterUtil.getBoolean(
 				portletElement.elementText("add-default-resource"),
@@ -2310,8 +2288,8 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 			if (publicRenderParameter == null) {
 				_log.error(
-					"Supported public render parameter references " +
-						"unknown identifier " + identifier);
+					"Supported public render parameter references unknown " +
+						"identifier " + identifier);
 
 				continue;
 			}
@@ -2592,6 +2570,21 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 			spriteFileName);
 
 		portletApp.setSpriteImages(spriteFileName, spriteProperties);
+	}
+
+	protected Portlet updatePortlet(
+		long companyId, String portletId, String roles) {
+
+		Portlet existingPortlet = portletPersistence.fetchByC_P(
+			companyId, portletId);
+
+		boolean active = true;
+
+		if (existingPortlet != null) {
+			active = existingPortlet.isActive();
+		}
+
+		return updatePortlet(companyId, portletId, roles, active);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

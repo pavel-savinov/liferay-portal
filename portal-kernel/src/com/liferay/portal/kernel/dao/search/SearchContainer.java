@@ -22,12 +22,10 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
-import com.liferay.portal.kernel.util.SearchContainerReference;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -147,14 +145,6 @@ public class SearchContainer<R> {
 
 		_emptyResultsMessage = emptyResultsMessage;
 
-		SearchContainerReference searchContainerReference =
-			(SearchContainerReference)portletRequest.getAttribute(
-				WebKeys.SEARCH_CONTAINER_REFERENCE);
-
-		if (searchContainerReference != null) {
-			searchContainerReference.register(this);
-		}
-
 		if (Validator.isNotNull(cssClass)) {
 			_cssClass = cssClass;
 		}
@@ -255,6 +245,7 @@ public class SearchContainer<R> {
 			id = id.concat("SearchContainer");
 
 			_id = PortalUtil.getUniqueElementId(request, namespace, id);
+
 			_uniqueId = true;
 
 			return _id;
@@ -263,6 +254,7 @@ public class SearchContainer<R> {
 		id = DeterminateKeyGenerator.generate("taglib_search_container");
 
 		_id = id.concat("SearchContainer");
+
 		_uniqueId = true;
 
 		return _id;
@@ -523,7 +515,7 @@ public class SearchContainer<R> {
 
 		if (isRecalculateCur()) {
 			if ((_total % _delta) == 0) {
-				_cur = (_total / _delta);
+				_cur = _total / _delta;
 			}
 			else {
 				_cur = (_total / _delta) + 1;

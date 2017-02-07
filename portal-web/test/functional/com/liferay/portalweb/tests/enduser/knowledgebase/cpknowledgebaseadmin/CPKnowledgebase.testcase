@@ -1,4 +1,5 @@
 <definition component-name="portal-knowledge-base">
+	<property name="portal.upstream" value="true" />
 	<property name="testray.main.component.name" value="Knowledge Base" />
 
 	<set-up>
@@ -95,22 +96,20 @@
 	</command>
 
 	<command name="AddKBArticlesViaKBAdmin" priority="4">
-		<var name="kbArticleCounterList" value="1,2,3" />
-
 		<execute macro="Navigator#openURL" />
 
 		<execute macro="ProductMenu#gotoSitesContent">
 			<var name="portlet" value="Knowledge Base" />
 		</execute>
 
-		<for list="${kbArticleCounterList}" param="kbCount">
+		<for list="1,2,3" param="kbCount">
 			<execute macro="KBArticle#addCP">
 				<var name="kbArticleContent" value="Knowledge Base Article Content ${kbCount}" />
 				<var name="kbArticleTitle" value="Knowledge Base Article Title ${kbCount}" />
 			</execute>
 		</for>
 
-		<for list="${kbArticleCounterList}" param="kbCount">
+		<for list="1,2,3" param="kbCount">
 			<execute macro="Navigator#openURL" />
 
 			<execute macro="ProductMenu#gotoSitesContent">
@@ -264,8 +263,8 @@
 		</execute>
 
 		<execute macro="Vocabulary#addWithAssociatedAssetTypeCP">
+			<var name="assetType" value="Knowledge Base Article" />
 			<var name="requiredCheckbox" value="true" />
-			<var name="vocabularyAssociatedAssetTypeList" value="Knowledge Base Article" />
 			<var name="vocabularyName" value="Vocabulary Name" />
 		</execute>
 
@@ -371,8 +370,8 @@
 		</execute>
 
 		<execute macro="Vocabulary#addWithAssociatedAssetTypeCP">
+			<var name="assetType" value="Knowledge Base Article" />
 			<var name="required" value="true" />
-			<var name="vocabularyAssociatedAssetTypeList" value="Knowledge Base Article" />
 			<var name="vocabularyName" value="Vocabulary Name" />
 		</execute>
 
@@ -842,11 +841,8 @@
 		</execute>
 
 		<execute macro="KBArticle#viewChildArticleCP">
-			<var name="kbArticleTitle" value="Knowledge Base Article Title Parent" />
-			<var name="kbAuthor" value="Test Test" />
 			<var name="kbChildArticleContent" value="Knowledge Base Article Content Child" />
 			<var name="kbChildArticleTitle" value="Knowledge Base Article Title Child" />
-			<var name="kbPriority" value="1.0" />
 		</execute>
 	</command>
 
@@ -953,11 +949,8 @@
 		</execute>
 
 		<execute macro="KBArticle#viewChildArticleCP">
-			<var name="kbArticleTitle" value="Knowledge Base Article Parent Title 4" />
-			<var name="kbAuthor" value="Test Test" />
 			<var name="kbChildArticleContent" value="In the last learning path, you built an application using the Model-View-Controller portlet framework." />
 			<var name="kbChildArticleTitle" value="Knowledge Base Article Parent Title 4 Child 1" />
-			<var name="kbPriority" value="1.0" />
 		</execute>
 
 		<execute macro="Navigator#openURL" />
@@ -972,11 +965,8 @@
 		</execute>
 
 		<execute macro="KBArticle#viewChildArticleCP">
-			<var name="kbArticleTitle" value="Knowledge Base Article Parent Title 5" />
-			<var name="kbAuthor" value="Test Test" />
 			<var name="kbChildArticleContent" value="Adding methods to the service layer." />
 			<var name="kbChildArticleTitle" value="Knowledge Base Article Parent Title 5 Child 1" />
-			<var name="kbPriority" value="1.0" />
 		</execute>
 
 		<execute macro="Navigator#openURL" />
@@ -996,11 +986,8 @@
 		</execute>
 
 		<execute macro="KBArticle#viewChildArticleCP">
-			<var name="kbArticleTitle" value="Knowledge Base Article Parent Title 4" />
-			<var name="kbAuthor" value="Test Test" />
 			<var name="kbChildArticleContent" value="Liferay permissions system is composed of several components." />
 			<var name="kbChildArticleTitle" value="Knowledge Base Article Parent Title 4 Child 1" />
-			<var name="kbPriority" value="1.0" />
 		</execute>
 
 		<execute macro="Navigator#openURL" />
@@ -1015,11 +1002,8 @@
 		</execute>
 
 		<execute macro="KBArticle#viewChildArticleCP">
-			<var name="kbArticleTitle" value="Knowledge Base Article Parent Title 5" />
-			<var name="kbAuthor" value="Test Test" />
 			<var name="kbChildArticleContent" value="Adding methods to the service layer." />
 			<var name="kbChildArticleTitle" value="Knowledge Base Article Parent Title 5 Child 1" />
-			<var name="kbPriority" value="1.0" />
 		</execute>
 
 		<execute macro="Navigator#openURL" />
@@ -1093,15 +1077,13 @@
 	</command>
 
 	<command name="ViewKBArticlePriority" priority="4">
-		<var name="kbArticleCounterList" value="1,2" />
-
 		<execute macro="Navigator#openURL" />
 
 		<execute macro="ProductMenu#gotoSitesContent">
 			<var name="portlet" value="Knowledge Base" />
 		</execute>
 
-		<for list="${kbArticleCounterList}" param="kbCount">
+		<for list="1,2" param="kbCount">
 			<execute macro="KBArticle#addCP">
 				<var name="kbArticleContent" value="Knowledge Base Article Content ${kbCount}" />
 				<var name="kbArticleTitle" value="Knowledge Base Article Title ${kbCount}" />
@@ -1161,9 +1143,6 @@
 	</command>
 
 	<command name="ViewPendingKBArticleContent" priority="3">
-		<var name="kbArticleContent" value="Knowledge Base Article Content" />
-		<var name="kbArticleTitle" value="Knowledge Base Article Title" />
-
 		<execute macro="Navigator#openURL" />
 
 		<execute macro="ProductMenu#gotoSitesConfiguration">
@@ -1182,14 +1161,14 @@
 		</execute>
 
 		<execute macro="KBArticle#addCP">
-			<var name="kbArticleContent" value="${kbArticleContent}" />
-			<var name="kbArticleTitle" value="${kbArticleTitle}" />
+			<var name="kbArticleContent" value="Knowledge Base Article Content" />
+			<var name="kbArticleTitle" value="Knowledge Base Article Title" />
 			<var name="kbWorkflowAction" value="Submit for Publication" />
 		</execute>
 
 		<execute macro="KBArticle#viewCP">
-			<var name="kbArticleContent" value="${kbArticleContent}" />
-			<var name="kbArticleTitle" value="${kbArticleTitle}" />
+			<var name="kbArticleContent" value="Knowledge Base Article Content" />
+			<var name="kbArticleTitle" value="Knowledge Base Article Title" />
 			<var name="kbWorkflowStatus" value="Pending" />
 		</execute>
 	</command>

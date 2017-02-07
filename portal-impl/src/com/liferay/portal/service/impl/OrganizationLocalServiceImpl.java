@@ -15,6 +15,7 @@
 package com.liferay.portal.service.impl;
 
 import com.liferay.portal.kernel.configuration.Filter;
+import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.DuplicateOrganizationException;
 import com.liferay.portal.kernel.exception.OrganizationNameException;
@@ -37,6 +38,8 @@ import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroupRole;
+import com.liferay.portal.kernel.route.model.GroupFriendlyURL;
+import com.liferay.portal.kernel.route.service.GroupFriendlyURLLocalServiceUtil;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
@@ -53,11 +56,13 @@ import com.liferay.portal.kernel.tree.TreePathUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -69,6 +74,7 @@ import com.liferay.portal.service.base.OrganizationLocalServiceBaseImpl;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portlet.usersadmin.search.OrganizationUsersSearcher;
 import com.liferay.users.admin.kernel.util.UsersAdminUtil;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
@@ -81,6 +87,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -219,7 +226,7 @@ public class OrganizationLocalServiceImpl
 			userId, parentGroupId, Organization.class.getName(), organizationId,
 			GroupConstants.DEFAULT_LIVE_GROUP_ID, getLocalizationMap(name),
 			null, GroupConstants.TYPE_SITE_PRIVATE, false,
-			GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, null, site, true,
+			GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, "", site, true,
 			null);
 
 		// Role
@@ -328,15 +335,21 @@ public class OrganizationLocalServiceImpl
 	public Organization deleteOrganization(Organization organization)
 		throws PortalException {
 
-		if (!CompanyThreadLocal.isDeleteInProcess() &&
-			((userLocalService.getOrganizationUsersCount(
-				organization.getOrganizationId(),
-				WorkflowConstants.STATUS_APPROVED) > 0) ||
-			 (organizationPersistence.countByC_P(
-				 organization.getCompanyId(),
-				 organization.getOrganizationId()) > 0))) {
+		if (!CompanyThreadLocal.isDeleteInProcess()) {
+			LinkedHashMap<String, Object> params = new LinkedHashMap<>();
 
-			throw new RequiredOrganizationException();
+			params.put(
+				"usersOrgs", Long.valueOf(organization.getOrganizationId()));
+
+			if ((organizationPersistence.countByC_P(
+					organization.getCompanyId(),
+					organization.getOrganizationId()) > 0) ||
+				(userFinder.countByKeywords(
+					organization.getCompanyId(), null,
+					WorkflowConstants.STATUS_APPROVED, params) > 0)) {
+
+				throw new RequiredOrganizationException();
+			}
 		}
 
 		// Asset
@@ -457,7 +470,7 @@ public class OrganizationLocalServiceImpl
 
 	@Override
 	public List<Organization> getNoAssetOrganizations() {
-		return organizationFinder.findByNoAssets();
+		return organizationFinder.findO_ByNoAssets();
 	}
 
 	/**
@@ -605,6 +618,58 @@ public class OrganizationLocalServiceImpl
 		}
 
 		return organizations;
+	}
+
+	/**
+	 * Returns all the organizations and users belonging to the parent
+	 * organization.
+	 *
+	 * @param  companyId the primary key of the organization and user's company
+	 * @param  parentOrganizationId the primary key of the organization and
+	 *         user's parent organization
+	 * @param  status the user's workflow status
+	 * @param  start the lower bound of the range of organizations and users to
+	 *         return
+	 * @param  end the upper bound of the range of organizations and users to
+	 *         return (not inclusive)
+	 * @param  obc the comparator to order the organizations and users
+	 *         (optionally <code>null</code>)
+	 * @return the organizations and users belonging to the parent organization
+	 */
+	@Override
+	public List<Object> getOrganizationsAndUsers(
+		long companyId, long parentOrganizationId, int status, int start,
+		int end, OrderByComparator<?> obc) {
+
+		QueryDefinition<?> queryDefinition = new QueryDefinition<>(
+			status, false, 0, false, start, end,
+			(OrderByComparator<Object>)obc);
+
+		return organizationFinder.findO_U_ByC_P(
+			companyId, parentOrganizationId, queryDefinition);
+	}
+
+	/**
+	 * Returns the number of organizations and users belonging to the parent
+	 * organization.
+	 *
+	 * @param  companyId the primary key of the organization and user's company
+	 * @param  parentOrganizationId the primary key of the organization and
+	 *         user's parent organization
+	 * @param  status the user's workflow status
+	 * @return the number of organizations and users belonging to the parent
+	 *         organization
+	 */
+	@Override
+	public int getOrganizationsAndUsersCount(
+		long companyId, long parentOrganizationId, int status) {
+
+		QueryDefinition<?> queryDefinition = new QueryDefinition<>(
+			status, false, 0, false, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			null);
+
+		return organizationFinder.countO_U_ByC_P(
+			companyId, parentOrganizationId, queryDefinition);
 	}
 
 	/**
@@ -1133,7 +1198,7 @@ public class OrganizationLocalServiceImpl
 			parentOrganizationIdComparator = StringPool.NOT_EQUAL;
 		}
 
-		return organizationFinder.findByKeywords(
+		return organizationFinder.findO_ByKeywords(
 			companyId, parentOrganizationId, parentOrganizationIdComparator,
 			keywords, type, regionId, countryId, params, start, end, obc);
 	}
@@ -1253,7 +1318,7 @@ public class OrganizationLocalServiceImpl
 			parentOrganizationIdComparator = StringPool.NOT_EQUAL;
 		}
 
-		return organizationFinder.findByC_PO_N_T_S_C_Z_R_C(
+		return organizationFinder.findO_ByC_PO_N_T_S_C_Z_R_C(
 			companyId, parentOrganizationId, parentOrganizationIdComparator,
 			name, type, street, city, zip, regionId, countryId, params,
 			andOperator, start, end, obc);
@@ -1361,7 +1426,7 @@ public class OrganizationLocalServiceImpl
 				parentOrganizationIdComparator = StringPool.NOT_EQUAL;
 			}
 
-			return organizationFinder.countByKeywords(
+			return organizationFinder.countO_ByKeywords(
 				companyId, parentOrganizationId, parentOrganizationIdComparator,
 				keywords, type, regionId, countryId, params);
 		}
@@ -1448,7 +1513,7 @@ public class OrganizationLocalServiceImpl
 				parentOrganizationIdComparator = StringPool.NOT_EQUAL;
 			}
 
-			return organizationFinder.countByC_PO_N_T_S_C_Z_R_C(
+			return organizationFinder.countO_ByC_PO_N_T_S_C_Z_R_C(
 				companyId, parentOrganizationId, parentOrganizationIdComparator,
 				name, type, street, city, zip, regionId, countryId, params,
 				andOperator);
@@ -1533,6 +1598,73 @@ public class OrganizationLocalServiceImpl
 
 		throw new SearchException(
 			"Unable to fix the search index after 10 attempts");
+	}
+
+	/**
+	 * Returns the organizations and users that match the keywords specified for
+	 * them and belong to the parent organization.
+	 *
+	 * @param  companyId the primary key of the organization and user's company
+	 * @param  parentOrganizationId the primary key of the organization and
+	 *         user's parent organization
+	 * @param  keywords the keywords (space separated), which may occur in the
+	 *         organization's name, type, or location fields or user's first
+	 *         name, middle name, last name, screen name, email address, or
+	 *         address fields
+	 * @param  status user's workflow status
+	 * @param  params the finder parameters (optionally <code>null</code>).
+	 * @param  start the lower bound of the range of organizations and users to
+	 *         return
+	 * @param  end the upper bound of the range of organizations and users to
+	 *         return (not inclusive)
+	 * @return the matching organizations and users
+	 */
+	@Override
+	public Hits searchOrganizationsAndUsers(
+			long companyId, long parentOrganizationId, String keywords,
+			int status, LinkedHashMap<String, Object> params, int start,
+			int end, Sort[] sorts)
+		throws PortalException {
+
+		Indexer indexer = OrganizationUsersSearcher.getInstance();
+
+		SearchContext searchContext = buildSearchContext(
+			companyId, parentOrganizationId, keywords, status, params, start,
+			end, sorts);
+
+		return indexer.search(searchContext);
+	}
+
+	/**
+	 * Returns the number of organizations and users that match the keywords
+	 * specified for them and belong to the parent organization.
+	 *
+	 * @param  companyId the primary key of the organization and user's company
+	 * @param  parentOrganizationId the primary key of the organization and
+	 *         user's parent organization
+	 * @param  keywords the keywords (space separated), which may occur in the
+	 *         organization's name, type, or location fields or user's first
+	 *         name, middle name, last name, screen name, email address, or
+	 *         address fields
+	 * @param  status user's workflow status
+	 * @param  params the finder parameters (optionally <code>null</code>).
+	 * @return the number of matching organizations and users
+	 */
+	@Override
+	public int searchOrganizationsAndUsersCount(
+			long companyId, long parentOrganizationId, String keywords,
+			int status, LinkedHashMap<String, Object> params)
+		throws PortalException {
+
+		Indexer indexer = OrganizationUsersSearcher.getInstance();
+
+		SearchContext searchContext = buildSearchContext(
+			companyId, parentOrganizationId, keywords, status, params,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+		Hits hits = indexer.search(searchContext);
+
+		return hits.getLength();
 	}
 
 	/**
@@ -1694,11 +1826,24 @@ public class OrganizationLocalServiceImpl
 		}
 
 		if (createSite || !oldName.equals(name) || organizationGroup) {
+			Map<Locale, String> groupFriendlyURLMap = new HashMap<>();
+
+			List<GroupFriendlyURL> groupFriendlyURLs =
+				GroupFriendlyURLLocalServiceUtil.getGroupFriendlyURLs(
+					companyId, group.getGroupId());
+
+			for (GroupFriendlyURL groupFriendlyURL : groupFriendlyURLs) {
+				groupFriendlyURLMap.put(
+					LocaleUtil.fromLanguageId(
+						groupFriendlyURL.getLanguageId()),
+					groupFriendlyURL.getFriendlyURL());
+			}
+
 			groupLocalService.updateGroup(
 				group.getGroupId(), parentGroupId, getLocalizationMap(name),
 				group.getDescriptionMap(), group.getType(),
 				group.isManualMembership(), group.getMembershipRestriction(),
-				group.getFriendlyURL(), group.isInheritContent(),
+				groupFriendlyURLMap, group.isInheritContent(),
 				group.isActive(), null);
 		}
 
@@ -1821,6 +1966,75 @@ public class OrganizationLocalServiceImpl
 	}
 
 	protected SearchContext buildSearchContext(
+		long companyId, long parentOrganizationId, String keywords, int status,
+		LinkedHashMap<String, Object> params, int start, int end,
+		Sort[] sorts) {
+
+		String city = null;
+		String country = null;
+		String emailAddress = null;
+		String firstName = null;
+		String fullName = null;
+		String lastName = null;
+		String middleName = null;
+		String name = null;
+		String region = null;
+		String screenName = null;
+		String street = null;
+		String type = null;
+		String zip = null;
+		boolean andOperator = false;
+
+		if (Validator.isNotNull(keywords)) {
+			city = keywords;
+			country = keywords;
+			emailAddress = keywords;
+			firstName = keywords;
+			fullName = keywords;
+			lastName = keywords;
+			middleName = keywords;
+			name = keywords;
+			region = keywords;
+			screenName = keywords;
+			street = keywords;
+			type = keywords;
+			zip = keywords;
+		}
+		else {
+			andOperator = true;
+		}
+
+		if (params == null) {
+			params = new LinkedHashMap<>();
+		}
+
+		params.put("keywords", keywords);
+		params.put("usersOrgs", parentOrganizationId);
+
+		SearchContext searchContext = buildSearchContext(
+			companyId, parentOrganizationId, name, type, street, city, zip,
+			region, country, params, andOperator, start, end, null);
+
+		Map<String, Serializable> attributes = searchContext.getAttributes();
+
+		attributes.put("emailAddress", emailAddress);
+		attributes.put("firstName", firstName);
+		attributes.put("fullName", fullName);
+		attributes.put("lastName", lastName);
+		attributes.put("middleName", middleName);
+		attributes.put("screenName", screenName);
+		attributes.put("status", status);
+
+		searchContext.setAttributes(attributes);
+
+		if (sorts != null) {
+			searchContext.setSorts(sorts);
+		}
+
+		return searchContext;
+	}
+
+	protected SearchContext buildSearchContext(
 		long companyId, long parentOrganizationId, String name, String type,
 		String street, String city, String zip, Long regionId, Long countryId,
 		LinkedHashMap<String, Object> params, boolean andSearch, int start,
@@ -1923,11 +2137,16 @@ public class OrganizationLocalServiceImpl
 	protected long[] getReindexOrganizationIds(Organization organization)
 		throws PortalException {
 
+		StringBundler sb = new StringBundler(3);
+
+		sb.append(StringPool.FORWARD_SLASH);
+		sb.append(organization.getOrganizationId());
+		sb.append(StringPool.FORWARD_SLASH);
+
 		List<Organization> organizations = organizationPersistence.findByC_T(
 			organization.getCompanyId(),
-			CustomSQLUtil.keywords(organization.getTreePath())[0],
-			QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-			new OrganizationNameComparator(true));
+			CustomSQLUtil.keywords(sb.toString())[0], QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, new OrganizationNameComparator(true));
 
 		long[] organizationIds = new long[organizations.size()];
 

@@ -86,6 +86,7 @@ public class ActionUtil {
 			wikiEngineRenderer);
 
 		renderRequest.setAttribute(WebKeys.DIFF_HTML_RESULTS, htmlDiffResult);
+
 		renderRequest.setAttribute(WebKeys.SOURCE_VERSION, sourceVersion);
 		renderRequest.setAttribute(WebKeys.TARGET_VERSION, targetVersion);
 		renderRequest.setAttribute(WebKeys.TITLE, title);
@@ -287,7 +288,7 @@ public class ActionUtil {
 			}
 		}
 		catch (NoSuchNodeException nsne) {
-			node = ActionUtil.getFirstVisibleNode(portletRequest);
+			node = getFirstVisibleNode(portletRequest);
 		}
 
 		return node;
@@ -395,11 +396,11 @@ public class ActionUtil {
 		throws PortletException {
 
 		try {
-			WikiNode node = ActionUtil.getNode(renderRequest);
+			WikiNode node = getNode(renderRequest);
 
 			renderRequest.setAttribute(WikiWebKeys.WIKI_NODE, node);
 
-			ActionUtil.getFirstVisiblePage(node.getNodeId(), renderRequest);
+			getFirstVisiblePage(node.getNodeId(), renderRequest);
 		}
 		catch (Exception e) {
 			if (e instanceof NoSuchNodeException ||
@@ -415,8 +416,9 @@ public class ActionUtil {
 		}
 
 		long categoryId = ParamUtil.getLong(renderRequest, "categoryId");
+		String tag = ParamUtil.getString(renderRequest, "tag");
 
-		if (categoryId > 0) {
+		if ((categoryId > 0) || Validator.isNotNull(tag)) {
 			return "/wiki/view_categorized_pages.jsp";
 		}
 		else {

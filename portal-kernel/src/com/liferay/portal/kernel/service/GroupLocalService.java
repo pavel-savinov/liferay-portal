@@ -115,6 +115,9 @@ public interface GroupLocalService extends BaseLocalService,
 	public boolean hasUserGroups(long userId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean isLiveGroupActive(Group group);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
 
 	public DynamicQuery dynamicQuery();
@@ -186,6 +189,24 @@ public interface GroupLocalService extends BaseLocalService,
 		boolean active, ServiceContext serviceContext)
 		throws PortalException;
 
+	public Group addGroup(long userId, long parentGroupId,
+		java.lang.String className, long classPK, long liveGroupId,
+		Map<Locale, java.lang.String> nameMap,
+		Map<Locale, java.lang.String> descriptionMap, int type,
+		boolean manualMembership, int membershipRestriction,
+		Map<Locale, java.lang.String> friendlyURLMap, boolean site,
+		boolean active, ServiceContext serviceContext)
+		throws PortalException;
+
+	public Group addGroup(long userId, long parentGroupId,
+		java.lang.String className, long classPK, long liveGroupId,
+		Map<Locale, java.lang.String> nameMap,
+		Map<Locale, java.lang.String> descriptionMap, int type,
+		boolean manualMembership, int membershipRestriction,
+		Map<Locale, java.lang.String> friendlyURLMap, boolean site,
+		boolean inheritContent, boolean active, ServiceContext serviceContext)
+		throws PortalException;
+
 	public Group checkScopeGroup(Layout layout, long userId)
 		throws PortalException;
 
@@ -252,6 +273,7 @@ public interface GroupLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Group fetchGroup(long companyId, java.lang.String groupKey);
 
+	@ThreadLocalCachable
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Group fetchGroup(long groupId);
 
@@ -469,6 +491,9 @@ public interface GroupLocalService extends BaseLocalService,
 	public Group updateFriendlyURL(long groupId, java.lang.String friendlyURL)
 		throws PortalException;
 
+	public Group updateFriendlyURL(long groupId,
+		Map<Locale, java.lang.String> friendlyURLMap) throws PortalException;
+
 	/**
 	* Updates the group in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	*
@@ -526,11 +551,26 @@ public interface GroupLocalService extends BaseLocalService,
 		ServiceContext serviceContext) throws PortalException;
 
 	public Group updateGroup(long groupId, long parentGroupId,
+		java.lang.String name, java.lang.String description, int type,
+		boolean manualMembership, int membershipRestriction,
+		Map<Locale, java.lang.String> friendlyURLMap, boolean inheritContent,
+		boolean active, ServiceContext serviceContext)
+		throws PortalException;
+
+	public Group updateGroup(long groupId, long parentGroupId,
 		Map<Locale, java.lang.String> nameMap,
 		Map<Locale, java.lang.String> descriptionMap, int type,
 		boolean manualMembership, int membershipRestriction,
 		java.lang.String friendlyURL, boolean inheritContent, boolean active,
 		ServiceContext serviceContext) throws PortalException;
+
+	public Group updateGroup(long groupId, long parentGroupId,
+		Map<Locale, java.lang.String> nameMap,
+		Map<Locale, java.lang.String> descriptionMap, int type,
+		boolean manualMembership, int membershipRestriction,
+		Map<Locale, java.lang.String> friendlyURLMap, boolean inheritContent,
+		boolean active, ServiceContext serviceContext)
+		throws PortalException;
 
 	/**
 	* Associates the group with a main site if the group is an organization.

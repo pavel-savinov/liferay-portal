@@ -22,6 +22,8 @@ import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.journal.configuration.JournalServiceConfiguration;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.mobile.device.Device;
@@ -64,6 +66,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -88,7 +91,7 @@ public class JournalTransformer {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #JournalTransformer(boolean)}
+	 * @deprecated As of 4.0.0, replaced by {@link #JournalTransformer(boolean)}
 	 */
 	@Deprecated
 	public JournalTransformer(
@@ -98,7 +101,7 @@ public class JournalTransformer {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link #JournalTransformer(boolean)}
+	 * @deprecated As of 4.0.0, replaced by {@link #JournalTransformer(boolean)}
 	 */
 	@Deprecated
 	public JournalTransformer(
@@ -524,6 +527,20 @@ public class JournalTransformer {
 				"type", StringPool.BLANK);
 
 			Map<String, String> attributes = new HashMap<>();
+
+			if (type.equals("image")) {
+				JSONObject dataJSON = JSONFactoryUtil.createJSONObject(data);
+
+				Iterator<String> itr = dataJSON.keys();
+
+				while (itr.hasNext()) {
+					String key = itr.next();
+
+					String value = dataJSON.getString(key);
+
+					attributes.put(key, value);
+				}
+			}
 
 			if (dynamicContentElement != null) {
 				for (Attribute attribute : dynamicContentElement.attributes()) {

@@ -92,7 +92,7 @@ import java.util.Objects;
 import java.util.Set;
 
 <#list referenceList as tempEntity>
-	<#if tempEntity.hasColumns() && ((entity.name == "Counter") || (tempEntity.name != "Counter"))>
+	<#if tempEntity.hasColumns() && (stringUtil.equals(entity.name, "Counter") || !stringUtil.equals(tempEntity.name, "Counter"))>
 		import ${tempEntity.apiPackagePath}.service.persistence.${tempEntity.name}Persistence;
 	</#if>
 </#list>
@@ -285,7 +285,7 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
 		<#if entity.getUniqueFinderList()?size &gt; 0>
-			clearUniqueFindersCache((${entity.name}ModelImpl)${entity.varName});
+			clearUniqueFindersCache((${entity.name}ModelImpl)${entity.varName}, true);
 		</#if>
 	}
 
@@ -298,57 +298,13 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 			entityCache.removeResult(${entity.name}ModelImpl.ENTITY_CACHE_ENABLED, ${entity.name}Impl.class, ${entity.varName}.getPrimaryKey());
 
 			<#if entity.getUniqueFinderList()?size &gt; 0>
-				clearUniqueFindersCache((${entity.name}ModelImpl)${entity.varName});
+				clearUniqueFindersCache((${entity.name}ModelImpl)${entity.varName}, true);
 			</#if>
 		}
 	}
 
 	<#if entity.getUniqueFinderList()?size &gt; 0>
-		protected void cacheUniqueFindersCache(${entity.name}ModelImpl ${entity.varName}ModelImpl, boolean isNew) {
-			if (isNew) {
-				<#list entity.getUniqueFinderList() as finder>
-					<#assign finderColsList = finder.getColumns() />
-
-					<#if finder_index == 0>
-						Object[]
-					</#if>
-					args = new Object[] {
-						<#list finderColsList as finderCol>
-							${entity.varName}ModelImpl.get${finderCol.methodName}()
-
-							<#if finderCol_has_next>
-								,
-							</#if>
-						</#list>
-					};
-
-					finderCache.putResult(FINDER_PATH_COUNT_BY_${finder.name?upper_case}, args, Long.valueOf(1));
-					finderCache.putResult(FINDER_PATH_FETCH_BY_${finder.name?upper_case}, args, ${entity.varName}ModelImpl);
-				</#list>
-			}
-			else {
-				<#list entity.getUniqueFinderList() as finder>
-					<#assign finderColsList = finder.getColumns() />
-
-					if ((${entity.varName}ModelImpl.getColumnBitmask() & FINDER_PATH_FETCH_BY_${finder.name?upper_case}.getColumnBitmask()) != 0) {
-						Object[] args = new Object[] {
-							<#list finderColsList as finderCol>
-								${entity.varName}ModelImpl.get${finderCol.methodName}()
-
-								<#if finderCol_has_next>
-									,
-								</#if>
-							</#list>
-						};
-
-						finderCache.putResult(FINDER_PATH_COUNT_BY_${finder.name?upper_case}, args, Long.valueOf(1));
-						finderCache.putResult(FINDER_PATH_FETCH_BY_${finder.name?upper_case}, args, ${entity.varName}ModelImpl);
-					}
-				</#list>
-			}
-		}
-
-		protected void clearUniqueFindersCache(${entity.name}ModelImpl ${entity.varName}ModelImpl) {
+		protected void cacheUniqueFindersCache(${entity.name}ModelImpl ${entity.varName}ModelImpl) {
 			<#list entity.getUniqueFinderList() as finder>
 				<#assign finderColsList = finder.getColumns() />
 
@@ -365,11 +321,32 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 					</#list>
 				};
 
-				finderCache.removeResult(FINDER_PATH_COUNT_BY_${finder.name?upper_case}, args);
-				finderCache.removeResult(FINDER_PATH_FETCH_BY_${finder.name?upper_case}, args);
+				finderCache.putResult(FINDER_PATH_COUNT_BY_${finder.name?upper_case}, args, Long.valueOf(1), false);
+				finderCache.putResult(FINDER_PATH_FETCH_BY_${finder.name?upper_case}, args, ${entity.varName}ModelImpl, false);
+			</#list>
+		}
+
+		protected void clearUniqueFindersCache(${entity.name}ModelImpl ${entity.varName}ModelImpl, boolean clearCurrent) {
+			<#list entity.getUniqueFinderList() as finder>
+				<#assign finderColsList = finder.getColumns() />
+
+				if (clearCurrent) {
+					Object[] args = new Object[] {
+						<#list finderColsList as finderCol>
+							${entity.varName}ModelImpl.get${finderCol.methodName}()
+
+							<#if finderCol_has_next>
+								,
+							</#if>
+						</#list>
+					};
+
+					finderCache.removeResult(FINDER_PATH_COUNT_BY_${finder.name?upper_case}, args);
+					finderCache.removeResult(FINDER_PATH_FETCH_BY_${finder.name?upper_case}, args);
+				}
 
 				if ((${entity.varName}ModelImpl.getColumnBitmask() & FINDER_PATH_FETCH_BY_${finder.name?upper_case}.getColumnBitmask()) != 0) {
-					args = new Object[] {
+					Object[] args = new Object[] {
 						<#list finderColsList as finderCol>
 							${entity.varName}ModelImpl.getOriginal${finderCol.methodName}()
 
@@ -777,8 +754,8 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 		entityCache.putResult(${entity.name}ModelImpl.ENTITY_CACHE_ENABLED, ${entity.name}Impl.class, ${entity.varName}.getPrimaryKey(), ${entity.varName}, false);
 
 		<#if uniqueFinderList?size &gt; 0>
-			clearUniqueFindersCache(${entity.varName}ModelImpl);
-			cacheUniqueFindersCache(${entity.varName}ModelImpl, isNew);
+			clearUniqueFindersCache(${entity.varName}ModelImpl, false);
+			cacheUniqueFindersCache(${entity.varName}ModelImpl);
 		</#if>
 
 		${entity.varName}.resetOriginalValues();
@@ -799,7 +776,7 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 		<#list entity.regularColList as column>
 			${entity.varName}Impl.set${column.methodName}(
 
-			<#if column.type == "boolean">
+			<#if stringUtil.equals(column.type, "boolean")>
 				${entity.varName}.is${column.methodName}()
 			<#else>
 				${entity.varName}.get${column.methodName}()
@@ -956,7 +933,7 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 				return map;
 			}
 
-			<#if entity.PKClassName == "String">
+			<#if stringUtil.equals(entity.PKClassName, "String")>
 				StringBundler query = new StringBundler(uncachedPrimaryKeys.size() * 4 + 1);
 			<#else>
 				StringBundler query = new StringBundler(uncachedPrimaryKeys.size() * 2 + 1);
@@ -965,7 +942,7 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 			query.append(_SQL_SELECT_${entity.alias?upper_case}_WHERE_PKS_IN);
 
 			for (Serializable primaryKey : uncachedPrimaryKeys) {
-				<#if entity.PKClassName == "String">
+				<#if stringUtil.equals(entity.PKClassName, "String")>
 					query.append(StringPool.APOSTROPHE);
 					query.append((String)primaryKey);
 					query.append(StringPool.APOSTROPHE);
@@ -1483,7 +1460,7 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 
 	<#if entity.badNamedColumnsList?size != 0>
 		@Override
-	    public Set<String> getBadColumnNames() {
+		public Set<String> getBadColumnNames() {
 			return _badColumnNames;
 		}
 	</#if>
@@ -1860,7 +1837,7 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 
 <#function bindParameter finderColsList>
 	<#list finderColsList as finderCol>
-		<#if !finderCol.hasArrayableOperator() || (finderCol.type == "String")>
+		<#if !finderCol.hasArrayableOperator() || stringUtil.equals(finderCol.type, "String")>
 			<#return true>
 		</#if>
 	</#list>
@@ -1873,7 +1850,7 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 >
 	<#list finderColsList as finderCol>
 		<#if _arrayable && finderCol.hasArrayableOperator()>
-			<#if finderCol.type == "String">
+			<#if stringUtil.equals(finderCol.type, "String")>
 				for (String ${finderCol.name} : ${finderCol.names}) {
 					if (${finderCol.name} != null && !${finderCol.name}.isEmpty()) {
 						qPos.add(${finderCol.name});
@@ -1886,9 +1863,9 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 		<#else>
 			if (bind${finderCol.methodName}) {
 				qPos.add(
-					<#if finderCol.type == "Date">
+					<#if stringUtil.equals(finderCol.type, "Date")>
 						new Timestamp(${finderCol.name}.getTime())
-					<#elseif (finderCol.type == "String") && !finderCol.isCaseSensitive()>
+					<#elseif stringUtil.equals(finderCol.type, "String") && !finderCol.isCaseSensitive()>
 						StringUtil.toLowerCase(${finderCol.name})
 					<#else>
 						${finderCol.name}

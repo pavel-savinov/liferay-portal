@@ -160,7 +160,7 @@ AUI.add(
 				return instance.get('container').all('> .field-wrapper');
 			},
 
-			getRoot: function() {
+			getForm: function() {
 				var instance = this;
 
 				var root;
@@ -171,7 +171,7 @@ AUI.add(
 					}
 				);
 
-				return root;
+				return root || instance;
 			},
 
 			_getField: function(fieldNode) {
@@ -205,7 +205,9 @@ AUI.add(
 					)
 				);
 
-				field.addTarget(instance);
+				var form = instance.getForm();
+
+				field.addTarget(form);
 
 				var translationManager = instance.get('translationManager');
 
@@ -240,13 +242,16 @@ AUI.add(
 			_getTemplateResourceURL: function() {
 				var instance = this;
 
-				var portletURL = Liferay.PortletURL.createURL(themeDisplay.getURLControlPanel());
+				var portletURL = Liferay.PortletURL.createRenderURL(themeDisplay.getURLControlPanel());
+
+				var container = instance.get('container');
 
 				portletURL.setDoAsGroupId(instance.get('doAsGroupId'));
 				portletURL.setLifecycle(Liferay.PortletURL.RESOURCE_PHASE);
 				portletURL.setParameter('fieldName', instance.get('name'));
 				portletURL.setParameter('mode', instance.get('mode'));
 				portletURL.setParameter('namespace', instance.get('fieldsNamespace'));
+				portletURL.setParameter('p_p_auth', container.getData('ddmAuthToken'));
 				portletURL.setParameter('p_p_isolated', true);
 				portletURL.setParameter('portletNamespace', instance.get('portletNamespace'));
 				portletURL.setParameter('readOnly', instance.get('readOnly'));
@@ -262,7 +267,7 @@ AUI.add(
 				var instance = this;
 
 				if (!A.instanceOf(instance, Liferay.DDM.Form)) {
-					var form = instance.getRoot();
+					var form = instance.getForm();
 
 					translationManager = form.get('translationManager');
 				}
@@ -830,13 +835,14 @@ AUI.add(
 						var instance = this;
 
 						var instanceId = instance.get('instanceId');
+
 						var values = instance.get('values');
 
 						var fieldValue = instance.getFieldInfo(values, 'instanceId', instanceId);
 
 						var localizationMap = {};
 
-						if (!A.Object.isEmpty(fieldValue)) {
+						if (fieldValue && fieldValue.value) {
 							localizationMap = fieldValue.value;
 						}
 
@@ -1015,7 +1021,7 @@ AUI.add(
 
 						var portletNamespace = instance.get('portletNamespace');
 
-						var portletURL = Liferay.PortletURL.createURL(themeDisplay.getURLControlPanel());
+						var portletURL = Liferay.PortletURL.createRenderURL(themeDisplay.getURLControlPanel());
 
 						portletURL.setDoAsGroupId(instance.get('doAsGroupId'));
 						portletURL.setParameter('criteria', criteria);
@@ -1201,7 +1207,7 @@ AUI.add(
 
 						var container = instance.get('container');
 
-						var url = Liferay.PortletURL.createURL(themeDisplay.getURLControlPanel());
+						var url = Liferay.PortletURL.createRenderURL(themeDisplay.getURLControlPanel());
 
 						url.setParameter('eventName', 'selectContent');
 						url.setParameter('groupId', themeDisplay.getScopeGroupId());
@@ -1379,6 +1385,8 @@ AUI.add(
 						instance._loadingAnimationNode = A.Node.create(TPL_LOADER);
 
 						instance._cache = {};
+
+						instance._clearedModal = false;
 
 						instance.after('selectedLayoutChange', instance._afterSelectedLayoutChange);
 						instance.after('selectedLayoutPathChange', instance._afterSelectedLayoutPathChange);
@@ -1666,6 +1674,8 @@ AUI.add(
 					_handleClearButtonClick: function() {
 						var instance = this;
 
+						instance._clearedModal = true;
+
 						instance.setValue('');
 
 						instance.set('selectedLayout', instance.get('selectedLayoutPath')[0]);
@@ -1803,6 +1813,8 @@ AUI.add(
 
 						currentTarget.addClass('active');
 
+						instance._currentParentLayoutId = 0;
+
 						instance._cleanSelectedLayout();
 
 						var privateLayout = currentTarget.test('.private');
@@ -1884,21 +1896,15 @@ AUI.add(
 
 							listNode.on('scroll', instance._handleModalScroll, instance);
 						}
-						else {
-							var path = instance.get('selectedLayoutPath');
+						else if (instance._clearedModal) {
+							instance._navbar.one('.active').removeClass('active');
 
-							instance.set(
-								'selectedLayout',
-								{
-									groupId: value.groupId,
-									label: value.label,
-									layoutId: value.layoutId,
-									path: path.slice(),
-									privateLayout: privateLayout
-								}
-							);
+							var activeClass = privateLayout ? '.private' : '.public';
 
+							instance._navbar.one(activeClass).addClass('active');
+							instance._resetBreadcrumb(privateLayout);
 							instance._renderLayoutsList(privateLayout);
+							instance._clearedModal = false;
 						}
 
 						modal.show();
@@ -2339,7 +2345,7 @@ AUI.add(
 
 						var portletNamespace = instance.get('portletNamespace');
 
-						var portletURL = Liferay.PortletURL.createURL(themeDisplay.getURLControlPanel());
+						var portletURL = Liferay.PortletURL.createRenderURL(themeDisplay.getURLControlPanel());
 
 						portletURL.setDoAsGroupId(instance.get('doAsGroupId'));
 						portletURL.setParameter('criteria', criteria);
@@ -2404,6 +2410,10 @@ AUI.add(
 							if (!parsedValue.name && parsedValue.title) {
 								parsedValue.name = parsedValue.title;
 							}
+
+							var altNode = A.one('#' + instance.getInputName() + 'Alt');
+
+							altNode.val(parsedValue.alt);
 
 							value = JSON.stringify(parsedValue);
 						}
@@ -2743,6 +2753,20 @@ AUI.add(
 		);
 
 		FieldTypes.select = SelectField;
+
+		var SeparatorField = A.Component.create(
+			{
+				EXTENDS: Field,
+
+				prototype: {
+					getValue: function() {
+						return '';
+					}
+				}
+			}
+		);
+
+		FieldTypes['ddm-separator'] = SeparatorField;
 
 		var Form = A.Component.create(
 			{

@@ -40,6 +40,8 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.servlet.filters.BasePortalFilter;
 import com.liferay.portal.util.PropsUtil;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -82,8 +84,11 @@ public class SecureFilter extends BasePortalFilter {
 				PropsUtil.get(propertyPrefix + "https.required"));
 		}
 
-		for (String hostAllowed : hostsAllowed) {
-			_hostsAllowed.add(hostAllowed);
+		if (hostsAllowed.length == 0) {
+			_hostsAllowed = Collections.emptySet();
+		}
+		else {
+			_hostsAllowed = new HashSet<>(Arrays.asList(hostsAllowed));
 		}
 
 		_usePermissionChecker = GetterUtil.getBoolean(
@@ -115,7 +120,8 @@ public class SecureFilter extends BasePortalFilter {
 
 			if (userId > 0) {
 				request = setCredentials(
-					request, session, userId, HttpServletRequest.BASIC_AUTH);
+					request, session, UserLocalServiceUtil.getUser(userId),
+					HttpServletRequest.BASIC_AUTH);
 			}
 			else {
 				HttpAuthorizationHeader httpAuthorizationHeader =
@@ -158,7 +164,8 @@ public class SecureFilter extends BasePortalFilter {
 
 			if (userId > 0) {
 				request = setCredentials(
-					request, session, userId, HttpServletRequest.DIGEST_AUTH);
+					request, session, UserLocalServiceUtil.getUser(userId),
+					HttpServletRequest.DIGEST_AUTH);
 			}
 			else {
 				HttpAuthorizationHeader httpAuthorizationHeader =
@@ -190,7 +197,9 @@ public class SecureFilter extends BasePortalFilter {
 	protected void initThreadLocals(User user) throws Exception {
 		CompanyThreadLocal.setCompanyId(user.getCompanyId());
 
-		PrincipalThreadLocal.setName(user.getUserId());
+		long userId = user.getUserId();
+
+		PrincipalThreadLocal.setName(userId);
 
 		if (!_usePermissionChecker) {
 			return;
@@ -199,7 +208,9 @@ public class SecureFilter extends BasePortalFilter {
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
 
-		if (permissionChecker != null) {
+		if ((permissionChecker != null) &&
+			(permissionChecker.getUserId() == userId)) {
+
 			return;
 		}
 
@@ -277,6 +288,13 @@ public class SecureFilter extends BasePortalFilter {
 				user = PortalUtil.initUser(request);
 			}
 			catch (NoSuchUserException nsue) {
+
+				// LPS-52675
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(nsue, nsue);
+				}
+
 				response.sendRedirect(HttpUtil.getCompleteURL(request));
 
 				return;
@@ -286,7 +304,7 @@ public class SecureFilter extends BasePortalFilter {
 
 			if (!user.isDefaultUser()) {
 				request = setCredentials(
-					request, request.getSession(), user.getUserId(), null);
+					request, request.getSession(), user, null);
 			}
 			else {
 				if (_digestAuthEnabled) {
@@ -305,18 +323,32 @@ public class SecureFilter extends BasePortalFilter {
 		}
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link
+	 *             #setCredentials(
+	 *             HttpServletRequest, HttpSession, User, String)}
+	 */
+	@Deprecated
 	protected HttpServletRequest setCredentials(
 			HttpServletRequest request, HttpSession session, long userId,
 			String authType)
 		throws Exception {
 
-		User user = UserLocalServiceUtil.getUser(userId);
+		return setCredentials(
+			request, session, UserLocalServiceUtil.getUser(userId), authType);
+	}
 
-		String userIdString = String.valueOf(userId);
+	protected HttpServletRequest setCredentials(
+			HttpServletRequest request, HttpSession session, User user,
+			String authType)
+		throws Exception {
+
+		String userIdString = String.valueOf(user.getUserId());
 
 		request = new ProtectedServletRequest(request, userIdString, authType);
 
 		session.setAttribute(_AUTHENTICATED_USER, userIdString);
+
 		session.setAttribute(WebKeys.USER, user);
 
 		initThreadLocals(request);
@@ -335,7 +367,7 @@ public class SecureFilter extends BasePortalFilter {
 
 	private boolean _basicAuthEnabled;
 	private boolean _digestAuthEnabled;
-	private final Set<String> _hostsAllowed = new HashSet<>();
+	private Set<String> _hostsAllowed;
 	private boolean _httpsRequired;
 	private boolean _usePermissionChecker;
 

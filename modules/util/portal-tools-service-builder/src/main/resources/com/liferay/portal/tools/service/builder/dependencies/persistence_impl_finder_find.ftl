@@ -1183,13 +1183,13 @@ that may or may not be enforced with a unique index at the database level. Case
 						}
 						else if (${finderCol.names}.length > 1) {
 							${finderCol.names} =
-								<#if finderCol.type == "String">
+								<#if stringUtil.equals(finderCol.type, "String")>
 									ArrayUtil.distinct(${finderCol.names}, NULL_SAFE_STRING_COMPARATOR);
 								<#else>
 									ArrayUtil.unique(${finderCol.names});
 								</#if>
 
-							<#if finderCol.type == "String">
+							<#if stringUtil.equals(finderCol.type, "String")>
 								Arrays.sort(${finderCol.names}, NULL_SAFE_STRING_COMPARATOR);
 							<#else>
 								Arrays.sort(${finderCol.names});
@@ -1503,13 +1503,13 @@ that may or may not be enforced with a unique index at the database level. Case
 					}
 					else if (${finderCol.names}.length > 1) {
 						${finderCol.names} =
-							<#if finderCol.type == "String">
+							<#if stringUtil.equals(finderCol.type, "String")>
 								ArrayUtil.distinct(${finderCol.names}, NULL_SAFE_STRING_COMPARATOR);
 							<#else>
 								ArrayUtil.unique(${finderCol.names});
 							</#if>
 
-						<#if finderCol.type == "String">
+						<#if stringUtil.equals(finderCol.type, "String")>
 							Arrays.sort(${finderCol.names}, NULL_SAFE_STRING_COMPARATOR);
 						<#else>
 							Arrays.sort(${finderCol.names});
@@ -1861,8 +1861,12 @@ that may or may not be enforced with a unique index at the database level. Case
 				}
 				else {
 					<#if !finder.isUnique()>
-						if ((list.size() > 1) && _log.isWarnEnabled()) {
-							_log.warn("${entity.name}PersistenceImpl.fetchBy${finder.name}(<#list finderColsList as finderCol>${finderCol.type}, </#list>boolean) with parameters (" + StringUtil.merge(finderArgs) + ") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
+						if (list.size() > 1) {
+							Collections.sort(list, Collections.reverseOrder());
+
+							if (_log.isWarnEnabled()) {
+								_log.warn("${entity.name}PersistenceImpl.fetchBy${finder.name}(<#list finderColsList as finderCol>${finderCol.type}, </#list>boolean) with parameters (" + StringUtil.merge(finderArgs) + ") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
+							}
 						}
 					</#if>
 

@@ -76,18 +76,37 @@ public abstract class ScreensJournalArticleServiceBaseImpl
 	}
 
 	/**
-	 * Returns the screens d d l record remote service.
+	 * Returns the screens comment remote service.
 	 *
-	 * @return the screens d d l record remote service
+	 * @return the screens comment remote service
+	 */
+	public com.liferay.screens.service.ScreensCommentService getScreensCommentService() {
+		return screensCommentService;
+	}
+
+	/**
+	 * Sets the screens comment remote service.
+	 *
+	 * @param screensCommentService the screens comment remote service
+	 */
+	public void setScreensCommentService(
+		com.liferay.screens.service.ScreensCommentService screensCommentService) {
+		this.screensCommentService = screensCommentService;
+	}
+
+	/**
+	 * Returns the screens ddl record remote service.
+	 *
+	 * @return the screens ddl record remote service
 	 */
 	public com.liferay.screens.service.ScreensDDLRecordService getScreensDDLRecordService() {
 		return screensDDLRecordService;
 	}
 
 	/**
-	 * Sets the screens d d l record remote service.
+	 * Sets the screens ddl record remote service.
 	 *
-	 * @param screensDDLRecordService the screens d d l record remote service
+	 * @param screensDDLRecordService the screens ddl record remote service
 	 */
 	public void setScreensDDLRecordService(
 		com.liferay.screens.service.ScreensDDLRecordService screensDDLRecordService) {
@@ -420,6 +439,8 @@ public abstract class ScreensJournalArticleServiceBaseImpl
 
 	@BeanReference(type = com.liferay.screens.service.ScreensAssetEntryService.class)
 	protected com.liferay.screens.service.ScreensAssetEntryService screensAssetEntryService;
+	@BeanReference(type = com.liferay.screens.service.ScreensCommentService.class)
+	protected com.liferay.screens.service.ScreensCommentService screensCommentService;
 	@BeanReference(type = com.liferay.screens.service.ScreensDDLRecordService.class)
 	protected com.liferay.screens.service.ScreensDDLRecordService screensDDLRecordService;
 	@BeanReference(type = ScreensJournalArticleService.class)

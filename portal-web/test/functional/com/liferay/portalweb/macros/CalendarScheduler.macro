@@ -107,7 +107,9 @@
 
 		<execute function="AssertTextEquals" locator1="Calendar#SCHEDULER_EVENT_DIALOG_BOX_EVENT_TITLE" value1="${eventTitle}" />
 		<execute function="AssertElementPresent" locator1="Calendar#SCHEDULER_EVENT_DIALOG_BOX_CALENDAR" value1="${calendarDefaultName}" />
+
 		<execute function="Select" locator1="Calendar#SCHEDULER_EVENT_DIALOG_BOX_CALENDAR" value1="${calendarName}" />
+
 		<execute function="AssertElementPresent" locator1="Calendar#SCHEDULER_EVENT_DIALOG_BOX_CALENDAR" value1="${calendarName}" />
 
 		<execute macro="CalendarScheduler#saveEvent" />
@@ -587,7 +589,7 @@
 	<command name="viewShowMoreLocalizedViaDayView">
 		<execute function="AssertClick" locator1="Calendar#VIEW_DAY_BUTTON" value1="${viewTypeLocalized}" />
 
-		<execute function="Pause" locator1="5000" />
+		<execute function="Pause" locator1="10000" />
 
 		<var name="key_messageLocalized" value="${messageLocalized}" />
 
@@ -597,6 +599,15 @@
 			</not>
 			<then>
 				<execute function="Click" locator1="Calendar#VIEW_NEXT_BUTTON" />
+			</then>
+		</if>
+
+		<if>
+			<not>
+				<execute function="IsElementPresent" locator1="Calendar#SCHEDULER_VIEW_DAY_SHOW_MORE_LOCALIZED" />
+			</not>
+			<then>
+				<execute function="Click" locator1="Calendar#VIEW_PREVIOUS_BUTTON" />
 			</then>
 		</if>
 

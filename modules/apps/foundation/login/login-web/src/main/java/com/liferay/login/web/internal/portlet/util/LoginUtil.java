@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.CookieKeys;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -59,7 +58,7 @@ import javax.servlet.http.HttpSession;
 public class LoginUtil {
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
+	 * @deprecated As of 1.1.0, replaced by {@link
 	 *             AuthenticatedSessionManagerUtil#getAuthenticatedUserId(
 	 *             HttpServletRequest, String, String, String)}
 	 */
@@ -152,14 +151,13 @@ public class LoginUtil {
 		String login = request.getParameter(paramName);
 
 		if ((login == null) || login.equals(StringPool.NULL)) {
-			login = GetterUtil.getString(
-				CookieKeys.getCookie(request, CookieKeys.LOGIN, false));
+			login = CookieKeys.getCookie(request, CookieKeys.LOGIN, false);
 
 			if (PropsValues.COMPANY_LOGIN_PREPOPULATE_DOMAIN &&
 				Validator.isNull(login) &&
 				company.getAuthType().equals(CompanyConstants.AUTH_TYPE_EA)) {
 
-				login = "@" + company.getMx();
+				login = "@".concat(company.getMx());
 			}
 		}
 
@@ -181,7 +179,7 @@ public class LoginUtil {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
+	 * @deprecated As of 1.1.0, replaced by {@link
 	 *             AuthenticatedSessionManagerUtil#login(HttpServletRequest,
 	 *             HttpServletResponse, String, String, boolean, String)}
 	 */
@@ -196,7 +194,7 @@ public class LoginUtil {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
+	 * @deprecated As of 1.1.0, replaced by {@link
 	 *             AuthenticatedSessionManagerUtil#renewSession(
 	 *             HttpServletRequest, HttpSession)}
 	 */
@@ -242,7 +240,7 @@ public class LoginUtil {
 	}
 
 	/**
-	 * @deprecated As of 7.0.0, replaced by {@link
+	 * @deprecated As of 1.1.0, replaced by {@link
 	 *             AuthenticatedSessionManagerUtil#signOutSimultaneousLogins(
 	 *             long)}
 	 */

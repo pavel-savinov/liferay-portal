@@ -44,11 +44,11 @@ public class FileUtilTest {
 	public void testDeleteFile() throws Exception {
 		Path filePath = Files.createTempFile("test", null);
 
-		Assert.assertTrue(Files.exists(filePath));
+		Assert.assertTrue(FileUtil.exists(filePath));
 
 		FileUtil.deleteFile(filePath);
 
-		Assert.assertTrue(Files.notExists(filePath));
+		Assert.assertTrue(FileUtil.notExists(filePath));
 	}
 
 	@Test
@@ -86,6 +86,8 @@ public class FileUtilTest {
 	@Test
 	public void testGetSanitizedFileName() {
 		for (String blacklistChar : PropsValues.SYNC_FILE_BLACKLIST_CHARS) {
+			blacklistChar = FileUtil.unescapeJava(blacklistChar);
+
 			String fileName = "test" + blacklistChar + "test";
 
 			Assert.assertEquals(
@@ -96,9 +98,7 @@ public class FileUtilTest {
 		for (String blacklistChar :
 				PropsValues.SYNC_FILE_BLACKLIST_CHARS_LAST) {
 
-			if (blacklistChar.startsWith("\\u")) {
-				blacklistChar = StringEscapeUtils.unescapeJava(blacklistChar);
-			}
+			blacklistChar = FileUtil.unescapeJava(blacklistChar);
 
 			String fileName = "test" + blacklistChar;
 
@@ -134,7 +134,7 @@ public class FileUtilTest {
 	public void testMoveFile() throws Exception {
 		Path sourceFilePath = Files.createTempFile("test", null);
 
-		Assert.assertTrue(Files.exists(sourceFilePath));
+		Assert.assertTrue(FileUtil.exists(sourceFilePath));
 
 		Path targetDirectoryFilePath = Files.createTempDirectory("test");
 
@@ -143,8 +143,8 @@ public class FileUtilTest {
 
 		FileUtil.moveFile(sourceFilePath, targetFilePath);
 
-		Assert.assertTrue(Files.notExists(sourceFilePath));
-		Assert.assertTrue(Files.exists(targetFilePath));
+		Assert.assertTrue(FileUtil.notExists(sourceFilePath));
+		Assert.assertTrue(FileUtil.exists(targetFilePath));
 	}
 
 	@Test

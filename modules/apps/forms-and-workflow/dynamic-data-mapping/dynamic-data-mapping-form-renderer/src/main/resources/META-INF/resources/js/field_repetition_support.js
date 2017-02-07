@@ -1,9 +1,11 @@
 AUI.add(
 	'liferay-ddm-form-renderer-field-repetition',
 	function(A) {
+		var AObject = A.Object;
+
 		var Renderer = Liferay.DDM.Renderer;
 
-		var FieldClassFactory = Renderer.FieldClassFactory;
+		var FieldTypes = Renderer.FieldTypes;
 
 		var SELECTOR_REPEAT_BUTTONS = '.lfr-ddm-form-field-repeatable-add-button, .lfr-ddm-form-field-repeatable-delete-button';
 
@@ -23,6 +25,7 @@ AUI.add(
 			},
 
 			repeatedIndex: {
+				state: true,
 				value: 0
 			},
 
@@ -37,7 +40,6 @@ AUI.add(
 
 				if (instance.get('repeatable')) {
 					instance._eventHandlers.push(
-						instance.after('repeatedIndexChange', instance._afterRepeatableIndexChange),
 						instance.after('render', instance._afterRepeatableFieldRender)
 					);
 				}
@@ -46,109 +48,22 @@ AUI.add(
 			destructor: function() {
 				var instance = this;
 
-				var repetitions = instance.get('repetitions');
+				instance._removeCurrentFieldFromRepetitionList();
 
-				var index = repetitions.indexOf(instance);
-
-				if (index > -1) {
-					repetitions.splice(index, 1);
-				}
-
-				repetitions.forEach(A.bind('_syncRepeatableField', instance));
+				instance._syncOtherRepeatableFields();
 			},
 
-			getRepeatedSiblings: function() {
+			copy: function() {
 				var instance = this;
 
-				return instance.get('repetitions');
+				var config = instance.copyConfiguration();
+
+				var fieldClass = instance.getFieldClass();
+
+				return new fieldClass(config);
 			},
 
-			remove: function() {
-				var instance = this;
-
-				instance.destroy();
-			},
-
-			renderRepeatable: function() {
-				var instance = this;
-
-				instance.renderRepeatableUI();
-				instance.syncRepeatablelUI();
-			},
-
-			renderRepeatableUI: function() {
-				var instance = this;
-
-				var container = instance.get('container');
-
-				if (!instance.get('readOnly')) {
-					container.append(TPL_REPEATABLE_TOOLBAR);
-				}
-			},
-
-			repeat: function() {
-				var instance = this;
-
-				var config = instance._copyConfiguration();
-
-				var type = instance.get('type');
-
-				var fieldClass = FieldClassFactory.getFieldClass(type, config.context);
-
-				var field = new fieldClass(config).render();
-
-				var repetitions = instance.getRepeatedSiblings();
-
-				var index = repetitions.indexOf(instance) + 1;
-
-				repetitions.splice(index, 0, field);
-
-				var container = instance.get('container');
-
-				container.insert(field.get('container'), 'after');
-
-				if (repetitions.length > index + 1) {
-					for (var i = index; i < repetitions.length; i++) {
-						instance._syncRepeatableField(repetitions[i]);
-					}
-				}
-
-				return field;
-			},
-
-			syncRepeatablelUI: function() {
-				var instance = this;
-
-				if (!instance.get('readOnly')) {
-					var container = instance.get('container');
-
-					container.one('.lfr-ddm-form-field-repeatable-delete-button').toggle(instance.get('repeatedIndex') > 0);
-				}
-			},
-
-			_afterRepeatableFieldRender: function() {
-				var instance = this;
-
-				var container = instance.get('container');
-
-				instance.renderRepeatable();
-
-				if (!instance.get('readOnly')) {
-					(new A.EventHandle(instance._DOMEventHandlers)).detach();
-
-					instance._DOMEventHandlers = [
-						container.delegate('click', instance._handleToolbarClick, SELECTOR_REPEAT_BUTTONS, instance)
-					];
-				}
-			},
-
-			_afterRepeatableIndexChange: function() {
-				var instance = this;
-
-				instance.render();
-			},
-
-			_copyConfiguration: function() {
+			copyConfiguration: function() {
 				var instance = this;
 
 				var context = instance.get('context');
@@ -179,6 +94,102 @@ AUI.add(
 				return config;
 			},
 
+			getFieldClass: function() {
+				var instance = this;
+
+				var type = instance.get('type');
+
+				var fieldType = FieldTypes.get(type);
+
+				var fieldClassName = fieldType.get('className');
+
+				return AObject.getValue(window, fieldClassName.split('.'));
+			},
+
+			getRepeatedSiblings: function() {
+				var instance = this;
+
+				return instance.get('repetitions');
+			},
+
+			remove: function() {
+				var instance = this;
+
+				instance.destroy();
+			},
+
+			renderRepeatable: function() {
+				var instance = this;
+
+				instance.renderRepeatableUI();
+
+				instance.syncRepeatablelUI();
+			},
+
+			renderRepeatableUI: function() {
+				var instance = this;
+
+				var container = instance.get('container');
+
+				if (!instance.get('readOnly')) {
+					container.append(TPL_REPEATABLE_TOOLBAR);
+				}
+			},
+
+			repeat: function() {
+				var instance = this;
+
+				var copiedField = instance.copy();
+
+				var repetitions = instance.getRepeatedSiblings();
+
+				var index = repetitions.indexOf(instance) + 1;
+
+				copiedField.set('repeatedIndex', index);
+
+				repetitions.splice(index, 0, copiedField);
+
+				var container = instance.get('container');
+
+				container.insert(copiedField.get('container'), 'after');
+
+				copiedField.render();
+
+				repetitions.filter(
+					function(repetition, currentIndex) {
+						return currentIndex > index;
+					}
+				).forEach(A.bind('_syncRepeatableField', instance));
+
+				return copiedField;
+			},
+
+			syncRepeatablelUI: function() {
+				var instance = this;
+
+				if (!instance.get('readOnly')) {
+					var container = instance.get('container');
+
+					container.one('.lfr-ddm-form-field-repeatable-delete-button').toggle(instance.get('repeatedIndex') > 0);
+				}
+			},
+
+			_afterRepeatableFieldRender: function() {
+				var instance = this;
+
+				var container = instance.get('container');
+
+				instance.renderRepeatable();
+
+				if (!instance.get('readOnly')) {
+					(new A.EventHandle(instance._DOMEventHandlers)).detach();
+
+					instance._DOMEventHandlers = [
+						container.delegate('click', instance._handleToolbarClick, SELECTOR_REPEAT_BUTTONS, instance)
+					];
+				}
+			},
+
 			_handleToolbarClick: function(event) {
 				var instance = this;
 
@@ -194,6 +205,26 @@ AUI.add(
 				event.stopPropagation();
 			},
 
+			_removeCurrentFieldFromRepetitionList: function() {
+				var instance = this;
+
+				var repetitions = instance.get('repetitions');
+
+				var index = repetitions.indexOf(instance);
+
+				if (index > -1) {
+					repetitions.splice(index, 1);
+				}
+			},
+
+			_syncOtherRepeatableFields: function() {
+				var instance = this;
+
+				var repetitions = instance.get('repetitions');
+
+				repetitions.forEach(A.bind('_syncRepeatableField', instance));
+			},
+
 			_syncRepeatableField: function(field) {
 				var instance = this;
 
@@ -205,6 +236,8 @@ AUI.add(
 				field.set('repetitions', repeatedSiblings);
 
 				field.setValue(value);
+
+				field.render();
 			},
 
 			_valueRepetitions: function() {

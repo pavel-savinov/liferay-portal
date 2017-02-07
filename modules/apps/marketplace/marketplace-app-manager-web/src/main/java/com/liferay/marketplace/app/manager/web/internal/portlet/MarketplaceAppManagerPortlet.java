@@ -30,6 +30,9 @@ import com.liferay.portal.kernel.model.PluginSetting;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.PluginSettingLocalService;
 import com.liferay.portal.kernel.service.PluginSettingService;
 import com.liferay.portal.kernel.service.PortletService;
@@ -46,13 +49,12 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.File;
@@ -69,6 +71,8 @@ import javax.portlet.ActionResponse;
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
@@ -150,7 +154,7 @@ public class MarketplaceAppManagerPortlet extends MVCPortlet {
 		throws Exception {
 
 		UploadPortletRequest uploadPortletRequest =
-			PortalUtil.getUploadPortletRequest(actionRequest);
+			_portal.getUploadPortletRequest(actionRequest);
 
 		String fileName = GetterUtil.getString(
 			uploadPortletRequest.getFileName("file"));
@@ -201,6 +205,36 @@ public class MarketplaceAppManagerPortlet extends MVCPortlet {
 		catch (MalformedURLException murle) {
 			SessionErrors.add(actionRequest, "invalidURL", murle);
 		}
+	}
+
+	@Override
+	public void processAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws IOException, PortletException {
+
+		checkOmniAdmin();
+
+		super.processAction(actionRequest, actionResponse);
+	}
+
+	@Override
+	public void render(
+			RenderRequest renderRequest, RenderResponse renderResponse)
+		throws IOException, PortletException {
+
+		checkOmniAdmin();
+
+		super.render(renderRequest, renderResponse);
+	}
+
+	@Override
+	public void serveResource(
+			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
+		throws IOException, PortletException {
+
+		checkOmniAdmin();
+
+		super.serveResource(resourceRequest, resourceResponse);
 	}
 
 	public void uninstallApp(
@@ -341,6 +375,19 @@ public class MarketplaceAppManagerPortlet extends MVCPortlet {
 		}
 	}
 
+	protected void checkOmniAdmin() throws PortletException {
+		PermissionChecker permissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		if (!permissionChecker.isOmniadmin()) {
+			PrincipalException principalException =
+				new PrincipalException.MustBeCompanyAdmin(
+					permissionChecker.getUserId());
+
+			throw new PortletException(principalException);
+		}
+	}
+
 	@Override
 	protected void doDispatch(
 			RenderRequest renderRequest, RenderResponse renderResponse)
@@ -368,24 +415,8 @@ public class MarketplaceAppManagerPortlet extends MVCPortlet {
 
 		int responseCode = HttpServletResponse.SC_OK;
 
-		String deploymentContext = ParamUtil.getString(
-			actionRequest, "deploymentContext");
-
 		try {
 			String fileName = null;
-
-			if (Validator.isNotNull(deploymentContext)) {
-				fileName = _DEPLOY_TO_PREFIX + deploymentContext + ".war";
-			}
-			else {
-				fileName = url.substring(url.lastIndexOf(CharPool.SLASH) + 1);
-
-				int pos = fileName.lastIndexOf(CharPool.PERIOD);
-
-				if (pos != -1) {
-					deploymentContext = fileName.substring(0, pos);
-				}
-			}
 
 			Http.Options options = new Http.Options();
 
@@ -505,6 +536,10 @@ public class MarketplaceAppManagerPortlet extends MVCPortlet {
 	private PanelCategoryRegistry _panelCategoryRegistry;
 	private PluginSettingLocalService _pluginSettingLocalService;
 	private PluginSettingService _pluginSettingService;
+
+	@Reference
+	private Portal _portal;
+
 	private PortletService _portletService;
 
 }

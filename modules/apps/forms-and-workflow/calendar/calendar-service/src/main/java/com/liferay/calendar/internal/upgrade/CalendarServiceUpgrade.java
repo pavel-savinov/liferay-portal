@@ -19,6 +19,7 @@ import com.liferay.calendar.internal.upgrade.v1_0_5.UpgradeCalendarResource;
 import com.liferay.calendar.internal.upgrade.v1_0_5.UpgradeCompanyId;
 import com.liferay.calendar.internal.upgrade.v1_0_5.UpgradeLastPublishDate;
 import com.liferay.calendar.upgrade.v1_0_2.UpgradeCalendar;
+import com.liferay.calendar.upgrade.v1_0_6.UpgradeSchema;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -32,7 +33,10 @@ import org.osgi.service.component.annotations.Reference;
  * @author Iván Zaera
  * @author Manuel de la Peña
  */
-@Component(immediate = true, service = UpgradeStepRegistrator.class)
+@Component(
+	immediate = true,
+	service = {CalendarServiceUpgrade.class, UpgradeStepRegistrator.class}
+)
 public class CalendarServiceUpgrade implements UpgradeStepRegistrator {
 
 	@Override
@@ -65,6 +69,10 @@ public class CalendarServiceUpgrade implements UpgradeStepRegistrator {
 				_classNameLocalService, _companyLocalService,
 				_userLocalService),
 			new UpgradeCompanyId(), new UpgradeLastPublishDate());
+
+		registry.register(
+			"com.liferay.calendar.service", "1.0.5", "1.0.6",
+			new UpgradeSchema());
 	}
 
 	@Reference(unbind = "-")

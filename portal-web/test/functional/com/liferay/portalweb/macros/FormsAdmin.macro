@@ -26,16 +26,6 @@
 		</execute>
 
 		<execute macro="FormFields#editText">
-			<var name="fieldName" value="$key" />
-			<var name="fieldValue" value="${displayedAttribute}" />
-		</execute>
-
-		<execute macro="FormFields#editText">
-			<var name="fieldName" value="$value" />
-			<var name="fieldValue" value="${storedAttribute}" />
-		</execute>
-
-		<execute macro="FormFields#editText">
 			<var name="fieldName" value="$username" />
 			<var name="fieldValue" value="${username}" />
 		</execute>
@@ -44,14 +34,44 @@
 			<var name="fieldName" value="$password" />
 			<var name="fieldValue" value="${password}" />
 		</execute>
+
+		<execute macro="FormsAdmin#editDataProviderOutputParameter">
+			<var name="outputParameterName" value="${outputParameterName}" />
+			<var name="outputParameterName2" value="${outputParameterName2}" />
+			<var name="outputParameterPath" value="${outputParameterPath}" />
+			<var name="outputParameterPath2" value="${outputParameterPath2}" />
+			<var name="outputParameterType" value="${outputParameterType}" />
+			<var name="outputParameterType2" value="${outputParameterType2}" />
+		</execute>
+	</command>
+
+	<command name="editDataProviderOutputParameter">
+		<execute function="Type" locator1="Form#DATA_PROVIDER_OUTPUT_PARAMETER_PATH_FIELD" value1="${outputParameterPath}" />
+		<execute function="Type" locator1="Form#DATA_PROVIDER_OUTPUT_PARAMETER_NAME_FIELD" value1="${outputParameterName}" />
+
+		<execute macro="FormFields#selectDataProviderOutputType">
+			<var name="outputParameterType" value="${outputParameterType}" />
+		</execute>
+
+		<if>
+			<isset var="outputParameterPath2" />
+			<then>
+				<execute function="Click" locator1="Form#DATA_PROVIDER_OUTPUT_PARAMETER_REPEAT_ICON" />
+
+				<execute function="Type" locator1="Form#DATA_PROVIDER_OUTPUT_PARAMETER_PATH_FIELD_2" value1="${outputParameterPath2}" />
+				<execute function="Type" locator1="Form#DATA_PROVIDER_OUTPUT_PARAMETER_NAME_FIELD_2" value1="${outputParameterName2}" />
+
+				<execute function="Click" locator1="Form#DATA_PROVIDER_OUTPUT_PARAMETER_TYPE_FIELD_2" />
+
+				<var name="key_outputParameterType" value="${outputParameterType2}" />
+
+				<execute function="AssertClick" locator1="Form#DATA_PROVIDER_OUTPUT_PARAMETER_TYPE_FIELD_OPTIONS_LIST_2" value1="${outputParameterType2}" />
+			</then>
+		</if>
 	</command>
 
 	<command name="saveDataProvider">
-		<execute function="SelectFrame" value1="relative=top" />
-
 		<execute macro="Button#clickSave" />
-
-		<execute function="SelectFrame" locator1="IFrame#DIALOG" />
 
 		<execute macro="Alert#viewSuccessMessage" />
 	</command>
@@ -160,8 +180,18 @@
 		</execute>
 	</command>
 
+	<command name="viewNoDuplicateForms">
+		<var name="key_formName" value="${formName}" />
+
+		<execute function="AssertElementNotPresent" locator1="FormsAdmin#FORMS_TABLE_NAME_2" value1="${formName}" />
+	</command>
+
 	<command name="viewNoFormEntries">
 		<execute function="AssertTextEquals" locator1="Message#EMPTY_INFO" value1="No entries were found." />
+	</command>
+
+	<command name="viewNoForms">
+		<execute function="AssertTextEquals" locator1="Message#EMPTY_INFO" value1="There are no forms. Click on the plus button to add the first one." />
 	</command>
 
 	<command name="viewParagraphEntry">

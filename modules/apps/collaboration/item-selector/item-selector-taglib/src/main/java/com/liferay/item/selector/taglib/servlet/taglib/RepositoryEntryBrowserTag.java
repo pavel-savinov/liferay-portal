@@ -14,8 +14,10 @@
 
 package com.liferay.item.selector.taglib.servlet.taglib;
 
+import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.ItemSelectorReturnTypeResolver;
 import com.liferay.item.selector.constants.ItemSelectorPortletKeys;
+import com.liferay.item.selector.taglib.ItemSelectorRepositoryEntryBrowserReturnTypeUtil;
 import com.liferay.item.selector.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
@@ -43,12 +45,26 @@ public class RepositoryEntryBrowserTag extends IncludeTag {
 	public static final String[] DISPLAY_STYLES =
 		new String[] {"icon", "descriptive", "list"};
 
+	/**
+	 * @deprecated As of 1.1.0, with no direct replacement
+	 */
+	@Deprecated
+	public void setDesiredItemSelectorReturnTypes(
+		List<ItemSelectorReturnType> desiredItemSelectorReturnTypes) {
+
+		_desiredItemSelectorReturnTypes = desiredItemSelectorReturnTypes;
+	}
+
 	public void setDisplayStyle(String displayStyle) {
 		_displayStyle = displayStyle;
 	}
 
 	public void setEmptyResultsMessage(String emptyResultsMessage) {
 		_emptyResultsMessage = emptyResultsMessage;
+	}
+
+	public void setExtensions(List<String> extensions) {
+		_extensions = extensions;
 	}
 
 	public void setItemSelectedEventName(String itemSelectedEventName) {
@@ -104,8 +120,10 @@ public class RepositoryEntryBrowserTag extends IncludeTag {
 	protected void cleanUp() {
 		super.cleanUp();
 
+		_desiredItemSelectorReturnTypes = null;
 		_emptyResultsMessage = null;
 		_displayStyle = null;
+		_extensions = new ArrayList<>();
 		_itemSelectedEventName = null;
 		_maxFileSize = PropsValues.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE;
 		_portletURL = null;
@@ -164,6 +182,19 @@ public class RepositoryEntryBrowserTag extends IncludeTag {
 			"liferay-item-selector:repository-entry-browser:" +
 				"emptyResultsMessage",
 			_getEmptyResultsMessage(request));
+
+		if (_desiredItemSelectorReturnTypes != null) {
+			request.setAttribute(
+				"liferay-item-selector:repository-entry-browser:" +
+					"existingFileEntryReturnType",
+				ItemSelectorRepositoryEntryBrowserReturnTypeUtil.
+					getFirstAvailableExistingFileEntryReturnType(
+						_desiredItemSelectorReturnTypes));
+		}
+
+		request.setAttribute(
+			"liferay-item-selector:repository-entry-browser:extensions",
+			_extensions);
 		request.setAttribute(
 			"liferay-item-selector:repository-entry-browser:" +
 				"itemSelectedEventName",
@@ -207,8 +238,10 @@ public class RepositoryEntryBrowserTag extends IncludeTag {
 		return LanguageUtil.get(request, "no-results-were-found");
 	}
 
+	private List<ItemSelectorReturnType> _desiredItemSelectorReturnTypes;
 	private String _displayStyle;
 	private String _emptyResultsMessage;
+	private List<String> _extensions = new ArrayList<>();
 	private String _itemSelectedEventName;
 	private ItemSelectorReturnTypeResolver _itemSelectorReturnTypeResolver;
 	private long _maxFileSize =

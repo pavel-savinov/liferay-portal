@@ -30,7 +30,7 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 	public void testAssertUsage() throws Exception {
 		test(
 			"AssertUsage.testjava",
-			"Use org.junit.Assert instead of org.testng.Assert");
+			"Use org.junit.Assert instead of org.testng.Assert, see LPS-55690");
 	}
 
 	@Test
@@ -42,7 +42,9 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 	public void testConstructorParameterOrder() throws Exception {
 		test(
 			"ConstructorParameterOrder.testjava",
-			"Constructor parameter order attribute");
+			"'_value = value;' should come before '_attribute = attribute;' " +
+				"to match order of constructor parameters",
+			23);
 	}
 
 	@Test
@@ -112,10 +114,13 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 		test(
 			"IfClauseParentheses.testjava",
 			new String[] {
-				"missing parentheses", "missing parentheses",
-				"missing parentheses", "missing parentheses",
-				"missing parentheses", "redundant parentheses",
-				"redundant parentheses"
+				"Missing parentheses in if-statement",
+				"Missing parentheses in if-statement",
+				"Missing parentheses in if-statement",
+				"Missing parentheses in if-statement",
+				"Redundant parentheses in if-statement",
+				"Redundant parentheses in if-statement",
+				"Redundant parentheses in if-statement"
 			},
 			new Integer[] {25, 29, 33, 39, 43, 47, 51});
 	}
@@ -146,8 +151,9 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 		test(
 			"IncorrectImports2.testjava",
 			new String[] {
-				"edu.emory.mathcs.backport.java", "jodd.util.StringPool",
-				"Proxy"
+				"Illegal import: edu.emory.mathcs.backport.java",
+				"Illegal import: jodd.util.StringPool",
+				"Use ProxyUtil instead of java.lang.reflect.Proxy"
 			});
 	}
 
@@ -156,15 +162,35 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 		test(
 			"IncorrectLineBreaks1.testjava",
 			new String[] {
-				"line break", "line break", "line break", "line break",
-				"line break", "line break", "line break", "line break",
-				"line break", "line break", "line break", "line break",
-				"line break", "line break", "line break", "line break",
-				"line break", "line break", "line break"
+				"Line should not start with '='",
+				"There should be a line break after '||'",
+				"There should be a line break after '\"Hello World\", " +
+					"\"Hello\", \"World\"),'",
+				"There should be a line break after '\"Hello World Hello " +
+					"World Hello World\",'",
+				"There should be a line break after " +
+					"'anotherStringWithAVeryLongName,'",
+				"There should be a line break after '='",
+				"There should be a line break after '+'",
+				"There should be a line break after '='",
+				"Line should not start with '.'",
+				"There should be a line break before 'throws'",
+				"There should be a line break after '}'",
+				"There should be a line break after '}'",
+				"There should be a line break after '('",
+				"There should be a line break after '('",
+				"'null) {' should be added to previous line",
+				"There should be a line break before 'new " +
+					"Comparator<String>() {'",
+				"There should be a line break after '},'",
+				"Line starts with '2' tabs, but '3' tabs are expected",
+				"There should be a line break before 'throws'",
+				"There should be a line break before 'throws'",
+				"'new String[] {' should be added to previous line"
 			},
 			new Integer[] {
-				31, 35, 43, 47, 49, 52, 55, 59, 62, 67, 71, 77, 81, 87, 98, 111,
-				116, 122, 132
+				31, 35, 43, 47, 52, 55, 58, 61, 65, 68, 73, 77, 82, 86, 93, 104,
+				117, 121, 122, 128, 138
 			});
 		test("IncorrectLineBreaks2.testjava");
 	}
@@ -182,18 +208,19 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 			new Integer[] {24, 28});
 	}
 
-	/*
 	@Test
 	public void testIncorrectTabs() throws Exception {
 		test(
 			"IncorrectTabs.testjava",
 			new String[] {
-				"Incorrect tab or line break", "Incorrect tab or line break",
-				"Incorrect tab or line break"
+				"There should be a line break after '('",
+				"There should be a line break after '{'",
+				"Line starts with '3' tabs, but '4' tabs are expected",
+				"Line starts with '2' tabs, but '3' tabs are expected",
+				"Line starts with '3' tabs, but '4' tabs are expected"
 			},
-			new Integer[] {27, 31, 37});
+			new Integer[] {26, 30, 31, 32, 37});
 	}
-	*/
 
 	@Test
 	public void testIncorrectVariableNames() throws Exception {
@@ -256,7 +283,7 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 
 	@Test
 	public void testLPS28266() throws Exception {
-		test("LPS28266.testjava", "Use getInt(1) for count");
+		test("LPS28266.testjava", "Use rs.getInt(1) for count, see LPS-28266");
 	}
 
 	@Test
@@ -283,12 +310,17 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 
 	@Test
 	public void testPackagePath() throws Exception {
-		test("PackagePath.testjava", "Incorrect package path");
+		test(
+			"PackagePath.testjava",
+			"The declared package 'com.liferay.source.formatter.hello.world' " +
+				"does not match the expected package");
 	}
 
 	@Test
 	public void testProxyUsage() throws Exception {
-		test("ProxyUsage.testjava", "Proxy");
+		test(
+			"ProxyUsage.testjava",
+			"Use ProxyUtil instead of java.lang.reflect.Proxy");
 	}
 
 	@Test

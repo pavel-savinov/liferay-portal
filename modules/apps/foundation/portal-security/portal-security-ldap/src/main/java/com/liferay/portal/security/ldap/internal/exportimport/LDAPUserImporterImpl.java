@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.exception.NoSuchRoleException;
 import com.liferay.portal.kernel.exception.NoSuchUserGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.lock.Lock;
 import com.liferay.portal.kernel.lock.LockManager;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -87,6 +88,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
@@ -234,8 +236,7 @@ public class LDAPUserImporterImpl implements LDAPUserImporter, UserImporter {
 						ldapServerId, companyId, binding));
 
 				return importUser(
-					ldapServerId, companyId, ldapContext, attributes,
-					StringPool.BLANK);
+					ldapServerId, companyId, ldapContext, attributes, null);
 			}
 			else {
 				return null;
@@ -341,7 +342,7 @@ public class LDAPUserImporterImpl implements LDAPUserImporter, UserImporter {
 			ldapServerId, companyId, ldapContext, fullUserDN);
 
 		User user = importUser(
-			ldapServerId, companyId, ldapContext, attributes, StringPool.BLANK);
+			ldapServerId, companyId, ldapContext, attributes, null);
 
 		ldapContext.close();
 
@@ -366,33 +367,32 @@ public class LDAPUserImporterImpl implements LDAPUserImporter, UserImporter {
 		try {
 			long defaultUserId = _userLocalService.getDefaultUserId(companyId);
 
-			if (_lockManager.hasLock(
-					defaultUserId, UserImporter.class.getName(), companyId)) {
+			LDAPImportConfiguration ldapImportConfiguration =
+				_ldapImportConfigurationProvider.getConfiguration(companyId);
 
+			Optional<Lock> optional = _lockManager.tryLock(
+				defaultUserId, UserImporter.class.getName(), companyId,
+				LDAPUserImporterImpl.class.getName(), false,
+				ldapImportConfiguration.importLockExpirationTime());
+
+			if (optional.isPresent()) {
+				Collection<LDAPServerConfiguration> ldapServerConfigurations =
+					_ldapServerConfigurationProvider.getConfigurations(
+						companyId);
+
+				for (LDAPServerConfiguration ldapServerConfiguration :
+						ldapServerConfigurations) {
+
+					importUsers(
+						ldapServerConfiguration.ldapServerId(), companyId);
+				}
+			}
+			else {
 				if (_log.isDebugEnabled()) {
 					_log.debug(
 						"Skipping LDAP import for company " + companyId +
 							" because another LDAP import is in process");
 				}
-
-				return;
-			}
-
-			LDAPImportConfiguration ldapImportConfiguration =
-				_ldapImportConfigurationProvider.getConfiguration(companyId);
-
-			_lockManager.lock(
-				defaultUserId, UserImporter.class.getName(), companyId,
-				LDAPUserImporterImpl.class.getName(), false,
-				ldapImportConfiguration.importLockExpirationTime());
-
-			Collection<LDAPServerConfiguration> ldapServerConfigurations =
-				_ldapServerConfigurationProvider.getConfigurations(companyId);
-
-			for (LDAPServerConfiguration ldapServerConfiguration :
-					ldapServerConfigurations) {
-
-				importUsers(ldapServerConfiguration.ldapServerId(), companyId);
 			}
 		}
 		finally {
@@ -506,6 +506,13 @@ public class LDAPUserImporterImpl implements LDAPUserImporter, UserImporter {
 				companyId, ldapGroup.getGroupName());
 		}
 		catch (NoSuchRoleException nsre) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(nsre, nsre);
+			}
+
 			User defaultUser = _userLocalService.getDefaultUser(companyId);
 
 			Map<Locale, String> descriptionMap = new HashMap<>();
@@ -785,8 +792,7 @@ public class LDAPUserImporterImpl implements LDAPUserImporter, UserImporter {
 					User user = importUser(
 						ldapServerId, companyId, userAttributes, userMappings,
 						userExpandoMappings, contactMappings,
-						contactExpandoMappings, StringPool.BLANK,
-						ldapUserIgnoreAttributes);
+						contactExpandoMappings, null, ldapUserIgnoreAttributes);
 
 					importGroups(
 						ldapServerId, companyId, ldapContext, userAttributes,
@@ -1068,6 +1074,13 @@ public class LDAPUserImporterImpl implements LDAPUserImporter, UserImporter {
 			}
 		}
 		catch (NoSuchUserGroupException nsuge) {
+
+			// LPS-52675
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(nsuge, nsuge);
+			}
+
 			StopWatch stopWatch = new StopWatch();
 
 			if (_log.isDebugEnabled()) {
@@ -1154,8 +1167,7 @@ public class LDAPUserImporterImpl implements LDAPUserImporter, UserImporter {
 				User user = importUser(
 					ldapServerId, companyId, userAttributes, userMappings,
 					userExpandoMappings, contactMappings,
-					contactExpandoMappings, StringPool.BLANK,
-					ldapUserIgnoreAttributes);
+					contactExpandoMappings, null, ldapUserIgnoreAttributes);
 
 				if (user != null) {
 					if (_log.isDebugEnabled()) {
@@ -1163,9 +1175,6 @@ public class LDAPUserImporterImpl implements LDAPUserImporter, UserImporter {
 							"Adding user " + user + " to user group " +
 								userGroupId);
 					}
-
-					_userLocalService.addUserGroupUsers(
-						userGroupId, new long[] {user.getUserId()});
 
 					newUserIds.add(user.getUserId());
 				}
@@ -1182,6 +1191,8 @@ public class LDAPUserImporterImpl implements LDAPUserImporter, UserImporter {
 						ldapServerId + " in " + stopWatch.getTime() + "ms");
 		}
 
+		Set<Long> deletedUserIds = new LinkedHashSet<>();
+
 		List<User> userGroupUsers = _userLocalService.getUserGroupUsers(
 			userGroupId);
 
@@ -1195,10 +1206,15 @@ public class LDAPUserImporterImpl implements LDAPUserImporter, UserImporter {
 							userGroupId);
 				}
 
-				_userLocalService.deleteUserGroupUser(
-					userGroupId, user.getUserId());
+				deletedUserIds.add(user.getUserId());
 			}
 		}
+
+		_userLocalService.addUserGroupUsers(
+			userGroupId, ArrayUtil.toLongArray(newUserIds));
+
+		_userLocalService.deleteUserGroupUsers(
+			userGroupId, ArrayUtil.toLongArray(deletedUserIds));
 	}
 
 	protected void populateExpandoAttributes(
@@ -1440,9 +1456,13 @@ public class LDAPUserImporterImpl implements LDAPUserImporter, UserImporter {
 				modifiedDate = LDAPUtil.parseDate(modifyTimestamp);
 
 				if (modifiedDate.equals(user.getModifiedDate())) {
-					updateUserPassword(
-						ldapImportConfiguration, user.getUserId(),
-						ldapUser.getScreenName(), password, passwordReset);
+					if (ldapUser.isUpdatePassword() ||
+						!ldapImportConfiguration.importUserPasswordEnabled()) {
+
+						updateUserPassword(
+							ldapImportConfiguration, user.getUserId(),
+							user.getScreenName(), password, passwordReset);
+					}
 
 					if (_log.isDebugEnabled()) {
 						_log.debug(
@@ -1488,7 +1508,9 @@ public class LDAPUserImporterImpl implements LDAPUserImporter, UserImporter {
 			ldapUser.setScreenName(user.getScreenName());
 		}
 
-		if (ldapUser.isUpdatePassword()) {
+		if (ldapUser.isUpdatePassword() ||
+			!ldapImportConfiguration.importUserPasswordEnabled()) {
+
 			password = updateUserPassword(
 				ldapImportConfiguration, user.getUserId(),
 				ldapUser.getScreenName(), password, passwordReset);
@@ -1513,7 +1535,7 @@ public class LDAPUserImporterImpl implements LDAPUserImporter, UserImporter {
 			passwordReset, ldapUser.getReminderQueryQuestion(),
 			ldapUser.getReminderQueryAnswer(), ldapUser.getScreenName(),
 			ldapUser.getEmailAddress(), ldapUser.getFacebookId(),
-			ldapUser.getOpenId(), (ldapUser.getPortraitId() > 0),
+			ldapUser.getOpenId(), ldapUser.isUpdatePortrait(),
 			ldapUser.getPortraitBytes(), ldapUser.getLanguageId(),
 			ldapUser.getTimeZoneId(), ldapUser.getGreeting(),
 			ldapUser.getComments(), ldapUser.getFirstName(),

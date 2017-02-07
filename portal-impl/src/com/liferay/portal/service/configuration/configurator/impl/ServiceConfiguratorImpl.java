@@ -21,8 +21,8 @@ import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
-import com.liferay.portal.kernel.service.ResourceActionLocalServiceUtil;
+import com.liferay.portal.kernel.security.permission.ResourceActions;
+import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ServiceComponentLocalService;
 import com.liferay.portal.kernel.service.configuration.ServiceComponentConfiguration;
 import com.liferay.portal.kernel.service.configuration.configurator.ServiceConfigurator;
@@ -37,7 +37,6 @@ import com.liferay.registry.ServiceRegistrar;
 import java.net.URL;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -72,6 +71,16 @@ public class ServiceConfiguratorImpl implements ServiceConfigurator {
 		reconfigureCaches(classLoader);
 
 		readResourceActions(classLoader);
+	}
+
+	public void setResourceActionLocalService(
+		ResourceActionLocalService resourceActionLocalService) {
+
+		_resourceActionLocalService = resourceActionLocalService;
+	}
+
+	public void setResourceActions(ResourceActions resourceActions) {
+		_resourceActions = resourceActions;
 	}
 
 	public void setServiceComponentLocalService(
@@ -171,36 +180,32 @@ public class ServiceConfiguratorImpl implements ServiceConfigurator {
 			return;
 		}
 
-		String[] resourceActionsConfigs = StringUtil.split(
-			configuration.get(PropsKeys.RESOURCE_ACTIONS_CONFIGS));
+		try {
+			String portlets = configuration.get(
+				"service.configurator.portlet.ids");
 
-		for (String resourceActionsConfig : resourceActionsConfigs) {
-			try {
-				ResourceActionsUtil.read(
-					null, classLoader, resourceActionsConfig);
+			if (Validator.isNull(portlets)) {
+				_resourceActions.readAndCheck(
+					null, classLoader,
+					StringUtil.split(
+						configuration.get(PropsKeys.RESOURCE_ACTIONS_CONFIGS)));
 			}
-			catch (Exception e) {
-				_log.error(
-					"Unable to read resource actions config in " +
-						resourceActionsConfig,
-					e);
+			else {
+				_resourceActions.read(
+					null, classLoader,
+					StringUtil.split(
+						configuration.get(PropsKeys.RESOURCE_ACTIONS_CONFIGS)));
+
+				for (String portletId : StringUtil.split(portlets)) {
+					_resourceActions.check(portletId);
+				}
 			}
 		}
-
-		String[] portletIds = StringUtil.split(
-			configuration.get("service.configurator.portlet.ids"));
-
-		for (String portletId : portletIds) {
-			List<String> modelNames =
-				ResourceActionsUtil.getPortletModelResources(portletId);
-
-			for (String modelName : modelNames) {
-				List<String> modelActions =
-					ResourceActionsUtil.getModelResourceActions(modelName);
-
-				ResourceActionLocalServiceUtil.checkResourceActions(
-					modelName, modelActions);
-			}
+		catch (Exception e) {
+			_log.error(
+				"Unable to read resource actions config in " +
+					PropsKeys.RESOURCE_ACTIONS_CONFIGS,
+				e);
 		}
 	}
 
@@ -267,6 +272,8 @@ public class ServiceConfiguratorImpl implements ServiceConfigurator {
 	private static final Log _log = LogFactoryUtil.getLog(
 		ServiceConfiguratorImpl.class);
 
+	private ResourceActionLocalService _resourceActionLocalService;
+	private ResourceActions _resourceActions;
 	private ServiceComponentLocalService _serviceComponentLocalService;
 	private volatile ServiceRegistrar<PortalCacheConfiguratorSettings>
 		_serviceRegistrar;

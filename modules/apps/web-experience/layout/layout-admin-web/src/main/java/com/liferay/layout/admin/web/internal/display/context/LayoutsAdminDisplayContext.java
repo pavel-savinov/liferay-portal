@@ -24,10 +24,13 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.route.model.GroupFriendlyURL;
+import com.liferay.portal.kernel.route.service.GroupFriendlyURLLocalServiceUtil;
 import com.liferay.portal.kernel.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserGroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
@@ -85,6 +88,22 @@ public class LayoutsAdminDisplayContext extends BaseLayoutDisplayContext {
 		return _groupDisplayContextHelper.getGroup();
 	}
 
+	public String getGroupFriendlyURL() {
+		String languageId = LocaleUtil.toLanguageId(themeDisplay.getLocale());
+
+		GroupFriendlyURL groupFriendlyURL =
+			GroupFriendlyURLLocalServiceUtil.fetchGroupFriendlyURL(
+				themeDisplay.getCompanyId(), getGroupId(), languageId);
+
+		if (groupFriendlyURL != null) {
+			return groupFriendlyURL.getFriendlyURL();
+		}
+
+		Group group = getGroup();
+
+		return group.getFriendlyURL();
+	}
+
 	public Long getGroupId() {
 		return _groupDisplayContextHelper.getGroupId();
 	}
@@ -105,6 +124,7 @@ public class LayoutsAdminDisplayContext extends BaseLayoutDisplayContext {
 		return _layoutDescriptions;
 	}
 
+	@Override
 	public Long getLayoutId() {
 		if (_layoutId != null) {
 			return _layoutId;
@@ -121,6 +141,7 @@ public class LayoutsAdminDisplayContext extends BaseLayoutDisplayContext {
 		return _layoutId;
 	}
 
+	@Override
 	public Group getLiveGroup() {
 		return _groupDisplayContextHelper.getLiveGroup();
 	}
@@ -196,10 +217,12 @@ public class LayoutsAdminDisplayContext extends BaseLayoutDisplayContext {
 		return portletURL;
 	}
 
+	@Override
 	public Group getSelGroup() {
 		return _groupDisplayContextHelper.getSelGroup();
 	}
 
+	@Override
 	public long getSelGroupId() {
 		Group selGroup = getSelGroup();
 
@@ -224,6 +247,7 @@ public class LayoutsAdminDisplayContext extends BaseLayoutDisplayContext {
 		return _selUser;
 	}
 
+	@Override
 	public Group getStagingGroup() {
 		return _groupDisplayContextHelper.getStagingGroup();
 	}

@@ -14,7 +14,7 @@
 
 package com.liferay.gradle.plugins.test.integration.tasks;
 
-import com.liferay.gradle.plugins.test.integration.util.GradleUtil;
+import com.liferay.gradle.plugins.test.integration.internal.util.GradleUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -153,6 +153,7 @@ public abstract class BaseAppServerTask extends DefaultTask {
 		File executableFile = new File(getBinDir(), getExecutable());
 
 		commands.add(executableFile.getAbsolutePath());
+
 		commands.addAll(getExecutableArgs());
 
 		ProcessExecutor processExecutor = new ProcessExecutor(commands);

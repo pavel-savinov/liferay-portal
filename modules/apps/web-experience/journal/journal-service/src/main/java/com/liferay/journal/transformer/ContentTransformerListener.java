@@ -183,11 +183,10 @@ public class ContentTransformerListener extends BaseTransformerListener {
 								article.getDocument(), elementName));
 					}
 				}
-
-				// Make sure to point images to the full path
-
 				else if ((text != null) &&
 						 text.startsWith("/image/journal/article?img_id")) {
+
+					// Make sure to point images to the full path
 
 					dynamicContentElement.setText(
 						"@cdn_host@@root_path@" + text);
@@ -225,6 +224,7 @@ public class ContentTransformerListener extends BaseTransformerListener {
 		String script, String name, String type, String call) {
 
 		String field = "$" + name + "." + call;
+
 		String wrappedField =
 			"<span class=\"journal-content-eip-" + type + "\" " +
 				"id=\"journal-content-field-name-" + name + "\">" + field +

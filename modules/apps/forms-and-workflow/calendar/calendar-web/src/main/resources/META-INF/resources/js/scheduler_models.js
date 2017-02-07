@@ -71,11 +71,22 @@ AUI.add(
 
 					content: {
 						getter: function(val) {
+							var content = val;
+
 							if (val) {
-								val = LString.escapeHTML(val);
+								content = LString.escapeHTML(val);
 							}
 
-							return val;
+							return content;
+						},
+						setter: function(val) {
+							var content = val;
+
+							if (val) {
+								content = LString.unescapeHTML(val);
+							}
+
+							return content;
 						}
 					},
 
@@ -138,6 +149,11 @@ AUI.add(
 						value: STR_BLANK
 					},
 
+					recurringCalendarBookingId: {
+						setter: toInt,
+						value: 0
+					},
+
 					reminder: {
 						getter: function() {
 							var instance = this;
@@ -171,7 +187,7 @@ AUI.add(
 
 				NAME: 'scheduler-event',
 
-				PROPAGATE_ATTRS: A.SchedulerEvent.PROPAGATE_ATTRS.concat(['calendarBookingId', 'calendarId', 'calendarResourceId', 'parentCalendarBookingId', 'recurrence', 'status']),
+				PROPAGATE_ATTRS: A.SchedulerEvent.PROPAGATE_ATTRS.concat(['calendarBookingId', 'calendarId', 'calendarResourceId', 'parentCalendarBookingId', 'recurrence', 'recurringCalendarBookingId', 'status']),
 
 				prototype: {
 					eventModel: Liferay.SchedulerEvent,
@@ -205,7 +221,7 @@ AUI.add(
 					isRecurring: function() {
 						var instance = this;
 
-						return instance.get('recurrence') !== STR_BLANK;
+						return (instance.get('recurrence') !== STR_BLANK) || (instance.get('calendarBookingId') != instance.get('recurringCalendarBookingId'));
 					},
 
 					syncNodeColorUI: function() {
@@ -406,7 +422,7 @@ AUI.add(
 
 							var remoteServices = scheduler.get('remoteServices');
 
-							remoteServices.updateCalendarColor(calendarId, parseInt(color.substr(1), 16));
+							remoteServices.updateCalendarColor(calendarId, color);
 						}
 						else {
 							Liferay.Store('com.liferay.calendar.web_calendar' + calendarId + 'Color', color);
@@ -433,7 +449,19 @@ AUI.add(
 			A.SchedulerEvents,
 			[Liferay.SchedulerModelSync],
 			{
-				getLoadEndDate: function(activeView) {
+				getEventsPerPage: function(activeView, eventsPerPage) {
+					var instance = this;
+
+					var viewName = activeView.get('name');
+
+					if (viewName !== 'agenda') {
+						eventsPerPage = -1;
+					}
+
+					return eventsPerPage;
+				},
+
+				getLoadEndDate: function(activeView, maxDaysDisplayed) {
 					var instance = this;
 
 					var date = activeView.getNextDate();
@@ -441,7 +469,9 @@ AUI.add(
 					var viewName = activeView.get('name');
 
 					if (viewName === 'agenda') {
-						date = DateMath.add(date, DateMath.MONTH, 1);
+						date = DateMath.add(date, DateMath.DAY, maxDaysDisplayed);
+
+						date = DateMath.subtract(date, DateMath.MINUTES, 1);
 					}
 					else if (viewName === 'month') {
 						date = DateMath.add(date, DateMath.WEEK, 1);
@@ -471,7 +501,9 @@ AUI.add(
 					var scheduler = instance.get('scheduler');
 
 					var activeView = scheduler.get('activeView');
+					var eventsPerPage = scheduler.get('eventsPerPage');
 					var filterCalendarBookings = scheduler.get('filterCalendarBookings');
+					var maxDaysDisplayed = scheduler.get('maxDaysDisplayed');
 
 					var calendarContainer = scheduler.get('calendarContainer');
 
@@ -481,8 +513,9 @@ AUI.add(
 
 					remoteServices.getEvents(
 						calendarIds,
+						instance.getEventsPerPage(activeView, eventsPerPage),
 						instance.getLoadStartDate(activeView),
-						instance.getLoadEndDate(activeView),
+						instance.getLoadEndDate(activeView, maxDaysDisplayed),
 						[CalendarWorkflow.STATUS_APPROVED, CalendarWorkflow.STATUS_DRAFT, CalendarWorkflow.STATUS_MAYBE, CalendarWorkflow.STATUS_PENDING],
 						function(calendarBookings) {
 							if (filterCalendarBookings) {

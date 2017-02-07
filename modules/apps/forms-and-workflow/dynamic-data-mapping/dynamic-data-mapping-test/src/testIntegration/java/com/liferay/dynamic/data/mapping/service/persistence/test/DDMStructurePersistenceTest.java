@@ -30,7 +30,6 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
-import com.liferay.portal.kernel.test.rule.TransactionalTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.util.IntegerWrapper;
@@ -40,6 +39,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PersistenceTestRule;
+import com.liferay.portal.test.rule.TransactionalTestRule;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -69,7 +69,8 @@ public class DDMStructurePersistenceTest {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule = new AggregateTestRule(new LiferayIntegrationTestRule(),
 			PersistenceTestRule.INSTANCE,
-			new TransactionalTestRule(Propagation.REQUIRED));
+			new TransactionalTestRule(Propagation.REQUIRED,
+				"com.liferay.dynamic.data.mapping.service"));
 
 	@Before
 	public void setUp() {
@@ -321,6 +322,16 @@ public class DDMStructurePersistenceTest {
 		_persistence.countByG_N_D(0L, StringPool.NULL, StringPool.NULL);
 
 		_persistence.countByG_N_D(0L, (String)null, (String)null);
+	}
+
+	@Test
+	public void testCountByG_C_N_D() throws Exception {
+		_persistence.countByG_C_N_D(RandomTestUtil.nextLong(),
+			RandomTestUtil.nextLong(), StringPool.BLANK, StringPool.BLANK);
+
+		_persistence.countByG_C_N_D(0L, 0L, StringPool.NULL, StringPool.NULL);
+
+		_persistence.countByG_C_N_D(0L, 0L, (String)null, (String)null);
 	}
 
 	@Test

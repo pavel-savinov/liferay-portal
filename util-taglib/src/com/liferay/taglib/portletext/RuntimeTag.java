@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.PortletInstance;
+import com.liferay.portal.kernel.model.PortletWrapper;
 import com.liferay.portal.kernel.portlet.PortletContainerUtil;
 import com.liferay.portal.kernel.portlet.PortletJSONUtil;
 import com.liferay.portal.kernel.portlet.PortletLayoutListener;
@@ -42,7 +43,6 @@ import com.liferay.portal.kernel.util.AutoResetThreadLocal;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
-import com.liferay.portal.kernel.util.PrefixPredicateFilter;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -182,7 +182,7 @@ public class RuntimeTag extends TagSupport {
 				request.getParameter("p_p_id"))) {
 
 			parameterMap = MapUtil.filterByKeys(
-				parameterMap, new PrefixPredicateFilter("p_p_"));
+				parameterMap, (key) -> !key.startsWith("p_p_"));
 		}
 
 		request = DynamicServletRequest.addQueryString(
@@ -392,7 +392,26 @@ public class RuntimeTag extends TagSupport {
 		// non-instanceable portlets
 
 		if (!portlet.isInstanceable()) {
-			portlet = (Portlet)portlet.clone();
+			portlet = new PortletWrapper(portlet) {
+
+				@Override
+				public boolean getStatic() {
+					return _staticPortlet;
+				}
+
+				@Override
+				public boolean isStatic() {
+					return _staticPortlet;
+				}
+
+				@Override
+				public void setStatic(boolean staticPortlet) {
+					_staticPortlet = staticPortlet;
+				}
+
+				private boolean _staticPortlet;
+
+			};
 		}
 
 		portlet.setStatic(true);

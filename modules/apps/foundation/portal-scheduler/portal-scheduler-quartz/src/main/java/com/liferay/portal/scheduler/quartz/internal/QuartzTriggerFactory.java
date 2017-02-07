@@ -37,7 +37,7 @@ import org.quartz.TriggerBuilder;
  * @author Tina Tian
  */
 @Component(
-	immediate = true,
+	enabled = false, immediate = true,
 	service = {QuartzTriggerFactory.class, TriggerFactory.class}
 )
 public class QuartzTriggerFactory implements TriggerFactory {
@@ -50,8 +50,8 @@ public class QuartzTriggerFactory implements TriggerFactory {
 		if (interval < 0) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
-					"Not scheduling " + jobName + " because interval is " +
-						"less than 0");
+					"Not scheduling " + jobName + " because interval is less " +
+						"than 0");
 			}
 
 			return null;

@@ -59,9 +59,9 @@ public class PQLValueTest extends TestCase {
 	public void testGetPQLResultError() throws Exception {
 		Set<String> pqls = new HashSet<>();
 
+		pqls.add("test == test");
 		pqls.add("test test");
 		pqls.add("true AND true");
-		pqls.add("test == test");
 
 		for (String pql : pqls) {
 			_validateGetPQLResultError(pql, "Invalid value: " + pql);
@@ -163,6 +163,7 @@ public class PQLValueTest extends TestCase {
 		PQLValue pqlValue = new PQLValue(pql);
 
 		Object actualResult = pqlValue.getPQLResult(properties);
+
 		Object expectedResult = null;
 
 		if (actualResult != null) {
