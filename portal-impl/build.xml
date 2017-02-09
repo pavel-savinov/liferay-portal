@@ -249,6 +249,12 @@ svn://svn.liferay.com/repos/public/alloy/trunk/sandbox/taglibs.
 		</antcall>
 	</target>
 
+	<target name="build-service-portal-route">
+		<antcall target="build-service">
+			<param name="service.file" value="${basedir}/src/com/liferay/portal/route/service.xml" />
+		</antcall>
+	</target>
+
 	<target name="build-service-portlet-announcements">
 		<antcall target="build-service">
 			<param name="service.file" value="${basedir}/src/com/liferay/portlet/announcements/service.xml" />
@@ -318,6 +324,7 @@ svn://svn.liferay.com/repos/public/alloy/trunk/sandbox/taglibs.
 	<target name="build-services">
 		<antcall target="build-service-counter" />
 		<antcall target="build-service-portal" />
+		<antcall target="build-service-portal-route" />
 		<antcall target="build-service-portlets" />
 
 		<gradle-execute dir="../modules" task="buildService">
@@ -583,6 +590,7 @@ svn://svn.liferay.com/repos/public/alloy/trunk/sandbox/taglibs.
 			<arg value="source.auto.fix=${source.auto.fix}" />
 			<arg value="source.base.dir=${source.base.dir}" />
 			<arg value="source.copyright.file=${source.copyright.file}" />
+			<arg value="source.file.extensions=${source.file.extensions}" />
 			<arg value="source.files=${source.files}" />
 			<arg value="source.print.errors=${source.print.errors}" />
 			<arg value="source.throw.exception=${source.throw.exception}" />
@@ -590,6 +598,12 @@ svn://svn.liferay.com/repos/public/alloy/trunk/sandbox/taglibs.
 		</java>
 
 		<delete file="ServiceBuilder.temp" />
+	</target>
+
+	<target name="format-source-bnd">
+		<antcall target="format-source">
+			<param name="source.file.extensions" value="bnd,gradle" />
+		</antcall>
 	</target>
 
 	<target name="format-source-current-branch">
