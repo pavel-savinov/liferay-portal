@@ -153,6 +153,9 @@ public class FriendlyURLServletTest {
 		mockHttpServletRequest.setAttribute(
 			WebKeys.I18N_LANGUAGE_ID,
 			(i18nData == null) ? null : i18nData.getLanguageId());
+		mockHttpServletRequest.setAttribute(
+			WebKeys.LOCALE,
+			LocaleUtil.fromLanguageId(i18nData.getLanguageId()));
 
 		String requestURI =
 			PropsValues.LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING +
