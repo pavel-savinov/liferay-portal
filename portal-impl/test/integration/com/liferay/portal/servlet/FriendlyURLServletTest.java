@@ -187,6 +187,9 @@ public class FriendlyURLServletTest {
 		FriendlyURLServlet.Redirect actualRedirect =
 			_friendlyURLServlet.getRedirect(request, path);
 
+		System.out.println("Actual redirect: " + actualRedirect.getPath());
+		System.out.println("Expected redirect: " + expectedRedirect.getPath());
+
 		Assert.assertEquals(expectedRedirect, actualRedirect);
 	}
 
