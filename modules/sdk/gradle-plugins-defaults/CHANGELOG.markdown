@@ -997,7 +997,7 @@ test compile and runtime classpaths.
 
 ### Added
 - [LPS-70424]: Add the ability to set a custom value for the project group by
-setting the property `project.group` in a `gradle.properties` file contained in
+setting the property `project.group` in a `gradle.properties` file located in
 any parent directory of the project.
 
 ### Changed
@@ -1008,6 +1008,15 @@ any parent directory of the project.
 ### Changed
 - [LPS-69926]: Set the `liferayOSGi.expandCompileInclude` property to `false` by
 default.
+
+## 2.4.27 - 2017-02-08
+
+### Changed
+- [LPS-70486]: Make the `compileClasspath` configuration non-transitive for
+Liferay apps.
+- [LPS-70486]: Use the `compileClasspath` configuration in the compile and
+runtime classpaths of the `test` and `testIntegration` source sets.
+- [LPS-70515]: Update the [Liferay Gradle Plugins] dependency to version 3.1.8.
 
 [Liferay CDN]: https://cdn.lfrs.sl/repository.liferay.com/nexus/content/groups/public
 [Liferay Gradle Plugins]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/gradle-plugins
@@ -1105,6 +1114,8 @@ default.
 [LPS-70336]: https://issues.liferay.com/browse/LPS-70336
 [LPS-70379]: https://issues.liferay.com/browse/LPS-70379
 [LPS-70424]: https://issues.liferay.com/browse/LPS-70424
+[LPS-70486]: https://issues.liferay.com/browse/LPS-70486
+[LPS-70515]: https://issues.liferay.com/browse/LPS-70515
 [LRDOCS-2594]: https://issues.liferay.com/browse/LRDOCS-2594
 [LRDOCS-2841]: https://issues.liferay.com/browse/LRDOCS-2841
 [LRDOCS-2981]: https://issues.liferay.com/browse/LRDOCS-2981

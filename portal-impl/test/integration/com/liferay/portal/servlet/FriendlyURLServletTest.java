@@ -63,7 +63,7 @@ public class FriendlyURLServletTest {
 
 	@Before
 	public void setUp() throws Exception {
-		PropsValues.LOCALES_ENABLED = new String[] {"en_US", "hu_HU", "en_GB"};
+		PropsValues.LOCALES_ENABLED = new String[] {"en_US", "hu_HU", "de_DE"};
 		PropsValues.LOCALE_USE_DEFAULT_IF_NOT_AVAILABLE = true;
 
 		LanguageUtil.init();
@@ -78,7 +78,7 @@ public class FriendlyURLServletTest {
 		_layout = LayoutTestUtil.addLayout(_group);
 
 		List<Locale> availableLocales = Arrays.asList(
-			LocaleUtil.US, LocaleUtil.UK, LocaleUtil.HUNGARY);
+			LocaleUtil.US, LocaleUtil.GERMANY, LocaleUtil.HUNGARY);
 
 		GroupTestUtil.updateDisplaySettings(
 			_group.getGroupId(), availableLocales, LocaleUtil.US);
@@ -113,7 +113,7 @@ public class FriendlyURLServletTest {
 		testGetI18nRedirect("/fr", "/en");
 		testGetI18nRedirect("/hu", "/hu");
 		testGetI18nRedirect("/en", "/en");
-		testGetI18nRedirect("/en_GB", "/en_GB");
+		testGetI18nRedirect("/de_DE", "/de_DE");
 		testGetI18nRedirect("/en_US", "/en_US");
 	}
 
@@ -153,6 +153,9 @@ public class FriendlyURLServletTest {
 		mockHttpServletRequest.setAttribute(
 			WebKeys.I18N_LANGUAGE_ID,
 			(i18nData == null) ? null : i18nData.getLanguageId());
+		mockHttpServletRequest.setAttribute(
+			WebKeys.LOCALE,
+			LocaleUtil.fromLanguageId(i18nData.getLanguageId()));
 
 		String requestURI =
 			PropsValues.LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING +
