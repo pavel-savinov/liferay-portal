@@ -699,8 +699,8 @@ to version 1.1.0.
 ## 3.0.46 - 2016-12-03
 
 ### Added
-- [LPS-69518]: Automatically delete the `liferay/logs` dir generated during the
-execution of the `autoUpdateXml` task.
+- [LPS-69518]: Automatically delete the `liferay/logs` directory generated
+during the execution of the `autoUpdateXml` task.
 
 ### Changed
 - [LPS-66853]: Update the [Liferay Gradle Plugins Source Formatter] dependency
@@ -712,7 +712,7 @@ to version 1.0.56.
 
 ### Added
 - [LPS-69501]: Allow portal tool versions to be overridden in a
-`gradle.properties` file contained in any parent directory of the project. For
+`gradle.properties` file located in any parent directory of the project. For
 example,
 
 		com.liferay.source.formatter.version=1.0.300
@@ -1042,6 +1042,16 @@ to version 1.0.80.
 - [LPS-69271]: Update the [Liferay Gradle Plugins Source Formatter] dependency
 to version 1.0.81.
 
+## 3.1.8 - 2017-02-08
+
+### Changed
+- [LPS-70510]: Deploy theme projects to the
+`[liferay.appServerParentDir]/deploy` directory by default.
+- [LPS-70515]: Update the [Liferay Source Formatter] dependency to version
+1.0.349.
+- [LPS-70515]: Update the [Liferay Gradle Plugins Source Formatter] dependency
+to version 1.0.82.
+
 [Gradle Bundle Plugin]: https://github.com/TomDmitriev/gradle-bundle-plugin
 [Liferay Ant BND]: https://github.com/liferay/liferay-portal/tree/master/modules/sdk/ant-bnd
 [Liferay CSS Builder]: https://github.com/liferay/liferay-portal/tree/master/modules/util/css-builder
@@ -1138,4 +1148,6 @@ to version 1.0.81.
 [LPS-70282]: https://issues.liferay.com/browse/LPS-70282
 [LPS-70336]: https://issues.liferay.com/browse/LPS-70336
 [LPS-70379]: https://issues.liferay.com/browse/LPS-70379
+[LPS-70510]: https://issues.liferay.com/browse/LPS-70510
+[LPS-70515]: https://issues.liferay.com/browse/LPS-70515
 [LRDOCS-3023]: https://issues.liferay.com/browse/LRDOCS-3023
