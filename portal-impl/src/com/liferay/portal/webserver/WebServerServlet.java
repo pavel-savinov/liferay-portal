@@ -53,6 +53,8 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.route.model.GroupFriendlyURL;
+import com.liferay.portal.kernel.route.service.GroupFriendlyURLLocalServiceUtil;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -89,6 +91,7 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -109,6 +112,7 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.documentlibrary.util.DocumentConversionUtil;
 import com.liferay.trash.kernel.model.TrashEntry;
 import com.liferay.trash.kernel.util.TrashUtil;
+import com.liferay.users.admin.kernel.file.uploads.UserFileUploadsSettings;
 
 import java.awt.image.RenderedImage;
 
@@ -624,7 +628,7 @@ public class WebServerServlet extends HttpServlet {
 			}
 		}
 
-		if (PropsValues.USERS_IMAGE_CHECK_TOKEN && (imageId > 0)) {
+		if (_userFileUploadsSettings.isImageCheckToken() && (imageId > 0)) {
 			String imageIdToken = ParamUtil.getString(request, "img_id_token");
 
 			if (user == null) {
@@ -715,10 +719,13 @@ public class WebServerServlet extends HttpServlet {
 			return null;
 		}
 
-		if (((PropsValues.USERS_IMAGE_MAX_HEIGHT > 0) &&
-			 (image.getHeight() > PropsValues.USERS_IMAGE_MAX_HEIGHT)) ||
-			((PropsValues.USERS_IMAGE_MAX_WIDTH > 0) &&
-			 (image.getWidth() > PropsValues.USERS_IMAGE_MAX_WIDTH))) {
+		int usersImageMaxHeight = _userFileUploadsSettings.getImageMaxHeight();
+		int usersImageMaxWidth = _userFileUploadsSettings.getImageMaxWidth();
+
+		if (((usersImageMaxHeight > 0) &&
+			 (image.getHeight() > usersImageMaxHeight)) ||
+			((usersImageMaxWidth > 0) &&
+			 (image.getWidth() > usersImageMaxWidth))) {
 
 			User user = UserLocalServiceUtil.getUserByPortraitId(imageId);
 
@@ -1207,7 +1214,19 @@ public class WebServerServlet extends HttpServlet {
 		List<Group> groups = WebDAVUtil.getGroups(user);
 
 		for (Group group : groups) {
-			String name = HttpUtil.fixPath(group.getFriendlyURL());
+			String languageId = LocaleUtil.toLanguageId(user.getLocale());
+
+			GroupFriendlyURL groupFriendlyURL =
+				GroupFriendlyURLLocalServiceUtil.fetchGroupFriendlyURL(
+					user.getCompanyId(), group.getGroupId(), languageId);
+
+			String friendlyURL = group.getFriendlyURL();
+
+			if (groupFriendlyURL != null) {
+				friendlyURL = groupFriendlyURL.getFriendlyURL();
+			}
+
+			String name = HttpUtil.fixPath(friendlyURL);
 
 			WebServerEntry webServerEntry = new WebServerEntry(
 				path, name + StringPool.SLASH, null, null,
@@ -1538,6 +1557,10 @@ public class WebServerServlet extends HttpServlet {
 		ServiceProxyFactory.newServiceTrackedInstance(
 			InactiveRequestHandler.class, WebServerServlet.class,
 			"_inactiveRequesthandler", false);
+	private static volatile UserFileUploadsSettings _userFileUploadsSettings =
+		ServiceProxyFactory.newServiceTrackedInstance(
+			UserFileUploadsSettings.class, WebServerServlet.class,
+			"_userFileUploadsSettings", false);
 
 	private final Format _dateFormat =
 		FastDateFormatFactoryUtil.getSimpleDateFormat("d MMM yyyy HH:mm z");

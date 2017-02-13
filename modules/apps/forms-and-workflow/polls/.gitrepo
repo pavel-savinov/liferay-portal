@@ -3,7 +3,7 @@
 ;
 [subrepo]
 	cmdver = liferay
-	commit = f9d56d500f46616f6bfcedcff515f9bdb4f90fe9
+	commit = 85cc7d5716b1fa660cbf5c27cf5bbdb1c1924cd2
 	mode = push
-	parent = 086b2c545c301fff9eba132864611258cb1ededf
+	parent = 9fdbbd75949366a77789a79418cd4a74860e28c4
 	remote = git@github.com:liferay/com-liferay-polls.git

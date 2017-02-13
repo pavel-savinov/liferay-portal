@@ -103,6 +103,8 @@ import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.UserAttributes;
+import com.liferay.portal.kernel.route.model.GroupFriendlyURL;
+import com.liferay.portal.kernel.route.service.GroupFriendlyURLLocalServiceUtil;
 import com.liferay.portal.kernel.security.auth.AlwaysAllowDoAsUser;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.auth.FullNameGenerator;
@@ -155,6 +157,7 @@ import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.DeterminateKeyGenerator;
+import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Http;
@@ -1384,16 +1387,14 @@ public class PortalImpl implements Portal {
 
 		String canonicalLayoutFriendlyURL = StringPool.BLANK;
 
-		String layoutFriendlyURL = layout.getFriendlyURL(
-			themeDisplay.getLocale());
-
 		String defaultLayoutFriendlyURL = layout.getFriendlyURL(
 			getSiteDefaultLocale(layout.getGroupId()));
 
-		if ((groupFriendlyURL.contains(layoutFriendlyURL) ||
+		if ((!layout.isFirstParent() || Validator.isNotNull(parametersURL)) &&
+			(groupFriendlyURL.contains(
+				layout.getFriendlyURL(themeDisplay.getLocale())) ||
 			 groupFriendlyURL.contains(
-				 StringPool.SLASH + layout.getLayoutId())) &&
-			(!layout.isFirstParent() || Validator.isNotNull(parametersURL))) {
+				 StringPool.SLASH + layout.getLayoutId()))) {
 
 			canonicalLayoutFriendlyURL = defaultLayoutFriendlyURL;
 		}
@@ -1628,49 +1629,12 @@ public class PortalImpl implements Portal {
 			long scopeGroupId, String ppid, Map<String, String[]> params)
 		throws PortalException {
 
-		StringBundler sb = new StringBundler(7);
-
 		Group group = GroupLocalServiceUtil.getGroup(scopeGroupId);
-
-		Company company = CompanyLocalServiceUtil.getCompany(
-			group.getCompanyId());
-
-		sb.append(
-			getPortalURL(
-				company.getVirtualHostname(), getPortalServerPort(false),
-				false));
-
-		sb.append(getPathFriendlyURLPrivateGroup());
 
 		Group controlPanelDisplayGroup = getControlPanelDisplayGroup(
 			group.getCompanyId(), scopeGroupId, 0, ppid);
 
-		if ((controlPanelDisplayGroup != null) &&
-			!controlPanelDisplayGroup.isControlPanel()) {
-
-			sb.append(controlPanelDisplayGroup.getFriendlyURL());
-			sb.append(VirtualLayoutConstants.CANONICAL_URL_SEPARATOR);
-		}
-
-		sb.append(GroupConstants.CONTROL_PANEL_FRIENDLY_URL);
-		sb.append(PropsValues.CONTROL_PANEL_LAYOUT_FRIENDLY_URL);
-
-		if (params != null) {
-			params = new LinkedHashMap<>(params);
-		}
-		else {
-			params = new LinkedHashMap<>();
-		}
-
-		params.put("p_p_id", new String[] {ppid});
-		params.put("p_p_lifecycle", new String[] {"0"});
-		params.put(
-			"p_p_state", new String[] {WindowState.MAXIMIZED.toString()});
-		params.put("p_p_mode", new String[] {PortletMode.VIEW.toString()});
-
-		sb.append(HttpUtil.parameterMapToString(params, true));
-
-		return sb.toString();
+		return getSiteAdminURL(controlPanelDisplayGroup, ppid, params);
 	}
 
 	@Override
@@ -3107,8 +3071,16 @@ public class PortalImpl implements Portal {
 			friendlyURL = themeDisplay.getI18nPath() + friendlyURL;
 		}
 
+		String groupFriendlyURL = group.getFriendlyURL();
+
+		String languageId = LocaleUtil.toLanguageId(themeDisplay.getLocale());
+
+		GroupFriendlyURL groupFriendlyURLInstance =
+			GroupFriendlyURLLocalServiceUtil.fetchGroupFriendlyURL(
+				themeDisplay.getCompanyId(), group.getGroupId(), languageId);
+
 		String layoutSetFriendlyURL =
-			_pathContext + friendlyURL + group.getFriendlyURL();
+			_pathContext + friendlyURL + groupFriendlyURL;
 
 		return addPreservedParameters(themeDisplay, layoutSetFriendlyURL);
 	}
@@ -3559,6 +3531,39 @@ public class PortalImpl implements Portal {
 		String virtualHostname = layoutSet.getVirtualHostname();
 
 		String portalURL = getPortalURL(request);
+
+		int pos = path.indexOf(CharPool.SLASH, 1);
+
+		if (pos == -1) {
+			pos = path.length();
+		}
+
+		String groupFriendlyURL =
+			FriendlyURLNormalizerUtil.normalizeWithEncoding(
+				HttpUtil.decodeURL(path.substring(0, pos)));
+
+		long companyId = getCompanyId(request);
+
+		Group group = GroupLocalServiceUtil.fetchFriendlyURLGroup(
+			companyId, groupFriendlyURL);
+
+		String languageId = LocaleUtil.toLanguageId(locale);
+
+		if (group != null) {
+			String localizedFriendlyURL = group.getFriendlyURL();
+
+			GroupFriendlyURL groupFriendlyURLInstance =
+				GroupFriendlyURLLocalServiceUtil.fetchGroupFriendlyURL(
+					companyId, group.getGroupId(), languageId);
+
+			if (groupFriendlyURLInstance != null) {
+				localizedFriendlyURL =
+					groupFriendlyURLInstance.getFriendlyURL();
+			}
+
+			requestURI = requestURI.replaceFirst(
+				groupFriendlyURL, localizedFriendlyURL);
+		}
 
 		if (Validator.isNull(virtualHostname) ||
 			!portalURL.contains(virtualHostname)) {
@@ -5044,6 +5049,52 @@ public class PortalImpl implements Portal {
 			"redirect", themeDisplay.getURLCurrent());
 
 		return siteAdministrationURL;
+	}
+
+	@Override
+	public String getSiteAdminURL(
+			Group group, String ppid, Map<String, String[]> params)
+		throws PortalException {
+
+		StringBundler sb = new StringBundler(7);
+
+		Company company = CompanyLocalServiceUtil.getCompany(
+			group.getCompanyId());
+
+		sb.append(
+			getPortalURL(
+				company.getVirtualHostname(), getPortalServerPort(false),
+				false));
+
+		sb.append(getPathFriendlyURLPrivateGroup());
+
+		if ((group != null) && !group.isControlPanel()) {
+			sb.append(group.getFriendlyURL());
+			sb.append(VirtualLayoutConstants.CANONICAL_URL_SEPARATOR);
+		}
+
+		sb.append(GroupConstants.CONTROL_PANEL_FRIENDLY_URL);
+		sb.append(PropsValues.CONTROL_PANEL_LAYOUT_FRIENDLY_URL);
+
+		if (params != null) {
+			params = new LinkedHashMap<>(params);
+		}
+		else {
+			params = new LinkedHashMap<>();
+		}
+
+		if (Validator.isNotNull(ppid)) {
+			params.put("p_p_id", new String[] {ppid});
+		}
+
+		params.put("p_p_lifecycle", new String[] {"0"});
+		params.put(
+			"p_p_state", new String[] {WindowState.MAXIMIZED.toString()});
+		params.put("p_p_mode", new String[] {PortletMode.VIEW.toString()});
+
+		sb.append(HttpUtil.parameterMapToString(params, true));
+
+		return sb.toString();
 	}
 
 	/**
@@ -7817,7 +7868,20 @@ public class PortalImpl implements Portal {
 		}
 
 		sb.append(friendlyURL);
-		sb.append(group.getFriendlyURL());
+
+		String groupFriendlyURL = group.getFriendlyURL();
+
+		String languageId = LocaleUtil.toLanguageId(themeDisplay.getLocale());
+
+		GroupFriendlyURL groupFriendlyURLInstance =
+			GroupFriendlyURLLocalServiceUtil.fetchGroupFriendlyURL(
+				group.getCompanyId(), group.getGroupId(), languageId);
+
+		if (groupFriendlyURLInstance != null) {
+			groupFriendlyURL = groupFriendlyURLInstance.getFriendlyURL();
+		}
+
+		sb.append(groupFriendlyURL);
 
 		return sb.toString();
 	}
@@ -7946,7 +8010,19 @@ public class PortalImpl implements Portal {
 			sb.append(_PUBLIC_GROUP_SERVLET_MAPPING);
 		}
 
-		sb.append(group.getFriendlyURL());
+		String groupFriendlyURL = group.getFriendlyURL();
+
+		String languageId = LocaleUtil.toLanguageId(themeDisplay.getLocale());
+
+		GroupFriendlyURL groupFriendlyURLInstance =
+			GroupFriendlyURLLocalServiceUtil.fetchGroupFriendlyURL(
+				themeDisplay.getCompanyId(), group.getGroupId(), languageId);
+
+		if (groupFriendlyURLInstance != null) {
+			groupFriendlyURL = groupFriendlyURLInstance.getFriendlyURL();
+		}
+
+		sb.append(groupFriendlyURL);
 		sb.append(layout.getFriendlyURL(themeDisplay.getLocale()));
 
 		sb.append(FRIENDLY_URL_SEPARATOR);
