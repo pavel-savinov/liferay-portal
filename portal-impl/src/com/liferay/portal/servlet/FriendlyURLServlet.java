@@ -226,7 +226,14 @@ public class FriendlyURLServlet extends HttpServlet {
 
 		long companyId = PortalInstances.getCompanyId(request);
 
+		String i18nLanguageId = GetterUtil.getString(
+			request.getAttribute(WebKeys.I18N_LANGUAGE_ID));
+
 		Locale locale = PortalUtil.getLocale(request);
+
+		if (Validator.isNull(i18nLanguageId)) {
+			i18nLanguageId = LocaleUtil.toLanguageId(locale);
+		}
 
 		Group group = GroupLocalServiceUtil.fetchFriendlyURLGroup(
 			companyId, friendlyURL);
@@ -359,9 +366,6 @@ public class FriendlyURLServlet extends HttpServlet {
 					layoutFriendlyURLCompositeFriendlyURL =
 						layoutFriendlyURLCompositeFriendlyURL.substring(0, pos);
 				}
-
-				String i18nLanguageId = (String)request.getAttribute(
-					WebKeys.I18N_LANGUAGE_ID);
 
 				if ((Validator.isNotNull(i18nLanguageId) &&
 					 !LanguageUtil.isAvailableLocale(
