@@ -330,6 +330,11 @@ public class AssetTagLocalServiceWrapper implements AssetTagLocalService,
 		return _assetTagLocalService.getTagsSize(groupId, classNameId, name);
 	}
 
+	@Override
+	public int searchCount(long[] groupIds, java.lang.String name) {
+		return _assetTagLocalService.searchCount(groupIds, name);
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*

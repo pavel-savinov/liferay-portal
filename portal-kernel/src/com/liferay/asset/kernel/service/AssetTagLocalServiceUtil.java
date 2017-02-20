@@ -309,6 +309,10 @@ public class AssetTagLocalServiceUtil {
 		return getService().getTagsSize(groupId, classNameId, name);
 	}
 
+	public static int searchCount(long[] groupIds, java.lang.String name) {
+		return getService().searchCount(groupIds, name);
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*

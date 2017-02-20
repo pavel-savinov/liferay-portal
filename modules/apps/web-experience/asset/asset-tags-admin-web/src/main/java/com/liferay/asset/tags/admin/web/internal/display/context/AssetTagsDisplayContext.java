@@ -29,12 +29,11 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portlet.asset.service.permission.AssetPermission;
+import com.liferay.portlet.asset.service.permission.AssetTagsPermission;
 import com.liferay.portlet.asset.util.comparator.AssetTagAssetCountComparator;
 import com.liferay.portlet.asset.util.comparator.AssetTagNameComparator;
 
@@ -105,10 +104,6 @@ public class AssetTagsDisplayContext {
 		}
 
 		_keywords = ParamUtil.getString(_request, "keywords", null);
-
-		if (Validator.isNotNull(_keywords)) {
-			_keywords = StringUtil.quote(_keywords, StringPool.PERCENT);
-		}
 
 		return _keywords;
 	}
@@ -274,7 +269,7 @@ public class AssetTagsDisplayContext {
 		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		if (AssetPermission.contains(
+		if (AssetTagsPermission.contains(
 				themeDisplay.getPermissionChecker(),
 				themeDisplay.getSiteGroupId(), ActionKeys.ADD_TAG)) {
 

@@ -4,6 +4,7 @@ AUI.add(
 		var SoyTemplateUtil = Liferay.DDM.SoyTemplateUtil;
 
 		var MAP_ACTION_DESCRIPTIONS = {
+			'auto-fill': 'auto-fill',
 			enable: 'enable-field',
 			'jump-to-page': 'jump-from-page-to-page',
 			require: 'require-field',
@@ -17,12 +18,29 @@ AUI.add(
 						value: null
 					},
 
+					functionsMetadata: {
+						value: []
+					},
+
+					getDataProviderInstancesURL: {
+						value: ''
+					},
+
+					getDataProviderParametersSettingsURL: {
+						value: ''
+					},
+
+					portletNamespace: {
+						value: ''
+					},
+
 					rules: {
 						value: []
 					},
 
 					strings: {
 						value: {
+							'auto-fill': Liferay.Language.get('autofill-x-from-data-provider-x'),
 							contains: Liferay.Language.get('contains'),
 							delete: Liferay.Language.get('delete'),
 							edit: Liferay.Language.get('edit'),
@@ -112,6 +130,7 @@ AUI.add(
 							function(field) {
 								fields.push(
 									{
+										dataType: field.get('dataType'),
 										label: field.get('label') || field.get('fieldName'),
 										options: field.get('options'),
 										type: field.get('type'),
@@ -157,7 +176,11 @@ AUI.add(
 									bubbleTargets: [instance],
 									contentBox: instance.get('contentBox'),
 									fields: instance.getFields(),
-									pages: instance.getPages()
+									functionsMetadata: instance.get('functionsMetadata'),
+									getDataProviderParametersSettingsURL: instance.get('getDataProviderParametersSettingsURL'),
+									getDataProviders: instance._dataProviders,
+									pages: instance.getPages(),
+									portletNamespace: instance.get('portletNamespace')
 								}
 							);
 						}
@@ -173,7 +196,32 @@ AUI.add(
 
 						FormBuilderRuleBuilder.superclass.show.apply(instance, arguments);
 
-						instance.syncUI();
+						if (!instance._dataProviders) {
+							instance._fillDataProviders();
+						}
+						else {
+							instance.syncUI();
+						}
+					},
+
+					_fillDataProviders: function() {
+						var instance = this;
+
+						A.io.request(
+							instance.get('getDataProviderInstancesURL'),
+							{
+								method: 'GET',
+								on: {
+									success: function(event, id, xhr) {
+										var result = JSON.parse(xhr.responseText);
+
+										instance._dataProviders = result;
+
+										instance.syncUI();
+									}
+								}
+							}
+						);
 					},
 
 					_getActionDescription: function(type, action) {
@@ -206,11 +254,36 @@ AUI.add(
 									)
 								];
 							}
+							else if (type === 'auto-fill') {
+								data = [];
+
+								var fieldListDescription = [];
+
+								for (var output in action.outputs) {
+									fieldListDescription.push(
+										badgeTemplate(
+											{
+												content: action.outputs[output]
+											}
+										)
+									);
+								}
+
+								data.push(fieldListDescription.join(', '));
+
+								data.push(
+									badgeTemplate(
+										{
+											content: instance._getDataProviderLabel(action.ddmDataProviderInstanceUUID)
+										}
+									)
+								);
+							}
 							else {
 								data = [
 									badgeTemplate(
 										{
-											content: action.target
+											content: action.label
 										}
 									)
 								];
@@ -238,6 +311,18 @@ AUI.add(
 						return actionsDescription;
 					},
 
+					_getDataProviderLabel: function(dataProviderUUID) {
+						var instance = this;
+
+						if (instance._dataProviders) {
+							for (var i = 0; i < instance._dataProviders.length; i++) {
+								if (dataProviderUUID === instance._dataProviders[i].uuid) {
+									return instance._dataProviders[i].name;
+								}
+							}
+						}
+					},
+
 					_getFieldLabel: function(fieldValue) {
 						var instance = this;
 
@@ -260,10 +345,12 @@ AUI.add(
 						var rulesDescription = [];
 
 						for (var i = 0; i < rules.length; i++) {
-							rulesDescription.push({
-								actions: instance._getActionsDescription(rules[i].actions),
-								conditions: rules[i].conditions
-							});
+							rulesDescription.push(
+								{
+									actions: instance._getActionsDescription(rules[i].actions),
+									conditions: rules[i].conditions
+								}
+							);
 						}
 
 						return rulesDescription;
