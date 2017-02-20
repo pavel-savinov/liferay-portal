@@ -263,11 +263,12 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 			project, LiferayExtension.class);
 
 		final GitRepo gitRepo = _getGitRepo(project.getProjectDir());
+		boolean testProject = GradleUtil.isTestProject(project);
 
 		File versionOverrideFile = _getVersionOverrideFile(project, gitRepo);
 
 		boolean syncReleaseVersions = _syncReleaseVersions(
-			project, portalRootDir, versionOverrideFile);
+			project, portalRootDir, versionOverrideFile, testProject);
 
 		_applyVersionOverrides(project, versionOverrideFile);
 
@@ -280,7 +281,6 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		List<String> taskNames = startParameter.getTaskNames();
 
 		final boolean publishing = _isPublishing(project);
-		boolean testProject = GradleUtil.isTestProject(project);
 
 		boolean deployToAppServerLibs = false;
 		boolean deployToTools = false;
@@ -374,13 +374,13 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 			project);
 
 		_configureBasePlugin(project, portalRootDir);
+		_configureBundleDefaultInstructions(project, portalRootDir, publishing);
 		_configureConfigurations(project, gitRepo, liferayExtension);
 		_configureDependencyChecker(project);
 		_configureDeployDir(
 			project, liferayExtension, deployToAppServerLibs, deployToTools);
 		_configureEclipse(project);
 		_configureJavaPlugin(project);
-		_configureLiferayOSGi(project, portalRootDir, publishing);
 		_configureLocalPortalTool(
 			project, portalRootDir, SourceFormatterPlugin.CONFIGURATION_NAME,
 			_SOURCE_FORMATTER_PORTAL_TOOL_NAME);
@@ -1508,6 +1508,52 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		basePluginConvention.setLibsDirName(dirName);
 	}
 
+	private void _configureBundleDefaultInstructions(
+		Project project, File portalRootDir, boolean publishing) {
+
+		LiferayOSGiExtension liferayOSGiExtension = GradleUtil.getExtension(
+			project, LiferayOSGiExtension.class);
+
+		Map<String, Object> bundleDefaultInstructions = new HashMap<>();
+
+		bundleDefaultInstructions.put("-check", "exports");
+		bundleDefaultInstructions.put(Constants.BUNDLE_VENDOR, "Liferay, Inc.");
+		bundleDefaultInstructions.put(
+			Constants.DONOTCOPY,
+			"(" + LiferayOSGiExtension.DONOTCOPY_DEFAULT + "|.touch)");
+		bundleDefaultInstructions.put(
+			Constants.FIXUPMESSAGES + ".deprecated",
+			"annotations are deprecated");
+		bundleDefaultInstructions.put(Constants.SOURCES, "false");
+
+		if (publishing) {
+			bundleDefaultInstructions.put(
+				"Git-Descriptor",
+				"${system-allow-fail;git describe --dirty --always}");
+			bundleDefaultInstructions.put(
+				"Git-SHA", "${system-allow-fail;git rev-list -1 HEAD}");
+		}
+
+		File appBndFile = _getAppBndFile(project, portalRootDir);
+
+		if (appBndFile != null) {
+			bundleDefaultInstructions.put(
+				Constants.INCLUDE,
+				FileUtil.getRelativePath(project, appBndFile));
+		}
+
+		File packageJsonFile = project.file("package.json");
+
+		if (packageJsonFile.exists()) {
+			bundleDefaultInstructions.put(
+				Constants.INCLUDERESOURCE + ".packagejson",
+				FileUtil.getRelativePath(project, packageJsonFile));
+		}
+
+		liferayOSGiExtension.bundleDefaultInstructions(
+			bundleDefaultInstructions);
+	}
+
 	private void _configureBundleInstructions(
 		Project project, GitRepo gitRepo) {
 
@@ -1565,8 +1611,7 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 							"com.liferay.arquillian.arquillian-container-" +
 								"liferay") ||
 						name.equals(
-							"com.liferay.arquillian.extension.junit.bridge") ||
-						name.equals("com.liferay.jasper.jspc")) {
+							"com.liferay.arquillian.extension.junit.bridge")) {
 
 						moduleDependency.exclude(
 							Collections.singletonMap("group", _GROUP_PORTAL));
@@ -1729,6 +1774,9 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 
 			_configureConfigurationTransitive(
 				project, JavaPlugin.COMPILE_CONFIGURATION_NAME, false);
+			_configureConfigurationTransitive(
+				project, JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME,
+				false);
 		}
 
 		_configureDependenciesTransitive(
@@ -1915,54 +1963,6 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 			FileUtil.relativize(testResultsDir, project.getBuildDir()));
 	}
 
-	private void _configureLiferayOSGi(
-		Project project, File portalRootDir, boolean publishing) {
-
-		LiferayOSGiExtension liferayOSGiExtension = GradleUtil.getExtension(
-			project, LiferayOSGiExtension.class);
-
-		Map<String, Object> bundleDefaultInstructions = new HashMap<>();
-
-		bundleDefaultInstructions.put("-check", "exports");
-		bundleDefaultInstructions.put(Constants.BUNDLE_VENDOR, "Liferay, Inc.");
-		bundleDefaultInstructions.put(
-			Constants.DONOTCOPY,
-			"(" + LiferayOSGiExtension.DONOTCOPY_DEFAULT + "|.touch)");
-		bundleDefaultInstructions.put(
-			Constants.FIXUPMESSAGES + ".deprecated",
-			"annotations are deprecated");
-		bundleDefaultInstructions.put(Constants.SOURCES, "false");
-
-		if (publishing) {
-			bundleDefaultInstructions.put(
-				"Git-Descriptor",
-				"${system-allow-fail;git describe --dirty --always}");
-			bundleDefaultInstructions.put(
-				"Git-SHA", "${system-allow-fail;git rev-list -1 HEAD}");
-		}
-
-		File appBndFile = _getAppBndFile(project, portalRootDir);
-
-		if (appBndFile != null) {
-			bundleDefaultInstructions.put(
-				Constants.INCLUDE,
-				FileUtil.getRelativePath(project, appBndFile));
-		}
-
-		File packageJsonFile = project.file("package.json");
-
-		if (packageJsonFile.exists()) {
-			bundleDefaultInstructions.put(
-				Constants.INCLUDERESOURCE + ".packagejson",
-				FileUtil.getRelativePath(project, packageJsonFile));
-		}
-
-		liferayOSGiExtension.bundleDefaultInstructions(
-			bundleDefaultInstructions);
-
-		liferayOSGiExtension.setExpandCompileInclude(false);
-	}
-
 	private void _configureLocalPortalTool(
 		Project project, File portalRootDir, String configurationName,
 		String portalToolName) {
@@ -2096,23 +2096,19 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 
 		_configureSourceSetClassesDir(project, sourceSet, "test-classes/unit");
 
-		Configuration compileConfiguration = GradleUtil.getConfiguration(
-			project, JavaPlugin.COMPILE_CONFIGURATION_NAME);
-
-		Configuration compileIncludeConfiguration = GradleUtil.getConfiguration(
-			project, LiferayOSGiPlugin.COMPILE_INCLUDE_CONFIGURATION_NAME);
+		Configuration compileClasspathConfiguration =
+			GradleUtil.getConfiguration(
+				project, JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME);
 
 		sourceSet.setCompileClasspath(
 			FileUtil.join(
-				compileIncludeConfiguration, compileConfiguration,
-				portalConfiguration, sourceSet.getCompileClasspath(),
-				portalTestConfiguration));
+				compileClasspathConfiguration, portalConfiguration,
+				sourceSet.getCompileClasspath(), portalTestConfiguration));
 
 		sourceSet.setRuntimeClasspath(
 			FileUtil.join(
-				compileIncludeConfiguration, compileConfiguration,
-				portalConfiguration, sourceSet.getRuntimeClasspath(),
-				portalTestConfiguration));
+				compileClasspathConfiguration, portalConfiguration,
+				sourceSet.getRuntimeClasspath(), portalTestConfiguration));
 	}
 
 	private void _configureSourceSetTestIntegration(
@@ -3293,6 +3289,10 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 		DocumentBuilderFactory documentBuilderFactory =
 			DocumentBuilderFactory.newInstance();
 
+		documentBuilderFactory.setFeature(
+			"http://apache.org/xml/features/nonvalidating/load-external-dtd",
+			false);
+
 		DocumentBuilder documentBuilder =
 			documentBuilderFactory.newDocumentBuilder();
 
@@ -3482,7 +3482,8 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 	}
 
 	private boolean _syncReleaseVersions(
-		Project project, File portalRootDir, File versionOverrideFile) {
+		Project project, File portalRootDir, File versionOverrideFile,
+		boolean testProject) {
 
 		boolean syncRelease = false;
 
@@ -3491,7 +3492,7 @@ public class LiferayOSGiDefaultsPlugin implements Plugin<Project> {
 				project, SYNC_RELEASE_PROPERTY_NAME, true);
 		}
 
-		if ((portalRootDir == null) || !syncRelease ||
+		if ((portalRootDir == null) || !syncRelease || testProject ||
 			!GradleUtil.hasStartParameterTask(
 				project, BaselinePlugin.BASELINE_TASK_NAME)) {
 

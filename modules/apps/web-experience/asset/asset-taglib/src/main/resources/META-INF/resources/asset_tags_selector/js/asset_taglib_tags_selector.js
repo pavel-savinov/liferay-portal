@@ -36,6 +36,8 @@ AUI.add(
 			]
 		);
 
+		var TPL_ALERT = '<div class="help-block">{duplicate} {tag}: {tagName}</div>';
+
 		/**
 		 * OPTIONS
 		 *
@@ -141,6 +143,8 @@ AUI.add(
 
 						entries.after('add', instance._updateHiddenInput, instance);
 						entries.after('remove', instance._updateHiddenInput, instance);
+
+						A.Do.before(instance._checkTag, instance.entries, 'add', instance);
 					},
 
 					syncUI: function() {
@@ -192,6 +196,44 @@ AUI.add(
 						instance.get('boundingBox').on('keypress', instance._onKeyPress, instance);
 					},
 
+					_checkTag: function(object) {
+						var instance = this;
+
+						var tag = !object.value ? object : object.value;
+
+						if (!instance.entries.containsKey(tag)) {
+							return;
+						}
+
+						var contentBox = instance.get('contentBox');
+
+						var toolbar = instance.icons.get('contentBox');
+
+						var message = Lang.sub(
+							TPL_ALERT,
+							{
+								duplicate: Liferay.Language.get('duplicate'),
+								tag: Liferay.Language.get('tag'),
+								tagName: tag
+							}
+						);
+
+						contentBox.addClass('has-error');
+
+						var alertNode = toolbar.insertBefore(message, toolbar);
+
+						A.later(
+							5000,
+							instance,
+							function() {
+								alertNode.remove();
+
+								contentBox.removeClass('has-error');
+							}, {}, false
+						);
+
+					},
+
 					_getTagsDataSource: function() {
 						var instance = this;
 
@@ -219,7 +261,7 @@ AUI.add(
 											serviceQueryObj = {
 												end: 20,
 												groupIds: instance.get('groupIds'),
-												name: '%' + term + '%',
+												name: term,
 												start: 0,
 												tagProperties: ''
 											};

@@ -459,6 +459,9 @@ public interface PortletDataContext extends Serializable {
 	public List<Element> getReferenceElements(
 		StagedModel parentStagedModel, Class<?> clazz);
 
+	public Set<Serializable> getRegisteredExportingClassedModelPrimaryKeys(
+		String modelClassName);
+
 	public String getRootPortletId();
 
 	/**
@@ -621,6 +624,8 @@ public interface PortletDataContext extends Serializable {
 	public boolean isWithinDateRange(Date modifiedDate);
 
 	public void putNotUniquePerLayout(String dataKey);
+
+	public void registerExportingClassedModel(ClassedModel classedModel);
 
 	public void setClassLoader(ClassLoader classLoader);
 

@@ -52,11 +52,15 @@ AUI.add(
 						valueFn: '_valueFormBuilder'
 					},
 
-					getDataProviderParametersSettingsURL: {
+					functionsMetadata: {
+						value: []
+					},
+
+					getDataProviderInstancesURL: {
 						value: ''
 					},
 
-					getDataProvidersURL: {
+					getDataProviderParametersSettingsURL: {
 						value: ''
 					},
 
@@ -762,6 +766,10 @@ AUI.add(
 						return new Liferay.DDL.FormBuilderRuleBuilder(
 							{
 								formBuilder: instance.get('formBuilder'),
+								functionsMetadata: instance.get('functionsMetadata'),
+								getDataProviderInstancesURL: instance.get('getDataProviderInstancesURL'),
+								getDataProviderParametersSettingsURL: instance.get('getDataProviderParametersSettingsURL'),
+								portletNamespace: instance.get('namespace'),
 								rules: instance.get('rules'),
 								visible: false
 							}
