@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.tools.ImportPackage;
 import com.liferay.portal.tools.ImportsFormatter;
+import com.liferay.portal.tools.ToolsUtil;
 
 import java.io.File;
 
@@ -228,7 +229,15 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 
 		content = StringUtil.replace(content, " \\\n", "\\\n");
 
-		Matcher matcher = _incorrectTabPattern.matcher(content);
+		Matcher matcher = _trailingSemiColonPattern.matcher(content);
+
+		if (matcher.find()) {
+			content = StringUtil.replaceFirst(
+				content, StringPool.SEMICOLON, StringPool.BLANK,
+				matcher.start());
+		}
+
+		matcher = _incorrectTabPattern.matcher(content);
 
 		if (matcher.find()) {
 			content = StringUtil.replaceFirst(
@@ -270,6 +279,9 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 			content = formatIncludeResource(content);
 		}
 
+		content = formatCapability(content, "Provide-Capability");
+		content = formatCapability(content, "Require-Capability");
+
 		return sortDefinitions(fileName, content, new DefinitionComparator());
 	}
 
@@ -292,6 +304,56 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 		}
 
 		return content;
+	}
+
+	protected String formatCapability(String content, String definitionKey) {
+		Pattern pattern = Pattern.compile(
+			"^" + definitionKey + ":[\\s\\S]*?([^\\\\]\n|\\Z)",
+			Pattern.MULTILINE);
+
+		Matcher matcher = pattern.matcher(content);
+
+		if (!matcher.find()) {
+			return content;
+		}
+
+		String match = matcher.group();
+
+		String replacement = StringUtil.replace(match, ": ", ":\\\n\t");
+
+		outerLoop:
+		while (true) {
+			matcher = _capabilityLineBreakPattern1.matcher(replacement);
+
+			while (matcher.find()) {
+				if (!ToolsUtil.isInsideQuotes(replacement, matcher.start())) {
+					replacement = StringUtil.replaceFirst(
+						replacement, ",", ",\\\n\t", matcher.start());
+
+					continue outerLoop;
+				}
+			}
+
+			break;
+		}
+
+		outerLoop:
+		while (true) {
+			matcher = _capabilityLineBreakPattern2.matcher(replacement);
+
+			while (matcher.find()) {
+				if (!ToolsUtil.isInsideQuotes(replacement, matcher.start())) {
+					replacement = StringUtil.replaceFirst(
+						replacement, ";", ";\\\n\t\t", matcher.start());
+
+					continue outerLoop;
+				}
+			}
+
+			break;
+		}
+
+		return StringUtil.replace(content, match, replacement);
 	}
 
 	@Override
@@ -600,6 +662,10 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 		"^Bundle-Name: (.*)\n", Pattern.MULTILINE);
 	private final Pattern _bundleSymbolicNamePattern = Pattern.compile(
 		"^Bundle-SymbolicName: (.*)\n", Pattern.MULTILINE);
+	private final Pattern _capabilityLineBreakPattern1 = Pattern.compile(
+		",[^\\\\]");
+	private final Pattern _capabilityLineBreakPattern2 = Pattern.compile(
+		";[^\\\\]");
 	private Map<String, String> _definitionKeysMap;
 	private final Pattern _exportsPattern = Pattern.compile(
 		"\nExport-Package:(\\\\\n| )(.*?\n|\\Z)[^\t]",
@@ -617,6 +683,8 @@ public class BNDSourceProcessor extends BaseSourceProcessor {
 		"\n[^\t].*:\\\\\n(\t{2,})[^\t]");
 	private final Pattern _singleValueOnMultipleLinesPattern = Pattern.compile(
 		"\n.*:(\\\\\n\t).*(\n[^\t]|\\Z)");
+	private final Pattern _trailingSemiColonPattern = Pattern.compile(
+		";(\n|\\Z)");
 	private final Pattern _webContextPathNamePattern = Pattern.compile(
 		"^Web-ContextPath: (.*)\n", Pattern.MULTILINE);
 	private final Pattern _wilcardImportPattern = Pattern.compile(

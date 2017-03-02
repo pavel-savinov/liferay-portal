@@ -28,6 +28,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.JschConfigSessionFactory;
 import org.eclipse.jgit.transport.OpenSshConfig;
@@ -40,6 +41,15 @@ public class GitWorkingDirectory {
 
 	public GitWorkingDirectory(String workingDirectory)
 		throws GitAPIException, InterruptedException, IOException {
+
+		this("master", workingDirectory);
+	}
+
+	public GitWorkingDirectory(
+			String upstreamBranchName, String workingDirectory)
+		throws GitAPIException, InterruptedException, IOException {
+
+		_upstreamBranchName = upstreamBranchName;
 
 		_setWorkingDirectory(workingDirectory);
 
@@ -54,6 +64,9 @@ public class GitWorkingDirectory {
 		_repository = fileRepositoryBuilder.build();
 
 		_git = new Git(_repository);
+
+		_repositoryName = _getRepositoryName();
+		_repositoryUsername = _getRepositoryUsername();
 	}
 
 	public void checkoutBranch(String branchName)
@@ -144,6 +157,18 @@ public class GitWorkingDirectory {
 		return _repository.getBranch();
 	}
 
+	public String getRepositoryName() {
+		return _repositoryName;
+	}
+
+	public String getRepositoryUsername() {
+		return _repositoryUsername;
+	}
+
+	public String getUpstreamBranchName() {
+		return _upstreamBranchName;
+	}
+
 	public File getWorkingDirectory() {
 		return _workingDirectory;
 	}
@@ -182,6 +207,37 @@ public class GitWorkingDirectory {
 		addCommand.addFilepattern(fileName);
 
 		addCommand.call();
+	}
+
+	private String _getRepositoryName() {
+		StoredConfig storedConfig = _repository.getConfig();
+
+		String remote = storedConfig.getString("remote", "upstream", "url");
+
+		int x = remote.indexOf("/") + 1;
+		int y = remote.indexOf(".git");
+
+		String repositoryName = remote.substring(x, y);
+
+		if (!_upstreamBranchName.contains("ee-") &&
+			!_upstreamBranchName.contains("-private")) {
+
+			repositoryName = repositoryName.replace("-ee", "");
+			repositoryName = repositoryName.replace("-private", "");
+		}
+
+		return repositoryName;
+	}
+
+	private String _getRepositoryUsername() {
+		StoredConfig storedConfig = _repository.getConfig();
+
+		String remote = storedConfig.getString("remote", "upstream", "url");
+
+		int x = remote.indexOf(":") + 1;
+		int y = remote.indexOf("/");
+
+		return remote.substring(x, y);
 	}
 
 	private void _setWorkingDirectory(String workingDirectory)
@@ -239,6 +295,9 @@ public class GitWorkingDirectory {
 	private final Git _git;
 	private File _gitDirectory;
 	private final Repository _repository;
+	private final String _repositoryName;
+	private final String _repositoryUsername;
+	private final String _upstreamBranchName;
 	private File _workingDirectory;
 
 }
