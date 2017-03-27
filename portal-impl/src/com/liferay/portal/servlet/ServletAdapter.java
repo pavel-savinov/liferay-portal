@@ -18,7 +18,9 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.registry.Filter;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
+import com.liferay.registry.ServiceReference;
 import com.liferay.registry.ServiceTracker;
+import com.liferay.registry.ServiceTrackerCustomizer;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
@@ -43,15 +45,10 @@ public class ServletAdapter extends HttpServlet {
 			"(&(" + config.getInitParameter("filter") + ")" +
 					"(objectClass=" + Servlet.class.getName() + "))");
 
-		_serviceTracker = registry.trackServices(filter);
+		_serviceTracker = registry.trackServices(
+			filter, new ServletTrackerCustomizer());
 
 		_serviceTracker.open();
-
-		Servlet servlet = getServlet();
-
-		if (servlet != null) {
-			servlet.init(config);
-		}
 	}
 
 	protected Servlet getServlet() {
@@ -90,5 +87,29 @@ public class ServletAdapter extends HttpServlet {
 	}
 
 	private ServiceTracker<Servlet, Servlet> _serviceTracker;
+
+	private static class ServletTrackerCustomizer
+		implements ServiceTrackerCustomizer<Servlet, Servlet> {
+
+		@Override
+		public Servlet addingService(
+			ServiceReference<Servlet> serviceReference) {
+
+			// invoke init
+		}
+
+		@Override
+		public void modifiedService(
+			ServiceReference<Servlet> serviceReference, Servlet service) {
+
+		}
+
+		@Override
+		public void removedService(
+			ServiceReference<Servlet> serviceReference, Servlet service) {
+
+			// invoke destroy
+		}
+	}
 
 }
