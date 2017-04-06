@@ -14,7 +14,6 @@
 
 package com.liferay.portal.kernel.util;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceTracker;
@@ -61,17 +60,15 @@ public class FriendlyURLNormalizerUtil {
 	@Deprecated
 	public void setFriendlyURLNormalizer(
 		FriendlyURLNormalizer friendlyURLNormalizer) {
-
 	}
 
-	private static ServiceTracker<FriendlyURLNormalizer, FriendlyURLNormalizer>
+	private static final ServiceTracker<FriendlyURLNormalizer, FriendlyURLNormalizer>
 		_serviceTracker;
 
 	static {
 		Registry registry = RegistryUtil.getRegistry();
 
-		_serviceTracker = registry.trackServices(
-			FriendlyURLNormalizer.class);
+		_serviceTracker = registry.trackServices(FriendlyURLNormalizer.class);
 
 		_serviceTracker.open();
 	}
