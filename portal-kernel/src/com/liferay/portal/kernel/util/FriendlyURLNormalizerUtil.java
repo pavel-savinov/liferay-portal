@@ -62,12 +62,8 @@ public class FriendlyURLNormalizerUtil {
 	public void setFriendlyURLNormalizer(
 		FriendlyURLNormalizer friendlyURLNormalizer) {
 
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
-
-		_friendlyURLNormalizer = friendlyURLNormalizer;
 	}
 
-	private static FriendlyURLNormalizer _friendlyURLNormalizer;
 	private static ServiceTracker<FriendlyURLNormalizer, FriendlyURLNormalizer>
 		_serviceTracker;
 
