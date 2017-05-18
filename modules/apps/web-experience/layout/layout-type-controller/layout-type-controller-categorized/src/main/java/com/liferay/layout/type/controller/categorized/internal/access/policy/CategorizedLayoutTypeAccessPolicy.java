@@ -25,6 +25,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
 
+import java.util.Objects;
+
 /**
  * @author Pavel Savinov
  */
@@ -40,7 +42,8 @@ public class CategorizedLayoutTypeAccessPolicy
 	protected boolean isAccessAllowedToLayoutPortlet(
 		HttpServletRequest request, Layout layout, Portlet portlet) {
 
-		if (portlet.getPortletName().equals(
+		if (Objects.equals(
+				portlet.getPortletName(),
 				CategorizedLayoutTypeControllerPortletKeys.
 					LAYOUT_TYPE_CATEGORIZED_PORTLET)) {
 
