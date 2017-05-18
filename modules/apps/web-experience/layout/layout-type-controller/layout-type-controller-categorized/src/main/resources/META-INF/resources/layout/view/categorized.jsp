@@ -14,7 +14,7 @@
  */
 --%>
 
-<%@ include file="/layout/view/init.jsp" %>
+<%@ include file="/init.jsp" %>
 
 <%
 String layoutTemplateId = GetterUtil.getString(selLayout.getTypeSettingsProperty("layout-template-id"), "1_column");

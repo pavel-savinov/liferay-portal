@@ -14,7 +14,7 @@
  */
 --%>
 
-<%@ include file="/layout/edit/init.jsp" %>
+<%@ include file="/init.jsp" %>
 
 <div id="<portlet:namespace />layoutTemplates">
 	<aui:field-wrapper label="layout-template">
