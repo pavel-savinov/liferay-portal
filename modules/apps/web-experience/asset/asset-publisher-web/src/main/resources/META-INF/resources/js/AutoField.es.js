@@ -14,19 +14,6 @@ import TagSelector from './TagSelector.es';
  *
  */
 class AutoField extends Component {
-	/**
-	 * @inheritDoc
-	 */
-	created() {
-	}
-
-	attached() {
-	}
-
-
-	rendered() {
-	}
-
 
 	/**
 	* Add new rule
@@ -38,7 +25,6 @@ class AutoField extends Component {
 
 		this.rules = list;
 	}
-
 
 	/**
 	* Change Selector

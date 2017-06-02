@@ -730,8 +730,6 @@ public class AssetPublisherConfigurationAction
 		List<AssetQueryRule> queryRules = new ArrayList<>();
 
 		for (int queryRulesIndex : queryRulesIndexes) {
-			System.out.println("indexQueryName");
-			System.out.println(queryRulesIndex);
 			AssetQueryRule queryRule = getQueryRule(
 				actionRequest, queryRulesIndex);
 

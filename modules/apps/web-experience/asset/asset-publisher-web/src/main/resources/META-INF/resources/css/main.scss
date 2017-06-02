@@ -69,10 +69,10 @@
 
 			.btn-toolbar-content {
 				position: absolute;
-			    bottom: -6px;
-			    right: 0px;
-			    background-color: #fff;
-			    padding: 15px 5px;
+				bottom: -6px;
+				right: 0px;
+				background-color: #fff;
+				padding: 15px 5px;
 			}
 		}
 
@@ -95,21 +95,21 @@
 
 	.timeline-increment-icon.add-condition:before {
 		background-color: #869cad;
-	    bottom: 37px;
-	    content: '';
-	    display: block;
-	    left: 20px;
-	    position: absolute;
-	    top: -10px;
-	    width: 2px;
+		bottom: 37px;
+		content: '';
+		display: block;
+		left: 20px;
+		position: absolute;
+		top: -10px;
+		width: 2px;
 	}
 
 	.timeline-increment-icon.add-condition {
 		.form-builder-timeline-add-item {
-		    border-radius: 100%;
-		    margin-left: 3px;
-		    padding: 0;
-		    color: #fff;
+			border-radius: 100%;
+			margin-left: 3px;
+			padding: 0;
+			color: #fff;
 		}
 	}
 }

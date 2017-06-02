@@ -17,12 +17,11 @@
 <%@ include file="/init.jsp" %>
 
 <%
-
-	JSONArray rules = JSONFactoryUtil.createJSONArray();
+JSONArray rules = JSONFactoryUtil.createJSONArray();
 %>
 
 <div id="<portlet:namespace />queryRules">
-	<aui:fieldset markupView="lexicon" label="displayed-assets-must-match-these-rules">
+	<aui:fieldset label="displayed-assets-must-match-these-rules" markupView="lexicon">
 		<liferay-ui:asset-tags-error />
 
 		<%
@@ -102,12 +101,10 @@
 				logic.put("categoryIdsTitles", categoryIdsTitles);
 			}
 
-
+			logic.put("queryAndOperator", queryAndOperator);
 			logic.put("queryContains", queryContains);
 			logic.put("queryValues", queryValues);
-			logic.put("queryAndOperator", queryAndOperator);
 			logic.put("type", queryName);
-
 
 			/*if (Validator.isNotNull(tagNames) || Validator.isNotNull(categoryIds) || (queryLogicIndexes.length == 1)) {
 				request.setAttribute("configuration.jsp-categorizableGroupIds", assetPublisherDisplayContext.getReferencedModelsGroupIds());
@@ -137,6 +134,7 @@
 
 	</aui:fieldset>
 </div>
+
 <div id="<portlet:namespace />ConditionForm">
 </div>
 <!-- contentBox: '#<portlet:namespace />queryRules',
@@ -145,22 +143,21 @@ namespace: '<portlet:namespace />',
 url: '<liferay-portlet:renderURL portletConfiguration="<%= true %>" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>"><portlet:param name="<%= Constants.CMD %>" value="edit_query_rule" /><portlet:param name="categorizableGroupIds" value="<%= StringUtil.merge(assetPublisherDisplayContext.getReferencedModelsGroupIds()) %>" /></liferay-portlet:renderURL>' -->
 
 <%
-	long[] categorizableGroupIds = (long[])request.getAttribute("configuration.jsp-categorizableGroupIds");
+long[] categorizableGroupIds = (long[])request.getAttribute("configuration.jsp-categorizableGroupIds");
 
-	if (categorizableGroupIds == null) {
-		categorizableGroupIds = StringUtil.split(ParamUtil.getString(request, "categorizableGroupIds"), 0l);
-	}
+if (categorizableGroupIds == null) {
+	categorizableGroupIds = StringUtil.split(ParamUtil.getString(request, "categorizableGroupIds"), 0l);
+}
 
-	Map<String, Object> autoField = new HashMap<>();
+Map<String, Object> autoField = new HashMap<>();
 
-	autoField.put("rules", rules);
-	autoField.put("namespace", liferayPortletResponse.getNamespace());
-	autoField.put("groupIds", StringUtil.merge(categorizableGroupIds));
-	autoField.put("id", "autofield");
-	autoField.put("portletURLCategorySelector", assetPublisherDisplayContext.getPortletURLCategorySelector().toString());
-	autoField.put("portletURLTagSelector", assetPublisherDisplayContext.getPortletURLTagSelector().toString());
-	autoField.put("vocabularyIds", assetPublisherDisplayContext.getVocabularyIds());
-
+autoField.put("rules", rules);
+autoField.put("namespace", liferayPortletResponse.getNamespace());
+autoField.put("groupIds", StringUtil.merge(categorizableGroupIds));
+autoField.put("id", "autofield");
+autoField.put("portletURLCategorySelector", assetPublisherDisplayContext.getPortletURLCategorySelector().toString());
+autoField.put("portletURLTagSelector", assetPublisherDisplayContext.getPortletURLTagSelector().toString());
+autoField.put("vocabularyIds", assetPublisherDisplayContext.getVocabularyIds());
 %>
 
 <soy:template-renderer

@@ -15,19 +15,19 @@
 package com.liferay.asset.publisher.web.display.context;
 
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
+import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
-import com.liferay.asset.kernel.model.AssetTag;
-import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
+import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.model.ClassType;
 import com.liferay.asset.kernel.model.ClassTypeField;
 import com.liferay.asset.kernel.model.ClassTypeReader;
 import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetEntryServiceUtil;
-import com.liferay.asset.kernel.service.persistence.AssetEntryQuery;
 import com.liferay.asset.kernel.service.AssetVocabularyServiceUtil;
+import com.liferay.asset.kernel.service.persistence.AssetEntryQuery;
 import com.liferay.asset.publisher.web.configuration.AssetPublisherPortletInstanceConfiguration;
 import com.liferay.asset.publisher.web.configuration.AssetPublisherWebConfiguration;
 import com.liferay.asset.publisher.web.constants.AssetPublisherPortletKeys;
@@ -565,7 +565,9 @@ public class AssetPublisherDisplayContext {
 				return null;
 			}
 
-			portletURL.setParameter("eventName", _portletResponse.getNamespace() + "selectCategory");
+			portletURL.setParameter(
+				"eventName",
+				_portletResponse.getNamespace() + "selectCategory");
 			portletURL.setParameter(
 				"selectedCategories", "{selectedCategories}");
 			portletURL.setParameter("singleSelect", "{singleSelect}");
@@ -591,7 +593,8 @@ public class AssetPublisherDisplayContext {
 				return null;
 			}
 
-			portletURL.setParameter("eventName", _portletResponse.getNamespace() + "selectTag");
+			portletURL.setParameter(
+				"eventName", _portletResponse.getNamespace() + "selectTag");
 			portletURL.setParameter("selectedTags", "{selectedTags}");
 
 			portletURL.setWindowState(LiferayWindowState.POP_UP);
@@ -808,7 +811,7 @@ public class AssetPublisherDisplayContext {
 				themeDisplay.getScopeGroupId());
 
 		return ListUtil.toString(
-				vocabularies, AssetVocabulary.VOCABULARY_ID_ACCESSOR);
+			vocabularies, AssetVocabulary.VOCABULARY_ID_ACCESSOR);
 	}
 
 	public AssetEntry incrementViewCounter(AssetEntry assetEntry)
