@@ -20,6 +20,7 @@
 
 <%@ taglib uri="http://liferay.com/tld/asset" prefix="liferay-asset" %><%@
 taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+taglib uri="http://liferay.com/tld/soy" prefix="soy" %><%@
 taglib uri="http://liferay.com/tld/comment" prefix="liferay-comment" %><%@
 taglib uri="http://liferay.com/tld/ddm" prefix="liferay-ddm" %><%@
 taglib uri="http://liferay.com/tld/flags" prefix="liferay-flags" %><%@
@@ -32,6 +33,9 @@ taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
 <%@ page import="com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil" %><%@
 page import="com.liferay.asset.kernel.exception.DuplicateQueryRuleException" %><%@
+page import="com.liferay.portal.kernel.json.JSONFactoryUtil" %><%@
+page import="com.liferay.portal.kernel.json.JSONObject" %><%@
+page import="com.liferay.portal.kernel.json.JSONArray" %><%@
 page import="com.liferay.asset.kernel.model.AssetCategory" %><%@
 page import="com.liferay.asset.kernel.model.AssetEntry" %><%@
 page import="com.liferay.asset.kernel.model.AssetRenderer" %><%@
@@ -113,8 +117,8 @@ page import="com.liferay.portlet.asset.util.AssetUtil" %><%@
 page import="com.liferay.portlet.usersadmin.search.GroupSearch" %><%@
 page import="com.liferay.site.item.selector.criteria.SiteItemSelectorReturnType" %><%@
 page import="com.liferay.site.item.selector.criterion.SiteItemSelectorCriterion" %><%@
-page import="com.liferay.taglib.servlet.PipingServletResponse" %>
-
+page import="com.liferay.taglib.servlet.PipingServletResponse" %><%@
+page import="com.liferay.taglib.util.AssetCategoryUtil"%>
 <%@ page import="java.io.Serializable" %>
 
 <%@ page import="java.text.Format" %>
