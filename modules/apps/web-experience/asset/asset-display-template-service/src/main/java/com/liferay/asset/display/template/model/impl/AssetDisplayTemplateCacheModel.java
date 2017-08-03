@@ -66,7 +66,7 @@ public class AssetDisplayTemplateCacheModel implements CacheModel<AssetDisplayTe
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(23);
+		StringBundler sb = new StringBundler(25);
 
 		sb.append("{assetDisplayTemplateId=");
 		sb.append(assetDisplayTemplateId);
@@ -86,6 +86,8 @@ public class AssetDisplayTemplateCacheModel implements CacheModel<AssetDisplayTe
 		sb.append(name);
 		sb.append(", classNameId=");
 		sb.append(classNameId);
+		sb.append(", plid=");
+		sb.append(plid);
 		sb.append(", DDMTemplateId=");
 		sb.append(DDMTemplateId);
 		sb.append(", main=");
@@ -133,6 +135,7 @@ public class AssetDisplayTemplateCacheModel implements CacheModel<AssetDisplayTe
 		}
 
 		assetDisplayTemplateImpl.setClassNameId(classNameId);
+		assetDisplayTemplateImpl.setPlid(plid);
 		assetDisplayTemplateImpl.setDDMTemplateId(DDMTemplateId);
 		assetDisplayTemplateImpl.setMain(main);
 
@@ -156,6 +159,8 @@ public class AssetDisplayTemplateCacheModel implements CacheModel<AssetDisplayTe
 		name = objectInput.readUTF();
 
 		classNameId = objectInput.readLong();
+
+		plid = objectInput.readLong();
 
 		DDMTemplateId = objectInput.readLong();
 
@@ -192,6 +197,8 @@ public class AssetDisplayTemplateCacheModel implements CacheModel<AssetDisplayTe
 
 		objectOutput.writeLong(classNameId);
 
+		objectOutput.writeLong(plid);
+
 		objectOutput.writeLong(DDMTemplateId);
 
 		objectOutput.writeBoolean(main);
@@ -206,6 +213,7 @@ public class AssetDisplayTemplateCacheModel implements CacheModel<AssetDisplayTe
 	public long modifiedDate;
 	public String name;
 	public long classNameId;
+	public long plid;
 	public long DDMTemplateId;
 	public boolean main;
 }

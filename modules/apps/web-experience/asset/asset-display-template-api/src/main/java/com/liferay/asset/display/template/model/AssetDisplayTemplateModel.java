@@ -235,6 +235,20 @@ public interface AssetDisplayTemplateModel extends BaseModel<AssetDisplayTemplat
 	public void setClassNameId(long classNameId);
 
 	/**
+	 * Returns the plid of this asset display template.
+	 *
+	 * @return the plid of this asset display template
+	 */
+	public long getPlid();
+
+	/**
+	 * Sets the plid of this asset display template.
+	 *
+	 * @param plid the plid of this asset display template
+	 */
+	public void setPlid(long plid);
+
+	/**
 	 * Returns the ddm template ID of this asset display template.
 	 *
 	 * @return the ddm template ID of this asset display template
