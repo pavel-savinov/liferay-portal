@@ -15,11 +15,18 @@
 package com.liferay.modern.site.building.fragment.web.internal.portlet;
 
 import com.liferay.modern.site.building.fragment.constants.FragmentPortletKeys;
+import com.liferay.modern.site.building.fragment.service.FragmentCollectionService;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextFactory;
+import com.liferay.portal.kernel.util.ParamUtil;
 
+import javax.portlet.ActionRequest;
+import javax.portlet.ActionResponse;
 import javax.portlet.Portlet;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Jürgen Kappler
@@ -45,4 +52,38 @@ import org.osgi.service.component.annotations.Component;
 	service = Portlet.class
 )
 public class FragmentPortlet extends MVCPortlet {
+
+	public void editFragmentCollection(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		long fragmentCollectionId = ParamUtil.getLong(
+			actionRequest, "fragmentCollectionId");
+
+		String name = ParamUtil.getString(actionRequest, "name");
+		String description = ParamUtil.getString(actionRequest, "description");
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			actionRequest);
+
+		if (fragmentCollectionId <= 0) {
+
+			// Add Fragment Collection
+
+			_fragmentCollectionService.addFragmentCollection(
+				serviceContext.getScopeGroupId(), name, description,
+				serviceContext);
+		}
+		else {
+
+			// Update Fragment Collection
+
+			_fragmentCollectionService.updateFragmentCollection(
+				fragmentCollectionId, name, description);
+		}
+	}
+
+	@Reference
+	private FragmentCollectionService _fragmentCollectionService;
+
 }
