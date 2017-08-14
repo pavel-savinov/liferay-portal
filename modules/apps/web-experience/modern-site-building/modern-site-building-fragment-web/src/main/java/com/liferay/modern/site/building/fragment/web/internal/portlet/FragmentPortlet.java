@@ -16,6 +16,7 @@ package com.liferay.modern.site.building.fragment.web.internal.portlet;
 
 import com.liferay.modern.site.building.fragment.constants.FragmentPortletKeys;
 import com.liferay.modern.site.building.fragment.service.FragmentCollectionService;
+import com.liferay.modern.site.building.fragment.service.FragmentEntryService;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
@@ -83,7 +84,45 @@ public class FragmentPortlet extends MVCPortlet {
 		}
 	}
 
+	public void editFragmentEntry(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		long fragmentCollectionId = ParamUtil.getLong(
+			actionRequest, "fragmentCollectionId");
+
+		long fragmentEntryId = ParamUtil.getLong(
+			actionRequest, "fragmentEntryId");
+
+		String name = ParamUtil.getString(actionRequest, "name");
+		String css = ParamUtil.getString(actionRequest, "cssContent");
+		String js = ParamUtil.getString(actionRequest, "jsContent");
+		String html = ParamUtil.getString(actionRequest, "htmlContent");
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			actionRequest);
+
+		if (fragmentEntryId <= 0) {
+
+			// Add Fragment Entry
+
+			_fragmentEntryService.addFragmentEntry(
+				serviceContext.getScopeGroupId(), fragmentCollectionId, name,
+				css, html, js, serviceContext);
+		}
+		else {
+
+			// Update Fragment Entry
+
+			_fragmentEntryService.updateFragmentEntry(
+				fragmentEntryId, name, css, js, html);
+		}
+	}
+
 	@Reference
 	private FragmentCollectionService _fragmentCollectionService;
+
+	@Reference
+	private FragmentEntryService _fragmentEntryService;
 
 }
