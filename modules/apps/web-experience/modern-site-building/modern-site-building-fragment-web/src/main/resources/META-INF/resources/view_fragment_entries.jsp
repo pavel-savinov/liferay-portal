@@ -69,9 +69,17 @@ renderResponse.setTitle(fragmentDisplayContext.getFragmentCollectionTitle());
 			portletURL="<%= currentURLObj %>"
 		/>
 	</liferay-frontend:management-bar-filters>
+
+	<liferay-frontend:management-bar-action-buttons>
+		<liferay-frontend:management-bar-button href="javascript:;" icon="trash" id="deleteSelectedFragmentEntries" label="delete" />
+	</liferay-frontend:management-bar-action-buttons>
 </liferay-frontend:management-bar>
 
-<aui:form action="<%= currentURL %>" cssClass="container-fluid-1280" name="fm">
+<portlet:actionURL name="deleteFragmentEntry" var="deleteFragmentEntryURL">
+	<portlet:param name="redirect" value="<%= currentURL %>" />
+</portlet:actionURL>
+
+<aui:form action="<%= deleteFragmentEntryURL %>" cssClass="container-fluid-1280" name="fm">
 	<liferay-ui:search-container
 		id="fragmentEntries"
 		searchContainer="<%= fragmentDisplayContext.getFragmentEntriesSearchContainer() %>"
@@ -115,3 +123,18 @@ renderResponse.setTitle(fragmentDisplayContext.getFragmentCollectionTitle());
 <liferay-frontend:add-menu>
 	<liferay-frontend:add-menu-item title='<%= LanguageUtil.get(request, "add-fragment-entry") %>' url="<%= addFragmentEntryURL.toString() %>" />
 </liferay-frontend:add-menu>
+
+<aui:script sandbox="<%= true %>">
+	var Util = Liferay.Util;
+
+	var form = $(document.<portlet:namespace />fm);
+
+	$('#<portlet:namespace />deleteSelectedFragmentEntries').on(
+		'click',
+		function() {
+			if (confirm('<liferay-ui:message key="are-you-sure-you-want-to-delete-this" />')) {
+				submitForm(form);
+			}
+		}
+	);
+</aui:script>

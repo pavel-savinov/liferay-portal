@@ -54,6 +54,47 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class FragmentPortlet extends MVCPortlet {
 
+	public void deleteFragmentCollection(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		long[] deleteFragmentCollectionIds = null;
+
+		long fragmentCollectionId = ParamUtil.getLong(
+			actionRequest, "fragmentCollectionId");
+
+		if (fragmentCollectionId > 0) {
+			deleteFragmentCollectionIds = new long[] {fragmentCollectionId};
+		}
+		else {
+			deleteFragmentCollectionIds = ParamUtil.getLongValues(
+				actionRequest, "rowIds");
+		}
+
+		_fragmentCollectionService.deleteFragmentCollections(
+			deleteFragmentCollectionIds);
+	}
+
+	public void deleteFragmentEntry(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws Exception {
+
+		long[] deleteFragmentEntryIds = null;
+
+		long fragmentEntryId = ParamUtil.getLong(
+			actionRequest, "fragmentEntryId");
+
+		if (fragmentEntryId > 0) {
+			deleteFragmentEntryIds = new long[] {fragmentEntryId};
+		}
+		else {
+			deleteFragmentEntryIds = ParamUtil.getLongValues(
+				actionRequest, "rowIds");
+		}
+
+		_fragmentEntryService.deleteFragmentEntries(deleteFragmentEntryIds);
+	}
+
 	public void editFragmentCollection(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
