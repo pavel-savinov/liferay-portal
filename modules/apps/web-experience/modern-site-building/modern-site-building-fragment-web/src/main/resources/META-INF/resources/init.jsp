@@ -14,11 +14,29 @@
  */
 --%>
 
-<%@ taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
-taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %>
+<%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
+
+<%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
+taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
+taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
+
+<%@ page import="com.liferay.modern.site.building.fragment.model.FragmentCollection" %><%@
+page import="com.liferay.modern.site.building.fragment.web.internal.display.context.FragmentDisplayContext" %><%@
+page import="com.liferay.portal.kernel.dao.search.ResultRow" %><%@
+page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
+page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
+page import="com.liferay.portal.kernel.util.StringPool" %><%@
+page import="com.liferay.portal.kernel.util.WebKeys" %>
 
 <liferay-frontend:defineObjects />
 
 <liferay-theme:defineObjects />
+
+<portlet:defineObjects />
+
+<%
+FragmentDisplayContext fragmentDisplayContext = new FragmentDisplayContext(renderRequest, renderResponse, request);
+%>
 
 <%@ include file="/init-ext.jsp" %>
