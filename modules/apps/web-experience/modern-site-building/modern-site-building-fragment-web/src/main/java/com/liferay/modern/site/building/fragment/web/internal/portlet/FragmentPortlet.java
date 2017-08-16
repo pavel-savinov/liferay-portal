@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
 	property = {
 		"com.liferay.portlet.css-class-wrapper=portlet-fragment-web",
 		"com.liferay.portlet.display-category=category.hidden",
+		"com.liferay.portlet.header-portlet-css=/css/main.css",
 		"com.liferay.portlet.icon=/icons/fragment.png",
 		"com.liferay.portlet.preferences-owned-by-group=true",
 		"com.liferay.portlet.private-request-attributes=false",
@@ -156,7 +157,7 @@ public class FragmentPortlet extends MVCPortlet {
 			// Update Fragment Entry
 
 			_fragmentEntryService.updateFragmentEntry(
-				fragmentEntryId, name, css, js, html);
+				fragmentEntryId, name, css, html, js);
 		}
 	}
 

@@ -16,6 +16,17 @@
 
 <%@ include file="/init.jsp" %>
 
+<style>
+	#wrapper .portlet-layout,
+	.portlet {
+		margin-bottom: 0;
+	}
+
+	.fragment-name {
+		display: none;
+	}
+</style>
+
 <%
 String redirect = fragmentDisplayContext.getEditFragmentEntryRedirect();
 
@@ -44,73 +55,44 @@ renderResponse.setTitle(((fragmentEntry == null) ? LanguageUtil.get(request, "ad
 	<portlet:param name="mvcPath" value="/edit_fragment_entry.jsp" />
 </portlet:actionURL>
 
-<aui:form action="<%= editFragmentEntryURL %>" cssClass="container-fluid-1280" enctype="multipart/form-data" method="post" name="fm">
+<aui:nav-bar cssClass="collapse-basic-search" markupView="lexicon">
+	<portlet:renderURL var="mainURL" />
+
+	<aui:nav cssClass="navbar-nav">
+		<aui:nav-item href="<%= mainURL.toString() %>" label="code" selected="<%= true %>" />
+		<aui:nav-item href="<%= mainURL.toString() %>" label="design" selected="<%= false %>" />
+	</aui:nav>
+</aui:nav-bar>
+
+<aui:form action="<%= editFragmentEntryURL %>" enctype="multipart/form-data" method="post" name="fm">
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="fragmentEntryId" type="hidden" value="<%= fragmentEntryId %>" />
 	<aui:input name="fragmentCollectionId" type="hidden" value="<%= fragmentCollectionId %>" />
-	<aui:input name="cssContent" type="hidden" />
-	<aui:input name="htmlContent" type="hidden" />
-	<aui:input name="jsContent" type="hidden" />
+	<aui:input name="htmlContent" type="hidden" value="<%= HtmlUtil.escape(fragmentEntry != null ? fragmentEntry.getHtml() : StringPool.BLANK) %>" />
+	<aui:input name="cssContent" type="hidden" value="<%= HtmlUtil.escape(fragmentEntry != null ? fragmentEntry.getCss() : StringPool.BLANK) %>" />
+	<aui:input name="jsContent" type="hidden" value="<%= HtmlUtil.escape(fragmentEntry != null ? fragmentEntry.getJs() : StringPool.BLANK) %>" />
 
 	<aui:model-context bean="<%= fragmentEntry %>" model="<%= FragmentEntry.class %>" />
 
 	<liferay-ui:error exception="<%= DuplicateFragmentEntryException.class %>" message="please-enter-a-unique-name" />
 	<liferay-ui:error exception="<%= FragmentEntryNameException.class %>" message="please-enter-a-valid-name" />
 
+	<div class="fragment-name">
+		<aui:input autoFocus="<%= true %>" label="name" name="name" placeholder="name" />
+	</div>
+
 	<%
-	Map<String, Object> editorContext = new HashMap<>();
-	editorContext.put("namespace", portletDisplay.getNamespace());
+	Map<String, Object> context = new HashMap<>();
+	context.put("namespace", portletDisplay.getNamespace());
 	%>
 
-	<aui:fieldset-group markupView="lexicon">
-		<aui:fieldset>
-			<aui:input autoFocus="<%= true %>" label="name" name="name" placeholder="name" />
+	<soy:template-renderer
+		context="<%= context %>"
+		module="modern-site-building-fragment-web/js/FragmentEditor.es"
+		templateNamespace="FragmentEditor.render"
+	/>
 
-			<div class="entry-content form-group">
-				<liferay-ui:input-editor
-					contents="<%= HtmlUtil.escape(fragmentEntry != null ? fragmentEntry.getCss() : StringPool.BLANK) %>"
-					editorName="alloyeditor"
-					name="cssEditor"
-					showSource="<%= false %>"
-				/>
-			</div>
-
-			<div class="entry-content form-group">
-				<liferay-ui:input-editor
-					contents="<%= HtmlUtil.escape(fragmentEntry != null ? fragmentEntry.getHtml() : StringPool.BLANK) %>"
-					editorName="alloyeditor"
-					name="htmlEditor"
-					showSource="<%= false %>"
-				/>
-			</div>
-
-			<div class="entry-content form-group">
-				<liferay-ui:input-editor
-					contents="<%= HtmlUtil.escape(fragmentEntry != null ? fragmentEntry.getJs() : StringPool.BLANK) %>"
-					editorName="alloyeditor"
-					name="jsEditor"
-					showSource="<%= false %>"
-				/>
-			</div>
-		</aui:fieldset>
-	</aui:fieldset-group>
-
-	<aui:button-row>
-		<aui:button cssClass="btn-lg" type="submit" />
-
-		<aui:button cssClass="btn-lg" href="<%= redirect %>" type="cancel" />
+	<aui:button-row cssClass="fragment-submit-buttons">
+		<aui:button cssClass="btn" type="submit" />
 	</aui:button-row>
 </aui:form>
-
-<aui:script use="aui-base,event-input">
-	var form = A.one('#<portlet:namespace />fm');
-
-	form.on(
-		'submit',
-		function() {
-			form.one('#<portlet:namespace />cssContent').val(window.<portlet:namespace />cssEditor.getText());
-			form.one('#<portlet:namespace />htmlContent').val(window.<portlet:namespace />htmlEditor.getText());
-			form.one('#<portlet:namespace />jsContent').val(window.<portlet:namespace />jsEditor.getText());
-		}
-	);
-</aui:script>
