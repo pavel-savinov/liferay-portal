@@ -1,0 +1,66 @@
+@import "mixins";
+
+.fragment-preview {
+	border: solid 4px #EEE;
+	box-sizing: border-box;
+	height: 40vh;
+	min-height: 20ch;
+	position: relative;
+	width: 100%;
+
+	@include sm {
+		float: left;
+		height: 50%;
+		text-align: center;
+		width: 50%;
+	}
+
+	&__frame {
+		border: none;
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+		left: 50%;
+		position: absolute;
+		top: 50%;
+		transform: translateX(-50%) translateY(-50%);
+		transition: width ease 0.2s, height ease 0.3s;
+		z-index: -1;
+
+		&--desktop {
+			height: calc((100% - 5em) * (9 / 16));
+			width: calc(100% - 5em);
+		}
+
+		&--tablet {
+			height: calc(100% - 5em);
+			width: calc((100% - 5em) * (3 / 4));
+		}
+
+		&--mobile {
+			height: calc(100% - 5em);
+			width: calc((100% - 5em) * (9 / 16));
+		}
+
+		&--full {
+			height: calc(100% - 5em);
+			width: calc(100% - 5em);
+		}
+	}
+
+	&__syntax {
+		color: #AAA;
+		position: absolute;
+		right: 0;
+		text-transform: uppercase;
+		top: 0;
+		z-index: 1;
+	}
+
+	&__toolbar {
+		margin: 0 auto;
+		opacity: 0.5;
+
+		.btn {
+			background-color: transparent;
+		}
+	}
+}

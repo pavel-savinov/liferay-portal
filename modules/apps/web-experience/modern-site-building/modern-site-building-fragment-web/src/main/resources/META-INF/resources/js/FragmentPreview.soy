@@ -1,0 +1,36 @@
+{namespace FragmentPreview}
+
+/**
+ * Renders a FragmentPreview
+ * @param? size
+ */
+{template .render}
+	<div class="fragment-preview">
+		<div class="fragment-preview__syntax btn btn-sm">
+			Result <span class="icon-cog"></span>
+		</div>
+		<div class="fragment-preview__toolbar btn-group" ref="resizeButtons">
+			<button type="button" class="btn btn-sm" onClick="_setPreviewSizeDesktop">
+				<span class="sr-only">Desktop</span>
+				<span class="icon-desktop"></span>
+			</button>
+			<button type="button" class="btn btn-sm" onClick="_setPreviewSizeTablet">
+				<span class="sr-only">Tablet</span>
+				<span class="icon-tablet"></span>
+			</button>
+			<button type="button" class="btn btn-sm" onClick="_setPreviewSizeMobile">
+				<span class="sr-only">Mobile</span>
+				<span class="icon-mobile"></span>
+			</button>
+			<button type="button" class="btn btn-sm" onClick="_setPreviewSizeFull">
+				<span class="sr-only">Expand</span>
+				<span class="icon-resize-full"></span>
+			</button>
+		</div>
+		<iframe
+			class="fragment-preview__frame fragment-preview__frame--{$size}"
+			ref="preview"
+			sandbox="allow-scripts"
+		></iframe>
+	</div>
+{/template}
