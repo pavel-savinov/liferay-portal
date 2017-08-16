@@ -1,0 +1,24 @@
+{namespace FragmentEditor}
+
+/**
+ * FragmentEditor
+ */
+{template .render}
+	<div class="fragment-editor" ref="wrapper">
+		{call SourceEditor.render}
+			{param ref: 'htmlEditor' /}
+			{param syntax: 'html' /}
+		{/call}
+		{call SourceEditor.render}
+			{param ref: 'cssEditor' /}
+			{param syntax: 'css' /}
+		{/call}
+		{call SourceEditor.render}
+			{param ref: 'jsEditor' /}
+			{param syntax: 'javascript' /}
+		{/call}
+		{call FragmentPreview.render}
+			{param ref: 'preview' /}
+		{/call}
+	</div>
+{/template}
