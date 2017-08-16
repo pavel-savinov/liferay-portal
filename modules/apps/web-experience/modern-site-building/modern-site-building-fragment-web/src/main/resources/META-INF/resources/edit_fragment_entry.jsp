@@ -16,6 +16,17 @@
 
 <%@ include file="/init.jsp" %>
 
+<style>
+	#wrapper .portlet-layout,
+	.portlet {
+		margin-bottom: 0;
+	}
+
+	.fragment-name {
+		display: none;
+	}
+</style>
+
 <%
 String redirect = fragmentDisplayContext.getEditFragmentEntryRedirect();
 
@@ -59,20 +70,23 @@ renderResponse.setTitle(((fragmentEntry == null) ? LanguageUtil.get(request, "ad
 	<aui:input name="htmlContent" type="hidden" value="<%= HtmlUtil.escape(fragmentEntry != null ? fragmentEntry.getHtml() : StringPool.BLANK) %>" />
 	<aui:input name="cssContent" type="hidden" value="<%= HtmlUtil.escape(fragmentEntry != null ? fragmentEntry.getCss() : StringPool.BLANK) %>" />
 	<aui:input name="jsContent" type="hidden" value="<%= HtmlUtil.escape(fragmentEntry != null ? fragmentEntry.getJs() : StringPool.BLANK) %>" />
-	<aui:input name="name" type="hidden" value="<%= HtmlUtil.escape(fragmentEntry != null ? fragmentEntry.getName() : StringPool.BLANK) %>" />
 
 	<aui:model-context bean="<%= fragmentEntry %>" model="<%= FragmentEntry.class %>" />
 
 	<liferay-ui:error exception="<%= DuplicateFragmentEntryException.class %>" message="please-enter-a-unique-name" />
 	<liferay-ui:error exception="<%= FragmentEntryNameException.class %>" message="please-enter-a-valid-name" />
 
+	<div class="fragment-name">
+		<aui:input autoFocus="<%= true %>" label="name" name="name" placeholder="name" />
+	</div>
+
 	<%
-	Map<String, Object> editorContext = new HashMap<>();
-	editorContext.put("namespace", portletDisplay.getNamespace());
+	Map<String, Object> context = new HashMap<>();
+	context.put("namespace", portletDisplay.getNamespace());
 	%>
 
 	<soy:template-renderer
-		context="<%= editorContext %>"
+		context="<%= context %>"
 		module="modern-site-building-fragment-web/js/FragmentEditor.es"
 		templateNamespace="FragmentEditor.render"
 	/>
