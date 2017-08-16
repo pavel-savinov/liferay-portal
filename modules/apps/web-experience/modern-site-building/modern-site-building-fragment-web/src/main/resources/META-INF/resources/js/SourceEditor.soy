@@ -1,0 +1,14 @@
+{namespace SourceEditor}
+
+/**
+ * Renders a SourceEditor
+ * @param syntax
+ */
+{template .render}
+	<div class="source-editor" ref="wrapper">
+		<div class="source-editor__syntax btn btn-sm">
+			{$syntax} <span class="icon-cog"></span>
+		</div>
+		<div ref="editorWrapper" class="source-editor__editor"></div>
+	</div>
+{/template}
