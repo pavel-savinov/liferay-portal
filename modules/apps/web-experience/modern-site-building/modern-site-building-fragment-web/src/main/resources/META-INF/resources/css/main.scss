@@ -3,6 +3,11 @@
 @import "./SourceEditor";
 @import "./FragmentPreview";
 
+#wrapper .portlet-layout,
+.portlet {
+	margin-bottom: 0;
+}
+
 .fragment-submit-buttons {
 	margin: 5px;
 	position: absolute;
