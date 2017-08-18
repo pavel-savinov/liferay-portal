@@ -1,13 +1,13 @@
 $toolbarHeight: 2em;
 
 .source-editor-toolbar {
+	border-bottom: solid thin #DDD;
 	height: $toolbarHeight;
 	line-height: $toolbarHeight;
-	padding: 0 1em;
+	padding: 0;
 	right: 0;
 	top: 0;
 	z-index: 1;
-  border-bottom: solid thin #ddd;
 
 	display: flex;
 	flex-wrap: nowrap;
@@ -15,25 +15,27 @@ $toolbarHeight: 2em;
 	width: 100%;
 
 	&--hidden {
-		position: absolute;
 		border-bottom: none;
+		position: absolute;
 	}
 
 	&__items {
+		display: flex;
 		height: $toolbarHeight;
 	}
 
 	&__item-wrapper {
+		border-right: solid 1px #DDD;
+		cursor: pointer;
 		height: $toolbarHeight;
-    margin-right: 1em;
-    padding-right: 1em;
-    border-right: solid 1px #ddd;
+		overflow: hidden;
+		position: relative;
 	}
 
 	&__syntax {
 		color: #AAA;
 		height: $toolbarHeight;
-		padding: 0.25em 0;
+		padding: 0.25 1em;
 		text-transform: uppercase;
 	}
 }
@@ -41,7 +43,9 @@ $toolbarHeight: 2em;
 .source-editor-toolbar-item {
 	background-color: transparent;
 	border: none;
+	color: black;
+	cursor: pointer;
 	font-size: 0.8em;
 	margin: 0;
-	padding: 0;
+	padding: 0 1em;
 }
