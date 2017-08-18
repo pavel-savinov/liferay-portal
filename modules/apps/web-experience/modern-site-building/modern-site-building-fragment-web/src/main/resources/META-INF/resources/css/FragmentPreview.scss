@@ -57,10 +57,14 @@
 
 	&__toolbar {
 		margin: 0 auto;
-		opacity: 0.5;
 
 		.btn {
 			background-color: transparent;
+			opacity: 0.5;
+		}
+
+		.btn.active {
+			opacity: 1;
 		}
 	}
 }

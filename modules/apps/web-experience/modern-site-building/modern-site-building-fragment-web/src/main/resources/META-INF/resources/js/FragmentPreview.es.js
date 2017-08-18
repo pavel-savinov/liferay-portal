@@ -1,5 +1,3 @@
-import {isString} from 'metal';
-import {toElement, addClasses, removeClasses} from 'metal-dom';
 import Component from 'metal-component';
 import Soy from 'metal-soy';
 import {isOneOf} from './validators.es';
@@ -43,18 +41,30 @@ class FragmentPreview extends Component {
 		}
 	}
 
+	/**
+	 * Changes the preview size to 'desktop'
+	 */
 	_setPreviewSizeDesktop() {
 		this.size = 'desktop';
 	}
 
+	/**
+	 * Changes the preview size to 'tablet'
+	 */
 	_setPreviewSizeTablet() {
 		this.size = 'tablet';
 	}
 
+	/**
+	 * Changes the preview size to 'mobile'
+	 */
 	_setPreviewSizeMobile() {
 		this.size = 'mobile';
 	}
 
+	/**
+	 * Changes the preview size to 'full'
+	 */
 	_setPreviewSizeFull() {
 		this.size = 'full';
 	}
