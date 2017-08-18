@@ -1,0 +1,24 @@
+{namespace SourceEditorToolbar}
+
+/**
+ * Renders a SourceEditorToolbar
+ * @param syntax
+ * @param? showToolbar
+ * @param? aceEditor
+ * @param? items
+ * @param? _toggleToolbar
+ */
+{template .render}
+	<div class="source-editor-toolbar {if not $showToolbar}source-editor-toolbar--hidden{/if}">
+		<div class="source-editor-toolbar__items">
+			{if $showToolbar and $aceEditor and $items}
+				{foreach $item in $items}
+					<div class="source-editor-toolbar__item-wrapper" ref="{$item}"></div>
+				{/foreach}
+			{/if}
+		</div>
+		<div class="source-editor-toolbar__syntax btn btn-sm" onclick="{$_toggleToolbar}">
+			{$syntax} <span class="icon-cog"></span>
+		</div>
+	</div>
+{/template}

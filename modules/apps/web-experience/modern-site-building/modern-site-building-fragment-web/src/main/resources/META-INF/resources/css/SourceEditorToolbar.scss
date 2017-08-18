@@ -1,0 +1,42 @@
+$toolbarHeight: 2em;
+
+.source-editor-toolbar {
+	height: $toolbarHeight;
+	line-height: $toolbarHeight;
+	padding: 0 1em;
+	right: 0;
+	top: 0;
+	z-index: 1;
+
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: space-between;
+	width: 100%;
+
+	&--hidden {
+		position: absolute;
+	}
+
+	&__items {
+		height: $toolbarHeight;
+	}
+
+	&__item-wrapper {
+		height: $toolbarHeight;
+	}
+
+	&__syntax {
+		color: #AAA;
+		height: $toolbarHeight;
+		padding: 0.25em 0;
+		text-transform: uppercase;
+	}
+}
+
+.source-editor-toolbar-item {
+	background-color: transparent;
+	border: none;
+	font-size: 0.8em;
+	margin: 0;
+	padding: 0;
+}
