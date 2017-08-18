@@ -1,7 +1,19 @@
 import Component from 'metal-component';
 import Soy from 'metal-soy';
+import {debounce} from './utils.es';
 import {isOneOf} from './validators.es';
 import templates from './FragmentPreview.soy';
+
+/**
+ * Defined ratios for preview sizing
+ * @type {Object}
+ */
+const SIZE_RATIO = {
+	desktop: {width: 16, height: 9},
+	tablet: {width: 4, height: 3},
+	mobile: {width: 10, height: 16},
+	full: {width: 1, height: 1},
+};
 
 /**
  * Component that renders the preview of a Fragment.
@@ -11,6 +23,22 @@ class FragmentPreview extends Component {
 	/** @inheritdoc */
 	attach() {
 		this._previewSizePrefix = this.refs.preview.className;
+
+		this._updatePreviewSize = debounce(
+			this._updatePreviewSize.bind(this),
+			100
+		);
+		window.addEventListener('resize', this._updatePreviewSize);
+	}
+
+	/** @inheritdoc */
+	rendered() {
+		this._updatePreviewSize();
+	}
+
+	/** @inheritdoc */
+	detached() {
+		window.removeEventListener('resize', this._updatePreviewSize);
 	}
 
 	/**
@@ -39,6 +67,20 @@ class FragmentPreview extends Component {
 		if (preview !== this.refs.preview.src) {
 			this.refs.preview.src = preview;
 		}
+	}
+
+	/**
+	 * Updates the preview size using the corresponding ratio
+	 */
+	_updatePreviewSize() {
+		const {width, height} = this.refs.wrapper.getBoundingClientRect();
+		const ratio = SIZE_RATIO[this.size];
+		const scale = Math.min(
+			(width * 0.9) / ratio.width,
+			(height * 0.8) / ratio.height
+		);
+		this.refs.preview.width = `${ratio.width * scale}px`;
+		this.refs.preview.height = `${ratio.height * scale}px`;
 	}
 
 	/**

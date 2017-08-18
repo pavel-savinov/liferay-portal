@@ -24,26 +24,6 @@
 		transform: translateX(-50%) translateY(-50%);
 		transition: width ease 0.2s, height ease 0.3s;
 		z-index: -1;
-
-		&--desktop {
-			height: calc((100% - 5em) * (9 / 16));
-			width: calc(100% - 5em);
-		}
-
-		&--tablet {
-			height: calc(100% - 5em);
-			width: calc((100% - 5em) * (3 / 4));
-		}
-
-		&--mobile {
-			height: calc(100% - 5em);
-			width: calc((100% - 5em) * (9 / 16));
-		}
-
-		&--full {
-			height: calc(100% - 5em);
-			width: calc(100% - 5em);
-		}
 	}
 
 	&__syntax {
