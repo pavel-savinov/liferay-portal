@@ -1,0 +1,13 @@
+{namespace ImportToolbarItem}
+
+/**
+ * ImportToolbarItem
+ */
+{template .render}
+	{@param? _import: any}
+
+	<label class="source-editor-toolbar-item">
+		<input class="import-toolbar-item__input" onchange="{$_import}" ref="inputField" type="file" />
+		Import
+	</label>
+{/template}
