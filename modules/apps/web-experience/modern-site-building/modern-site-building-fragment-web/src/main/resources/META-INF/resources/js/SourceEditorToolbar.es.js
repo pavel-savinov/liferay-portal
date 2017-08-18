@@ -3,6 +3,7 @@ import Component from 'metal-component';
 import Soy from 'metal-soy';
 import templates from './SourceEditorToolbar.soy';
 import {isOneOf} from './validators.es';
+import ExportToolbarItem from './toolbar-items/ExportToolbarItem.es';
 import ImportToolbarItem from './toolbar-items/ImportToolbarItem.es';
 import SelectAllToolbarItem from './toolbar-items/SelectAllToolbarItem.es';
 
@@ -11,6 +12,7 @@ import SelectAllToolbarItem from './toolbar-items/SelectAllToolbarItem.es';
  * @type {Object}
  */
 const ITEM_MAP = {
+	export: ExportToolbarItem,
 	import: ImportToolbarItem,
 	selectAll: SelectAllToolbarItem,
 };
