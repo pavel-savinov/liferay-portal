@@ -1,14 +1,15 @@
 {namespace SourceEditorToolbar}
 
 /**
- * Renders a SourceEditorToolbar
- * @param syntax
- * @param? showToolbar
- * @param? aceEditor
- * @param? items
- * @param? _toggleToolbar
+ * SourceEditorToolbar
  */
 {template .render}
+	{@param syntax: string}
+	{@param items: list<string>}
+	{@param? aceEditor: any}
+	{@param? showToolbar: bool}
+	{@param? _toggleToolbar: any}
+
 	<div class="source-editor-toolbar {if not $showToolbar}source-editor-toolbar--hidden{/if}">
 		<div class="source-editor-toolbar__items">
 			{if $showToolbar and $aceEditor and $items}

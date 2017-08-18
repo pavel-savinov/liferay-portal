@@ -1,10 +1,11 @@
 {namespace SelectAllToolbarItem}
 
 /**
- * Render toolbar item
- * @param? _selectAll
+ * SelectAllToolbarItem
  */
 {template .render}
+	{@param? _selectAll: any}
+
 	<button class="source-editor-toolbar-item" onclick="{$_selectAll}" type="button">
 		Select all
 	</button>

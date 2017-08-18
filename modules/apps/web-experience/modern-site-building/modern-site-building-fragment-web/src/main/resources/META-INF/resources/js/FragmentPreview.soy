@@ -2,10 +2,11 @@
 
 /**
  * Renders a FragmentPreview
- * @param? size
  */
 {template .render}
-	<div class="fragment-preview">
+	{@param? size: string}
+
+	<div class="fragment-preview" ref="wrapper">
 		<div class="fragment-preview__syntax btn btn-sm">
 			Result <span class="icon-cog"></span>
 		</div>

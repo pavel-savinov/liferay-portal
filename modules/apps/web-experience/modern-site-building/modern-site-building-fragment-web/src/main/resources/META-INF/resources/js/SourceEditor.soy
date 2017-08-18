@@ -1,11 +1,12 @@
 {namespace SourceEditor}
 
 /**
- * Renders a SourceEditor
- * @param syntax
- * @param? toolbarItems
+ * SourceEditor
  */
 {template .render}
+	{@param syntax: string}
+	{@param toolbarItems: list<string>}
+
 	<div class="source-editor" ref="wrapper">
 		{call SourceEditorToolbar.render}
 			{param ref: 'toolbar' /}
