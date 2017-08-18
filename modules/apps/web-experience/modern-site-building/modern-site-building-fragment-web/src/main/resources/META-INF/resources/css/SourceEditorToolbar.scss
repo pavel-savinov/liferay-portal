@@ -45,7 +45,14 @@ $toolbarHeight: 2em;
 	border: none;
 	color: black;
 	cursor: pointer;
+	display: block;
 	font-size: 0.8em;
 	margin: 0;
 	padding: 0 1em;
+	text-decoration: none;
+
+	&:hover {
+		color: #AAA;
+		text-decoration: none;
+	}
 }
