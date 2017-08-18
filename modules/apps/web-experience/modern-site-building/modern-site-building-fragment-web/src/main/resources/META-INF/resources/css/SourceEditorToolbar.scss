@@ -7,6 +7,7 @@ $toolbarHeight: 2em;
 	right: 0;
 	top: 0;
 	z-index: 1;
+  border-bottom: solid thin #ddd;
 
 	display: flex;
 	flex-wrap: nowrap;
@@ -15,6 +16,7 @@ $toolbarHeight: 2em;
 
 	&--hidden {
 		position: absolute;
+		border-bottom: none;
 	}
 
 	&__items {
@@ -23,6 +25,9 @@ $toolbarHeight: 2em;
 
 	&__item-wrapper {
 		height: $toolbarHeight;
+    margin-right: 1em;
+    padding-right: 1em;
+    border-right: solid 1px #ddd;
 	}
 
 	&__syntax {
