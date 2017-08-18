@@ -17,13 +17,14 @@
 
 	&__frame {
 		border: none;
-		box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+		box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 		left: 50%;
 		position: absolute;
 		top: 50%;
 		transform: translateX(-50%) translateY(-50%);
 		transition: width ease 0.2s, height ease 0.3s;
 		z-index: -1;
+		background-color: white;
 	}
 
 	&__syntax {
