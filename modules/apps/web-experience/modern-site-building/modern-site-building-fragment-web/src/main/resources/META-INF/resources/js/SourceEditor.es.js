@@ -1,6 +1,8 @@
-import {isString} from 'metal';
+/* global AUI */
+
 import Component from 'metal-component';
 import Soy from 'metal-soy';
+import SourceEditorToolbar from './SourceEditorToolbar.es';
 import templates from './SourceEditor.soy';
 import {isOneOf} from './validators.es';
 
@@ -16,15 +18,19 @@ class SourceEditor extends Component {
 		this._initialContent = null;
 		this._onChange = this._onChange.bind(this);
 
-		AUI().use('aui-ace-editor', (A) => {
-			this._editorDocument = new A.AceEditor(
+		AUI().use('aui-ace-editor', (A) => { // eslint-disable-line new-cap
+			const editor = new A.AceEditor(
 				{
 					boundingBox: this.refs.editorWrapper,
 					mode: this.syntax,
 					tabSize: 2,
 					highlightActiveLine: false,
 				}
-			).render().getEditor().getSession().getDocument();
+			);
+
+			this.refs.toolbar.aceEditor = editor.getEditor();
+
+			this._editorDocument = editor.getSession().getDocument();
 
 			if (this._initialContent) {
 				this.setContent(this._initialContent);
@@ -77,9 +83,19 @@ SourceEditor.STATE = {
 	 * It will be used for Ace and rendered on the interface.
 	 * @type {string}
 	 */
-syntax: {
-	validator: isOneOf(['html', 'css', 'javascript']),
-},
+	syntax: {
+		validator: isOneOf(['html', 'css', 'javascript']),
+	},
+
+	/**
+	 * Array of items that should be rendered inside the toolbar,
+	 * each item will be placed inside the toolbar, and receive
+	 * the existing editor as parameter.
+	 * @type {Array<string>}
+	 */
+	toolbarItems: {
+		value: [],
+	},
 };
 
 Soy.register(SourceEditor, templates);

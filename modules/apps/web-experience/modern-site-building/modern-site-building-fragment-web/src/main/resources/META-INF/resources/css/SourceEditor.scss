@@ -5,6 +5,7 @@
 	box-sizing: border-box;
 	height: 40vh;
 	min-height: 20ch;
+	overflow: hidden;
 	position: relative;
 	width: 100%;
 
@@ -17,14 +18,5 @@
 	&__editor {
 		height: 100%;
 		width: 100%;
-	}
-
-	&__syntax {
-		color: #AAA;
-		position: absolute;
-		right: 0;
-		text-transform: uppercase;
-		top: 0;
-		z-index: 1;
 	}
 }

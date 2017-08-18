@@ -1,10 +1,11 @@
 @import "mixins";
 @import "./FragmentEditor";
 @import "./SourceEditor";
+@import "./SourceEditorToolbar";
 @import "./FragmentPreview";
 
-#wrapper .portlet-layout,
-.portlet {
+#wrapper .portlet-layout.row,
+#wrapper .portlet {
 	margin-bottom: 0;
 }
 
