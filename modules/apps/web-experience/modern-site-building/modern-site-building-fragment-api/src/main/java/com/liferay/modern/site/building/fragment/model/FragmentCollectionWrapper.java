@@ -338,14 +338,14 @@ public class FragmentCollectionWrapper implements FragmentCollection,
 	}
 
 	@Override
-	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
-		_fragmentCollection.setExpandoBridgeAttributes(expandoBridge);
-	}
-
-	@Override
 	public void setExpandoBridgeAttributes(
 		com.liferay.portal.kernel.model.BaseModel<?> baseModel) {
 		_fragmentCollection.setExpandoBridgeAttributes(baseModel);
+	}
+
+	@Override
+	public void setExpandoBridgeAttributes(ExpandoBridge expandoBridge) {
+		_fragmentCollection.setExpandoBridgeAttributes(expandoBridge);
 	}
 
 	@Override
