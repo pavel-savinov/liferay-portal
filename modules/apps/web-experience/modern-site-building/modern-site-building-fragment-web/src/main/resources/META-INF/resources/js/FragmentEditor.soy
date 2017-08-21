@@ -1,0 +1,27 @@
+{namespace FragmentEditor}
+
+/**
+ * FragmentEditor
+ */
+{template .render}
+	<div class="fragment-editor" ref="wrapper">
+		{call SourceEditor.render}
+			{param ref: 'htmlEditor' /}
+			{param syntax: 'html' /}
+			{param toolbarItems: ['selectAll', 'import', 'export'] /}
+		{/call}
+		{call SourceEditor.render}
+			{param ref: 'cssEditor' /}
+			{param syntax: 'css' /}
+			{param toolbarItems: ['selectAll'] /}
+		{/call}
+		{call SourceEditor.render}
+			{param ref: 'jsEditor' /}
+			{param syntax: 'javascript' /}
+			{param toolbarItems: ['selectAll'] /}
+		{/call}
+		{call FragmentPreview.render}
+			{param ref: 'preview' /}
+		{/call}
+	</div>
+{/template}
