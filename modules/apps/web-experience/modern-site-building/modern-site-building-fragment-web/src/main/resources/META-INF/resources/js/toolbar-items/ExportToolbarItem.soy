@@ -1,0 +1,13 @@
+{namespace ExportToolbarItem}
+
+/**
+ * ExportToolbarItem
+ */
+{template .render}
+	{@param? _editorContent: string}
+
+	<a
+		href="data:application/octet-stream;charset=utf-8,{$_editorContent}"
+		class="source-editor-toolbar-item"
+	>Export</a>
+{/template}
