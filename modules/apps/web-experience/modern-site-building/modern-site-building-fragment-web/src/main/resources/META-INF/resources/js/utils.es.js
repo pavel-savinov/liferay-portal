@@ -22,9 +22,9 @@ function debounce(fn, time) {
  */
 function decodeHTMLEntities(text) {
 	const element = document.createElement('div');
-element.innerHTML = text;
-text = element.textContent;
-return element.textContent;
+	element.innerHTML = text;
+	text = element.textContent;
+	return element.textContent;
 }
 
 export {
