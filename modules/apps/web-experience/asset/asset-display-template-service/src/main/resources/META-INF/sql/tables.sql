@@ -8,6 +8,7 @@ create table AssetDisplayTemplate (
 	modifiedDate DATE null,
 	name VARCHAR(75) null,
 	classNameId LONG,
+	plid LONG,
 	DDMTemplateId LONG,
 	main BOOLEAN
 );
