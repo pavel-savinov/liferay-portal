@@ -15,3 +15,14 @@
 --%>
 
 <%@ include file="/init.jsp" %>
+
+<%
+Map<String, Object> contextObjects = (Map<String, Object>)request.getAttribute(AssetDisplayLayoutTypeControllerWebKeys.CONTEXT_OBJECTS);
+List<AssetEntry> entries = (List<AssetEntry>)request.getAttribute(AssetDisplayLayoutTypeControllerWebKeys.ENTRIES);
+DDMTemplate ddmTemplate = (DDMTemplate)request.getAttribute(WebKeys.TEMPLATE);
+
+String displayStyle = "ddmTemplate_" + ddmTemplate.getTemplateKey();
+%>
+
+<liferay-ddm:template-renderer className="<%= AssetDisplayTemplate.class.getName() %>" contextObjects="<%= contextObjects %>" displayStyle="<%= displayStyle %>" displayStyleGroupId="<%= ddmTemplate.getGroupId() %>" entries="<%= entries %>">
+</liferay-ddm:template-renderer>
