@@ -2236,6 +2236,7 @@ public class AssetDisplayTemplatePersistenceImpl extends BasePersistenceImpl<Ass
 		assetDisplayTemplateImpl.setClassNameId(assetDisplayTemplate.getClassNameId());
 		assetDisplayTemplateImpl.setDDMTemplateId(assetDisplayTemplate.getDDMTemplateId());
 		assetDisplayTemplateImpl.setMain(assetDisplayTemplate.isMain());
+		assetDisplayTemplateImpl.setPlid(assetDisplayTemplate.getPlid());
 
 		return assetDisplayTemplateImpl;
 	}
