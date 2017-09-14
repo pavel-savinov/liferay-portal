@@ -25,6 +25,8 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCCommandCache;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
+import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.servlet.taglib.aui.ScriptData;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateConstants;
@@ -384,6 +386,12 @@ public class SoyPortlet extends MVCPortlet {
 			getMVCPathAttributeName(renderResponse.getNamespace()), path);
 	}
 
+	private void _clearSessionMessages(PortletRequest portletRequest) {
+		SessionErrors.clear(portletRequest);
+
+		SessionMessages.clear(portletRequest);
+	}
+
 	private Template _createRequestTemplate(PortletRequest portletRequest)
 		throws TemplateException {
 
@@ -515,6 +523,8 @@ public class SoyPortlet extends MVCPortlet {
 
 		populateJavaScriptTemplateContext(
 			template, portletResponse.getNamespace());
+
+		_clearSessionMessages(portletRequest);
 	}
 
 	private void _writeJavaScript(
