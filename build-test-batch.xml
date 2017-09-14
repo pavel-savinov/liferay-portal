@@ -588,6 +588,91 @@ app.server.type=@{app.server.type}]]></echo>
 		</sequential>
 	</macrodef>
 
+	<macrodef name="run-bundle-blacklist-restart-test">
+		<sequential>
+			<run-batch-test tomcat.gc.log="true">
+				<test-action>
+					<database-test-run-test database.type="mysql" stop.app.server="true">
+						<test-action>
+							<antcall inheritAll="false" target="prepare-log4j-ext-xml">
+								<param name="database.type" value="@{database.type}" />
+							</antcall>
+
+							<antcall inheritAll="false" target="prepare-portal-ext-properties">
+								<param name="database.type" value="@{database.type}" />
+							</antcall>
+
+							<antcall inheritAll="false" target="prepare-system-ext-properties" />
+
+							<property name="blacklist.cfg.name" value="com.liferay.portal.bundle.blacklist.internal.BundleBlacklistConfiguration.cfg" />
+
+							<gradle-execute dir="modules/apps/static/portal-bundle-blacklist/portal-bundle-blacklist-test" task="test">
+								<arg value="test" />
+								<arg value="--tests" />
+								<arg value="*.BundleBlacklistSetUpBatchTest" />
+								<arg value="-Dblacklist.cfg.name=${blacklist.cfg.name}" />
+								<arg value="-Dliferay.home=${liferay.home}" />
+							</gradle-execute>
+
+							<trycatch>
+								<try>
+									<antcall inheritall="false" target="start-app-server" />
+
+									<gradle-execute dir="modules/apps/static/portal-bundle-blacklist/portal-bundle-blacklist-test" task="testIntegration">
+										<arg value="testIntegration" />
+										<arg value="--tests" />
+										<arg value="*.BundleBlacklistVerifyUninstalledTest" />
+									</gradle-execute>
+								</try>
+
+								<finally>
+									<ant dir="portal-kernel" inheritAll="false" target="test-class">
+										<property name="test.class" value="PortalLogAssertorTest" />
+									</ant>
+								</finally>
+							</trycatch>
+
+							<antcall inheritall="false" target="stop-app-server" />
+
+							<delete file="${liferay.home}/osgi/configs/${blacklist.cfg.name}" />
+
+							<trycatch>
+								<try>
+									<antcall inheritall="false" target="start-app-server-preserve-liferay-home" />
+
+									<gradle-execute dir="modules/apps/static/portal-bundle-blacklist/portal-bundle-blacklist-test" task="testIntegration">
+										<arg value="testIntegration" />
+										<arg value="--tests" />
+										<arg value="*.BundleBlacklistVerifyReinstalledTest" />
+									</gradle-execute>
+								</try>
+
+								<finally>
+									<ant dir="portal-kernel" inheritAll="false" target="test-class">
+										<property name="test.class" value="PortalLogAssertorTest" />
+									</ant>
+								</finally>
+							</trycatch>
+
+						</test-action>
+					</database-test-run-test>
+				</test-action>
+
+				<test-set-up>
+					<if>
+						<isset property="env.DIST_PATH" />
+						<then>
+							<prepare-test-environment />
+						</then>
+						<else>
+							<prepare-test-build />
+						</else>
+					</if>
+				</test-set-up>
+			</run-batch-test>
+		</sequential>
+	</macrodef>
+
 	<macrodef name="run-empty-temp-dir-test">
 		<sequential>
 			<run-batch-test tomcat.gc.log="true">
@@ -1727,6 +1812,10 @@ app.server.type=@{app.server.type}]]></echo>
 		</run-batch-test>
 	</target>
 
+	<target name="bundle-blacklist-restart-jdk8">
+		<run-bundle-blacklist-restart-test />
+	</target>
+
 	<target name="central-requirements-jdk8">
 		<fail message="Please set the property ${central.requirements.tests}." unless="central.requirements.tests" />
 
@@ -2038,31 +2127,35 @@ app.server.type=@{app.server.type}]]></echo>
 		<run-functional-test app.server.type="tcserver" database.type="mysql" test.portal.log.assert="true" />
 	</target>
 
-	<target name="functional-smoke-tomcat80-db2105-jdk8">
+	<target name="functional-smoke-tomcat80-mysql56-jdk8">
+		<run-functional-test app.server.type="tomcat" app.server.version="8.0.32" database.type="mysql" test.portal.log.assert="true" />
+	</target>
+
+	<target name="functional-smoke-tomcat85-db2105-jdk8">
 		<run-functional-test app.server.type="tomcat" database.type="db2" test.portal.log.assert="true" />
 	</target>
 
-	<target name="functional-smoke-tomcat80-mariadb100-jdk8">
+	<target name="functional-smoke-tomcat85-mariadb100-jdk8">
 		<run-functional-test app.server.type="tomcat" database.type="mariadb" test.portal.log.assert="true" />
 	</target>
 
-	<target name="functional-smoke-tomcat80-mysql55-jdk8">
+	<target name="functional-smoke-tomcat85-mysql55-jdk8">
 		<run-functional-test app.server.type="tomcat" database.type="mysql" test.portal.log.assert="true" />
 	</target>
 
-	<target name="functional-smoke-tomcat80-mysql56-jdk8">
+	<target name="functional-smoke-tomcat85-mysql56-jdk8">
 		<run-functional-test app.server.type="tomcat" database.type="mysql" test.portal.log.assert="true" />
 	</target>
 
-	<target name="functional-smoke-tomcat80-oracle121-jdk8">
+	<target name="functional-smoke-tomcat85-oracle121-jdk8">
 		<run-functional-test app.server.type="tomcat" database.type="oracle" test.portal.log.assert="false" />
 	</target>
 
-	<target name="functional-smoke-tomcat80-postgresql94-jdk8">
+	<target name="functional-smoke-tomcat85-postgresql94-jdk8">
 		<run-functional-test app.server.type="tomcat" database.type="postgresql" test.portal.log.assert="true" />
 	</target>
 
-	<target name="functional-smoke-tomcat80-sybase160-jdk8">
+	<target name="functional-smoke-tomcat85-sybase160-jdk8">
 		<run-functional-test app.server.type="tomcat" database.type="sybase" test.portal.log.assert="true" />
 	</target>
 
@@ -2078,27 +2171,39 @@ app.server.type=@{app.server.type}]]></echo>
 		<run-functional-test app.server.type="wildfly" database.type="mariadb" test.portal.log.assert="false" />
 	</target>
 
-	<target name="functional-tomcat80-hypersonic20-jdk8">
-		<run-functional-test app.server.type="tomcat" database.type="hypersonic" />
-	</target>
-
-	<target name="functional-tomcat80-mysql55-jdk8">
-		<run-functional-test app.server.type="tomcat" database.type="mysql" database.version="5.5" />
-	</target>
-
 	<target name="functional-tomcat80-mysql56-jdk8">
-		<run-functional-test app.server.type="tomcat" database.type="mysql" />
-	</target>
-
-	<target name="functional-tomcat80-mysql56-jdk8-quarantine">
-		<antcall target="functional-tomcat80-mysql56-jdk8" />
+		<run-functional-test app.server.type="tomcat" app.server.version="8.0.32" database.type="mysql" />
 	</target>
 
 	<target name="functional-tomcat80-postgresql94-jdk8">
-		<run-functional-test app.server.type="tomcat" database.type="postgresql" />
+		<run-functional-test app.server.type="tomcat" app.server.version="8.0.32" database.type="postgresql" />
 	</target>
 
 	<target name="functional-tomcat80-sybase160-jdk8">
+		<run-functional-test app.server.type="tomcat" app.server.version="8.0.32" database.type="sybase" />
+	</target>
+
+	<target name="functional-tomcat85-hypersonic20-jdk8">
+		<run-functional-test app.server.type="tomcat" database.type="hypersonic" />
+	</target>
+
+	<target name="functional-tomcat85-mysql55-jdk8">
+		<run-functional-test app.server.type="tomcat" database.type="mysql" database.version="5.5" />
+	</target>
+
+	<target name="functional-tomcat85-mysql56-jdk8">
+		<run-functional-test app.server.type="tomcat" database.type="mysql" />
+	</target>
+
+	<target name="functional-tomcat85-mysql56-jdk8-quarantine">
+		<antcall target="functional-tomcat85-mysql56-jdk8" />
+	</target>
+
+	<target name="functional-tomcat85-postgresql94-jdk8">
+		<run-functional-test app.server.type="tomcat" database.type="postgresql" />
+	</target>
+
+	<target name="functional-tomcat85-sybase160-jdk8">
 		<run-functional-test app.server.type="tomcat" database.type="sybase" />
 	</target>
 
@@ -2110,27 +2215,27 @@ app.server.type=@{app.server.type}]]></echo>
 		<run-functional-test app.server.type="tcserver" database.type="mysql" />
 	</target>
 
-	<target name="functional-upgrade-tomcat80-mariadb100-jdk8">
+	<target name="functional-upgrade-tomcat85-mariadb100-jdk8">
 		<run-functional-test app.server.type="tomcat" database.type="mariadb" />
 	</target>
 
-	<target name="functional-upgrade-tomcat80-mysql56-jdk8">
+	<target name="functional-upgrade-tomcat85-mysql56-jdk8">
 		<run-functional-test app.server.type="tomcat" database.type="mysql" />
 	</target>
 
-	<target name="functional-upgrade-tomcat80-oracle121-jdk8">
+	<target name="functional-upgrade-tomcat85-oracle121-jdk8">
 		<run-functional-test app.server.type="tomcat" database.type="oracle" />
 	</target>
 
-	<target name="functional-upgrade-tomcat80-postgresql94-jdk8">
+	<target name="functional-upgrade-tomcat85-postgresql94-jdk8">
 		<run-functional-test app.server.type="tomcat" database.type="postgresql" />
 	</target>
 
-	<target name="functional-upgrade-tomcat80-postgresql94-jdk8-quarantine">
-		<antcall target="functional-upgrade-tomcat80-postgresql94-jdk8" />
+	<target name="functional-upgrade-tomcat85-postgresql94-jdk8-quarantine">
+		<antcall target="functional-upgrade-tomcat85-postgresql94-jdk8" />
 	</target>
 
-	<target name="functional-upgrade-tomcat80-sybase160-jdk8">
+	<target name="functional-upgrade-tomcat85-sybase160-jdk8">
 		<run-functional-test app.server.type="tomcat" database.type="sybase" />
 	</target>
 
@@ -2325,7 +2430,7 @@ app.server.type=@{app.server.type}]]></echo>
 		</run-batch-test>
 	</target>
 
-	<target name="modules-functional-tomcat80-mysql56-jdk8">
+	<target name="modules-functional-tomcat85-mysql56-jdk8">
 		<run-functional-test app.server.type="tomcat" database.type="mysql" />
 	</target>
 
@@ -2464,6 +2569,10 @@ ${output.content}</echo>
 	</target>
 
 	<target name="plugins-functional-tomcat80-mysql56-jdk8">
+		<run-functional-test app.server.type="tomcat" app.server.version="8.0.32" database.type="mysql" />
+	</target>
+
+	<target name="plugins-functional-tomcat85-mysql56-jdk8">
 		<run-functional-test app.server.type="tomcat" database.type="mysql" />
 	</target>
 
@@ -2522,6 +2631,48 @@ ${output.content}</echo>
 					</else>
 				</if>
 			</test-set-up>
+		</run-batch-test>
+	</target>
+
+	<target name="portal-license-jdk8">
+		<run-batch-test>
+			<test-action>
+				<sequential>
+					<execute>
+						<![CDATA[
+							git diff --name-only ${liferay.portal.branch}...HEAD > ${project.dir}/git.diff
+						]]>
+					</execute>
+
+					<print-file file.name="${project.dir}/git.diff" />
+
+					<copy file="${project.dir}/git.diff" todir="${release.tool.dir}" />
+
+					<print-file file.name="${release.tool.dir}/git.diff" />
+
+					<execute dir="${release.tool.dir}">
+						<![CDATA[
+							ant dist -f build-release-license.xml
+						]]>
+					</execute>
+				</sequential>
+			</test-action>
+
+			<test-tear-down>
+				<if>
+				 	<available file="${project.dir}/git.diff" />
+			 		<then>
+						<delete file="${project.dir}/git.diff" />
+			 		</then>
+			 	</if>
+
+			 	<if>
+				 	<available file="${release.tool.dir}/git.diff" />
+			 		<then>
+						<delete file="${release.tool.dir}/git.diff" />
+			 		</then>
+			 	</if>
+			</test-tear-down>
 		</run-batch-test>
 	</target>
 
@@ -2967,6 +3118,10 @@ information. Make sure to commit in all build services results.
 	</target>
 
 	<target name="subrepository-functional-tomcat80-mysql56-jdk8">
+		<run-functional-test app.server.type="tomcat" app.server.version="8.0.32" database.type="mysql" />
+	</target>
+
+	<target name="subrepository-functional-tomcat85-mysql56-jdk8">
 		<run-functional-test app.server.type="tomcat" database.type="mysql" />
 	</target>
 
