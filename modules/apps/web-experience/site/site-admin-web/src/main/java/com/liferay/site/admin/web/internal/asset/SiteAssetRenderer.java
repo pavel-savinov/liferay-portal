@@ -36,7 +36,7 @@ public class SiteAssetRenderer extends BaseJSPAssetRenderer<Group> {
 
 	public SiteAssetRenderer(Group group) {
 		if (group.isSite()) {
-			_site = group;
+			_siteGroup = group;
 		}
 		else {
 			throw new IllegalArgumentException(
@@ -46,7 +46,7 @@ public class SiteAssetRenderer extends BaseJSPAssetRenderer<Group> {
 
 	@Override
 	public Group getAssetObject() {
-		return _site;
+		return _siteGroup;
 	}
 
 	@Override
@@ -56,12 +56,12 @@ public class SiteAssetRenderer extends BaseJSPAssetRenderer<Group> {
 
 	@Override
 	public long getClassPK() {
-		return _site.getPrimaryKey();
+		return _siteGroup.getPrimaryKey();
 	}
 
 	@Override
 	public long getGroupId() {
-		return _site.getGroupId();
+		return _siteGroup.getGroupId();
 	}
 
 	@Override
@@ -75,11 +75,11 @@ public class SiteAssetRenderer extends BaseJSPAssetRenderer<Group> {
 
 		try {
 			return
-				_site.getDescriptiveName(PortalUtil.getLocale(portletRequest));
+				_siteGroup.getDescriptiveName(PortalUtil.getLocale(portletRequest));
 		}
 		catch (PortalException pe) {
 			_log.error(
-				"Unable to get summary for groupId " + _site.getGroupId(),
+				"Unable to get summary for groupId " + _siteGroup.getGroupId(),
 				pe);
 		}
 
@@ -89,12 +89,12 @@ public class SiteAssetRenderer extends BaseJSPAssetRenderer<Group> {
 	@Override
 	public String getTitle(Locale locale) {
 		try {
-			return _site.getDescriptiveName(locale);
+			return _siteGroup.getDescriptiveName(locale);
 		}
 		catch (PortalException pe) {
 			_log.error(
 				"Unable to get descriptive name for group " +
-				_site.getGroupId(),
+				_siteGroup.getGroupId(),
 				pe);
 		}
 
@@ -103,7 +103,7 @@ public class SiteAssetRenderer extends BaseJSPAssetRenderer<Group> {
 
 	@Override
 	public long getUserId() {
-		return _site.getCreatorUserId();
+		return _siteGroup.getCreatorUserId();
 	}
 
 	@Override
@@ -113,12 +113,12 @@ public class SiteAssetRenderer extends BaseJSPAssetRenderer<Group> {
 
 	@Override
 	public String getUuid() {
-		return _site.getUuid();
+		return _siteGroup.getUuid();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		SiteAssetRenderer.class);
 
-	private final Group _site;
+	private final Group _siteGroup;
 
 }
