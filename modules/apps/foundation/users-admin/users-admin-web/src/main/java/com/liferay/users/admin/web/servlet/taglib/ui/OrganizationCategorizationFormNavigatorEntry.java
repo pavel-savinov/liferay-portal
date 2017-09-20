@@ -14,8 +14,6 @@
 
 package com.liferay.users.admin.web.servlet.taglib.ui;
 
-import com.liferay.portal.kernel.model.Organization;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorConstants;
 import com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorEntry;
 
