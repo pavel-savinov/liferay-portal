@@ -39,7 +39,8 @@ public class SiteAssetRenderer extends BaseJSPAssetRenderer<Group> {
 			_site = group;
 		}
 		else {
-			_site = null;
+			throw new IllegalArgumentException(
+				"Only site groups are supported");
 		}
 	}
 
