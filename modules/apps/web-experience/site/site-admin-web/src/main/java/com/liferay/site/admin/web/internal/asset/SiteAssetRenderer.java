@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.StringPool;
 
 import java.util.Locale;
 
@@ -94,7 +93,7 @@ public class SiteAssetRenderer extends BaseJSPAssetRenderer<Group> {
 		catch (PortalException pe) {
 			_log.error(
 				"Unable to get descriptive name for group " +
-				_siteGroup.getGroupId(),
+					_siteGroup.getGroupId(),
 				pe);
 		}
 
