@@ -14,7 +14,7 @@
 
 package com.liferay.directory.web.internal.asset;
 
-import com.liferay.asset.kernel.model.BaseJSPAssetRenderer;
+import com.liferay.asset.kernel.model.BaseAssetRenderer;
 import com.liferay.portal.kernel.model.Organization;
 
 import java.util.Locale;
@@ -23,12 +23,12 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Ricardo Couso
  */
-public class OrganizationAssetRenderer
-	extends BaseJSPAssetRenderer<Organization> {
+public class OrganizationAssetRenderer extends BaseAssetRenderer<Organization> {
 
 	public OrganizationAssetRenderer(Organization organization) {
 		_organization = organization;
@@ -52,11 +52,6 @@ public class OrganizationAssetRenderer
 	@Override
 	public long getGroupId() {
 		return _organization.getGroupId();
-	}
-
-	@Override
-	public String getJspPath(HttpServletRequest request, String template) {
-		return null;
 	}
 
 	@Override
@@ -84,6 +79,15 @@ public class OrganizationAssetRenderer
 	@Override
 	public String getUuid() {
 		return _organization.getUuid();
+	}
+
+	@Override
+	public boolean include(
+			HttpServletRequest request, HttpServletResponse response,
+			String template)
+		throws Exception {
+
+		return false;
 	}
 
 	private final Organization _organization;
