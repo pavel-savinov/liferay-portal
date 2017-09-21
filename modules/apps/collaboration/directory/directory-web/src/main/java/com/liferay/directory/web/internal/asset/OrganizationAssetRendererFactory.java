@@ -22,8 +22,6 @@ import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.util.PortletKeys;
 
-import javax.servlet.ServletContext;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -61,7 +59,6 @@ public class OrganizationAssetRendererFactory
 			new OrganizationAssetRenderer(organization);
 
 		organizationAssetRenderer.setAssetRendererType(type);
-		organizationAssetRenderer.setServletContext(_servletContext);
 
 		return organizationAssetRenderer;
 	}
@@ -81,14 +78,6 @@ public class OrganizationAssetRendererFactory
 		return TYPE;
 	}
 
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.directory.web)",
-		unbind = "-"
-	)
-	public void setServletContext(ServletContext servletContext) {
-		_servletContext = servletContext;
-	}
-
 	@Reference(unbind = "-")
 	protected void setOrganizationLocalService(
 		OrganizationLocalService organizationLocalService) {
@@ -97,6 +86,5 @@ public class OrganizationAssetRendererFactory
 	}
 
 	private OrganizationLocalService _organizationLocalService;
-	private ServletContext _servletContext;
 
 }
