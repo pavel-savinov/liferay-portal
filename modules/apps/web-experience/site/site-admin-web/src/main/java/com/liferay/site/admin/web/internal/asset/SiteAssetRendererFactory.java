@@ -21,8 +21,6 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.GroupLocalService;
 
-import javax.servlet.ServletContext;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -49,7 +47,6 @@ public class SiteAssetRendererFactory extends BaseAssetRendererFactory<Group> {
 
 		if (siteAssetRenderer != null) {
 			siteAssetRenderer.setAssetRendererType(type);
-			siteAssetRenderer.setServletContext(_servletContext);
 
 			return siteAssetRenderer;
 		}
@@ -82,20 +79,11 @@ public class SiteAssetRendererFactory extends BaseAssetRendererFactory<Group> {
 		return TYPE;
 	}
 
-	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.site.admin.web)",
-		unbind = "-"
-	)
-	public void setServletContext(ServletContext servletContext) {
-		_servletContext = servletContext;
-	}
-
 	@Reference(unbind = "-")
 	protected void setGroupLocalService(GroupLocalService groupLocalService) {
 		_groupLocalService = groupLocalService;
 	}
 
 	private GroupLocalService _groupLocalService;
-	private ServletContext _servletContext;
 
 }
