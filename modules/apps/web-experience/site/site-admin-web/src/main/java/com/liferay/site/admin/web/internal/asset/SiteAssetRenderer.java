@@ -14,7 +14,7 @@
 
 package com.liferay.site.admin.web.internal.asset;
 
-import com.liferay.asset.kernel.model.BaseJSPAssetRenderer;
+import com.liferay.asset.kernel.model.BaseAssetRenderer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -27,11 +27,12 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Ricardo Couso
  */
-public class SiteAssetRenderer extends BaseJSPAssetRenderer<Group> {
+public class SiteAssetRenderer extends BaseAssetRenderer<Group> {
 
 	public SiteAssetRenderer(Group group) {
 		if (group.isSite()) {
@@ -64,17 +65,12 @@ public class SiteAssetRenderer extends BaseJSPAssetRenderer<Group> {
 	}
 
 	@Override
-	public String getJspPath(HttpServletRequest request, String template) {
-		return null;
-	}
-
-	@Override
 	public String getSummary(
 		PortletRequest portletRequest, PortletResponse portletResponse) {
 
 		try {
-			return
-				_siteGroup.getDescriptiveName(PortalUtil.getLocale(portletRequest));
+			return _siteGroup.getDescriptiveName(
+				PortalUtil.getLocale(portletRequest));
 		}
 		catch (PortalException pe) {
 			_log.error(
@@ -113,6 +109,15 @@ public class SiteAssetRenderer extends BaseJSPAssetRenderer<Group> {
 	@Override
 	public String getUuid() {
 		return _siteGroup.getUuid();
+	}
+
+	@Override
+	public boolean include(
+			HttpServletRequest request, HttpServletResponse response,
+			String template)
+		throws Exception {
+
+		return false;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
