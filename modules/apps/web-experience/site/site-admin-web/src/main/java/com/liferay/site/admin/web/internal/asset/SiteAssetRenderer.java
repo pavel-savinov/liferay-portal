@@ -35,7 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 public class SiteAssetRenderer extends BaseAssetRenderer<Group> {
 
 	public SiteAssetRenderer(Group group) {
-		if (group.isSite()) {
+		if (group.isSite() || group.isStagingGroup()) {
 			_siteGroup = group;
 		}
 		else {
