@@ -50,9 +50,8 @@ public class SiteAssetRendererFactory extends BaseAssetRendererFactory<Group> {
 
 			return siteAssetRenderer;
 		}
-		else {
-			return null;
-		}
+
+		return null;
 	}
 
 	@Override
