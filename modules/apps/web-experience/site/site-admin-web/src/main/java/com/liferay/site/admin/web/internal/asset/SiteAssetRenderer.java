@@ -74,7 +74,7 @@ public class SiteAssetRenderer extends BaseAssetRenderer<Group> {
 		}
 		catch (PortalException pe) {
 			_log.error(
-				"Unable to get summary for groupId " + _siteGroup.getGroupId(),
+				"Unable to get summary for group " + _siteGroup.getGroupId(),
 				pe);
 		}
 
