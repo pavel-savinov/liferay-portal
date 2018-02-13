@@ -14,6 +14,7 @@
 
 package com.liferay.fragment.service.impl;
 
+import com.liferay.fragment.exception.NoSuchEntryLinkException;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.base.FragmentEntryLinkLocalServiceBaseImpl;
@@ -90,6 +91,16 @@ public class FragmentEntryLinkLocalServiceImpl
 		}
 
 		return deletedFragmentEntryLinks;
+	}
+
+	@Override
+	public FragmentEntryLink getFragmentEntryLink(
+			long groupId, long fragmentEntryId, long classNameId, long classPK,
+			int position)
+		throws NoSuchEntryLinkException {
+
+		return fragmentEntryLinkPersistence.findByG_F_C_C_P(
+			groupId, fragmentEntryId, classNameId, classPK, position);
 	}
 
 	@Override
