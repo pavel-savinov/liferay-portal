@@ -222,6 +222,15 @@ public class FragmentEntryLinkLocalServiceWrapper
 		return _fragmentEntryLinkLocalService.getFragmentEntryLink(fragmentEntryLinkId);
 	}
 
+	@Override
+	public com.liferay.fragment.model.FragmentEntryLink getFragmentEntryLink(
+		long groupId, long fragmentEntryId, long classNameId, long classPK,
+		int position)
+		throws com.liferay.fragment.exception.NoSuchEntryLinkException {
+		return _fragmentEntryLinkLocalService.getFragmentEntryLink(groupId,
+			fragmentEntryId, classNameId, classPK, position);
+	}
+
 	/**
 	* Returns a range of all the fragment entry links.
 	*

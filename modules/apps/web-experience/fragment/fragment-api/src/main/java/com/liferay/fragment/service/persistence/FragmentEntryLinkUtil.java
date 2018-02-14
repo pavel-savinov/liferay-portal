@@ -648,6 +648,96 @@ public class FragmentEntryLinkUtil {
 	}
 
 	/**
+	* Returns the fragment entry link where groupId = &#63; and fragmentEntryId = &#63; and classNameId = &#63; and classPK = &#63; and position = &#63; or throws a {@link NoSuchEntryLinkException} if it could not be found.
+	*
+	* @param groupId the group ID
+	* @param fragmentEntryId the fragment entry ID
+	* @param classNameId the class name ID
+	* @param classPK the class pk
+	* @param position the position
+	* @return the matching fragment entry link
+	* @throws NoSuchEntryLinkException if a matching fragment entry link could not be found
+	*/
+	public static FragmentEntryLink findByG_F_C_C_P(long groupId,
+		long fragmentEntryId, long classNameId, long classPK, int position)
+		throws com.liferay.fragment.exception.NoSuchEntryLinkException {
+		return getPersistence()
+				   .findByG_F_C_C_P(groupId, fragmentEntryId, classNameId,
+			classPK, position);
+	}
+
+	/**
+	* Returns the fragment entry link where groupId = &#63; and fragmentEntryId = &#63; and classNameId = &#63; and classPK = &#63; and position = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	*
+	* @param groupId the group ID
+	* @param fragmentEntryId the fragment entry ID
+	* @param classNameId the class name ID
+	* @param classPK the class pk
+	* @param position the position
+	* @return the matching fragment entry link, or <code>null</code> if a matching fragment entry link could not be found
+	*/
+	public static FragmentEntryLink fetchByG_F_C_C_P(long groupId,
+		long fragmentEntryId, long classNameId, long classPK, int position) {
+		return getPersistence()
+				   .fetchByG_F_C_C_P(groupId, fragmentEntryId, classNameId,
+			classPK, position);
+	}
+
+	/**
+	* Returns the fragment entry link where groupId = &#63; and fragmentEntryId = &#63; and classNameId = &#63; and classPK = &#63; and position = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	*
+	* @param groupId the group ID
+	* @param fragmentEntryId the fragment entry ID
+	* @param classNameId the class name ID
+	* @param classPK the class pk
+	* @param position the position
+	* @param retrieveFromCache whether to retrieve from the finder cache
+	* @return the matching fragment entry link, or <code>null</code> if a matching fragment entry link could not be found
+	*/
+	public static FragmentEntryLink fetchByG_F_C_C_P(long groupId,
+		long fragmentEntryId, long classNameId, long classPK, int position,
+		boolean retrieveFromCache) {
+		return getPersistence()
+				   .fetchByG_F_C_C_P(groupId, fragmentEntryId, classNameId,
+			classPK, position, retrieveFromCache);
+	}
+
+	/**
+	* Removes the fragment entry link where groupId = &#63; and fragmentEntryId = &#63; and classNameId = &#63; and classPK = &#63; and position = &#63; from the database.
+	*
+	* @param groupId the group ID
+	* @param fragmentEntryId the fragment entry ID
+	* @param classNameId the class name ID
+	* @param classPK the class pk
+	* @param position the position
+	* @return the fragment entry link that was removed
+	*/
+	public static FragmentEntryLink removeByG_F_C_C_P(long groupId,
+		long fragmentEntryId, long classNameId, long classPK, int position)
+		throws com.liferay.fragment.exception.NoSuchEntryLinkException {
+		return getPersistence()
+				   .removeByG_F_C_C_P(groupId, fragmentEntryId, classNameId,
+			classPK, position);
+	}
+
+	/**
+	* Returns the number of fragment entry links where groupId = &#63; and fragmentEntryId = &#63; and classNameId = &#63; and classPK = &#63; and position = &#63;.
+	*
+	* @param groupId the group ID
+	* @param fragmentEntryId the fragment entry ID
+	* @param classNameId the class name ID
+	* @param classPK the class pk
+	* @param position the position
+	* @return the number of matching fragment entry links
+	*/
+	public static int countByG_F_C_C_P(long groupId, long fragmentEntryId,
+		long classNameId, long classPK, int position) {
+		return getPersistence()
+				   .countByG_F_C_C_P(groupId, fragmentEntryId, classNameId,
+			classPK, position);
+	}
+
+	/**
 	* Caches the fragment entry link in the entity cache if it is enabled.
 	*
 	* @param fragmentEntryLink the fragment entry link

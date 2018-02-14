@@ -16,6 +16,7 @@ package com.liferay.fragment.service;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.fragment.exception.NoSuchEntryLinkException;
 import com.liferay.fragment.model.FragmentEntryLink;
 
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
@@ -191,6 +192,11 @@ public interface FragmentEntryLinkLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public FragmentEntryLink getFragmentEntryLink(long fragmentEntryLinkId)
 		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public FragmentEntryLink getFragmentEntryLink(long groupId,
+		long fragmentEntryId, long classNameId, long classPK, int position)
+		throws NoSuchEntryLinkException;
 
 	/**
 	* Returns a range of all the fragment entry links.

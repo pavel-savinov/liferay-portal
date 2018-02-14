@@ -5,6 +5,7 @@
  */
 {template .render}
 	{@param fragmentCollections: list<?>}
+	{@param layoutPageTemplateEntryId: string}
 	{@param portletNamespace: string}
 	{@param renderFragmentEntryURL: string}
 	{@param spritemap: string}
@@ -57,6 +58,7 @@
 								{param events: ['fragmentRemoveButtonClick': $_handleFragmentRemoveButtonClick] /}
 								{param fragmentEntryId: $fragment.fragmentEntryId /}
 								{param index: index($fragment) /}
+								{param layoutPageTemplateEntryId: $layoutPageTemplateEntryId /}
 								{param name: $fragment.name /}
 								{param portletNamespace: $portletNamespace /}
 								{param renderFragmentEntryURL: $renderFragmentEntryURL /}

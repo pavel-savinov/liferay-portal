@@ -62,6 +62,10 @@ class LayoutPageTemplateFragment extends Component {
 			`${this.portletNamespace}fragmentEntryId`,
 			fragmentEntryId
 		);
+		formData.append(
+			`${this.portletNamespace}layoutPageTemplateEntryId`,
+			this.layoutPageTemplateEntryId
+		);
 		formData.append(`${this.portletNamespace}position`, position);
 
 		this._loading = true;
@@ -113,6 +117,15 @@ LayoutPageTemplateFragment.STATE = {
 	 * @type {!number}
 	 */
 	index: Config.number().required(),
+
+	/**
+	 * Layout page template entry id used for storing changes.
+	 * @default undefined
+	 * @instance
+	 * @memberOf LayoutPageTemplateFragment
+	 * @type {!string}
+	 */
+	layoutPageTemplateEntryId: Config.string().required(),
 
 	/**
 	 * Fragment name

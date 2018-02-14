@@ -14,19 +14,29 @@
 
 package com.liferay.layout.admin.web.internal.portlet.action;
 
+import com.liferay.fragment.exception.NoSuchEntryLinkException;
+import com.liferay.fragment.model.FragmentEntryLink;
+import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.fragment.util.FragmentEntryRenderUtil;
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
+import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.servlet.http.HttpServletRequest;
 
+import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.WebKeys;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Pablo Molina
@@ -46,20 +56,52 @@ public class RenderFragmentEntryMVCActionCommand extends BaseMVCActionCommand {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
 		long fragmentEntryId = ParamUtil.getLong(
 			actionRequest, "fragmentEntryId");
-		long fragmentEntryInstanceId = ParamUtil.getLong(
+		int fragmentEntryInstanceId = ParamUtil.getInteger(
 			actionRequest, "fragmentEntryInstanceId");
+		long layoutPageTemplateEntryId = ParamUtil.getLong(
+			actionRequest, "layoutPageTemplateEntryId");
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
-		jsonObject.put(
-			"content",
-			FragmentEntryRenderUtil.renderFragmentEntry(
-				fragmentEntryId, fragmentEntryInstanceId));
+		try {
+			FragmentEntryLink fragmentEntryLink =
+				_fragmentEntryLinkLocalService.getFragmentEntryLink(
+					themeDisplay.getScopeGroupId(), fragmentEntryId,
+					_portal.getClassNameId(
+						LayoutPageTemplateEntry.class.getName()),
+					layoutPageTemplateEntryId,
+					fragmentEntryInstanceId);
+
+			HttpServletRequest request =
+				_portal.getHttpServletRequest(actionRequest);
+
+			jsonObject.put(
+				"content",
+				FragmentEntryRenderUtil.renderTestFragmentEntryLink(
+					_portal.getHttpServletRequest(actionRequest),
+					_portal.getHttpServletResponse(actionResponse),
+					fragmentEntryLink.getFragmentEntryLinkId(),
+					fragmentEntryInstanceId));
+		}
+		catch (NoSuchEntryLinkException nsele) {
+			jsonObject.put(
+				"content",
+				FragmentEntryRenderUtil.renderFragmentEntry(
+					fragmentEntryId, fragmentEntryInstanceId));
+		}
 
 		JSONPortletResponseUtil.writeJSON(
 			actionRequest, actionResponse, jsonObject);
 	}
 
+	@Reference
+	FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
+
+	@Reference
+	private Portal _portal;
 }

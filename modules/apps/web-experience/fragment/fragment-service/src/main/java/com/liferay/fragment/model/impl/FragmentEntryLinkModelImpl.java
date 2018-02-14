@@ -108,7 +108,8 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 	public static final long CLASSPK_COLUMN_BITMASK = 2L;
 	public static final long FRAGMENTENTRYID_COLUMN_BITMASK = 4L;
 	public static final long GROUPID_COLUMN_BITMASK = 8L;
-	public static final long FRAGMENTENTRYLINKID_COLUMN_BITMASK = 16L;
+	public static final long POSITION_COLUMN_BITMASK = 16L;
+	public static final long FRAGMENTENTRYLINKID_COLUMN_BITMASK = 32L;
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.fragment.service.util.ServiceProps.get(
 				"lock.expiration.time.com.liferay.fragment.model.FragmentEntryLink"));
 
@@ -414,7 +415,19 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 
 	@Override
 	public void setPosition(int position) {
+		_columnBitmask |= POSITION_COLUMN_BITMASK;
+
+		if (!_setOriginalPosition) {
+			_setOriginalPosition = true;
+
+			_originalPosition = _position;
+		}
+
 		_position = position;
+	}
+
+	public int getOriginalPosition() {
+		return _originalPosition;
 	}
 
 	public long getColumnBitmask() {
@@ -535,6 +548,10 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 		fragmentEntryLinkModelImpl._originalClassPK = fragmentEntryLinkModelImpl._classPK;
 
 		fragmentEntryLinkModelImpl._setOriginalClassPK = false;
+
+		fragmentEntryLinkModelImpl._originalPosition = fragmentEntryLinkModelImpl._position;
+
+		fragmentEntryLinkModelImpl._setOriginalPosition = false;
 
 		fragmentEntryLinkModelImpl._columnBitmask = 0;
 	}
@@ -695,6 +712,8 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 	private String _js;
 	private String _editableValues;
 	private int _position;
+	private int _originalPosition;
+	private boolean _setOriginalPosition;
 	private long _columnBitmask;
 	private FragmentEntryLink _escapedModel;
 }

@@ -1723,6 +1723,309 @@ public class FragmentEntryLinkPersistenceImpl extends BasePersistenceImpl<Fragme
 	private static final String _FINDER_COLUMN_G_C_C_GROUPID_2 = "fragmentEntryLink.groupId = ? AND ";
 	private static final String _FINDER_COLUMN_G_C_C_CLASSNAMEID_2 = "fragmentEntryLink.classNameId = ? AND ";
 	private static final String _FINDER_COLUMN_G_C_C_CLASSPK_2 = "fragmentEntryLink.classPK = ?";
+	public static final FinderPath FINDER_PATH_FETCH_BY_G_F_C_C_P = new FinderPath(FragmentEntryLinkModelImpl.ENTITY_CACHE_ENABLED,
+			FragmentEntryLinkModelImpl.FINDER_CACHE_ENABLED,
+			FragmentEntryLinkImpl.class, FINDER_CLASS_NAME_ENTITY,
+			"fetchByG_F_C_C_P",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Integer.class.getName()
+			},
+			FragmentEntryLinkModelImpl.GROUPID_COLUMN_BITMASK |
+			FragmentEntryLinkModelImpl.FRAGMENTENTRYID_COLUMN_BITMASK |
+			FragmentEntryLinkModelImpl.CLASSNAMEID_COLUMN_BITMASK |
+			FragmentEntryLinkModelImpl.CLASSPK_COLUMN_BITMASK |
+			FragmentEntryLinkModelImpl.POSITION_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_G_F_C_C_P = new FinderPath(FragmentEntryLinkModelImpl.ENTITY_CACHE_ENABLED,
+			FragmentEntryLinkModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_F_C_C_P",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName(),
+				Long.class.getName(), Integer.class.getName()
+			});
+
+	/**
+	 * Returns the fragment entry link where groupId = &#63; and fragmentEntryId = &#63; and classNameId = &#63; and classPK = &#63; and position = &#63; or throws a {@link NoSuchEntryLinkException} if it could not be found.
+	 *
+	 * @param groupId the group ID
+	 * @param fragmentEntryId the fragment entry ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param position the position
+	 * @return the matching fragment entry link
+	 * @throws NoSuchEntryLinkException if a matching fragment entry link could not be found
+	 */
+	@Override
+	public FragmentEntryLink findByG_F_C_C_P(long groupId,
+		long fragmentEntryId, long classNameId, long classPK, int position)
+		throws NoSuchEntryLinkException {
+		FragmentEntryLink fragmentEntryLink = fetchByG_F_C_C_P(groupId,
+				fragmentEntryId, classNameId, classPK, position);
+
+		if (fragmentEntryLink == null) {
+			StringBundler msg = new StringBundler(12);
+
+			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+			msg.append("groupId=");
+			msg.append(groupId);
+
+			msg.append(", fragmentEntryId=");
+			msg.append(fragmentEntryId);
+
+			msg.append(", classNameId=");
+			msg.append(classNameId);
+
+			msg.append(", classPK=");
+			msg.append(classPK);
+
+			msg.append(", position=");
+			msg.append(position);
+
+			msg.append("}");
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
+			}
+
+			throw new NoSuchEntryLinkException(msg.toString());
+		}
+
+		return fragmentEntryLink;
+	}
+
+	/**
+	 * Returns the fragment entry link where groupId = &#63; and fragmentEntryId = &#63; and classNameId = &#63; and classPK = &#63; and position = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param groupId the group ID
+	 * @param fragmentEntryId the fragment entry ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param position the position
+	 * @return the matching fragment entry link, or <code>null</code> if a matching fragment entry link could not be found
+	 */
+	@Override
+	public FragmentEntryLink fetchByG_F_C_C_P(long groupId,
+		long fragmentEntryId, long classNameId, long classPK, int position) {
+		return fetchByG_F_C_C_P(groupId, fragmentEntryId, classNameId, classPK,
+			position, true);
+	}
+
+	/**
+	 * Returns the fragment entry link where groupId = &#63; and fragmentEntryId = &#63; and classNameId = &#63; and classPK = &#63; and position = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param groupId the group ID
+	 * @param fragmentEntryId the fragment entry ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param position the position
+	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @return the matching fragment entry link, or <code>null</code> if a matching fragment entry link could not be found
+	 */
+	@Override
+	public FragmentEntryLink fetchByG_F_C_C_P(long groupId,
+		long fragmentEntryId, long classNameId, long classPK, int position,
+		boolean retrieveFromCache) {
+		Object[] finderArgs = new Object[] {
+				groupId, fragmentEntryId, classNameId, classPK, position
+			};
+
+		Object result = null;
+
+		if (retrieveFromCache) {
+			result = finderCache.getResult(FINDER_PATH_FETCH_BY_G_F_C_C_P,
+					finderArgs, this);
+		}
+
+		if (result instanceof FragmentEntryLink) {
+			FragmentEntryLink fragmentEntryLink = (FragmentEntryLink)result;
+
+			if ((groupId != fragmentEntryLink.getGroupId()) ||
+					(fragmentEntryId != fragmentEntryLink.getFragmentEntryId()) ||
+					(classNameId != fragmentEntryLink.getClassNameId()) ||
+					(classPK != fragmentEntryLink.getClassPK()) ||
+					(position != fragmentEntryLink.getPosition())) {
+				result = null;
+			}
+		}
+
+		if (result == null) {
+			StringBundler query = new StringBundler(7);
+
+			query.append(_SQL_SELECT_FRAGMENTENTRYLINK_WHERE);
+
+			query.append(_FINDER_COLUMN_G_F_C_C_P_GROUPID_2);
+
+			query.append(_FINDER_COLUMN_G_F_C_C_P_FRAGMENTENTRYID_2);
+
+			query.append(_FINDER_COLUMN_G_F_C_C_P_CLASSNAMEID_2);
+
+			query.append(_FINDER_COLUMN_G_F_C_C_P_CLASSPK_2);
+
+			query.append(_FINDER_COLUMN_G_F_C_C_P_POSITION_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(groupId);
+
+				qPos.add(fragmentEntryId);
+
+				qPos.add(classNameId);
+
+				qPos.add(classPK);
+
+				qPos.add(position);
+
+				List<FragmentEntryLink> list = q.list();
+
+				if (list.isEmpty()) {
+					finderCache.putResult(FINDER_PATH_FETCH_BY_G_F_C_C_P,
+						finderArgs, list);
+				}
+				else {
+					FragmentEntryLink fragmentEntryLink = list.get(0);
+
+					result = fragmentEntryLink;
+
+					cacheResult(fragmentEntryLink);
+
+					if ((fragmentEntryLink.getGroupId() != groupId) ||
+							(fragmentEntryLink.getFragmentEntryId() != fragmentEntryId) ||
+							(fragmentEntryLink.getClassNameId() != classNameId) ||
+							(fragmentEntryLink.getClassPK() != classPK) ||
+							(fragmentEntryLink.getPosition() != position)) {
+						finderCache.putResult(FINDER_PATH_FETCH_BY_G_F_C_C_P,
+							finderArgs, fragmentEntryLink);
+					}
+				}
+			}
+			catch (Exception e) {
+				finderCache.removeResult(FINDER_PATH_FETCH_BY_G_F_C_C_P,
+					finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		if (result instanceof List<?>) {
+			return null;
+		}
+		else {
+			return (FragmentEntryLink)result;
+		}
+	}
+
+	/**
+	 * Removes the fragment entry link where groupId = &#63; and fragmentEntryId = &#63; and classNameId = &#63; and classPK = &#63; and position = &#63; from the database.
+	 *
+	 * @param groupId the group ID
+	 * @param fragmentEntryId the fragment entry ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param position the position
+	 * @return the fragment entry link that was removed
+	 */
+	@Override
+	public FragmentEntryLink removeByG_F_C_C_P(long groupId,
+		long fragmentEntryId, long classNameId, long classPK, int position)
+		throws NoSuchEntryLinkException {
+		FragmentEntryLink fragmentEntryLink = findByG_F_C_C_P(groupId,
+				fragmentEntryId, classNameId, classPK, position);
+
+		return remove(fragmentEntryLink);
+	}
+
+	/**
+	 * Returns the number of fragment entry links where groupId = &#63; and fragmentEntryId = &#63; and classNameId = &#63; and classPK = &#63; and position = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param fragmentEntryId the fragment entry ID
+	 * @param classNameId the class name ID
+	 * @param classPK the class pk
+	 * @param position the position
+	 * @return the number of matching fragment entry links
+	 */
+	@Override
+	public int countByG_F_C_C_P(long groupId, long fragmentEntryId,
+		long classNameId, long classPK, int position) {
+		FinderPath finderPath = FINDER_PATH_COUNT_BY_G_F_C_C_P;
+
+		Object[] finderArgs = new Object[] {
+				groupId, fragmentEntryId, classNameId, classPK, position
+			};
+
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(6);
+
+			query.append(_SQL_COUNT_FRAGMENTENTRYLINK_WHERE);
+
+			query.append(_FINDER_COLUMN_G_F_C_C_P_GROUPID_2);
+
+			query.append(_FINDER_COLUMN_G_F_C_C_P_FRAGMENTENTRYID_2);
+
+			query.append(_FINDER_COLUMN_G_F_C_C_P_CLASSNAMEID_2);
+
+			query.append(_FINDER_COLUMN_G_F_C_C_P_CLASSPK_2);
+
+			query.append(_FINDER_COLUMN_G_F_C_C_P_POSITION_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(groupId);
+
+				qPos.add(fragmentEntryId);
+
+				qPos.add(classNameId);
+
+				qPos.add(classPK);
+
+				qPos.add(position);
+
+				count = (Long)q.uniqueResult();
+
+				finderCache.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception e) {
+				finderCache.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_G_F_C_C_P_GROUPID_2 = "fragmentEntryLink.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_F_C_C_P_FRAGMENTENTRYID_2 = "fragmentEntryLink.fragmentEntryId = ? AND ";
+	private static final String _FINDER_COLUMN_G_F_C_C_P_CLASSNAMEID_2 = "fragmentEntryLink.classNameId = ? AND ";
+	private static final String _FINDER_COLUMN_G_F_C_C_P_CLASSPK_2 = "fragmentEntryLink.classPK = ? AND ";
+	private static final String _FINDER_COLUMN_G_F_C_C_P_POSITION_2 = "fragmentEntryLink.position = ?";
 
 	public FragmentEntryLinkPersistenceImpl() {
 		setModelClass(FragmentEntryLink.class);
@@ -1738,6 +2041,14 @@ public class FragmentEntryLinkPersistenceImpl extends BasePersistenceImpl<Fragme
 		entityCache.putResult(FragmentEntryLinkModelImpl.ENTITY_CACHE_ENABLED,
 			FragmentEntryLinkImpl.class, fragmentEntryLink.getPrimaryKey(),
 			fragmentEntryLink);
+
+		finderCache.putResult(FINDER_PATH_FETCH_BY_G_F_C_C_P,
+			new Object[] {
+				fragmentEntryLink.getGroupId(),
+				fragmentEntryLink.getFragmentEntryId(),
+				fragmentEntryLink.getClassNameId(),
+				fragmentEntryLink.getClassPK(), fragmentEntryLink.getPosition()
+			}, fragmentEntryLink);
 
 		fragmentEntryLink.resetOriginalValues();
 	}
@@ -1792,6 +2103,9 @@ public class FragmentEntryLinkPersistenceImpl extends BasePersistenceImpl<Fragme
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		clearUniqueFindersCache((FragmentEntryLinkModelImpl)fragmentEntryLink,
+			true);
 	}
 
 	@Override
@@ -1802,6 +2116,56 @@ public class FragmentEntryLinkPersistenceImpl extends BasePersistenceImpl<Fragme
 		for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
 			entityCache.removeResult(FragmentEntryLinkModelImpl.ENTITY_CACHE_ENABLED,
 				FragmentEntryLinkImpl.class, fragmentEntryLink.getPrimaryKey());
+
+			clearUniqueFindersCache((FragmentEntryLinkModelImpl)fragmentEntryLink,
+				true);
+		}
+	}
+
+	protected void cacheUniqueFindersCache(
+		FragmentEntryLinkModelImpl fragmentEntryLinkModelImpl) {
+		Object[] args = new Object[] {
+				fragmentEntryLinkModelImpl.getGroupId(),
+				fragmentEntryLinkModelImpl.getFragmentEntryId(),
+				fragmentEntryLinkModelImpl.getClassNameId(),
+				fragmentEntryLinkModelImpl.getClassPK(),
+				fragmentEntryLinkModelImpl.getPosition()
+			};
+
+		finderCache.putResult(FINDER_PATH_COUNT_BY_G_F_C_C_P, args,
+			Long.valueOf(1), false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_G_F_C_C_P, args,
+			fragmentEntryLinkModelImpl, false);
+	}
+
+	protected void clearUniqueFindersCache(
+		FragmentEntryLinkModelImpl fragmentEntryLinkModelImpl,
+		boolean clearCurrent) {
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					fragmentEntryLinkModelImpl.getGroupId(),
+					fragmentEntryLinkModelImpl.getFragmentEntryId(),
+					fragmentEntryLinkModelImpl.getClassNameId(),
+					fragmentEntryLinkModelImpl.getClassPK(),
+					fragmentEntryLinkModelImpl.getPosition()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_F_C_C_P, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_F_C_C_P, args);
+		}
+
+		if ((fragmentEntryLinkModelImpl.getColumnBitmask() &
+				FINDER_PATH_FETCH_BY_G_F_C_C_P.getColumnBitmask()) != 0) {
+			Object[] args = new Object[] {
+					fragmentEntryLinkModelImpl.getOriginalGroupId(),
+					fragmentEntryLinkModelImpl.getOriginalFragmentEntryId(),
+					fragmentEntryLinkModelImpl.getOriginalClassNameId(),
+					fragmentEntryLinkModelImpl.getOriginalClassPK(),
+					fragmentEntryLinkModelImpl.getOriginalPosition()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_F_C_C_P, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_F_C_C_P, args);
 		}
 	}
 
@@ -2038,6 +2402,9 @@ public class FragmentEntryLinkPersistenceImpl extends BasePersistenceImpl<Fragme
 		entityCache.putResult(FragmentEntryLinkModelImpl.ENTITY_CACHE_ENABLED,
 			FragmentEntryLinkImpl.class, fragmentEntryLink.getPrimaryKey(),
 			fragmentEntryLink, false);
+
+		clearUniqueFindersCache(fragmentEntryLinkModelImpl, false);
+		cacheUniqueFindersCache(fragmentEntryLinkModelImpl);
 
 		fragmentEntryLink.resetOriginalValues();
 

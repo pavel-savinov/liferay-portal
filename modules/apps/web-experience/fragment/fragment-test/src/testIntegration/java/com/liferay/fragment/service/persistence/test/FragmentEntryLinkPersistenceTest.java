@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -186,6 +187,15 @@ public class FragmentEntryLinkPersistenceTest {
 			RandomTestUtil.nextLong(), RandomTestUtil.nextLong());
 
 		_persistence.countByG_C_C(0L, 0L, 0L);
+	}
+
+	@Test
+	public void testCountByG_F_C_C_P() throws Exception {
+		_persistence.countByG_F_C_C_P(RandomTestUtil.nextLong(),
+			RandomTestUtil.nextLong(), RandomTestUtil.nextLong(),
+			RandomTestUtil.nextLong(), RandomTestUtil.nextInt());
+
+		_persistence.countByG_F_C_C_P(0L, 0L, 0L, 0L, 0);
 	}
 
 	@Test
@@ -409,6 +419,34 @@ public class FragmentEntryLinkPersistenceTest {
 		List<Object> result = _persistence.findWithDynamicQuery(dynamicQuery);
 
 		Assert.assertEquals(0, result.size());
+	}
+
+	@Test
+	public void testResetOriginalValues() throws Exception {
+		FragmentEntryLink newFragmentEntryLink = addFragmentEntryLink();
+
+		_persistence.clearCache();
+
+		FragmentEntryLink existingFragmentEntryLink = _persistence.findByPrimaryKey(newFragmentEntryLink.getPrimaryKey());
+
+		Assert.assertEquals(Long.valueOf(existingFragmentEntryLink.getGroupId()),
+			ReflectionTestUtil.<Long>invoke(existingFragmentEntryLink,
+				"getOriginalGroupId", new Class<?>[0]));
+		Assert.assertEquals(Long.valueOf(
+				existingFragmentEntryLink.getFragmentEntryId()),
+			ReflectionTestUtil.<Long>invoke(existingFragmentEntryLink,
+				"getOriginalFragmentEntryId", new Class<?>[0]));
+		Assert.assertEquals(Long.valueOf(
+				existingFragmentEntryLink.getClassNameId()),
+			ReflectionTestUtil.<Long>invoke(existingFragmentEntryLink,
+				"getOriginalClassNameId", new Class<?>[0]));
+		Assert.assertEquals(Long.valueOf(existingFragmentEntryLink.getClassPK()),
+			ReflectionTestUtil.<Long>invoke(existingFragmentEntryLink,
+				"getOriginalClassPK", new Class<?>[0]));
+		Assert.assertEquals(Integer.valueOf(
+				existingFragmentEntryLink.getPosition()),
+			ReflectionTestUtil.<Integer>invoke(existingFragmentEntryLink,
+				"getOriginalPosition", new Class<?>[0]));
 	}
 
 	protected FragmentEntryLink addFragmentEntryLink()
