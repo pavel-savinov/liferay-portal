@@ -18,9 +18,9 @@ import com.liferay.bookmarks.model.BookmarksEntry;
 import com.liferay.bookmarks.service.BookmarksEntryLocalService;
 import com.liferay.bookmarks.uad.constants.BookmarksUADConstants;
 import com.liferay.bookmarks.uad.entity.BookmarksEntryUADEntity;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.user.associated.data.aggregator.BaseUADEntityAggregator;
 import com.liferay.user.associated.data.aggregator.UADEntityAggregator;
 import com.liferay.user.associated.data.entity.UADEntity;
@@ -76,8 +76,8 @@ public class BookmarksEntryUADEntityAggregator extends BaseUADEntityAggregator {
 	}
 
 	private DynamicQuery _getDynamicQuery(long userId) {
-		return _uadDynamicQueryHelper.getDynamicQuery(
-			_bookmarksEntryLocalService::dynamicQuery,
+		return _uadDynamicQueryHelper.addDynamicQueryCriteria(
+			_bookmarksEntryLocalService.dynamicQuery(),
 			BookmarksUADConstants.USER_ID_FIELD_NAMES_BOOKMARKS_ENTRY, userId);
 	}
 

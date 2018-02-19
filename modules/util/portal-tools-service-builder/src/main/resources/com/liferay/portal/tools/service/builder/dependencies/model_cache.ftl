@@ -206,7 +206,7 @@ public class ${entity.name}CacheModel implements CacheModel<${entity.name}>, Ext
 		<#if entity.hasCompoundPK()>
 			${entity.PKVarName} = new ${entity.PKClassName}(
 
-				<#list entity.PKList as entityColumn>
+				<#list entity.PKEntityColumns as entityColumn>
 					${entityColumn.name}
 
 					<#if entityColumn_has_next>

@@ -20,7 +20,7 @@
 					}
 				}
 			<#else>
-				query.append(_FINDER_COLUMN_${finder.name?upper_case}_${entityColumn.name?upper_case}_7${finderFieldSuffix});
+				query.append(_FINDER_COLUMN_${entityFinder.name?upper_case}_${entityColumn.name?upper_case}_7${finderFieldSuffix});
 
 				query.append(StringUtil.merge(${entityColumn.names}));
 
@@ -38,8 +38,8 @@
 	</#if>
 </#list>
 
-<#if finder.where?? && validator.isNotNull(finder.getWhere())>
-	query.append("${finder.where}");
+<#if entityFinder.where?? && validator.isNotNull(entityFinder.getWhere())>
+	query.append("${entityFinder.where}");
 <#else>
 	query.setStringAt(removeConjunction(query.stringAt(query.index() - 1)), query.index() - 1);
 </#if>

@@ -1,7 +1,7 @@
-<#assign entityColumns = finder.entityColumns />
+<#assign entityColumns = entityFinder.entityColumns />
 
 /**
- * Returns the number of ${entity.humanNames} where ${finder.getHumanConditions(false)}.
+ * Returns the number of ${entity.humanNames} where ${entityFinder.getHumanConditions(false)}.
  *
 <#list entityColumns as entityColumn>
  * @param ${entityColumn.name} the ${entityColumn.humanName}
@@ -9,7 +9,7 @@
  * @return the number of matching ${entity.humanNames}
  */
 @Override
-public int countBy${finder.name}(
+public int countBy${entityFinder.name}(
 
 <#list entityColumns as entityColumn>
 	${entityColumn.type} ${entityColumn.name}
@@ -21,10 +21,10 @@ public int countBy${finder.name}(
 
 ) {
 	FinderPath finderPath =
-		<#if !finder.hasCustomComparator()>
-			FINDER_PATH_COUNT_BY_${finder.name?upper_case};
+		<#if !entityFinder.hasCustomComparator()>
+			FINDER_PATH_COUNT_BY_${entityFinder.name?upper_case};
 		<#else>
-			FINDER_PATH_WITH_PAGINATION_COUNT_BY_${finder.name?upper_case};
+			FINDER_PATH_WITH_PAGINATION_COUNT_BY_${entityFinder.name?upper_case};
 		</#if>
 
 	Object[] finderArgs = new Object[] {
@@ -72,9 +72,9 @@ public int countBy${finder.name}(
 	return count.intValue();
 }
 
-<#if finder.hasArrayableOperator()>
+<#if entityFinder.hasArrayableOperator()>
 	/**
-	 * Returns the number of ${entity.humanNames} where ${finder.getHumanConditions(true)}.
+	 * Returns the number of ${entity.humanNames} where ${entityFinder.getHumanConditions(true)}.
 	 *
 	<#list entityColumns as entityColumn>
 		<#if entityColumn.hasArrayableOperator()>
@@ -86,7 +86,7 @@ public int countBy${finder.name}(
 	 * @return the number of matching ${entity.humanNames}
 	 */
 	@Override
-	public int countBy${finder.name}(
+	public int countBy${entityFinder.name}(
 
 	<#list entityColumns as entityColumn>
 		<#if entityColumn.hasArrayableOperator()>
@@ -137,7 +137,7 @@ public int countBy${finder.name}(
 			</#list>
 		};
 
-		Long count = (Long)finderCache.getResult(FINDER_PATH_WITH_PAGINATION_COUNT_BY_${finder.name?upper_case}, finderArgs, this);
+		Long count = (Long)finderCache.getResult(FINDER_PATH_WITH_PAGINATION_COUNT_BY_${entityFinder.name?upper_case}, finderArgs, this);
 
 		if (count == null) {
 			<#include "persistence_impl_count_by_arrayable_query.ftl">
@@ -159,10 +159,10 @@ public int countBy${finder.name}(
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(FINDER_PATH_WITH_PAGINATION_COUNT_BY_${finder.name?upper_case}, finderArgs, count);
+				finderCache.putResult(FINDER_PATH_WITH_PAGINATION_COUNT_BY_${entityFinder.name?upper_case}, finderArgs, count);
 			}
 			catch (Exception e) {
-				finderCache.removeResult(FINDER_PATH_WITH_PAGINATION_COUNT_BY_${finder.name?upper_case}, finderArgs);
+				finderCache.removeResult(FINDER_PATH_WITH_PAGINATION_COUNT_BY_${entityFinder.name?upper_case}, finderArgs);
 
 				throw processException(e);
 			}
@@ -175,9 +175,9 @@ public int countBy${finder.name}(
 	}
 </#if>
 
-<#if entity.isPermissionCheckEnabled(finder)>
+<#if entity.isPermissionCheckEnabled(entityFinder)>
 	/**
-	 * Returns the number of ${entity.humanNames} that the user has permission to view where ${finder.getHumanConditions(false)}.
+	 * Returns the number of ${entity.humanNames} that the user has permission to view where ${entityFinder.getHumanConditions(false)}.
 	 *
 	<#list entityColumns as entityColumn>
 	 * @param ${entityColumn.name} the ${entityColumn.humanName}
@@ -185,7 +185,7 @@ public int countBy${finder.name}(
 	 * @return the number of matching ${entity.humanNames} that the user has permission to view
 	 */
 	@Override
-	public int filterCountBy${finder.name}(
+	public int filterCountBy${entityFinder.name}(
 
 	<#list entityColumns as entityColumn>
 		${entityColumn.type} ${entityColumn.name}
@@ -196,15 +196,15 @@ public int countBy${finder.name}(
 	</#list>
 
 	) {
-		<#if finder.hasEntityColumn("groupId")>
+		<#if entityFinder.hasEntityColumn("groupId")>
 			if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-		<#elseif finder.hasEntityColumn("companyId")>
+		<#elseif entityFinder.hasEntityColumn("companyId")>
 			if (!InlineSQLHelperUtil.isEnabled(companyId, 0)) {
 		<#else>
 			if (!InlineSQLHelperUtil.isEnabled()) {
 		</#if>
 
-			return countBy${finder.name}(
+			return countBy${entityFinder.name}(
 
 			<#list entityColumns as entityColumn>
 				${entityColumn.name}
@@ -220,7 +220,7 @@ public int countBy${finder.name}(
 		<#if entity.isPermissionedModel()>
 			<#include "persistence_impl_count_by_query.ftl">
 
-			String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(), ${entity.name}.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, _FILTER_ENTITY_TABLE_FILTER_USERID_COLUMN<#if finder.hasEntityColumn("groupId")>, groupId</#if>);
+			String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(), ${entity.name}.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, _FILTER_ENTITY_TABLE_FILTER_USERID_COLUMN<#if entityFinder.hasEntityColumn("groupId")>, groupId</#if>);
 
 			Session session = null;
 
@@ -254,7 +254,7 @@ public int countBy${finder.name}(
 
 			<#assign sqlQuery = false />
 
-			String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(), ${entity.name}.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN<#if finder.hasEntityColumn("groupId")>, groupId</#if>);
+			String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(), ${entity.name}.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN<#if entityFinder.hasEntityColumn("groupId")>, groupId</#if>);
 
 			Session session = null;
 
@@ -282,9 +282,9 @@ public int countBy${finder.name}(
 		</#if>
 	}
 
-	<#if finder.hasArrayableOperator()>
+	<#if entityFinder.hasArrayableOperator()>
 		/**
-		 * Returns the number of ${entity.humanNames} that the user has permission to view where ${finder.getHumanConditions(true)}.
+		 * Returns the number of ${entity.humanNames} that the user has permission to view where ${entityFinder.getHumanConditions(true)}.
 		 *
 		<#list entityColumns as entityColumn>
 			<#if entityColumn.hasArrayableOperator()>
@@ -296,7 +296,7 @@ public int countBy${finder.name}(
 		 * @return the number of matching ${entity.humanNames} that the user has permission to view
 		 */
 		@Override
-		public int filterCountBy${finder.name}(
+		public int filterCountBy${entityFinder.name}(
 
 		<#list entityColumns as entityColumn>
 			<#if entityColumn.hasArrayableOperator()>
@@ -311,21 +311,21 @@ public int countBy${finder.name}(
 		</#list>
 
 		) {
-			<#if finder.hasEntityColumn("groupId")>
+			<#if entityFinder.hasEntityColumn("groupId")>
 				if (!InlineSQLHelperUtil.isEnabled(
-					<#if finder.getEntityColumn("groupId").hasArrayableOperator()>
+					<#if entityFinder.getEntityColumn("groupId").hasArrayableOperator()>
 						groupIds
 					<#else>
 						groupId
 					</#if>
 				)) {
-			<#elseif finder.hasEntityColumn("companyId")>
+			<#elseif entityFinder.hasEntityColumn("companyId")>
 				if (!InlineSQLHelperUtil.isEnabled(companyId, 0)) {
 			<#else>
 				if (!InlineSQLHelperUtil.isEnabled()) {
 			</#if>
 
-				return countBy${finder.name}(
+				return countBy${entityFinder.name}(
 
 				<#list entityColumns as entityColumn>
 					<#if entityColumn.hasArrayableOperator()>
@@ -369,8 +369,8 @@ public int countBy${finder.name}(
 
 				String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(), ${entity.name}.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, _FILTER_ENTITY_TABLE_FILTER_USERID_COLUMN
 
-				<#if finder.hasEntityColumn("groupId")>,
-					<#if finder.getEntityColumn("groupId").hasArrayableOperator()>
+				<#if entityFinder.hasEntityColumn("groupId")>,
+					<#if entityFinder.getEntityColumn("groupId").hasArrayableOperator()>
 						groupIds
 					<#else>
 						groupId
@@ -413,8 +413,8 @@ public int countBy${finder.name}(
 
 				String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(), ${entity.name}.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN
 
-				<#if finder.hasEntityColumn("groupId")>,
-					<#if finder.getEntityColumn("groupId").hasArrayableOperator()>
+				<#if entityFinder.hasEntityColumn("groupId")>,
+					<#if entityFinder.getEntityColumn("groupId").hasArrayableOperator()>
 						groupIds
 					<#else>
 						groupId

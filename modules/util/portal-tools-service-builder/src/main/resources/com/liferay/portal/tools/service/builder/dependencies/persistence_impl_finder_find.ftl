@@ -1,44 +1,44 @@
-<#assign entityColumns = finder.entityColumns />
+<#assign entityColumns = entityFinder.entityColumns />
 
 <#--
 Basic Cases Table:
 
 +---------------------------+-------------------------------+-------------------------------+
-|							|	finder.isCollection()		|	!finder.isCollection()		|
+|							|	entityFinder.isCollection()		|	!entityFinder.isCollection()		|
 +---------------------------+-------------------------------+-------------------------------+
-|	finder.isUnique()		|			Case 1				|			Case 2				|
+|	entityFinder.isUnique()		|			Case 1				|			Case 2				|
 +---------------------------+-------------------------------+-------------------------------+
-|	!finder.isUnique()		|			Case 3				|			Case 4				|
+|	!entityFinder.isUnique()		|			Case 3				|			Case 4				|
 +---------------------------+-------------------------------+-------------------------------+
 
 Combination Cases Table 1:
 
 +---------------------------+-------------------------------+-------------------------------+
-|							|	finder.isCollection()		|	!finder.isCollection()		|
+|							|	entityFinder.isCollection()		|	!entityFinder.isCollection()		|
 +---------------------------+---------------------------------------------------------------+
-|	finder.isUnique()		|							Case 5								|
+|	entityFinder.isUnique()		|							Case 5								|
 +---------------------------+---------------------------------------------------------------+
-|	!finder.isUnique()		|							Case 6								|
+|	!entityFinder.isUnique()		|							Case 6								|
 +---------------------------+---------------------------------------------------------------+
 
 Combination Cases Table 2:
 
 +---------------------------+-------------------------------+-------------------------------+
-|							|	finder.isCollection()		|	!finder.isCollection()		|
+|							|	entityFinder.isCollection()		|	!entityFinder.isCollection()		|
 +---------------------------+-------------------------------+-------------------------------+
-|	finder.isUnique()		|								|								|
+|	entityFinder.isUnique()		|								|								|
 +---------------------------|			Case 7				|			Case 8				|
-|	!finder.isUnique()		|								|								|
+|	!entityFinder.isUnique()		|								|								|
 +---------------------------+-------------------------------+-------------------------------+
 
 Combination Cases Table 3:
 
 +---------------------------+-------------------------------+-------------------------------+
-|							|	finder.isCollection()		|	!finder.isCollection()		|
+|							|	entityFinder.isCollection()		|	!entityFinder.isCollection()		|
 +---------------------------+-------------------------------+-------------------------------+
-|	finder.isUnique()		|																|
+|	entityFinder.isUnique()		|																|
 +---------------------------|--------------------------------			Case 9				|
-|	!finder.isUnique()		|								|								|
+|	!entityFinder.isUnique()		|								|								|
 +---------------------------+-------------------------------+-------------------------------+
 
 There are a total of 9 cases. The first 4 cases are the basic cases as show in
@@ -60,27 +60,27 @@ A combination of case 1, case 2, and case 4 is grouped as case 9.
 Grouping the basic cases allows us to write the finder implementation with as
 little duplicate code as possible.
 
-finder.isUnique() means a literal unique finder because it generates a unique
-index at the database level. !finder.isCollection() means a conceptual unique
+entityFinder.isUnique() means a literal unique finder because it generates a unique
+index at the database level. !entityFinder.isCollection() means a conceptual unique
 that may or may not be enforced with a unique index at the database level. Case
 9 can be considered a union of the literal and conceptual unique finders.
 -->
 
-<#-- Case 1: finder.isCollection() && finder.isUnique() -->
+<#-- Case 1: entityFinder.isCollection() && entityFinder.isUnique() -->
 
-<#if finder.isCollection() && finder.isUnique()>
+<#if entityFinder.isCollection() && entityFinder.isUnique()>
 </#if>
 
-<#-- Case 2: !finder.isCollection() && finder.isUnique() -->
+<#-- Case 2: !entityFinder.isCollection() && entityFinder.isUnique() -->
 
-<#if !finder.isCollection() && finder.isUnique()>
+<#if !entityFinder.isCollection() && entityFinder.isUnique()>
 </#if>
 
-<#-- Case 3: finder.isCollection() && !finder.isUnique() -->
+<#-- Case 3: entityFinder.isCollection() && !entityFinder.isUnique() -->
 
-<#if finder.isCollection() && !finder.isUnique()>
+<#if entityFinder.isCollection() && !entityFinder.isUnique()>
 	/**
-	 * Returns all the ${entity.humanNames} where ${finder.getHumanConditions(false)}.
+	 * Returns all the ${entity.humanNames} where ${entityFinder.getHumanConditions(false)}.
 	 *
 	<#list entityColumns as entityColumn>
 	 * @param ${entityColumn.name} the ${entityColumn.humanName}
@@ -88,7 +88,7 @@ that may or may not be enforced with a unique index at the database level. Case
 	 * @return the matching ${entity.humanNames}
 	 */
 	@Override
-	public List<${entity.name}> findBy${finder.name}(
+	public List<${entity.name}> findBy${entityFinder.name}(
 
 	<#list entityColumns as entityColumn>
 		${entityColumn.type} ${entityColumn.name}
@@ -99,7 +99,7 @@ that may or may not be enforced with a unique index at the database level. Case
 	</#list>
 
 	) {
-		return findBy${finder.name}(
+		return findBy${entityFinder.name}(
 
 		<#list entityColumns as entityColumn>
 			${entityColumn.name},
@@ -109,7 +109,7 @@ that may or may not be enforced with a unique index at the database level. Case
 	}
 
 	/**
-	 * Returns a range of all the ${entity.humanNames} where ${finder.getHumanConditions(false)}.
+	 * Returns a range of all the ${entity.humanNames} where ${entityFinder.getHumanConditions(false)}.
 	 *
 	 * <p>
 	 * <#include "range_comment.ftl">
@@ -123,14 +123,14 @@ that may or may not be enforced with a unique index at the database level. Case
 	 * @return the range of matching ${entity.humanNames}
 	 */
 	@Override
-	public List<${entity.name}> findBy${finder.name}(
+	public List<${entity.name}> findBy${entityFinder.name}(
 
 	<#list entityColumns as entityColumn>
 		${entityColumn.type} ${entityColumn.name},
 	</#list>
 
 	int start, int end) {
-		return findBy${finder.name}(
+		return findBy${entityFinder.name}(
 
 		<#list entityColumns as entityColumn>
 			${entityColumn.name},
@@ -140,7 +140,7 @@ that may or may not be enforced with a unique index at the database level. Case
 	}
 
 	/**
-	 * Returns an ordered range of all the ${entity.humanNames} where ${finder.getHumanConditions(false)}.
+	 * Returns an ordered range of all the ${entity.humanNames} where ${entityFinder.getHumanConditions(false)}.
 	 *
 	 * <p>
 	 * <#include "range_comment.ftl">
@@ -155,14 +155,14 @@ that may or may not be enforced with a unique index at the database level. Case
 	 * @return the ordered range of matching ${entity.humanNames}
 	 */
 	@Override
-	public List<${entity.name}> findBy${finder.name}(
+	public List<${entity.name}> findBy${entityFinder.name}(
 
 	<#list entityColumns as entityColumn>
 		${entityColumn.type} ${entityColumn.name},
 	</#list>
 
 	int start, int end, OrderByComparator<${entity.name}> orderByComparator) {
-		return findBy${finder.name}(
+		return findBy${entityFinder.name}(
 
 		<#list entityColumns as entityColumn>
 			${entityColumn.name},
@@ -172,7 +172,7 @@ that may or may not be enforced with a unique index at the database level. Case
 	}
 
 	/**
-	 * Returns an ordered range of all the ${entity.humanNames} where ${finder.getHumanConditions(false)}.
+	 * Returns an ordered range of all the ${entity.humanNames} where ${entityFinder.getHumanConditions(false)}.
 	 *
 	 * <p>
 	 * <#include "range_comment.ftl">
@@ -188,7 +188,7 @@ that may or may not be enforced with a unique index at the database level. Case
 	 * @return the ordered range of matching ${entity.humanNames}
 	 */
 	@Override
-	public List<${entity.name}> findBy${finder.name}(
+	public List<${entity.name}> findBy${entityFinder.name}(
 
 	<#list entityColumns as entityColumn>
 		${entityColumn.type} ${entityColumn.name},
@@ -199,10 +199,10 @@ that may or may not be enforced with a unique index at the database level. Case
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
-		<#if !finder.hasCustomComparator()>
+		<#if !entityFinder.hasCustomComparator()>
 			if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) && (orderByComparator == null)) {
 				pagination = false;
-				finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_${finder.name?upper_case};
+				finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_${entityFinder.name?upper_case};
 				finderArgs = new Object[] {
 					<#list entityColumns as entityColumn>
 						${entityColumn.name}
@@ -216,7 +216,7 @@ that may or may not be enforced with a unique index at the database level. Case
 			else {
 		</#if>
 
-		finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_${finder.name?upper_case};
+		finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_${entityFinder.name?upper_case};
 		finderArgs = new Object[] {
 			<#list entityColumns as entityColumn>
 				${entityColumn.name},
@@ -225,7 +225,7 @@ that may or may not be enforced with a unique index at the database level. Case
 			start, end, orderByComparator
 		};
 
-		<#if !finder.hasCustomComparator()>
+		<#if !entityFinder.hasCustomComparator()>
 			}
 		</#if>
 
@@ -302,7 +302,7 @@ that may or may not be enforced with a unique index at the database level. Case
 	}
 
 	/**
-	 * Returns the first ${entity.humanName} in the ordered set where ${finder.getHumanConditions(false)}.
+	 * Returns the first ${entity.humanName} in the ordered set where ${entityFinder.getHumanConditions(false)}.
 	 *
 	<#list entityColumns as entityColumn>
 	 * @param ${entityColumn.name} the ${entityColumn.humanName}
@@ -312,14 +312,14 @@ that may or may not be enforced with a unique index at the database level. Case
 	 * @throws ${noSuchEntity}Exception if a matching ${entity.humanName} could not be found
 	 */
 	@Override
-	public ${entity.name} findBy${finder.name}_First(
+	public ${entity.name} findBy${entityFinder.name}_First(
 
 	<#list entityColumns as entityColumn>
 		${entityColumn.type} ${entityColumn.name},
 	</#list>
 
 	OrderByComparator<${entity.name}> orderByComparator) throws ${noSuchEntity}Exception {
-		${entity.name} ${entity.varName} = fetchBy${finder.name}_First(
+		${entity.name} ${entity.varName} = fetchBy${entityFinder.name}_First(
 
 		<#list entityColumns as entityColumn>
 			${entityColumn.name},
@@ -348,7 +348,7 @@ that may or may not be enforced with a unique index at the database level. Case
 	}
 
 	/**
-	 * Returns the first ${entity.humanName} in the ordered set where ${finder.getHumanConditions(false)}.
+	 * Returns the first ${entity.humanName} in the ordered set where ${entityFinder.getHumanConditions(false)}.
 	 *
 	<#list entityColumns as entityColumn>
 	 * @param ${entityColumn.name} the ${entityColumn.humanName}
@@ -357,14 +357,14 @@ that may or may not be enforced with a unique index at the database level. Case
 	 * @return the first matching ${entity.humanName}, or <code>null</code> if a matching ${entity.humanName} could not be found
 	 */
 	@Override
-	public ${entity.name} fetchBy${finder.name}_First(
+	public ${entity.name} fetchBy${entityFinder.name}_First(
 
 	<#list entityColumns as entityColumn>
 		${entityColumn.type} ${entityColumn.name},
 	</#list>
 
 	OrderByComparator<${entity.name}> orderByComparator) {
-		List<${entity.name}> list = findBy${finder.name}(
+		List<${entity.name}> list = findBy${entityFinder.name}(
 
 		<#list entityColumns as entityColumn>
 			${entityColumn.name},
@@ -380,7 +380,7 @@ that may or may not be enforced with a unique index at the database level. Case
 	}
 
 	/**
-	 * Returns the last ${entity.humanName} in the ordered set where ${finder.getHumanConditions(false)}.
+	 * Returns the last ${entity.humanName} in the ordered set where ${entityFinder.getHumanConditions(false)}.
 	 *
 	<#list entityColumns as entityColumn>
 	 * @param ${entityColumn.name} the ${entityColumn.humanName}
@@ -390,14 +390,14 @@ that may or may not be enforced with a unique index at the database level. Case
 	 * @throws ${noSuchEntity}Exception if a matching ${entity.humanName} could not be found
 	 */
 	@Override
-	public ${entity.name} findBy${finder.name}_Last(
+	public ${entity.name} findBy${entityFinder.name}_Last(
 
 	<#list entityColumns as entityColumn>
 		${entityColumn.type} ${entityColumn.name},
 	</#list>
 
 	OrderByComparator<${entity.name}> orderByComparator) throws ${noSuchEntity}Exception {
-		${entity.name} ${entity.varName} = fetchBy${finder.name}_Last(
+		${entity.name} ${entity.varName} = fetchBy${entityFinder.name}_Last(
 
 		<#list entityColumns as entityColumn>
 			${entityColumn.name},
@@ -426,7 +426,7 @@ that may or may not be enforced with a unique index at the database level. Case
 	}
 
 	/**
-	 * Returns the last ${entity.humanName} in the ordered set where ${finder.getHumanConditions(false)}.
+	 * Returns the last ${entity.humanName} in the ordered set where ${entityFinder.getHumanConditions(false)}.
 	 *
 	<#list entityColumns as entityColumn>
 	 * @param ${entityColumn.name} the ${entityColumn.humanName}
@@ -435,14 +435,14 @@ that may or may not be enforced with a unique index at the database level. Case
 	 * @return the last matching ${entity.humanName}, or <code>null</code> if a matching ${entity.humanName} could not be found
 	 */
 	@Override
-	public ${entity.name} fetchBy${finder.name}_Last(
+	public ${entity.name} fetchBy${entityFinder.name}_Last(
 
 	<#list entityColumns as entityColumn>
 		${entityColumn.type} ${entityColumn.name},
 	</#list>
 
 	OrderByComparator<${entity.name}> orderByComparator) {
-		int count = countBy${finder.name}(
+		int count = countBy${entityFinder.name}(
 
 		<#list entityColumns as entityColumn>
 			${entityColumn.name}
@@ -458,7 +458,7 @@ that may or may not be enforced with a unique index at the database level. Case
 			return null;
 		}
 
-		List<${entity.name}> list = findBy${finder.name}(
+		List<${entity.name}> list = findBy${entityFinder.name}(
 
 		<#list entityColumns as entityColumn>
 			${entityColumn.name},
@@ -473,9 +473,9 @@ that may or may not be enforced with a unique index at the database level. Case
 		return null;
 	}
 
-	<#if !finder.hasEntityColumn(entity.PKVarName)>
+	<#if !entityFinder.hasEntityColumn(entity.PKVarName)>
 		/**
-		 * Returns the ${entity.humanNames} before and after the current ${entity.humanName} in the ordered set where ${finder.getHumanConditions(false)}.
+		 * Returns the ${entity.humanNames} before and after the current ${entity.humanName} in the ordered set where ${entityFinder.getHumanConditions(false)}.
 		 *
 		 * @param ${entity.PKVarName} the primary key of the current ${entity.humanName}
 		<#list entityColumns as entityColumn>
@@ -486,7 +486,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		 * @throws ${noSuchEntity}Exception if a ${entity.humanName} with the primary key could not be found
 		 */
 		@Override
-		public ${entity.name}[] findBy${finder.name}_PrevAndNext(${entity.PKClassName} ${entity.PKVarName},
+		public ${entity.name}[] findBy${entityFinder.name}_PrevAndNext(${entity.PKClassName} ${entity.PKVarName},
 
 		<#list entityColumns as entityColumn>
 			${entityColumn.type} ${entityColumn.name},
@@ -503,7 +503,7 @@ that may or may not be enforced with a unique index at the database level. Case
 				${entity.name}[] array = new ${entity.name}Impl[3];
 
 				array[0] =
-					getBy${finder.name}_PrevAndNext(
+					getBy${entityFinder.name}_PrevAndNext(
 						session, ${entity.varName},
 
 						<#list entityColumns as entityColumn>
@@ -515,7 +515,7 @@ that may or may not be enforced with a unique index at the database level. Case
 				array[1] = ${entity.varName};
 
 				array[2] =
-					getBy${finder.name}_PrevAndNext(
+					getBy${entityFinder.name}_PrevAndNext(
 						session, ${entity.varName},
 
 						<#list entityColumns as entityColumn>
@@ -534,7 +534,7 @@ that may or may not be enforced with a unique index at the database level. Case
 			}
 		}
 
-		protected ${entity.name} getBy${finder.name}_PrevAndNext(
+		protected ${entity.name} getBy${entityFinder.name}_PrevAndNext(
 			Session session, ${entity.name} ${entity.varName},
 
 			<#list entityColumns as entityColumn>
@@ -575,9 +575,9 @@ that may or may not be enforced with a unique index at the database level. Case
 		}
 	</#if>
 
-	<#if entity.isPermissionCheckEnabled(finder)>
+	<#if entity.isPermissionCheckEnabled(entityFinder)>
 		/**
-		 * Returns all the ${entity.humanNames} that the user has permission to view where ${finder.getHumanConditions(false)}.
+		 * Returns all the ${entity.humanNames} that the user has permission to view where ${entityFinder.getHumanConditions(false)}.
 		 *
 		<#list entityColumns as entityColumn>
 		 * @param ${entityColumn.name} the ${entityColumn.humanName}
@@ -585,7 +585,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		 * @return the matching ${entity.humanNames} that the user has permission to view
 		 */
 		@Override
-		public List<${entity.name}> filterFindBy${finder.name}(
+		public List<${entity.name}> filterFindBy${entityFinder.name}(
 
 		<#list entityColumns as entityColumn>
 			${entityColumn.type} ${entityColumn.name}
@@ -596,7 +596,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		</#list>
 
 		) {
-			return filterFindBy${finder.name}(
+			return filterFindBy${entityFinder.name}(
 
 			<#list entityColumns as entityColumn>
 				${entityColumn.name},
@@ -606,7 +606,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		}
 
 		/**
-		 * Returns a range of all the ${entity.humanNames} that the user has permission to view where ${finder.getHumanConditions(false)}.
+		 * Returns a range of all the ${entity.humanNames} that the user has permission to view where ${entityFinder.getHumanConditions(false)}.
 		 *
 		 * <p>
 		 * <#include "range_comment.ftl">
@@ -620,14 +620,14 @@ that may or may not be enforced with a unique index at the database level. Case
 		 * @return the range of matching ${entity.humanNames} that the user has permission to view
 		 */
 		@Override
-		public List<${entity.name}> filterFindBy${finder.name}(
+		public List<${entity.name}> filterFindBy${entityFinder.name}(
 
 		<#list entityColumns as entityColumn>
 			${entityColumn.type} ${entityColumn.name},
 		</#list>
 
 		int start, int end) {
-			return filterFindBy${finder.name}(
+			return filterFindBy${entityFinder.name}(
 
 			<#list entityColumns as entityColumn>
 				${entityColumn.name},
@@ -637,7 +637,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		}
 
 		/**
-		 * Returns an ordered range of all the ${entity.humanNames} that the user has permissions to view where ${finder.getHumanConditions(false)}.
+		 * Returns an ordered range of all the ${entity.humanNames} that the user has permissions to view where ${entityFinder.getHumanConditions(false)}.
 		 *
 		 * <p>
 		 * <#include "range_comment.ftl">
@@ -652,22 +652,22 @@ that may or may not be enforced with a unique index at the database level. Case
 		 * @return the ordered range of matching ${entity.humanNames} that the user has permission to view
 		 */
 		@Override
-		public List<${entity.name}> filterFindBy${finder.name}(
+		public List<${entity.name}> filterFindBy${entityFinder.name}(
 
 		<#list entityColumns as entityColumn>
 			${entityColumn.type} ${entityColumn.name},
 		</#list>
 
 		int start, int end, OrderByComparator<${entity.name}> orderByComparator) {
-			<#if finder.hasEntityColumn("groupId")>
+			<#if entityFinder.hasEntityColumn("groupId")>
 				if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-			<#elseif finder.hasEntityColumn("companyId")>
+			<#elseif entityFinder.hasEntityColumn("companyId")>
 				if (!InlineSQLHelperUtil.isEnabled(companyId, 0)) {
 			<#else>
 				if (!InlineSQLHelperUtil.isEnabled()) {
 			</#if>
 
-				return findBy${finder.name}(
+				return findBy${entityFinder.name}(
 
 				<#list entityColumns as entityColumn>
 					${entityColumn.name},
@@ -679,7 +679,7 @@ that may or may not be enforced with a unique index at the database level. Case
 			<#if entity.isPermissionedModel()>
 				<#include "persistence_impl_find_by_query.ftl">
 
-				String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(), ${entity.name}.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, _FILTER_ENTITY_TABLE_FILTER_USERID_COLUMN<#if finder.hasEntityColumn("groupId")>, groupId</#if>);
+				String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(), ${entity.name}.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, _FILTER_ENTITY_TABLE_FILTER_USERID_COLUMN<#if entityFinder.hasEntityColumn("groupId")>, groupId</#if>);
 
 				Session session = null;
 
@@ -744,7 +744,7 @@ that may or may not be enforced with a unique index at the database level. Case
 					}
 				}
 
-				String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(), ${entity.name}.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN<#if finder.hasEntityColumn("groupId")>, groupId</#if>);
+				String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(), ${entity.name}.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN<#if entityFinder.hasEntityColumn("groupId")>, groupId</#if>);
 
 				Session session = null;
 
@@ -775,9 +775,9 @@ that may or may not be enforced with a unique index at the database level. Case
 			</#if>
 		}
 
-		<#if !finder.hasEntityColumn(entity.PKVarName)>
+		<#if !entityFinder.hasEntityColumn(entity.PKVarName)>
 			/**
-			 * Returns the ${entity.humanNames} before and after the current ${entity.humanName} in the ordered set of ${entity.humanNames} that the user has permission to view where ${finder.getHumanConditions(false)}.
+			 * Returns the ${entity.humanNames} before and after the current ${entity.humanName} in the ordered set of ${entity.humanNames} that the user has permission to view where ${entityFinder.getHumanConditions(false)}.
 			 *
 			 * @param ${entity.PKVarName} the primary key of the current ${entity.humanName}
 			<#list entityColumns as entityColumn>
@@ -788,22 +788,22 @@ that may or may not be enforced with a unique index at the database level. Case
 			 * @throws ${noSuchEntity}Exception if a ${entity.humanName} with the primary key could not be found
 			 */
 			@Override
-			public ${entity.name}[] filterFindBy${finder.name}_PrevAndNext(${entity.PKClassName} ${entity.PKVarName},
+			public ${entity.name}[] filterFindBy${entityFinder.name}_PrevAndNext(${entity.PKClassName} ${entity.PKVarName},
 
 			<#list entityColumns as entityColumn>
 				${entityColumn.type} ${entityColumn.name},
 			</#list>
 
 			OrderByComparator<${entity.name}> orderByComparator) throws ${noSuchEntity}Exception {
-				<#if finder.hasEntityColumn("groupId")>
+				<#if entityFinder.hasEntityColumn("groupId")>
 					if (!InlineSQLHelperUtil.isEnabled(groupId)) {
-				<#elseif finder.hasEntityColumn("companyId")>
+				<#elseif entityFinder.hasEntityColumn("companyId")>
 					if (!InlineSQLHelperUtil.isEnabled(companyId, 0)) {
 				<#else>
 					if (!InlineSQLHelperUtil.isEnabled()) {
 				</#if>
 
-					return findBy${finder.name}_PrevAndNext(${entity.PKVarName},
+					return findBy${entityFinder.name}_PrevAndNext(${entity.PKVarName},
 
 					<#list entityColumns as entityColumn>
 						${entityColumn.name},
@@ -822,7 +822,7 @@ that may or may not be enforced with a unique index at the database level. Case
 					${entity.name}[] array = new ${entity.name}Impl[3];
 
 					array[0] =
-						filterGetBy${finder.name}_PrevAndNext(
+						filterGetBy${entityFinder.name}_PrevAndNext(
 							session, ${entity.varName},
 
 							<#list entityColumns as entityColumn>
@@ -834,7 +834,7 @@ that may or may not be enforced with a unique index at the database level. Case
 					array[1] = ${entity.varName};
 
 					array[2] =
-						filterGetBy${finder.name}_PrevAndNext(
+						filterGetBy${entityFinder.name}_PrevAndNext(
 							session, ${entity.varName},
 
 							<#list entityColumns as entityColumn>
@@ -853,7 +853,7 @@ that may or may not be enforced with a unique index at the database level. Case
 				}
 			}
 
-			protected ${entity.name} filterGetBy${finder.name}_PrevAndNext(
+			protected ${entity.name} filterGetBy${entityFinder.name}_PrevAndNext(
 				Session session, ${entity.name} ${entity.varName},
 
 				<#list entityColumns as entityColumn>
@@ -865,7 +865,7 @@ that may or may not be enforced with a unique index at the database level. Case
 				<#if entity.isPermissionedModel()>
 					<#include "persistence_impl_get_by_prev_and_next_query.ftl">
 
-					String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(), ${entity.name}.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, _FILTER_ENTITY_TABLE_FILTER_USERID_COLUMN<#if finder.hasEntityColumn("groupId")>, groupId</#if>);
+					String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(), ${entity.name}.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, _FILTER_ENTITY_TABLE_FILTER_USERID_COLUMN<#if entityFinder.hasEntityColumn("groupId")>, groupId</#if>);
 
 					Query q = session.createQuery(sql);
 
@@ -995,7 +995,7 @@ that may or may not be enforced with a unique index at the database level. Case
 						}
 					}
 
-					String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(), ${entity.name}.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN<#if finder.hasEntityColumn("groupId")>, groupId</#if>);
+					String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(), ${entity.name}.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN<#if entityFinder.hasEntityColumn("groupId")>, groupId</#if>);
 
 					SQLQuery q = session.createSynchronizedSQLQuery(sql);
 
@@ -1033,9 +1033,9 @@ that may or may not be enforced with a unique index at the database level. Case
 			}
 		</#if>
 
-		<#if finder.hasArrayableOperator()>
+		<#if entityFinder.hasArrayableOperator()>
 			/**
-			 * Returns all the ${entity.humanNames} that the user has permission to view where ${finder.getHumanConditions(true)}.
+			 * Returns all the ${entity.humanNames} that the user has permission to view where ${entityFinder.getHumanConditions(true)}.
 			 *
 			<#list entityColumns as entityColumn>
 				<#if entityColumn.hasArrayableOperator()>
@@ -1047,7 +1047,7 @@ that may or may not be enforced with a unique index at the database level. Case
 			 * @return the matching ${entity.humanNames} that the user has permission to view
 			 */
 			@Override
-			public List<${entity.name}> filterFindBy${finder.name}(
+			public List<${entity.name}> filterFindBy${entityFinder.name}(
 
 			<#list entityColumns as entityColumn>
 				<#if entityColumn.hasArrayableOperator()>
@@ -1062,7 +1062,7 @@ that may or may not be enforced with a unique index at the database level. Case
 			</#list>
 
 			) {
-				return filterFindBy${finder.name}(
+				return filterFindBy${entityFinder.name}(
 
 				<#list entityColumns as entityColumn>
 					<#if entityColumn.hasArrayableOperator()>
@@ -1076,7 +1076,7 @@ that may or may not be enforced with a unique index at the database level. Case
 			}
 
 			/**
-			 * Returns a range of all the ${entity.humanNames} that the user has permission to view where ${finder.getHumanConditions(true)}.
+			 * Returns a range of all the ${entity.humanNames} that the user has permission to view where ${entityFinder.getHumanConditions(true)}.
 			 *
 			 * <p>
 			 * <#include "range_comment.ftl">
@@ -1094,7 +1094,7 @@ that may or may not be enforced with a unique index at the database level. Case
 			 * @return the range of matching ${entity.humanNames} that the user has permission to view
 			 */
 			@Override
-			public List<${entity.name}> filterFindBy${finder.name}(
+			public List<${entity.name}> filterFindBy${entityFinder.name}(
 
 			<#list entityColumns as entityColumn>
 				<#if entityColumn.hasArrayableOperator()>
@@ -1105,7 +1105,7 @@ that may or may not be enforced with a unique index at the database level. Case
 			</#list>
 
 			int start, int end) {
-				return filterFindBy${finder.name}(
+				return filterFindBy${entityFinder.name}(
 
 				<#list entityColumns as entityColumn>
 					<#if entityColumn.hasArrayableOperator()>
@@ -1119,7 +1119,7 @@ that may or may not be enforced with a unique index at the database level. Case
 			}
 
 			/**
-			 * Returns an ordered range of all the ${entity.humanNames} that the user has permission to view where ${finder.getHumanConditions(true)}.
+			 * Returns an ordered range of all the ${entity.humanNames} that the user has permission to view where ${entityFinder.getHumanConditions(true)}.
 			 *
 			 * <p>
 			 * <#include "range_comment.ftl">
@@ -1138,7 +1138,7 @@ that may or may not be enforced with a unique index at the database level. Case
 			 * @return the ordered range of matching ${entity.humanNames} that the user has permission to view
 			 */
 			@Override
-			public List<${entity.name}> filterFindBy${finder.name}(
+			public List<${entity.name}> filterFindBy${entityFinder.name}(
 
 			<#list entityColumns as entityColumn>
 				<#if entityColumn.hasArrayableOperator()>
@@ -1149,21 +1149,21 @@ that may or may not be enforced with a unique index at the database level. Case
 			</#list>
 
 			int start, int end, OrderByComparator<${entity.name}> orderByComparator) {
-				<#if finder.hasEntityColumn("groupId")>
+				<#if entityFinder.hasEntityColumn("groupId")>
 					if (!InlineSQLHelperUtil.isEnabled(
-						<#if finder.getEntityColumn("groupId").hasArrayableOperator()>
+						<#if entityFinder.getEntityColumn("groupId").hasArrayableOperator()>
 							groupIds
 						<#else>
 							groupId
 						</#if>
 					)) {
-				<#elseif finder.hasEntityColumn("companyId")>
+				<#elseif entityFinder.hasEntityColumn("companyId")>
 					if (!InlineSQLHelperUtil.isEnabled(companyId, 0)) {
 				<#else>
 					if (!InlineSQLHelperUtil.isEnabled()) {
 				</#if>
 
-					return findBy${finder.name}(
+					return findBy${entityFinder.name}(
 
 					<#list entityColumns as entityColumn>
 						<#if entityColumn.hasArrayableOperator()>
@@ -1203,8 +1203,8 @@ that may or may not be enforced with a unique index at the database level. Case
 
 					String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(), ${entity.name}.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, _FILTER_ENTITY_TABLE_FILTER_USERID_COLUMN
 
-					<#if finder.hasEntityColumn("groupId")>,
-						<#if finder.getEntityColumn("groupId").hasArrayableOperator()>
+					<#if entityFinder.hasEntityColumn("groupId")>,
+						<#if entityFinder.getEntityColumn("groupId").hasArrayableOperator()>
 							groupIds
 						<#else>
 							groupId
@@ -1271,8 +1271,8 @@ that may or may not be enforced with a unique index at the database level. Case
 
 					String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(), ${entity.name}.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN
 
-					<#if finder.hasEntityColumn("groupId")>,
-						<#if finder.getEntityColumn("groupId").hasArrayableOperator()>
+					<#if entityFinder.hasEntityColumn("groupId")>,
+						<#if entityFinder.getEntityColumn("groupId").hasArrayableOperator()>
 							groupIds
 						<#else>
 							groupId
@@ -1313,27 +1313,27 @@ that may or may not be enforced with a unique index at the database level. Case
 	</#if>
 </#if>
 
-<#-- Case 4: !finder.isCollection() && !finder.isUnique() -->
+<#-- Case 4: !entityFinder.isCollection() && !entityFinder.isUnique() -->
 
-<#if !finder.isCollection() && !finder.isUnique()>
+<#if !entityFinder.isCollection() && !entityFinder.isUnique()>
 </#if>
 
-<#-- Case 5: finder.isUnique() -->
+<#-- Case 5: entityFinder.isUnique() -->
 
-<#if finder.isUnique()>
+<#if entityFinder.isUnique()>
 </#if>
 
-<#-- Case 6: !finder.isUnique() -->
+<#-- Case 6: !entityFinder.isUnique() -->
 
-<#if !finder.isUnique()>
+<#if !entityFinder.isUnique()>
 </#if>
 
-<#-- Case 7: finder.isCollection() -->
+<#-- Case 7: entityFinder.isCollection() -->
 
-<#if finder.isCollection()>
-	<#if finder.hasArrayableOperator()>
+<#if entityFinder.isCollection()>
+	<#if entityFinder.hasArrayableOperator()>
 		/**
-		 * Returns all the ${entity.humanNames} where ${finder.getHumanConditions(true)}.
+		 * Returns all the ${entity.humanNames} where ${entityFinder.getHumanConditions(true)}.
 		 *
 		 * <p>
 		 * <#include "range_comment.ftl">
@@ -1349,7 +1349,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		 * @return the matching ${entity.humanNames}
 		 */
 		@Override
-		public List<${entity.name}> findBy${finder.name}(
+		public List<${entity.name}> findBy${entityFinder.name}(
 
 		<#list entityColumns as entityColumn>
 			<#if entityColumn.hasArrayableOperator()>
@@ -1364,7 +1364,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		</#list>
 
 		) {
-			return findBy${finder.name}(
+			return findBy${entityFinder.name}(
 
 			<#list entityColumns as entityColumn>
 				<#if entityColumn.hasArrayableOperator()>
@@ -1378,7 +1378,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		}
 
 		/**
-		 * Returns a range of all the ${entity.humanNames} where ${finder.getHumanConditions(true)}.
+		 * Returns a range of all the ${entity.humanNames} where ${entityFinder.getHumanConditions(true)}.
 		 *
 		 * <p>
 		 * <#include "range_comment.ftl">
@@ -1396,7 +1396,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		 * @return the range of matching ${entity.humanNames}
 		 */
 		@Override
-		public List<${entity.name}> findBy${finder.name}(
+		public List<${entity.name}> findBy${entityFinder.name}(
 
 		<#list entityColumns as entityColumn>
 			<#if entityColumn.hasArrayableOperator()>
@@ -1407,7 +1407,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		</#list>
 
 		int start, int end) {
-			return findBy${finder.name}(
+			return findBy${entityFinder.name}(
 
 			<#list entityColumns as entityColumn>
 				<#if entityColumn.hasArrayableOperator()>
@@ -1421,7 +1421,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		}
 
 		/**
-		 * Returns an ordered range of all the ${entity.humanNames} where ${finder.getHumanConditions(true)}.
+		 * Returns an ordered range of all the ${entity.humanNames} where ${entityFinder.getHumanConditions(true)}.
 		 *
 		 * <p>
 		 * <#include "range_comment.ftl">
@@ -1440,7 +1440,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		 * @return the ordered range of matching ${entity.humanNames}
 		 */
 		@Override
-		public List<${entity.name}> findBy${finder.name}(
+		public List<${entity.name}> findBy${entityFinder.name}(
 
 		<#list entityColumns as entityColumn>
 			<#if entityColumn.hasArrayableOperator()>
@@ -1451,7 +1451,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		</#list>
 
 		int start, int end, OrderByComparator<${entity.name}> orderByComparator) {
-			return findBy${finder.name}(
+			return findBy${entityFinder.name}(
 
 			<#list entityColumns as entityColumn>
 				<#if entityColumn.hasArrayableOperator()>
@@ -1465,7 +1465,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		}
 
 		/**
-		 * Returns an ordered range of all the ${entity.humanNames} where ${finder.getHumanConditions(false)}, optionally using the finder cache.
+		 * Returns an ordered range of all the ${entity.humanNames} where ${entityFinder.getHumanConditions(false)}, optionally using the finder cache.
 		 *
 		 * <p>
 		 * <#include "range_comment.ftl">
@@ -1481,7 +1481,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		 * @return the ordered range of matching ${entity.humanNames}
 		 */
 		@Override
-		public List<${entity.name}> findBy${finder.name}(
+		public List<${entity.name}> findBy${entityFinder.name}(
 
 		<#list entityColumns as entityColumn>
 			<#if entityColumn.hasArrayableOperator()>
@@ -1528,8 +1528,8 @@ that may or may not be enforced with a unique index at the database level. Case
 				</#if>
 			</#list>
 			) {
-				<#if finder.isUnique()>
-					${entity.name} ${entity.varName} = fetchBy${finder.name}(
+				<#if entityFinder.isUnique()>
+					${entity.name} ${entity.varName} = fetchBy${entityFinder.name}(
 						<#list entityColumns as entityColumn>
 							<#if entityColumn.hasArrayableOperator()>
 								${entityColumn.names}[0]
@@ -1553,7 +1553,7 @@ that may or may not be enforced with a unique index at the database level. Case
 						return list;
 					}
 				<#else>
-					return findBy${finder.name}(
+					return findBy${entityFinder.name}(
 						<#list entityColumns as entityColumn>
 							<#if entityColumn.hasArrayableOperator()>
 								${entityColumn.names}[0],
@@ -1602,7 +1602,7 @@ that may or may not be enforced with a unique index at the database level. Case
 			List<${entity.name}> list = null;
 
 			if (retrieveFromCache) {
-				list = (List<${entity.name}>)finderCache.getResult(FINDER_PATH_WITH_PAGINATION_FIND_BY_${finder.name?upper_case}, finderArgs, this);
+				list = (List<${entity.name}>)finderCache.getResult(FINDER_PATH_WITH_PAGINATION_FIND_BY_${entityFinder.name?upper_case}, finderArgs, this);
 
 				if ((list != null) && !list.isEmpty()) {
 					for (${entity.name} ${entity.varName} : list) {
@@ -1662,10 +1662,10 @@ that may or may not be enforced with a unique index at the database level. Case
 
 					cacheResult(list);
 
-					finderCache.putResult(FINDER_PATH_WITH_PAGINATION_FIND_BY_${finder.name?upper_case}, finderArgs, list);
+					finderCache.putResult(FINDER_PATH_WITH_PAGINATION_FIND_BY_${entityFinder.name?upper_case}, finderArgs, list);
 				}
 				catch (Exception e) {
-					finderCache.removeResult(FINDER_PATH_WITH_PAGINATION_FIND_BY_${finder.name?upper_case}, finderArgs);
+					finderCache.removeResult(FINDER_PATH_WITH_PAGINATION_FIND_BY_${entityFinder.name?upper_case}, finderArgs);
 
 					throw processException(e);
 				}
@@ -1679,16 +1679,16 @@ that may or may not be enforced with a unique index at the database level. Case
 	</#if>
 </#if>
 
-<#-- Case 8: !finder.isCollection() -->
+<#-- Case 8: !entityFinder.isCollection() -->
 
-<#if !finder.isCollection()>
+<#if !entityFinder.isCollection()>
 </#if>
 
-<#-- Case 9: !finder.isCollection() || finder.isUnique() -->
+<#-- Case 9: !entityFinder.isCollection() || entityFinder.isUnique() -->
 
-<#if !finder.isCollection() || finder.isUnique()>
+<#if !entityFinder.isCollection() || entityFinder.isUnique()>
 	/**
-	 * Returns the ${entity.humanName} where ${finder.getHumanConditions(false)} or throws a {@link ${noSuchEntity}Exception} if it could not be found.
+	 * Returns the ${entity.humanName} where ${entityFinder.getHumanConditions(false)} or throws a {@link ${noSuchEntity}Exception} if it could not be found.
 	 *
 	<#list entityColumns as entityColumn>
 	 * @param ${entityColumn.name} the ${entityColumn.humanName}
@@ -1697,7 +1697,7 @@ that may or may not be enforced with a unique index at the database level. Case
 	 * @throws ${noSuchEntity}Exception if a matching ${entity.humanName} could not be found
 	 */
 	@Override
-	public ${entity.name} findBy${finder.name}(
+	public ${entity.name} findBy${entityFinder.name}(
 
 	<#list entityColumns as entityColumn>
 		${entityColumn.type} ${entityColumn.name}
@@ -1708,7 +1708,7 @@ that may or may not be enforced with a unique index at the database level. Case
 	</#list>
 
 	) throws ${noSuchEntity}Exception {
-		${entity.name} ${entity.varName} = fetchBy${finder.name}(
+		${entity.name} ${entity.varName} = fetchBy${entityFinder.name}(
 
 		<#list entityColumns as entityColumn>
 			${entityColumn.name}
@@ -1745,7 +1745,7 @@ that may or may not be enforced with a unique index at the database level. Case
 	}
 
 	/**
-	 * Returns the ${entity.humanName} where ${finder.getHumanConditions(false)} or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 * Returns the ${entity.humanName} where ${entityFinder.getHumanConditions(false)} or returns <code>null</code> if it could not be found. Uses the finder cache.
 	 *
 	<#list entityColumns as entityColumn>
 	 * @param ${entityColumn.name} the ${entityColumn.humanName}
@@ -1753,7 +1753,7 @@ that may or may not be enforced with a unique index at the database level. Case
 	 * @return the matching ${entity.humanName}, or <code>null</code> if a matching ${entity.humanName} could not be found
 	 */
 	@Override
-	public ${entity.name} fetchBy${finder.name}(
+	public ${entity.name} fetchBy${entityFinder.name}(
 
 	<#list entityColumns as entityColumn>
 		${entityColumn.type} ${entityColumn.name}
@@ -1764,7 +1764,7 @@ that may or may not be enforced with a unique index at the database level. Case
 	</#list>
 
 	) {
-		return fetchBy${finder.name}(
+		return fetchBy${entityFinder.name}(
 
 		<#list entityColumns as entityColumn>
 			${entityColumn.name},
@@ -1774,7 +1774,7 @@ that may or may not be enforced with a unique index at the database level. Case
 	}
 
 	/**
-	 * Returns the ${entity.humanName} where ${finder.getHumanConditions(false)} or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 * Returns the ${entity.humanName} where ${entityFinder.getHumanConditions(false)} or returns <code>null</code> if it could not be found, optionally using the finder cache.
 	 *
 	<#list entityColumns as entityColumn>
 	 * @param ${entityColumn.name} the ${entityColumn.humanName}
@@ -1783,7 +1783,7 @@ that may or may not be enforced with a unique index at the database level. Case
 	 * @return the matching ${entity.humanName}, or <code>null</code> if a matching ${entity.humanName} could not be found
 	 */
 	@Override
-	public ${entity.name} fetchBy${finder.name}(
+	public ${entity.name} fetchBy${entityFinder.name}(
 
 	<#list entityColumns as entityColumn>
 		${entityColumn.type} ${entityColumn.name}
@@ -1805,7 +1805,7 @@ that may or may not be enforced with a unique index at the database level. Case
 		Object result = null;
 
 		if (retrieveFromCache) {
-			result = finderCache.getResult(FINDER_PATH_FETCH_BY_${finder.name?upper_case}, finderArgs, this);
+			result = finderCache.getResult(FINDER_PATH_FETCH_BY_${entityFinder.name?upper_case}, finderArgs, this);
 		}
 
 		if (result instanceof ${entity.name}) {
@@ -1851,15 +1851,15 @@ that may or may not be enforced with a unique index at the database level. Case
 				List<${entity.name}> list = q.list();
 
 				if (list.isEmpty()) {
-					finderCache.putResult(FINDER_PATH_FETCH_BY_${finder.name?upper_case}, finderArgs, list);
+					finderCache.putResult(FINDER_PATH_FETCH_BY_${entityFinder.name?upper_case}, finderArgs, list);
 				}
 				else {
-					<#if !finder.isUnique()>
+					<#if !entityFinder.isUnique()>
 						if (list.size() > 1) {
 							Collections.sort(list, Collections.reverseOrder());
 
 							if (_log.isWarnEnabled()) {
-								_log.warn("${entity.name}PersistenceImpl.fetchBy${finder.name}(<#list entityColumns as entityColumn>${entityColumn.type}, </#list>boolean) with parameters (" + StringUtil.merge(finderArgs) + ") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
+								_log.warn("${entity.name}PersistenceImpl.fetchBy${entityFinder.name}(<#list entityColumns as entityColumn>${entityColumn.type}, </#list>boolean) with parameters (" + StringUtil.merge(finderArgs) + ") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
 							}
 						}
 					</#if>
@@ -1883,12 +1883,12 @@ that may or may not be enforced with a unique index at the database level. Case
 							</#if>
 						</#list>
 					) {
-						finderCache.putResult(FINDER_PATH_FETCH_BY_${finder.name?upper_case}, finderArgs, ${entity.varName});
+						finderCache.putResult(FINDER_PATH_FETCH_BY_${entityFinder.name?upper_case}, finderArgs, ${entity.varName});
 					}
 				}
 			}
 			catch (Exception e) {
-				finderCache.removeResult(FINDER_PATH_FETCH_BY_${finder.name?upper_case}, finderArgs);
+				finderCache.removeResult(FINDER_PATH_FETCH_BY_${entityFinder.name?upper_case}, finderArgs);
 
 				throw processException(e);
 			}

@@ -17,7 +17,7 @@ import java.util.Date;
 @ProviderType
 public class ${entity.PKClassName} implements Comparable<${entity.PKClassName}>, Serializable {
 
-	<#list entity.PKList as entityColumn>
+	<#list entity.PKEntityColumns as entityColumn>
 		public ${entityColumn.type} ${entityColumn.name};
 	</#list>
 
@@ -26,7 +26,7 @@ public class ${entity.PKClassName} implements Comparable<${entity.PKClassName}>,
 
 	public ${entity.PKClassName}(
 
-	<#list entity.PKList as entityColumn>
+	<#list entity.PKEntityColumns as entityColumn>
 		${entityColumn.type} ${entityColumn.name}
 
 		<#if entityColumn_has_next>
@@ -35,12 +35,12 @@ public class ${entity.PKClassName} implements Comparable<${entity.PKClassName}>,
 	</#list>
 
 	) {
-		<#list entity.PKList as entityColumn>
+		<#list entity.PKEntityColumns as entityColumn>
 			this.${entityColumn.name} = ${entityColumn.name};
 		</#list>
 	}
 
-	<#list entity.PKList as entityColumn>
+	<#list entity.PKEntityColumns as entityColumn>
 		<#if !entityColumn.isCollection()>
 			public ${entityColumn.type} get${entityColumn.methodName}() {
 				return ${entityColumn.name};
@@ -66,7 +66,7 @@ public class ${entity.PKClassName} implements Comparable<${entity.PKClassName}>,
 
 		int value = 0;
 
-		<#list entity.PKList as entityColumn>
+		<#list entity.PKEntityColumns as entityColumn>
 			<#if entityColumn.isPrimitiveType()>
 				<#if stringUtil.equals(entityColumn.type, "boolean")>
 					if (!${entityColumn.name} && pk.${entityColumn.name}) {
@@ -119,7 +119,7 @@ public class ${entity.PKClassName} implements Comparable<${entity.PKClassName}>,
 
 		if (
 
-		<#list entity.PKList as entityColumn>
+		<#list entity.PKEntityColumns as entityColumn>
 			<#if entityColumn.isPrimitiveType()>
 				(${entityColumn.name} == pk.${entityColumn.name})
 			<#else>
@@ -141,7 +141,7 @@ public class ${entity.PKClassName} implements Comparable<${entity.PKClassName}>,
 	public int hashCode() {
 		int hashCode = 0;
 
-		<#list entity.PKList as entityColumn>
+		<#list entity.PKEntityColumns as entityColumn>
 			hashCode = HashUtil.hash(hashCode, ${entityColumn.name});
 		</#list>
 
@@ -150,11 +150,11 @@ public class ${entity.PKClassName} implements Comparable<${entity.PKClassName}>,
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(${entity.PKList?size * 2 + 2});
+		StringBundler sb = new StringBundler(${entity.PKEntityColumns?size * 2 + 2});
 
 		sb.append("{");
 
-		<#list entity.PKList as entityColumn>
+		<#list entity.PKEntityColumns as entityColumn>
 			<#if entityColumn?is_first>
 				sb.append("${entityColumn.name}=");
 			<#else>

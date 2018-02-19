@@ -4,9 +4,9 @@
 
 <#if entity.isHierarchicalTree()>
 	<#assign
-		pkColumn = entity.getPKList()?first
+		pkEntityColumn = entity.PKEntityColumns?first
 
-		parentPKColumn = entity.getEntityColumn("parent" + pkColumn.methodName)
+		parentPKColumn = entity.getEntityColumn("parent" + pkEntityColumn.methodName)
 	/>
 </#if>
 
@@ -143,7 +143,7 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 	<#if entity.entityOrder??>
 		<#assign orderList = entity.entityOrder.entityColumns />
 	<#else>
-		<#assign orderList = entity.getPKList() />
+		<#assign orderList = entity.PKEntityColumns />
 	</#if>
 
 	<#assign orderByJPQL = "" />
@@ -219,13 +219,13 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 
 		<#assign columnBitmaskEnabled = true />
 
-		<#if entity.finderColumnsList?size == 0>
+		<#if entity.finderEntityColumns?size == 0>
 			public static final boolean COLUMN_BITMASK_ENABLED = false;
 
 			<#assign columnBitmaskEnabled = false />
 		</#if>
 
-		<#if entity.finderColumnsList?size &gt; 64>
+		<#if entity.finderEntityColumns?size &gt; 64>
 			public static final boolean COLUMN_BITMASK_ENABLED = false;
 
 			<#assign columnBitmaskEnabled = false />
@@ -236,14 +236,14 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 
 			<#assign columnBitmask = 1 />
 
-			<#list entity.finderColumnsList as entityColumn>
+			<#list entity.finderEntityColumns as entityColumn>
 				public static final long ${entityColumn.name?upper_case}_COLUMN_BITMASK = ${columnBitmask}L;
 
 				<#assign columnBitmask = columnBitmask * 2 />
 			</#list>
 
 			<#list orderList as order>
-				<#if !entity.finderColumnsList?seq_contains(order)>
+				<#if !entity.finderEntityColumns?seq_contains(order)>
 					public static final long ${order.name?upper_case}_COLUMN_BITMASK = ${columnBitmask}L;
 
 					<#assign columnBitmask = columnBitmask * 2 />
@@ -334,7 +334,7 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 		<#if entity.hasCompoundPK()>
 			return new ${entity.PKClassName}(
 
-			<#list entity.PKList as entityColumn>
+			<#list entity.PKEntityColumns as entityColumn>
 				_${entityColumn.name}
 
 				<#if entityColumn_has_next>
@@ -344,18 +344,18 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 
 			);
 		<#else>
-			return _${entity.PKList[0].name};
+			return _${entity.PKEntityColumns[0].name};
 		</#if>
 	}
 
 	@Override
 	public void setPrimaryKey(${entity.PKClassName} primaryKey) {
 		<#if entity.hasCompoundPK()>
-			<#list entity.PKList as entityColumn>
+			<#list entity.PKEntityColumns as entityColumn>
 				set${entityColumn.methodName}(primaryKey.${entityColumn.name});
 			</#list>
 		<#else>
-			set${entity.PKList[0].methodName}(primaryKey);
+			set${entity.PKEntityColumns[0].methodName}(primaryKey);
 		</#if>
 	}
 
@@ -364,7 +364,7 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 		<#if entity.hasCompoundPK()>
 			return new ${entity.PKClassName}(
 
-			<#list entity.PKList as entityColumn>
+			<#list entity.PKEntityColumns as entityColumn>
 				_${entityColumn.name}
 
 				<#if entityColumn_has_next>
@@ -374,7 +374,7 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 
 			);
 		<#else>
-			return _${entity.PKList[0].name};
+			return _${entity.PKEntityColumns[0].name};
 		</#if>
 	}
 
@@ -464,7 +464,7 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 			return availableLanguageIds;
 		}
 
-		<#list entity.localizedColumns as entityColumn>
+		<#list entity.localizedEntityColumns as entityColumn>
 			@Override
 			public String get${entityColumn.methodName}() {
 				return get${entityColumn.methodName}(getDefaultLanguageId(), false);
@@ -859,11 +859,11 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 
 	<#if entity.isHierarchicalTree()>
 		public long getNestedSetsTreeNodeLeft() {
-			return _left${pkColumn.methodName};
+			return _left${pkEntityColumn.methodName};
 		}
 
 		public long getNestedSetsTreeNodeRight() {
-			return _right${pkColumn.methodName};
+			return _right${pkEntityColumn.methodName};
 		}
 
 		public long getNestedSetsTreeNodeScopeId() {
@@ -877,11 +877,11 @@ public class ${entity.name}ModelImpl extends BaseModelImpl<${entity.name}> imple
 		}
 
 		public void setNestedSetsTreeNodeLeft(long nestedSetsTreeNodeLeft) {
-			_left${pkColumn.methodName} = nestedSetsTreeNodeLeft;
+			_left${pkEntityColumn.methodName} = nestedSetsTreeNodeLeft;
 		}
 
 		public void setNestedSetsTreeNodeRight(long nestedSetsTreeNodeRight) {
-			_right${pkColumn.methodName} = nestedSetsTreeNodeRight;
+			_right${pkEntityColumn.methodName} = nestedSetsTreeNodeRight;
 		}
 	</#if>
 

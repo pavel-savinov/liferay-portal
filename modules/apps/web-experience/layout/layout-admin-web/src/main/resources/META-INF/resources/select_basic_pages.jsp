@@ -17,25 +17,14 @@
 <%@ include file="/init.jsp" %>
 
 <%
-List<String> types = ListUtil.filter(
-	ListUtil.fromArray(LayoutTypeControllerTracker.getTypes()),
-	new PredicateFilter<String>() {
-
-		@Override
-		public boolean filter(String type) {
-			LayoutTypeController layoutTypeController = LayoutTypeControllerTracker.getLayoutTypeController(type);
-
-			return layoutTypeController.isInstanceable();
-		}
-
-	});
+SelectLayoutPageTemplateEntryDisplayContext selectLayoutPageTemplateEntryDisplayContext = new SelectLayoutPageTemplateEntryDisplayContext(layoutsAdminDisplayContext, request);
 %>
 
 <liferay-ui:search-container
-	total="<%= types.size() %>"
+	total="<%= selectLayoutPageTemplateEntryDisplayContext.getTypesCount() %>"
 >
 	<liferay-ui:search-container-results
-		results="<%= types %>"
+		results="<%= selectLayoutPageTemplateEntryDisplayContext.getTypes() %>"
 	/>
 
 	<liferay-ui:search-container-row

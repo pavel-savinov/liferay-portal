@@ -1,24 +1,24 @@
-<#assign entityColumns = finder.entityColumns />
+<#assign entityColumns = entityFinder.entityColumns />
 
-<#-- Case 3: finder.isCollection() && !finder.isUnique() -->
+<#-- Case 3: entityFinder.isCollection() && !entityFinder.isUnique() -->
 
-<#if finder.isCollection() && !finder.isUnique()>
+<#if entityFinder.isCollection() && !entityFinder.isUnique()>
 	/**
-	 * Removes all the ${entity.humanNames} where ${finder.getHumanConditions(false)} from the database.
+	 * Removes all the ${entity.humanNames} where ${entityFinder.getHumanConditions(false)} from the database.
 	 *
 	<#list entityColumns as entityColumn>
 	 * @param ${entityColumn.name} the ${entityColumn.humanName}
 	</#list>
 	 */
 	@Override
-	public void removeBy${finder.name}(
+	public void removeBy${entityFinder.name}(
 
 	<#list entityColumns as entityColumn>
 		${entityColumn.type} ${entityColumn.name}<#if entityColumn_has_next>,</#if>
 	</#list>
 
 	) {
-		for (${entity.name} ${entity.varName} : findBy${finder.name}(
+		for (${entity.name} ${entity.varName} : findBy${entityFinder.name}(
 
 		<#list entityColumns as entityColumn>
 			${entityColumn.name},
@@ -31,10 +31,10 @@
 	}
 <#else>
 
-<#-- Case 9: !finder.isCollection() || finder.isUnique() -->
+<#-- Case 9: !entityFinder.isCollection() || entityFinder.isUnique() -->
 
 	/**
-	 * Removes the ${entity.humanName} where ${finder.getHumanConditions(false)} from the database.
+	 * Removes the ${entity.humanName} where ${entityFinder.getHumanConditions(false)} from the database.
 	 *
 	<#list entityColumns as entityColumn>
 	 * @param ${entityColumn.name} the ${entityColumn.humanName}
@@ -42,7 +42,7 @@
 	 * @return the ${entity.humanName} that was removed
 	 */
 	@Override
-	public ${entity.name} removeBy${finder.name}(
+	public ${entity.name} removeBy${entityFinder.name}(
 
 	<#list entityColumns as entityColumn>
 		${entityColumn.type} ${entityColumn.name}
@@ -53,7 +53,7 @@
 	</#list>
 
 	) throws ${noSuchEntity}Exception {
-		${entity.name} ${entity.varName} = findBy${finder.name}(
+		${entity.name} ${entity.varName} = findBy${entityFinder.name}(
 
 		<#list entityColumns as entityColumn>
 			${entityColumn.name}

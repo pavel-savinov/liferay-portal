@@ -12,9 +12,7 @@
 	>
 		<#if entity.hasCompoundPK()>
 			<composite-id class="${apiPackagePath}.service.persistence.${entity.name}PK" name="primaryKey">
-				<#assign pkList = entity.getPKList() />
-
-				<#list pkList as entityColumn>
+				<#list entity.PKEntityColumns as entityColumn>
 					<key-property
 
 					<#if serviceBuilder.isHBMCamelCasePropertyAccessor(entityColumn.name)>
@@ -39,7 +37,7 @@
 				</#list>
 			</composite-id>
 		<#else>
-			<#assign entityColumn = entity.getPKList()?first />
+			<#assign entityColumn = entity.PKEntityColumns?first />
 
 			<id
 				<#if serviceBuilder.isHBMCamelCasePropertyAccessor(entityColumn.name)>
@@ -115,16 +113,16 @@
 		</#list>
 	</class>
 
-	<#list entity.blobEntityColumns as entityColumn>
-		<#if entityColumn.lazy>
+	<#list entity.blobEntityColumns as blobEntityColumn>
+		<#if blobEntityColumn.lazy>
 			<class
 				<#if entity.isDynamicUpdateEnabled()>
 					dynamic-update="true"
 				</#if>
 
-				lazy="true" name="${apiPackagePath}.model.${entity.name}${entityColumn.methodName}BlobModel" table="${entity.table}"
+				lazy="true" name="${apiPackagePath}.model.${entity.name}${blobEntityColumn.methodName}BlobModel" table="${entity.table}"
 			>
-				<#assign entityColumn = entity.getPKList()?first />
+				<#assign entityColumn = entity.PKEntityColumns?first />
 
 				<id column="${entityColumn.DBName}" name="${entityColumn.name}">
 					<generator class="foreign">
@@ -132,7 +130,7 @@
 					</generator>
 				</id>
 
-				<property column="${entityColumn.DBName}" name="${entityColumn.name}Blob" type="blob" />
+				<property column="${blobEntityColumn.DBName}" name="${blobEntityColumn.name}Blob" type="blob" />
 			</class>
 		</#if>
 	</#list>

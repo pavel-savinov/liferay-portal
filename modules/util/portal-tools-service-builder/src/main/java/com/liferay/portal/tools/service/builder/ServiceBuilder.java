@@ -1266,7 +1266,7 @@ public class ServiceBuilder {
 				return null;
 			}
 
-			mappingEntities.put(entity.getName(), entity.getPKList());
+			mappingEntities.put(entity.getName(), entity.getPKEntityColumns());
 		}
 
 		return mappingEntities;
@@ -2093,9 +2093,9 @@ public class ServiceBuilder {
 	}
 
 	private void _createEJBPK(Entity entity) throws Exception {
-		List<EntityColumn> pkList = entity.getPKList();
+		List<EntityColumn> pkEntityColumns = entity.getPKEntityColumns();
 
-		if (pkList.size() <= 1) {
+		if (pkEntityColumns.size() <= 1) {
 			return;
 		}
 
@@ -3496,27 +3496,26 @@ public class ServiceBuilder {
 				continue;
 			}
 
-			List<EntityFinder> finderList = entity.getFinderList();
+			List<EntityFinder> entityFinders = entity.getEntityFinders();
 
-			for (EntityFinder finder : finderList) {
-				if (finder.isDBIndex()) {
-					List<String> finderColsNames = new ArrayList<>();
+			for (EntityFinder entityFinder : entityFinders) {
+				if (entityFinder.isDBIndex()) {
+					List<String> dbNames = new ArrayList<>();
 
-					List<EntityColumn> finderColsList = finder.getEntityColumns();
+					List<EntityColumn> entityColumns = entityFinder.getEntityColumns();
 
-					for (EntityColumn col : finderColsList) {
-						finderColsNames.add(col.getDBName());
+					for (EntityColumn entityColumn : entityColumns) {
+						dbNames.add(entityColumn.getDBName());
 					}
 
-					if (finderColsNames.isEmpty()) {
+					if (dbNames.isEmpty()) {
 						continue;
 					}
 
 					IndexMetadata indexMetadata =
 						IndexMetadataFactoryUtil.createIndexMetadata(
-							finder.isUnique(), entity.getTable(),
-							finderColsNames.toArray(
-								new String[finderColsNames.size()]));
+							entityFinder.isUnique(), entity.getTable(),
+							dbNames.toArray(new String[dbNames.size()]));
 
 					_addIndexMetadata(
 						indexMetadatasMap, indexMetadata.getTableName(),
@@ -4192,9 +4191,9 @@ public class ServiceBuilder {
 		String tableName = entityMapping.getTableName();
 
 		for (Entity entity : entities) {
-			List<EntityColumn> pkList = entity.getPKList();
+			List<EntityColumn> pkEntityColumns = entity.getPKEntityColumns();
 
-			for (EntityColumn entityColumn : pkList) {
+			for (EntityColumn entityColumn : pkEntityColumns) {
 				IndexMetadata indexMetadata =
 					IndexMetadataFactoryUtil.createIndexMetadata(
 						false, tableName, entityColumn.getDBName());
@@ -4271,19 +4270,18 @@ public class ServiceBuilder {
 		sb.append(" (\n");
 
 		for (Entity entity : entities) {
-			List<EntityColumn> pkList = entity.getPKList();
+			List<EntityColumn> pkEntityColumns = entity.getPKEntityColumns();
 
-			for (EntityColumn col : pkList) {
-				String colDBName = col.getDBName();
+			for (EntityColumn entityColumn : pkEntityColumns) {
+				String dbName = entityColumn.getDBName();
 
 				if ((_databaseNameMaxLength > 0) &&
-					(colDBName.length() > _databaseNameMaxLength)) {
+					(dbName.length() > _databaseNameMaxLength)) {
 
 					throw new ServiceBuilderException(
 						StringBundler.concat(
 							"Unable to create entity mapping \"", tableName,
-							"\" because column name \"", colDBName,
-							"\" exceeds ",
+							"\" because column name \"", dbName, "\" exceeds ",
 							String.valueOf(_databaseNameMaxLength),
 							" characters. Some databases do not allow column ",
 							"names longer than 30 characters. To disable this ",
@@ -4292,36 +4290,36 @@ public class ServiceBuilder {
 							"that your database supports."));
 				}
 
-				String colType = col.getType();
+				String type = entityColumn.getType();
 
 				sb.append("\t");
-				sb.append(colDBName);
+				sb.append(dbName);
 				sb.append(" ");
 
-				if (StringUtil.equalsIgnoreCase(colType, "boolean")) {
+				if (StringUtil.equalsIgnoreCase(type, "boolean")) {
 					sb.append("BOOLEAN");
 				}
-				else if (StringUtil.equalsIgnoreCase(colType, "double") ||
-						 StringUtil.equalsIgnoreCase(colType, "float")) {
+				else if (StringUtil.equalsIgnoreCase(type, "double") ||
+						 StringUtil.equalsIgnoreCase(type, "float")) {
 
 					sb.append("DOUBLE");
 				}
-				else if (colType.equals("int") || colType.equals("Integer") ||
-						 StringUtil.equalsIgnoreCase(colType, "short")) {
+				else if (type.equals("int") || type.equals("Integer") ||
+						 StringUtil.equalsIgnoreCase(type, "short")) {
 
 					sb.append("INTEGER");
 				}
-				else if (StringUtil.equalsIgnoreCase(colType, "long")) {
+				else if (StringUtil.equalsIgnoreCase(type, "long")) {
 					sb.append("LONG");
 				}
-				else if (colType.equals("Map")) {
+				else if (type.equals("Map")) {
 					sb.append("TEXT");
 				}
-				else if (colType.equals("String")) {
+				else if (type.equals("String")) {
 					int maxLength = getMaxLength(
-						entity.getName(), col.getName());
+						entity.getName(), entityColumn.getName());
 
-					if (col.isLocalized()) {
+					if (entityColumn.isLocalized()) {
 						maxLength = 4000;
 					}
 
@@ -4337,18 +4335,18 @@ public class ServiceBuilder {
 						sb.append("TEXT");
 					}
 				}
-				else if (colType.equals("Date")) {
+				else if (type.equals("Date")) {
 					sb.append("DATE");
 				}
 				else {
 					sb.append("invalid");
 				}
 
-				if (col.isPrimary()) {
+				if (entityColumn.isPrimary()) {
 					sb.append(" not null");
 				}
-				else if (colType.equals("Date") || colType.equals("Map") ||
-						 colType.equals("String")) {
+				else if (type.equals("Date") || type.equals("Map") ||
+						 type.equals("String")) {
 
 					sb.append(" null");
 				}
@@ -4362,16 +4360,16 @@ public class ServiceBuilder {
 		for (int i = 1; i < entities.length; i++) {
 			Entity entity = entities[i];
 
-			List<EntityColumn> pkList = entity.getPKList();
+			List<EntityColumn> pkEntityColumns = entity.getPKEntityColumns();
 
-			for (int j = 0; j < pkList.size(); j++) {
-				EntityColumn col = pkList.get(j);
+			for (int j = 0; j < pkEntityColumns.size(); j++) {
+				EntityColumn entityColumn = pkEntityColumns.get(j);
 
 				if ((i != 1) || (j != 0)) {
 					sb.append(", ");
 				}
 
-				sb.append(col.getDBName());
+				sb.append(entityColumn.getDBName());
 			}
 		}
 
@@ -4382,7 +4380,7 @@ public class ServiceBuilder {
 	}
 
 	private String _getCreateTableSQL(Entity entity) {
-		List<EntityColumn> pkList = entity.getPKList();
+		List<EntityColumn> pkEntityColumns = entity.getPKEntityColumns();
 		List<EntityColumn> regularEntityColumns = entity.getRegularEntityColumns();
 
 		if (regularEntityColumns.isEmpty()) {
@@ -4520,12 +4518,12 @@ public class ServiceBuilder {
 		if (entity.hasCompoundPK()) {
 			sb.append("\tprimary key (");
 
-			for (int j = 0; j < pkList.size(); j++) {
-				EntityColumn pk = pkList.get(j);
+			for (int j = 0; j < pkEntityColumns.size(); j++) {
+				EntityColumn pk = pkEntityColumns.get(j);
 
 				sb.append(pk.getDBName());
 
-				if ((j + 1) != pkList.size()) {
+				if ((j + 1) != pkEntityColumns.size()) {
 					sb.append(", ");
 				}
 			}
@@ -4551,7 +4549,7 @@ public class ServiceBuilder {
 	private EntityColumn _getEntityColumnByColumnDBName(
 		Entity entity, String columnDBName) {
 
-		for (EntityColumn entityColumn : entity.getFinderColumnsList()) {
+		for (EntityColumn entityColumn : entity.getFinderEntityColumns()) {
 			if (columnDBName.equals(entityColumn.getDBName())) {
 				return entityColumn;
 			}
@@ -5191,7 +5189,7 @@ public class ServiceBuilder {
 			entityElement.attributeValue("dynamic-update-enabled"),
 			mvccEnabled);
 
-		List<EntityColumn> pkList = new ArrayList<>();
+		List<EntityColumn> pkEntityColumns = new ArrayList<>();
 		List<EntityColumn> regularEntityColumns = new ArrayList<>();
 		List<EntityColumn> blobEntityColumns = new ArrayList<>();
 		List<EntityColumn> collectionEntityColumns = new ArrayList<>();
@@ -5304,7 +5302,7 @@ public class ServiceBuilder {
 				uadNonanonymizable);
 
 			if (primary) {
-				pkList.add(entityColumn);
+				pkEntityColumns.add(entityColumn);
 			}
 
 			if (columnType.equals("Collection")) {
@@ -5332,7 +5330,7 @@ public class ServiceBuilder {
 			}
 		}
 
-		if (uuid && pkList.isEmpty()) {
+		if (uuid && pkEntityColumns.isEmpty()) {
 			throw new ServiceBuilderException(
 				"Unable to create entity \"" + entityName +
 					"\" with a UUID without a primary key");
@@ -5619,7 +5617,7 @@ public class ServiceBuilder {
 			entityName, humanName, tableName, alias, uuid, uuidAccessor, localService,
 			remoteService, persistenceClassName, finderClassName, dataSource,
 			sessionFactory, txManager, cacheEnabled, dynamicUpdateEnabled,
-			jsonEnabled, mvccEnabled, trashEnabled, deprecated, pkList,
+			jsonEnabled, mvccEnabled, trashEnabled, deprecated, pkEntityColumns,
 			regularEntityColumns, blobEntityColumns, collectionEntityColumns, entityColumns, entityOrder,
 			entityFinders, referenceEntities, unresolvedReferenceEntityNames, txRequiredMethodNames,
 			resourceActionModel);
@@ -5704,20 +5702,20 @@ public class ServiceBuilder {
 			newLocalizedColumnElement.addAttribute("type", "long");
 		}
 
-		List<EntityColumn> pkList = entity.getPKList();
+		List<EntityColumn> pkEntityColumns = entity.getPKEntityColumns();
 
-		if (pkList.size() > 1) {
+		if (pkEntityColumns.size() > 1) {
 			throw new IllegalArgumentException(
 				"Unable to use localized entity with compound primary key");
 		}
 
-		EntityColumn pkColumn = pkList.get(0);
+		EntityColumn pkEntityColumn = pkEntityColumns.get(0);
 
 		newLocalizedColumnElement = newLocalizedEntityElement.addElement(
 			"column");
 
-		newLocalizedColumnElement.addAttribute("name", pkColumn.getName());
-		newLocalizedColumnElement.addAttribute("type", pkColumn.getType());
+		newLocalizedColumnElement.addAttribute("name", pkEntityColumn.getName());
+		newLocalizedColumnElement.addAttribute("type", pkEntityColumn.getType());
 
 		newLocalizedColumnElement = newLocalizedEntityElement.addElement(
 			"column");
@@ -5736,7 +5734,7 @@ public class ServiceBuilder {
 					"columns");
 		}
 
-		List<EntityColumn> localizedColumns = new ArrayList<>(
+		List<EntityColumn> localizedEntityColumns = new ArrayList<>(
 			localizedColumnElements.size());
 
 		for (Element localizedColumnElement : localizedColumnElements) {
@@ -5753,7 +5751,7 @@ public class ServiceBuilder {
 				}
 			}
 
-			localizedColumns.add(new EntityColumn(columnName, columnDBName));
+			localizedEntityColumns.add(new EntityColumn(columnName, columnDBName));
 
 			newLocalizedColumnElement = newLocalizedEntityElement.addElement(
 				"column");
@@ -5769,7 +5767,7 @@ public class ServiceBuilder {
 			newLocalizedEntityElement.addElement("finder");
 
 		String finderName = TextFormatter.format(
-			pkColumn.getName(), TextFormatter.G);
+			pkEntityColumn.getName(), TextFormatter.G);
 
 		newLocalizedFinderElement.addAttribute("name", finderName);
 
@@ -5779,7 +5777,7 @@ public class ServiceBuilder {
 			newLocalizedFinderElement.addElement("finder-column");
 
 		newLocalizedFinderColumnElement.addAttribute(
-			"name", pkColumn.getName());
+			"name", pkEntityColumn.getName());
 
 		newLocalizedFinderElement = newLocalizedEntityElement.addElement(
 			"finder");
@@ -5796,7 +5794,7 @@ public class ServiceBuilder {
 			"finder-column");
 
 		newLocalizedFinderColumnElement.addAttribute(
-			"name", pkColumn.getName());
+			"name", pkEntityColumn.getName());
 
 		newLocalizedFinderColumnElement = newLocalizedFinderElement.addElement(
 			"finder-column");
@@ -5883,7 +5881,7 @@ public class ServiceBuilder {
 
 		Entity localizedEntity = _parseEntity(newLocalizedEntityElement);
 
-		entity.setLocalizedColumns(localizedColumns);
+		entity.setLocalizedEntityColumns(localizedEntityColumns);
 		entity.setLocalizedEntity(localizedEntity);
 	}
 
@@ -5955,9 +5953,9 @@ public class ServiceBuilder {
 	}
 
 	private void _removeEJBPK(Entity entity, String outputPath) {
-		List<EntityColumn> pkList = entity.getPKList();
+		List<EntityColumn> pkEntityColumns = entity.getPKEntityColumns();
 
-		if (pkList.size() <= 1) {
+		if (pkEntityColumns.size() <= 1) {
 			return;
 		}
 
