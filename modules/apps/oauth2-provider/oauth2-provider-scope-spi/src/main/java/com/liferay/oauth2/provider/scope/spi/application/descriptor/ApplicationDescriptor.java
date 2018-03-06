@@ -12,22 +12,28 @@
  * details.
  */
 
-package com.liferay.layout.admin.web.internal.constants;
+package com.liferay.oauth2.provider.scope.spi.application.descriptor;
+
+import aQute.bnd.annotation.ProviderType;
+
+import java.util.Locale;
 
 /**
- * @author Julio Camarero
+ * Represents the localization information for OAuth2 applications.
+ *
+ * @author Carlos Sierra Andrés
+ * @review
  */
-public class LayoutAdminWebKeys {
+@ProviderType
+public interface ApplicationDescriptor {
 
-	public static final String ASSET_DISPLAY_CONTRIBUTOR_TRACKER =
-		"ASSET_DISPLAY_CONTRIBUTOR_TRACKER";
-
-	public static final String ITEM_SELECTOR = "ITEM_SELECTOR";
-
-	public static final String LAYOUT_ADMIN_CONFIGURATION =
-		"LAYOUT_ADMIN_CONFIGURATION";
-
-	public static final String LAYOUT_PAGE_TEMPLATE_COLLECTION_SERVICE =
-		"LAYOUT_PAGE_TEMPLATE_COLLECTION_SERVICE";
+	/**
+	 * Localize an application for a given locale.
+	 *
+	 * @param locale the locale requested for the description.
+	 * @return a description for the applicationName in the requested locale.
+	 * @review
+	 */
+	public String describeApplication(Locale locale);
 
 }

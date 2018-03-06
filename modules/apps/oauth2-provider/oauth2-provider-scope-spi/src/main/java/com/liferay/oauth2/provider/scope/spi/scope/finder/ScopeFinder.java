@@ -12,22 +12,27 @@
  * details.
  */
 
-package com.liferay.layout.admin.web.internal.constants;
+package com.liferay.oauth2.provider.scope.spi.scope.finder;
+
+import aQute.bnd.annotation.ProviderType;
+
+import java.util.Collection;
 
 /**
- * @author Julio Camarero
+ * This class is the entry point to the OAuth2 Scopes framework. Applications
+ * can define a custom ScopeFinder to expose supported scopes.
+ *
+ * @author Carlos Sierra Andrés
+ * @review
  */
-public class LayoutAdminWebKeys {
+@ProviderType
+public interface ScopeFinder {
 
-	public static final String ASSET_DISPLAY_CONTRIBUTOR_TRACKER =
-		"ASSET_DISPLAY_CONTRIBUTOR_TRACKER";
-
-	public static final String ITEM_SELECTOR = "ITEM_SELECTOR";
-
-	public static final String LAYOUT_ADMIN_CONFIGURATION =
-		"LAYOUT_ADMIN_CONFIGURATION";
-
-	public static final String LAYOUT_PAGE_TEMPLATE_COLLECTION_SERVICE =
-		"LAYOUT_PAGE_TEMPLATE_COLLECTION_SERVICE";
+	/**
+	 * Returns the list of scopes, internal to the application.
+	 * @return a collection of the available scopes.
+	 * @review
+	 */
+	public Collection<String> findScopes();
 
 }

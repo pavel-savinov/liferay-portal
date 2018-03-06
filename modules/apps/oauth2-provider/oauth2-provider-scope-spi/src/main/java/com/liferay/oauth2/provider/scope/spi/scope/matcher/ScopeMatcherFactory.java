@@ -12,22 +12,26 @@
  * details.
  */
 
-package com.liferay.layout.admin.web.internal.constants;
+package com.liferay.oauth2.provider.scope.spi.scope.matcher;
+
+import aQute.bnd.annotation.ProviderType;
 
 /**
- * @author Julio Camarero
+ * Factory that creates {@link ScopeMatcher} for a given input.
+ * This allow for components to switch matching strategies using configuration.
+ *
+ * @author Carlos Sierra Andrés
+ * @review
  */
-public class LayoutAdminWebKeys {
+@ProviderType
+public interface ScopeMatcherFactory {
 
-	public static final String ASSET_DISPLAY_CONTRIBUTOR_TRACKER =
-		"ASSET_DISPLAY_CONTRIBUTOR_TRACKER";
-
-	public static final String ITEM_SELECTOR = "ITEM_SELECTOR";
-
-	public static final String LAYOUT_ADMIN_CONFIGURATION =
-		"LAYOUT_ADMIN_CONFIGURATION";
-
-	public static final String LAYOUT_PAGE_TEMPLATE_COLLECTION_SERVICE =
-		"LAYOUT_PAGE_TEMPLATE_COLLECTION_SERVICE";
+	/**
+	 * Creates a {@link ScopeMatcher} for the given input.
+	 * @param input the input the matcher will match against.
+	 * @return the ScopeMatcher that will match against the input.
+	 * @review
+	 */
+	public ScopeMatcher create(String input);
 
 }
