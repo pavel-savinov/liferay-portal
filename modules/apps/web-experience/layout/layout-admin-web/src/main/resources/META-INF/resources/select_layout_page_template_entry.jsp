@@ -32,13 +32,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
 
 <aui:form cssClass="container-fluid-1280" name="fm">
 	<c:choose>
-		<c:when test="<%= selectLayoutPageTemplateEntryDisplayContext.isBasicPages() %>">
-			<liferay-util:include page="/select_basic_pages.jsp" servletContext="<%= application %>" />
-		</c:when>
-		<c:when test="<%= selectLayoutPageTemplateEntryDisplayContext.isGlobalTemplates() %>">
-			<liferay-util:include page="/select_global_templates.jsp" servletContext="<%= application %>" />
-		</c:when>
-		<c:otherwise>
+		<c:when test="<%= selectLayoutPageTemplateEntryDisplayContext.isContentPages() %>">
 			<liferay-ui:search-container
 				id="layoutPageTemplateEntries"
 				total="<%= selectLayoutPageTemplateEntryDisplayContext.getLayoutPageTemplateEntriesCount() %>"
@@ -123,6 +117,12 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
 
 				Liferay.on('destroyPortlet', handleDestroyPortlet);
 			</aui:script>
+		</c:when>
+		<c:when test="<%= selectLayoutPageTemplateEntryDisplayContext.isBasicPages() %>">
+			<liferay-util:include page="/select_basic_pages.jsp" servletContext="<%= application %>" />
+		</c:when>
+		<c:otherwise>
+			<liferay-util:include page="/select_global_templates.jsp" servletContext="<%= application %>" />
 		</c:otherwise>
 	</c:choose>
 </aui:form>
