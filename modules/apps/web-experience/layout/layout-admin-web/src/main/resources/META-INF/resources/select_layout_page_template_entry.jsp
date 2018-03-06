@@ -26,7 +26,6 @@ renderResponse.setTitle(LanguageUtil.get(request, "select-template"));
 %>
 
 <clay:navigation-bar
-	inverted="<%= true %>"
 	items="<%= selectLayoutPageTemplateEntryDisplayContext.getNavigationItems() %>"
 />
 
