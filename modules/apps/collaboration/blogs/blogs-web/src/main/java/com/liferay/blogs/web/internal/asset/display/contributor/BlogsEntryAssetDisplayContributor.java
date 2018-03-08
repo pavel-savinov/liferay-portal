@@ -21,8 +21,10 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.AggregateResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleLoaderUtil;
+import com.liferay.portal.kernel.util.StringPool;
 
 import java.util.Locale;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 import org.osgi.service.component.annotations.Component;
@@ -33,7 +35,8 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(immediate = true, service = AssetDisplayContributor.class)
 public class BlogsEntryAssetDisplayContributor
-	extends BaseAssetDisplayContributor implements AssetDisplayContributor {
+	extends BaseAssetDisplayContributor<BlogsEntry>
+	implements AssetDisplayContributor {
 
 	@Override
 	public String getClassName() {
@@ -52,7 +55,22 @@ public class BlogsEntryAssetDisplayContributor
 
 	@Override
 	protected String[] getAssetEntryModelFields() {
-		return new String[] {"title", "subtitle", "content"};
+		return new String[] {"subtitle", "content"};
+	}
+
+	@Override
+	protected Object getFieldValue(
+		BlogsEntry blogsEntry, String field, Locale locale) {
+
+		if (Objects.equals(field, "content")) {
+			return blogsEntry.getContent();
+		}
+
+		if (Objects.equals(field, "subtitle")) {
+			return blogsEntry.getSubtitle();
+		}
+
+		return StringPool.BLANK;
 	}
 
 	@Reference(
