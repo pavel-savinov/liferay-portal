@@ -301,7 +301,7 @@
 					defaultLanguageId: defaultLanguageId,
 
 					<c:if test='<%= type.equals("editor") %>'>
-						editor: window['<portlet:namespace /><%= HtmlUtil.escapeJS(fieldName) %>'],
+						editor: window['<portlet:namespace /><%= HtmlUtil.escapeJS(fieldName) + "Editor" %>'],
 					</c:if>
 
 					fieldPrefix: '<%= fieldPrefix %>',
