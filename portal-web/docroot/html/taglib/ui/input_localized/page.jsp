@@ -211,7 +211,7 @@
 	</c:if>
 </div>
 
-<div class="form-text"><%= HtmlUtil.escape(mainLanguageValue) %></div>
+<div class="form-text"><%= HtmlUtil.escape(helpMessage) %></div>
 
 <c:if test="<%= Validator.isNotNull(maxLength) %>">
 	<aui:script use="aui-char-counter">
@@ -306,6 +306,7 @@
 
 					fieldPrefix: '<%= fieldPrefix %>',
 					fieldPrefixSeparator: '<%= fieldPrefixSeparator %>',
+					helpMessage: '<%= HtmlUtil.escapeJS(helpMessage) %>',
 					id: '<%= id %>',
 					inputPlaceholder: placeholder,
 					inputBox: '#<portlet:namespace /><%= id %>BoundingBox',
