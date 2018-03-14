@@ -485,12 +485,12 @@ AUI.add(
 					_updateTrigger: function(languageId) {
 						var instance = this;
 
-						languageId = languageId.replace('_', '-').toLowerCase();
+						languageId = languageId.replace('_', '-');
 
 						var triggerContent = A.Lang.sub(
 							instance.TRIGGER_TEMPLATE,
 							{
-								flag: Liferay.Util.getLexiconIconTpl(languageId),
+								flag: Liferay.Util.getLexiconIconTpl(languageId.toLowerCase()),
 								languageId: languageId,
 							}
 						);
