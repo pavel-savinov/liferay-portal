@@ -18,15 +18,20 @@ import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.fragment.util.FragmentEntryRenderUtil;
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
+import com.liferay.layout.admin.web.internal.util.LayoutPageTemplateFragmentProcessorUtil;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -59,10 +64,18 @@ public class RenderFragmentEntryMVCActionCommand extends BaseMVCActionCommand {
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 		if (fragmentEntryLink != null) {
+			HttpServletRequest request = _portal.getHttpServletRequest(
+				actionRequest);
+			HttpServletResponse response = _portal.getHttpServletResponse(
+				actionResponse);
+
+			String content = FragmentEntryRenderUtil.renderFragmentEntryLink(
+				fragmentEntryLink);
+
 			jsonObject.put(
 				"content",
-				FragmentEntryRenderUtil.renderFragmentEntryLink(
-					fragmentEntryLink));
+				LayoutPageTemplateFragmentProcessorUtil.
+					processFragmentEntryContent(content, request, response));
 		}
 
 		JSONPortletResponseUtil.writeJSON(
@@ -71,5 +84,8 @@ public class RenderFragmentEntryMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
+
+	@Reference
+	private Portal _portal;
 
 }

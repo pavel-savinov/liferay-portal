@@ -21,6 +21,7 @@ import com.liferay.fragment.service.FragmentCollectionServiceUtil;
 import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
 import com.liferay.fragment.service.FragmentEntryServiceUtil;
 import com.liferay.fragment.util.FragmentEntryRenderUtil;
+import com.liferay.layout.admin.web.internal.util.LayoutPageTemplateFragmentProcessorUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -38,6 +39,7 @@ import javax.portlet.PortletURL;
 import javax.portlet.RenderResponse;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Jürgen Kappler
@@ -163,6 +165,9 @@ public class FragmentsEditorContext {
 
 		List<SoyContext> soyContexts = new ArrayList<>();
 
+		HttpServletResponse response = PortalUtil.getHttpServletResponse(
+			_renderResponse);
+
 		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
@@ -177,10 +182,14 @@ public class FragmentsEditorContext {
 
 			SoyContext soyContext = new SoyContext();
 
+			String content = FragmentEntryRenderUtil.renderFragmentEntryLink(
+				fragmentEntryLink);
+
 			soyContext.putHTML(
 				"content",
-				FragmentEntryRenderUtil.renderFragmentEntryLink(
-					fragmentEntryLink));
+				LayoutPageTemplateFragmentProcessorUtil.
+					processFragmentEntryContent(content, _request, response));
+
 			soyContext.put(
 				"editableValues",
 				JSONFactoryUtil.createJSONObject(
