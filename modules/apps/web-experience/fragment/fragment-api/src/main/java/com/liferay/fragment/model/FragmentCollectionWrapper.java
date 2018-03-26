@@ -18,6 +18,8 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
 
+import com.liferay.exportimport.kernel.lar.StagedModelType;
+
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -58,6 +60,7 @@ public class FragmentCollectionWrapper implements FragmentCollection,
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("uuid", getUuid());
 		attributes.put("fragmentCollectionId", getFragmentCollectionId());
 		attributes.put("groupId", getGroupId());
 		attributes.put("companyId", getCompanyId());
@@ -74,6 +77,12 @@ public class FragmentCollectionWrapper implements FragmentCollection,
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
 		Long fragmentCollectionId = (Long)attributes.get("fragmentCollectionId");
 
 		if (fragmentCollectionId != null) {
@@ -276,6 +285,16 @@ public class FragmentCollectionWrapper implements FragmentCollection,
 		return _fragmentCollection.getUserUuid();
 	}
 
+	/**
+	* Returns the uuid of this fragment collection.
+	*
+	* @return the uuid of this fragment collection
+	*/
+	@Override
+	public java.lang.String getUuid() {
+		return _fragmentCollection.getUuid();
+	}
+
 	@Override
 	public int hashCode() {
 		return _fragmentCollection.hashCode();
@@ -459,6 +478,16 @@ public class FragmentCollectionWrapper implements FragmentCollection,
 		_fragmentCollection.setUserUuid(userUuid);
 	}
 
+	/**
+	* Sets the uuid of this fragment collection.
+	*
+	* @param uuid the uuid of this fragment collection
+	*/
+	@Override
+	public void setUuid(java.lang.String uuid) {
+		_fragmentCollection.setUuid(uuid);
+	}
+
 	@Override
 	public com.liferay.portal.kernel.model.CacheModel<FragmentCollection> toCacheModel() {
 		return _fragmentCollection.toCacheModel();
@@ -502,6 +531,11 @@ public class FragmentCollectionWrapper implements FragmentCollection,
 		}
 
 		return false;
+	}
+
+	@Override
+	public StagedModelType getStagedModelType() {
+		return _fragmentCollection.getStagedModelType();
 	}
 
 	@Override

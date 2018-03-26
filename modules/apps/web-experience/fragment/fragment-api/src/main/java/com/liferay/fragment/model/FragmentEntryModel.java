@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.GroupedModel;
 import com.liferay.portal.kernel.model.ShardedModel;
+import com.liferay.portal.kernel.model.StagedAuditedModel;
 import com.liferay.portal.kernel.model.WorkflowedModel;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -45,7 +46,7 @@ import java.util.Date;
  */
 @ProviderType
 public interface FragmentEntryModel extends BaseModel<FragmentEntry>,
-	GroupedModel, ShardedModel, WorkflowedModel {
+	GroupedModel, ShardedModel, StagedAuditedModel, WorkflowedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -65,6 +66,23 @@ public interface FragmentEntryModel extends BaseModel<FragmentEntry>,
 	 * @param primaryKey the primary key of this fragment entry
 	 */
 	public void setPrimaryKey(long primaryKey);
+
+	/**
+	 * Returns the uuid of this fragment entry.
+	 *
+	 * @return the uuid of this fragment entry
+	 */
+	@AutoEscape
+	@Override
+	public String getUuid();
+
+	/**
+	 * Sets the uuid of this fragment entry.
+	 *
+	 * @param uuid the uuid of this fragment entry
+	 */
+	@Override
+	public void setUuid(String uuid);
 
 	/**
 	 * Returns the fragment entry ID of this fragment entry.

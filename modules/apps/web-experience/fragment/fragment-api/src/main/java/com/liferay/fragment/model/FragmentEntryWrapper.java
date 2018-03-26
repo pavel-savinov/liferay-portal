@@ -18,6 +18,8 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
 
+import com.liferay.exportimport.kernel.lar.StagedModelType;
+
 import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.service.ServiceContext;
 
@@ -58,6 +60,7 @@ public class FragmentEntryWrapper implements FragmentEntry,
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("uuid", getUuid());
 		attributes.put("fragmentEntryId", getFragmentEntryId());
 		attributes.put("groupId", getGroupId());
 		attributes.put("companyId", getCompanyId());
@@ -82,6 +85,12 @@ public class FragmentEntryWrapper implements FragmentEntry,
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
 		Long fragmentEntryId = (Long)attributes.get("fragmentEntryId");
 
 		if (fragmentEntryId != null) {
@@ -430,6 +439,16 @@ public class FragmentEntryWrapper implements FragmentEntry,
 	@Override
 	public java.lang.String getUserUuid() {
 		return _fragmentEntry.getUserUuid();
+	}
+
+	/**
+	* Returns the uuid of this fragment entry.
+	*
+	* @return the uuid of this fragment entry
+	*/
+	@Override
+	public java.lang.String getUuid() {
+		return _fragmentEntry.getUuid();
 	}
 
 	@Override
@@ -785,6 +804,16 @@ public class FragmentEntryWrapper implements FragmentEntry,
 		_fragmentEntry.setUserUuid(userUuid);
 	}
 
+	/**
+	* Sets the uuid of this fragment entry.
+	*
+	* @param uuid the uuid of this fragment entry
+	*/
+	@Override
+	public void setUuid(java.lang.String uuid) {
+		_fragmentEntry.setUuid(uuid);
+	}
+
 	@Override
 	public com.liferay.portal.kernel.model.CacheModel<FragmentEntry> toCacheModel() {
 		return _fragmentEntry.toCacheModel();
@@ -827,6 +856,11 @@ public class FragmentEntryWrapper implements FragmentEntry,
 		}
 
 		return false;
+	}
+
+	@Override
+	public StagedModelType getStagedModelType() {
+		return _fragmentEntry.getStagedModelType();
 	}
 
 	@Override

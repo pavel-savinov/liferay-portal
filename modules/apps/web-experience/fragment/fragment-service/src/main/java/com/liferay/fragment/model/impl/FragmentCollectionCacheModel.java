@@ -65,9 +65,11 @@ public class FragmentCollectionCacheModel implements CacheModel<FragmentCollecti
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(21);
+		StringBundler sb = new StringBundler(23);
 
-		sb.append("{fragmentCollectionId=");
+		sb.append("{uuid=");
+		sb.append(uuid);
+		sb.append(", fragmentCollectionId=");
 		sb.append(fragmentCollectionId);
 		sb.append(", groupId=");
 		sb.append(groupId);
@@ -95,6 +97,13 @@ public class FragmentCollectionCacheModel implements CacheModel<FragmentCollecti
 	@Override
 	public FragmentCollection toEntityModel() {
 		FragmentCollectionImpl fragmentCollectionImpl = new FragmentCollectionImpl();
+
+		if (uuid == null) {
+			fragmentCollectionImpl.setUuid("");
+		}
+		else {
+			fragmentCollectionImpl.setUuid(uuid);
+		}
 
 		fragmentCollectionImpl.setFragmentCollectionId(fragmentCollectionId);
 		fragmentCollectionImpl.setGroupId(groupId);
@@ -150,6 +159,8 @@ public class FragmentCollectionCacheModel implements CacheModel<FragmentCollecti
 
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
+		uuid = objectInput.readUTF();
+
 		fragmentCollectionId = objectInput.readLong();
 
 		groupId = objectInput.readLong();
@@ -168,6 +179,13 @@ public class FragmentCollectionCacheModel implements CacheModel<FragmentCollecti
 	@Override
 	public void writeExternal(ObjectOutput objectOutput)
 		throws IOException {
+		if (uuid == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(uuid);
+		}
+
 		objectOutput.writeLong(fragmentCollectionId);
 
 		objectOutput.writeLong(groupId);
@@ -208,6 +226,7 @@ public class FragmentCollectionCacheModel implements CacheModel<FragmentCollecti
 		}
 	}
 
+	public String uuid;
 	public long fragmentCollectionId;
 	public long groupId;
 	public long companyId;
