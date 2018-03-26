@@ -14,10 +14,6 @@
 
 package com.liferay.fragment.internal.exportimport.data.handler;
 
-import com.liferay.bookmarks.constants.BookmarksConstants;
-import com.liferay.bookmarks.constants.BookmarksPortletKeys;
-import com.liferay.bookmarks.model.BookmarksEntry;
-import com.liferay.bookmarks.model.BookmarksFolder;
 import com.liferay.exportimport.kernel.lar.BasePortletDataHandler;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
@@ -26,36 +22,34 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.exportimport.portlet.data.handler.helper.PortletDataHandlerHelper;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
+import com.liferay.fragment.constants.FragmentConstants;
+import com.liferay.fragment.constants.FragmentPortletKeys;
+import com.liferay.fragment.model.FragmentCollection;
+import com.liferay.fragment.model.FragmentEntry;
+import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
-import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.xml.Element;
+
+import java.util.List;
+
+import javax.portlet.PortletPreferences;
+
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import javax.portlet.PortletPreferences;
-import java.util.List;
-
 /**
- * @author Jorge Ferrer
- * @author Bruno Farache
- * @author Raymond Augé
- * @author Juan Fernández
- * @author Mate Thurzo
- * @author Daniel Kocsis
+ * @author Pavel Savinov
  */
 @Component(
 	immediate = true,
-	property = {
-		"javax.portlet.name=" + BookmarksPortletKeys.BOOKMARKS,
-		"javax.portlet.name=" + BookmarksPortletKeys.BOOKMARKS_ADMIN
-	},
+	property = {"javax.portlet.name=" + FragmentPortletKeys.FRAGMENT},
 	service = PortletDataHandler.class
 )
 public class FragmentPortletDataHandler extends BasePortletDataHandler {
 
-	public static final String NAMESPACE = "bookmarks";
+	public static final String NAMESPACE = "fragments";
 
 	public static final String SCHEMA_VERSION = "1.0.0";
 
@@ -66,7 +60,7 @@ public class FragmentPortletDataHandler extends BasePortletDataHandler {
 
 	@Override
 	public String getServiceName() {
-		return BookmarksConstants.SERVICE_NAME;
+		return FragmentConstants.SERVICE_NAME;
 	}
 
 	@Override
@@ -77,14 +71,14 @@ public class FragmentPortletDataHandler extends BasePortletDataHandler {
 
 	@Activate
 	protected void activate() {
-		setDataPortletPreferences("rootFolderId");
 		setDeletionSystemEventStagedModelTypes(
-			new StagedModelType(BookmarksEntry.class),
-			new StagedModelType(BookmarksFolder.class));
+			new StagedModelType(FragmentCollection.class),
+			new StagedModelType(FragmentEntry.class),
+			new StagedModelType(FragmentEntryLink.class));
 		setExportControls(
 			new PortletDataHandlerBoolean(
 				NAMESPACE, "entries", true, false, null,
-				BookmarksEntry.class.getName()));
+				FragmentEntry.class.getName()));
 		setImportControls(getExportControls());
 	}
 
@@ -95,14 +89,14 @@ public class FragmentPortletDataHandler extends BasePortletDataHandler {
 		throws Exception {
 
 		if (portletDataContext.addPrimaryKey(
-				BookmarksPortletDataHandler.class, "deleteData")) {
+				FragmentPortletDataHandler.class, "deleteData")) {
 
 			return portletPreferences;
 		}
 
-		_bookmarksEntryStagedModelRepository.deleteStagedModels(
+		_fragmentEntryStagedModelRepository.deleteStagedModels(
 			portletDataContext);
-		_bookmarksFolderStagedModelRepository.deleteStagedModels(
+		_fragmentCollectionStagedModelRepository.deleteStagedModels(
 			portletDataContext);
 
 		return portletPreferences;
@@ -121,22 +115,22 @@ public class FragmentPortletDataHandler extends BasePortletDataHandler {
 		}
 
 		portletDataContext.addPortletPermissions(
-			BookmarksConstants.RESOURCE_NAME);
+			FragmentConstants.RESOURCE_NAME);
 
 		rootElement.addAttribute(
 			"group-id", String.valueOf(portletDataContext.getScopeGroupId()));
 
-		ExportActionableDynamicQuery folderActionableDynamicQuery =
-			_bookmarksFolderStagedModelRepository.
+		ActionableDynamicQuery fragmentCollectionExportActionableDynamicQuery =
+			_fragmentCollectionStagedModelRepository.
 				getExportActionableDynamicQuery(portletDataContext);
 
-		folderActionableDynamicQuery.performActions();
+		fragmentCollectionExportActionableDynamicQuery.performActions();
 
-		ActionableDynamicQuery entryActionableDynamicQuery =
-			_bookmarksEntryStagedModelRepository.
-				getExportActionableDynamicQuery(portletDataContext);
+		ActionableDynamicQuery fragmentEntryActionableDynamicQuery =
+			_fragmentEntryStagedModelRepository.getExportActionableDynamicQuery(
+				portletDataContext);
 
-		entryActionableDynamicQuery.performActions();
+		fragmentEntryActionableDynamicQuery.performActions();
 
 		return getExportDataRootElementString(rootElement);
 	}
@@ -152,26 +146,40 @@ public class FragmentPortletDataHandler extends BasePortletDataHandler {
 		}
 
 		portletDataContext.importPortletPermissions(
-			BookmarksConstants.RESOURCE_NAME);
+			FragmentConstants.RESOURCE_NAME);
 
-		Element foldersElement = portletDataContext.getImportDataGroupElement(
-			BookmarksFolder.class);
+		Element fragmentCollectionsElement =
+			portletDataContext.getImportDataGroupElement(
+				FragmentCollection.class);
 
-		List<Element> folderElements = foldersElement.elements();
+		List<Element> fragmentCollectionElements =
+			fragmentCollectionsElement.elements();
 
-		for (Element folderElement : folderElements) {
+		for (Element fragmentCollectionElement : fragmentCollectionElements) {
 			StagedModelDataHandlerUtil.importStagedModel(
-				portletDataContext, folderElement);
+				portletDataContext, fragmentCollectionElement);
 		}
 
-		Element entriesElement = portletDataContext.getImportDataGroupElement(
-			BookmarksEntry.class);
+		Element fragmentEntriesElement =
+			portletDataContext.getImportDataGroupElement(FragmentEntry.class);
 
-		List<Element> entryElements = entriesElement.elements();
+		List<Element> fragmentEntryElements = fragmentEntriesElement.elements();
 
-		for (Element entryElement : entryElements) {
+		for (Element fragmentEntryElement : fragmentEntryElements) {
 			StagedModelDataHandlerUtil.importStagedModel(
-				portletDataContext, entryElement);
+				portletDataContext, fragmentEntryElement);
+		}
+
+		Element fragmentEntryLinksElement =
+			portletDataContext.getImportDataGroupElement(
+				FragmentEntryLink.class);
+
+		List<Element> fragmentEntryLinkElements =
+			fragmentEntryLinksElement.elements();
+
+		for (Element fragmentEntryLinkElement : fragmentEntryLinkElements) {
+			StagedModelDataHandlerUtil.importStagedModel(
+				portletDataContext, fragmentEntryLinkElement);
 		}
 
 		return null;
@@ -183,41 +191,17 @@ public class FragmentPortletDataHandler extends BasePortletDataHandler {
 			PortletPreferences portletPreferences)
 		throws Exception {
 
-		ActionableDynamicQuery entryExportActionableDynamicQuery =
-			_bookmarksEntryStagedModelRepository.
+		ActionableDynamicQuery fragmentCollectionExportActionableDynamicQuery =
+			_fragmentCollectionStagedModelRepository.
 				getExportActionableDynamicQuery(portletDataContext);
 
-		entryExportActionableDynamicQuery.performCount();
+		fragmentCollectionExportActionableDynamicQuery.performCount();
 
-		ActionableDynamicQuery folderExportActionableDynamicQuery =
-			_bookmarksFolderStagedModelRepository.
-				getExportActionableDynamicQuery(portletDataContext);
+		ActionableDynamicQuery fragmentEntryExportActionableDynamicQuery =
+			_fragmentEntryStagedModelRepository.getExportActionableDynamicQuery(
+				portletDataContext);
 
-		folderExportActionableDynamicQuery.performCount();
-	}
-
-	@Reference(
-		target = "(model.class.name=com.liferay.bookmarks.model.BookmarksEntry)",
-		unbind = "-"
-	)
-	protected void setBookmarksEntryStagedModelRepository(
-		StagedModelRepository<BookmarksEntry>
-			bookmarksEntryStagedModelRepository) {
-
-		_bookmarksEntryStagedModelRepository =
-			bookmarksEntryStagedModelRepository;
-	}
-
-	@Reference(
-		target = "(model.class.name=com.liferay.bookmarks.model.BookmarksFolder)",
-		unbind = "-"
-	)
-	protected void setBookmarksFolderStagedModelRepository(
-		StagedModelRepository<BookmarksFolder>
-			bookmarksFolderStagedModelRepository) {
-
-		_bookmarksFolderStagedModelRepository =
-			bookmarksFolderStagedModelRepository;
+		fragmentEntryExportActionableDynamicQuery.performCount();
 	}
 
 	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
@@ -225,10 +209,26 @@ public class FragmentPortletDataHandler extends BasePortletDataHandler {
 		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
-	private StagedModelRepository<BookmarksEntry>
-		_bookmarksEntryStagedModelRepository;
-	private StagedModelRepository<BookmarksFolder>
-		_bookmarksFolderStagedModelRepository;
+	@Reference(
+		target = "(model.class.name=com.liferay.fragment.model.FragmentCollection)",
+		unbind = "-"
+	)
+	private StagedModelRepository<FragmentCollection>
+		_fragmentCollectionStagedModelRepository;
+
+	@Reference(
+		target = "(model.class.name=com.liferay.fragment.model.FragmentEntryLink)",
+		unbind = "-"
+	)
+	private StagedModelRepository<FragmentEntryLink>
+		_fragmentEntryLinkStagedModelRepository;
+
+	@Reference(
+		target = "(model.class.name=com.liferay.fragment.model.FragmentEntry)",
+		unbind = "-"
+	)
+	private StagedModelRepository<FragmentEntry>
+		_fragmentEntryStagedModelRepository;
 
 	@Reference
 	private PortletDataHandlerHelper _portletDataHandlerHelper;
