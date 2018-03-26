@@ -189,6 +189,16 @@ public class FragmentEntryLocalServiceImpl
 	}
 
 	@Override
+	public void deleteFragmentEntries(long groupId) throws PortalException {
+		List<FragmentEntry> fragmentEntries =
+			fragmentEntryPersistence.findByGroupId(groupId);
+
+		for (FragmentEntry fragmentEntry : fragmentEntries) {
+			deleteFragmentEntry(fragmentEntry);
+		}
+	}
+
+	@Override
 	public FragmentEntry deleteFragmentEntry(FragmentEntry fragmentEntry)
 		throws PortalException {
 
