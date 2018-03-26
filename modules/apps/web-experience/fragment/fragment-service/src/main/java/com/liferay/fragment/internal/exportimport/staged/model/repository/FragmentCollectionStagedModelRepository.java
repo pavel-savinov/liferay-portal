@@ -14,64 +14,61 @@
 
 package com.liferay.fragment.internal.exportimport.staged.model.repository;
 
-import com.liferay.bookmarks.model.BookmarksFolder;
-import com.liferay.bookmarks.service.BookmarksEntryLocalService;
-import com.liferay.bookmarks.service.BookmarksFolderLocalService;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
-import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.StagedModelModifiedDateComparator;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepositoryHelper;
+import com.liferay.fragment.model.FragmentCollection;
+import com.liferay.fragment.service.FragmentCollectionLocalService;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.trash.TrashHandler;
-import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 import java.util.List;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
- * @author Daniel Kocsis
- * @author Mate Thurzo
+ * @author Pavel Savinov
  */
 @Component(
 	immediate = true,
-	property = {"model.class.name=com.liferay.bookmarks.model.BookmarksFolder"},
+	property = {"model.class.name=com.liferay.fragment.model.FragmentCollection"},
 	service = StagedModelRepository.class
 )
 public class FragmentCollectionStagedModelRepository
-	implements StagedModelRepository<BookmarksFolder> {
+	implements StagedModelRepository<FragmentCollection> {
 
 	@Override
-	public BookmarksFolder addStagedModel(
+	public FragmentCollection addStagedModel(
 			PortletDataContext portletDataContext,
-			BookmarksFolder bookmarksFolder)
+			FragmentCollection fragmentCollection)
 		throws PortalException {
 
 		long userId = portletDataContext.getUserId(
-			bookmarksFolder.getUserUuid());
+			fragmentCollection.getUserUuid());
 
 		ServiceContext serviceContext = portletDataContext.createServiceContext(
-			bookmarksFolder);
+			fragmentCollection);
 
 		if (portletDataContext.isDataStrategyMirror()) {
-			serviceContext.setUuid(bookmarksFolder.getUuid());
+			serviceContext.setUuid(fragmentCollection.getUuid());
 		}
 
-		return _bookmarksFolderLocalService.addFolder(
-			userId, bookmarksFolder.getParentFolderId(),
-			bookmarksFolder.getName(), bookmarksFolder.getDescription(),
+		return _fragmentCollectionLocalService.addFragmentCollection(
+			userId, serviceContext.getScopeGroupId(),
+			fragmentCollection.getName(), fragmentCollection.getDescription(),
 			serviceContext);
 	}
 
 	@Override
-	public void deleteStagedModel(BookmarksFolder bookmarksFolder)
+	public void deleteStagedModel(FragmentCollection fragmentCollection)
 		throws PortalException {
 
-		_bookmarksFolderLocalService.deleteFolder(bookmarksFolder);
+		_fragmentCollectionLocalService.deleteFragmentCollection(
+			fragmentCollection);
 	}
 
 	@Override
@@ -79,11 +76,11 @@ public class FragmentCollectionStagedModelRepository
 			String uuid, long groupId, String className, String extraData)
 		throws PortalException {
 
-		BookmarksFolder bookmarksFolder = fetchStagedModelByUuidAndGroupId(
-			uuid, groupId);
+		FragmentCollection fragmentCollection =
+			fetchStagedModelByUuidAndGroupId(uuid, groupId);
 
-		if (bookmarksFolder != null) {
-			deleteStagedModel(bookmarksFolder);
+		if (fragmentCollection != null) {
+			deleteStagedModel(fragmentCollection);
 		}
 	}
 
@@ -91,113 +88,64 @@ public class FragmentCollectionStagedModelRepository
 	public void deleteStagedModels(PortletDataContext portletDataContext)
 		throws PortalException {
 
-		_bookmarksFolderLocalService.deleteFolders(
+		_fragmentCollectionLocalService.deleteFragmentCollections(
 			portletDataContext.getScopeGroupId());
 	}
 
 	@Override
-	public BookmarksFolder fetchMissingReference(String uuid, long groupId) {
-		return
-			(BookmarksFolder)_stagedModelRepositoryHelper.fetchMissingReference(
-				uuid, groupId, this);
+	public FragmentCollection fetchMissingReference(String uuid, long groupId) {
+		return (FragmentCollection)_stagedModelRepositoryHelper.
+			fetchMissingReference(uuid, groupId, this);
 	}
 
 	@Override
-	public BookmarksFolder fetchStagedModelByUuidAndGroupId(
+	public FragmentCollection fetchStagedModelByUuidAndGroupId(
 		String uuid, long groupId) {
 
-		return _bookmarksFolderLocalService.
-			fetchBookmarksFolderByUuidAndGroupId(uuid, groupId);
+		return _fragmentCollectionLocalService.
+			fetchFragmentCollectionByUuidAndGroupId(uuid, groupId);
 	}
 
 	@Override
-	public List<BookmarksFolder> fetchStagedModelsByUuidAndCompanyId(
+	public List<FragmentCollection> fetchStagedModelsByUuidAndCompanyId(
 		String uuid, long companyId) {
 
-		return _bookmarksFolderLocalService.
-			getBookmarksFoldersByUuidAndCompanyId(
+		return _fragmentCollectionLocalService.
+			getFragmentCollectionsByUuidAndCompanyId(
 				uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-				new StagedModelModifiedDateComparator<BookmarksFolder>());
+				new StagedModelModifiedDateComparator<FragmentCollection>());
 	}
 
 	@Override
 	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
 		PortletDataContext portletDataContext) {
 
-		return _bookmarksFolderLocalService.getExportActionableDynamicQuery(
+		return _fragmentCollectionLocalService.getExportActionableDynamicQuery(
 			portletDataContext);
 	}
 
 	@Override
-	public void restoreStagedModel(
-			PortletDataContext portletDataContext,
-			BookmarksFolder bookmarksFolder)
-		throws PortletDataException {
+	public FragmentCollection saveStagedModel(
+			FragmentCollection fragmentCollection)
+		throws PortalException {
 
-		long userId = portletDataContext.getUserId(
-			bookmarksFolder.getUserUuid());
-
-		BookmarksFolder existingFolder = fetchStagedModelByUuidAndGroupId(
-			bookmarksFolder.getUuid(), portletDataContext.getScopeGroupId());
-
-		if ((existingFolder == null) ||
-			!_stagedModelRepositoryHelper.isStagedModelInTrash(
-				existingFolder)) {
-
-			return;
-		}
-
-		TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(
-			BookmarksFolder.class.getName());
-
-		try {
-			if (trashHandler.isRestorable(existingFolder.getFolderId())) {
-				trashHandler.restoreTrashEntry(
-					userId, existingFolder.getFolderId());
-			}
-		}
-		catch (PortalException pe) {
-			throw new PortletDataException(pe);
-		}
+		return _fragmentCollectionLocalService.updateFragmentCollection(
+			fragmentCollection);
 	}
 
 	@Override
-	public BookmarksFolder saveStagedModel(BookmarksFolder bookmarksFolder)
-		throws PortalException {
-
-		return _bookmarksFolderLocalService.updateBookmarksFolder(
-			bookmarksFolder);
-	}
-
-	@Override
-	public BookmarksFolder updateStagedModel(
+	public FragmentCollection updateStagedModel(
 			PortletDataContext portletDataContext,
-			BookmarksFolder bookmarksFolder)
+			FragmentCollection fragmentCollection)
 		throws PortalException {
 
-		long userId = portletDataContext.getUserId(
-			bookmarksFolder.getUserUuid());
-
-		ServiceContext serviceContext = portletDataContext.createServiceContext(
-			bookmarksFolder);
-
-		return _bookmarksFolderLocalService.updateFolder(
-			userId, bookmarksFolder.getFolderId(),
-			bookmarksFolder.getParentFolderId(), bookmarksFolder.getName(),
-			bookmarksFolder.getDescription(), serviceContext);
-	}
-
-	@Reference(unbind = "-")
-	protected void setBookmarksEntryLocalService(
-		BookmarksFolderLocalService bookmarksFolderLocalService) {
-
-		_bookmarksFolderLocalService = bookmarksFolderLocalService;
+		return _fragmentCollectionLocalService.updateFragmentCollection(
+			fragmentCollection.getFragmentCollectionId(),
+			fragmentCollection.getName(), fragmentCollection.getDescription());
 	}
 
 	@Reference
-	private BookmarksEntryLocalService _bookmarksEntryLocalService;
-
-	private BookmarksFolderLocalService _bookmarksFolderLocalService;
+	private FragmentCollectionLocalService _fragmentCollectionLocalService;
 
 	@Reference
 	private StagedModelRepositoryHelper _stagedModelRepositoryHelper;
