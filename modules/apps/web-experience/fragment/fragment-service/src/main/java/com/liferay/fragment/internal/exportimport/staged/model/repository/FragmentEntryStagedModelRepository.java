@@ -14,66 +14,61 @@
 
 package com.liferay.fragment.internal.exportimport.staged.model.repository;
 
-import com.liferay.bookmarks.model.BookmarksEntry;
-import com.liferay.bookmarks.model.BookmarksFolderConstants;
-import com.liferay.bookmarks.service.BookmarksEntryLocalService;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
-import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.StagedModelModifiedDateComparator;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepositoryHelper;
+import com.liferay.fragment.model.FragmentEntry;
+import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.trash.TrashHandler;
-import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 import java.util.List;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
- * @author Daniel Kocsis
- * @author Mate Thurzo
+ * @author Pavel Savinov
  */
 @Component(
 	immediate = true,
-	property = {"model.class.name=com.liferay.bookmarks.model.BookmarksEntry"},
+	property = {"model.class.name=com.liferay.fragment.model.FragmentEntry"},
 	service = StagedModelRepository.class
 )
 public class FragmentEntryStagedModelRepository
-	implements StagedModelRepository<BookmarksEntry> {
+	implements StagedModelRepository<FragmentEntry> {
 
 	@Override
-	public BookmarksEntry addStagedModel(
-			PortletDataContext portletDataContext,
-			BookmarksEntry bookmarksEntry)
+	public FragmentEntry addStagedModel(
+			PortletDataContext portletDataContext, FragmentEntry fragmentEntry)
 		throws PortalException {
 
-		long userId = portletDataContext.getUserId(
-			bookmarksEntry.getUserUuid());
+		long userId = portletDataContext.getUserId(fragmentEntry.getUserUuid());
 
 		ServiceContext serviceContext = portletDataContext.createServiceContext(
-			bookmarksEntry);
+			fragmentEntry);
 
 		if (portletDataContext.isDataStrategyMirror()) {
-			serviceContext.setUuid(bookmarksEntry.getUuid());
+			serviceContext.setUuid(fragmentEntry.getUuid());
 		}
 
-		return _bookmarksEntryLocalService.addEntry(
-			userId, bookmarksEntry.getGroupId(), bookmarksEntry.getFolderId(),
-			bookmarksEntry.getName(), bookmarksEntry.getUrl(),
-			bookmarksEntry.getDescription(), serviceContext);
+		return _fragmentEntryLocalService.addFragmentEntry(
+			userId, fragmentEntry.getGroupId(),
+			fragmentEntry.getFragmentCollectionId(), fragmentEntry.getName(),
+			fragmentEntry.getCss(), fragmentEntry.getHtml(),
+			fragmentEntry.getJs(), fragmentEntry.getStatus(), serviceContext);
 	}
 
 	@Override
-	public void deleteStagedModel(BookmarksEntry bookmarksEntry)
+	public void deleteStagedModel(FragmentEntry fragmentEntry)
 		throws PortalException {
 
-		_bookmarksEntryLocalService.deleteEntry(bookmarksEntry);
+		_fragmentEntryLocalService.deleteFragmentEntry(fragmentEntry);
 	}
 
 	@Override
@@ -81,11 +76,11 @@ public class FragmentEntryStagedModelRepository
 			String uuid, long groupId, String className, String extraData)
 		throws PortalException {
 
-		BookmarksEntry bookmarksEntry = fetchStagedModelByUuidAndGroupId(
+		FragmentEntry fragmentEntry = fetchStagedModelByUuidAndGroupId(
 			uuid, groupId);
 
-		if (bookmarksEntry != null) {
-			deleteStagedModel(bookmarksEntry);
+		if (fragmentEntry != null) {
+			deleteStagedModel(fragmentEntry);
 		}
 	}
 
@@ -93,117 +88,70 @@ public class FragmentEntryStagedModelRepository
 	public void deleteStagedModels(PortletDataContext portletDataContext)
 		throws PortalException {
 
-		_bookmarksEntryLocalService.deleteEntries(
-			portletDataContext.getScopeGroupId(),
-			BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+		_fragmentEntryLocalService.deleteFragmentEntries(
+			portletDataContext.getScopeGroupId());
 	}
 
 	@Override
-	public BookmarksEntry fetchMissingReference(String uuid, long groupId) {
+	public FragmentEntry fetchMissingReference(String uuid, long groupId) {
 		return
-			(BookmarksEntry)_stagedModelRepositoryHelper.fetchMissingReference(
+			(FragmentEntry)_stagedModelRepositoryHelper.fetchMissingReference(
 				uuid, groupId, this);
 	}
 
 	@Override
-	public BookmarksEntry fetchStagedModelByUuidAndGroupId(
+	public FragmentEntry fetchStagedModelByUuidAndGroupId(
 		String uuid, long groupId) {
 
-		return _bookmarksEntryLocalService.fetchBookmarksEntryByUuidAndGroupId(
+		return _fragmentEntryLocalService.fetchFragmentEntryByUuidAndGroupId(
 			uuid, groupId);
 	}
 
 	@Override
-	public List<BookmarksEntry> fetchStagedModelsByUuidAndCompanyId(
+	public List<FragmentEntry> fetchStagedModelsByUuidAndCompanyId(
 		String uuid, long companyId) {
 
-		return _bookmarksEntryLocalService.
-			getBookmarksEntriesByUuidAndCompanyId(
-				uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
-				new StagedModelModifiedDateComparator<BookmarksEntry>());
+		return _fragmentEntryLocalService.getFragmentEntriesByUuidAndCompanyId(
+			uuid, companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			new StagedModelModifiedDateComparator<FragmentEntry>());
 	}
 
 	@Override
 	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
 		PortletDataContext portletDataContext) {
 
-		return _bookmarksEntryLocalService.getExportActionableDynamicQuery(
+		return _fragmentEntryLocalService.getExportActionableDynamicQuery(
 			portletDataContext);
 	}
 
 	@Override
-	public void restoreStagedModel(
-			PortletDataContext portletDataContext,
-			BookmarksEntry bookmarksEntry)
-		throws PortletDataException {
+	public FragmentEntry saveStagedModel(FragmentEntry fragmentEntry)
+		throws PortalException {
 
-		long userId = portletDataContext.getUserId(
-			bookmarksEntry.getUserUuid());
-
-		BookmarksEntry existingBookmarksEntry =
-			fetchStagedModelByUuidAndGroupId(
-				bookmarksEntry.getUuid(), portletDataContext.getScopeGroupId());
-
-		if ((existingBookmarksEntry == null) ||
-			!_stagedModelRepositoryHelper.isStagedModelInTrash(
-				existingBookmarksEntry)) {
-
-			return;
-		}
-
-		TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(
-			BookmarksEntry.class.getName());
-
-		try {
-			if (trashHandler.isRestorable(
-					existingBookmarksEntry.getEntryId())) {
-
-				trashHandler.restoreTrashEntry(
-					userId, existingBookmarksEntry.getEntryId());
-			}
-		}
-		catch (PortalException pe) {
-			throw new PortletDataException(pe);
-		}
+		return _fragmentEntryLocalService.updateFragmentEntry(fragmentEntry);
 	}
 
 	@Override
-	public BookmarksEntry saveStagedModel(BookmarksEntry bookmarksEntry)
+	public FragmentEntry updateStagedModel(
+			PortletDataContext portletDataContext, FragmentEntry fragmentEntry)
 		throws PortalException {
 
-		return _bookmarksEntryLocalService.updateBookmarksEntry(bookmarksEntry);
-	}
-
-	@Override
-	public BookmarksEntry updateStagedModel(
-			PortletDataContext portletDataContext,
-			BookmarksEntry bookmarksEntry)
-		throws PortalException {
-
-		long userId = portletDataContext.getUserId(
-			bookmarksEntry.getUserUuid());
+		long userId = portletDataContext.getUserId(fragmentEntry.getUserUuid());
 
 		ServiceContext serviceContext = portletDataContext.createServiceContext(
-			bookmarksEntry);
+			fragmentEntry);
 
-		return _bookmarksEntryLocalService.updateEntry(
-			userId, bookmarksEntry.getEntryId(), bookmarksEntry.getGroupId(),
-			bookmarksEntry.getFolderId(), bookmarksEntry.getName(),
-			bookmarksEntry.getUrl(), bookmarksEntry.getDescription(),
-			serviceContext);
-	}
-
-	@Reference(unbind = "-")
-	protected void setBookmarksEntryLocalService(
-		BookmarksEntryLocalService bookmarksEntryLocalService) {
-
-		_bookmarksEntryLocalService = bookmarksEntryLocalService;
+		return _fragmentEntryLocalService.updateFragmentEntry(
+			userId, fragmentEntry.getFragmentEntryId(), fragmentEntry.getName(),
+			fragmentEntry.getCss(), fragmentEntry.getHtml(),
+			fragmentEntry.getJs(), fragmentEntry.getStatus(), serviceContext);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		BookmarksEntryStagedModelRepository.class);
+		FragmentEntryStagedModelRepository.class);
 
-	private BookmarksEntryLocalService _bookmarksEntryLocalService;
+	@Reference
+	private FragmentEntryLocalService _fragmentEntryLocalService;
 
 	@Reference
 	private StagedModelRepositoryHelper _stagedModelRepositoryHelper;

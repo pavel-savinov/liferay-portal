@@ -14,15 +14,15 @@
 
 package com.liferay.fragment.internal.exportimport.data.handler;
 
-import com.liferay.bookmarks.model.BookmarksEntry;
-import com.liferay.bookmarks.model.BookmarksFolder;
-import com.liferay.bookmarks.model.BookmarksFolderConstants;
 import com.liferay.exportimport.data.handler.base.BaseStagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
+import com.liferay.fragment.model.FragmentCollection;
+import com.liferay.fragment.model.FragmentEntry;
+import com.liferay.fragment.service.FragmentCollectionLocalService;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.xml.Element;
 
@@ -32,14 +32,13 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Mate Thurzo
- * @author Daniel Kocsis
+ * @author Pavel Savinov
  */
 @Component(immediate = true, service = StagedModelDataHandler.class)
 public class FragmentEntryStagedModelDataHandler
-	extends BaseStagedModelDataHandler<BookmarksEntry> {
+	extends BaseStagedModelDataHandler<FragmentEntry> {
 
-	public static final String[] CLASS_NAMES = {BookmarksEntry.class.getName()};
+	public static final String[] CLASS_NAMES = {FragmentEntry.class.getName()};
 
 	@Override
 	public String[] getClassNames() {
@@ -47,100 +46,105 @@ public class FragmentEntryStagedModelDataHandler
 	}
 
 	@Override
-	public String getDisplayName(BookmarksEntry entry) {
-		return entry.getName();
+	public String getDisplayName(FragmentEntry fragmentEntry) {
+		return fragmentEntry.getName();
 	}
 
 	@Override
 	protected void doExportStagedModel(
-			PortletDataContext portletDataContext, BookmarksEntry entry)
+			PortletDataContext portletDataContext, FragmentEntry fragmentEntry)
 		throws Exception {
 
-		if (entry.getFolderId() !=
-				BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+		FragmentCollection fragmentCollection =
+			_fragmentCollectionLocalService.fetchFragmentCollection(
+				fragmentEntry.getFragmentCollectionId());
 
-			StagedModelDataHandlerUtil.exportReferenceStagedModel(
-				portletDataContext, entry, entry.getFolder(),
-				PortletDataContext.REFERENCE_TYPE_PARENT);
-		}
+		StagedModelDataHandlerUtil.exportReferenceStagedModel(
+			portletDataContext, fragmentEntry, fragmentCollection,
+			PortletDataContext.REFERENCE_TYPE_PARENT);
 
-		Element entryElement = portletDataContext.getExportDataElement(entry);
+		Element entryElement = portletDataContext.getExportDataElement(
+			fragmentEntry);
 
 		portletDataContext.addClassedModel(
-			entryElement, ExportImportPathUtil.getModelPath(entry), entry);
+			entryElement, ExportImportPathUtil.getModelPath(fragmentEntry),
+			fragmentEntry);
 	}
 
 	@Override
 	protected void doImportMissingReference(
 			PortletDataContext portletDataContext, String uuid, long groupId,
-			long entryId)
+			long fragmentEntryId)
 		throws Exception {
 
-		BookmarksEntry existingEntry = fetchMissingReference(uuid, groupId);
+		FragmentEntry existingFragmentEntry = fetchMissingReference(
+			uuid, groupId);
 
-		if (existingEntry == null) {
+		if (existingFragmentEntry == null) {
 			return;
 		}
 
-		Map<Long, Long> entryIds =
+		Map<Long, Long> fragmentEntryIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
-				BookmarksEntry.class);
+				FragmentEntry.class);
 
-		entryIds.put(entryId, existingEntry.getEntryId());
+		fragmentEntryIds.put(
+			fragmentEntryId, existingFragmentEntry.getFragmentEntryId());
 	}
 
 	@Override
 	protected void doImportStagedModel(
-			PortletDataContext portletDataContext, BookmarksEntry entry)
+			PortletDataContext portletDataContext, FragmentEntry fragmentEntry)
 		throws Exception {
 
-		Map<Long, Long> folderIds =
+		Map<Long, Long> fragmentCollectionIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
-				BookmarksFolder.class);
+				FragmentCollection.class);
 
-		long folderId = MapUtil.getLong(
-			folderIds, entry.getFolderId(), entry.getFolderId());
+		long fragmentCollectionId = MapUtil.getLong(
+			fragmentCollectionIds, fragmentEntry.getFragmentCollectionId(),
+			fragmentEntry.getFragmentCollectionId());
 
-		BookmarksEntry importedEntry = (BookmarksEntry)entry.clone();
+		FragmentEntry importedFragmentEntry =
+			(FragmentEntry)fragmentEntry.clone();
 
-		importedEntry.setGroupId(portletDataContext.getScopeGroupId());
-		importedEntry.setFolderId(folderId);
+		importedFragmentEntry.setGroupId(portletDataContext.getScopeGroupId());
+		importedFragmentEntry.setFragmentCollectionId(fragmentCollectionId);
 
-		BookmarksEntry existingEntry =
+		FragmentEntry existingFragmentEntry =
 			_stagedModelRepository.fetchStagedModelByUuidAndGroupId(
-				entry.getUuid(), portletDataContext.getScopeGroupId());
+				fragmentEntry.getUuid(), portletDataContext.getScopeGroupId());
 
-		if ((existingEntry == null) ||
+		if ((existingFragmentEntry == null) ||
 			!portletDataContext.isDataStrategyMirror()) {
 
-			importedEntry = _stagedModelRepository.addStagedModel(
-				portletDataContext, importedEntry);
+			importedFragmentEntry = _stagedModelRepository.addStagedModel(
+				portletDataContext, importedFragmentEntry);
 		}
 		else {
-			importedEntry.setEntryId(existingEntry.getEntryId());
+			importedFragmentEntry.setFragmentEntryId(
+				existingFragmentEntry.getFragmentEntryId());
 
-			importedEntry = _stagedModelRepository.updateStagedModel(
-				portletDataContext, importedEntry);
+			importedFragmentEntry = _stagedModelRepository.updateStagedModel(
+				portletDataContext, importedFragmentEntry);
 		}
 
-		portletDataContext.importClassedModel(entry, importedEntry);
+		portletDataContext.importClassedModel(
+			fragmentEntry, importedFragmentEntry);
 	}
 
 	@Override
-	protected StagedModelRepository<BookmarksEntry> getStagedModelRepository() {
+	protected StagedModelRepository<FragmentEntry> getStagedModelRepository() {
 		return _stagedModelRepository;
 	}
 
+	@Reference
+	private FragmentCollectionLocalService _fragmentCollectionLocalService;
+
 	@Reference(
-		target = "(model.class.name=com.liferay.bookmarks.model.BookmarksEntry)",
+		target = "(model.class.name=com.liferay.fragment.model.FragmentEntry)",
 		unbind = "-"
 	)
-	protected void setStagedModelRepository(
-		StagedModelRepository<BookmarksEntry> stagedModelRepository) {
-
-		_stagedModelRepository = stagedModelRepository;
-	}
-
-	private StagedModelRepository<BookmarksEntry> _stagedModelRepository;
+	private StagedModelRepository<FragmentEntry> _stagedModelRepository;
 
 }
