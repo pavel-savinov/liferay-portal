@@ -14,20 +14,22 @@
 
 package com.liferay.fragment.internal.xstream.configurator;
 
-import com.liferay.bookmarks.model.impl.BookmarksEntryImpl;
-import com.liferay.bookmarks.model.impl.BookmarksFolderImpl;
 import com.liferay.exportimport.kernel.xstream.XStreamAlias;
 import com.liferay.exportimport.kernel.xstream.XStreamConverter;
 import com.liferay.exportimport.kernel.xstream.XStreamType;
+import com.liferay.fragment.model.impl.FragmentCollectionImpl;
+import com.liferay.fragment.model.impl.FragmentEntryImpl;
+import com.liferay.fragment.model.impl.FragmentEntryLinkImpl;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.xstream.configurator.XStreamConfigurator;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
 
 import java.util.List;
 
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+
 /**
- * @author Mate Thurzo
+ * @author Pavel Savinov
  */
 @Component(immediate = true, service = XStreamConfigurator.class)
 public class FragmentXStreamConfigurator implements XStreamConfigurator {
@@ -50,8 +52,10 @@ public class FragmentXStreamConfigurator implements XStreamConfigurator {
 	@Activate
 	protected void activate() {
 		_xStreamAliases = new XStreamAlias[] {
-			new XStreamAlias(BookmarksEntryImpl.class, "BookmarksEntry"),
-			new XStreamAlias(BookmarksFolderImpl.class, "BookmarksFolder")
+			new XStreamAlias(
+				FragmentCollectionImpl.class, "FragmentCollection"),
+			new XStreamAlias(FragmentEntryImpl.class, "FragmentEntry"),
+			new XStreamAlias(FragmentEntryLinkImpl.class, "FragmentEntryLink")
 		};
 	}
 
