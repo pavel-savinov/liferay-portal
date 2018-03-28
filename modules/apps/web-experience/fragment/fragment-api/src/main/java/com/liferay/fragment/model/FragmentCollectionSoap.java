@@ -34,6 +34,7 @@ public class FragmentCollectionSoap implements Serializable {
 	public static FragmentCollectionSoap toSoapModel(FragmentCollection model) {
 		FragmentCollectionSoap soapModel = new FragmentCollectionSoap();
 
+		soapModel.setUuid(model.getUuid());
 		soapModel.setFragmentCollectionId(model.getFragmentCollectionId());
 		soapModel.setGroupId(model.getGroupId());
 		soapModel.setCompanyId(model.getCompanyId());
@@ -97,6 +98,14 @@ public class FragmentCollectionSoap implements Serializable {
 
 	public void setPrimaryKey(long pk) {
 		setFragmentCollectionId(pk);
+	}
+
+	public String getUuid() {
+		return _uuid;
+	}
+
+	public void setUuid(String uuid) {
+		_uuid = uuid;
 	}
 
 	public long getFragmentCollectionId() {
@@ -179,6 +188,7 @@ public class FragmentCollectionSoap implements Serializable {
 		_description = description;
 	}
 
+	private String _uuid;
 	private long _fragmentCollectionId;
 	private long _groupId;
 	private long _companyId;

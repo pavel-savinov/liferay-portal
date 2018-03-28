@@ -34,6 +34,7 @@ public class FragmentEntrySoap implements Serializable {
 	public static FragmentEntrySoap toSoapModel(FragmentEntry model) {
 		FragmentEntrySoap soapModel = new FragmentEntrySoap();
 
+		soapModel.setUuid(model.getUuid());
 		soapModel.setFragmentEntryId(model.getFragmentEntryId());
 		soapModel.setGroupId(model.getGroupId());
 		soapModel.setCompanyId(model.getCompanyId());
@@ -102,6 +103,14 @@ public class FragmentEntrySoap implements Serializable {
 
 	public void setPrimaryKey(long pk) {
 		setFragmentEntryId(pk);
+	}
+
+	public String getUuid() {
+		return _uuid;
+	}
+
+	public void setUuid(String uuid) {
+		_uuid = uuid;
 	}
 
 	public long getFragmentEntryId() {
@@ -248,6 +257,7 @@ public class FragmentEntrySoap implements Serializable {
 		_statusDate = statusDate;
 	}
 
+	private String _uuid;
 	private long _fragmentEntryId;
 	private long _groupId;
 	private long _companyId;

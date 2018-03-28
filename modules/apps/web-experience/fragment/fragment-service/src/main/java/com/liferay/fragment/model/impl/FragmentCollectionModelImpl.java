@@ -19,6 +19,8 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 
+import com.liferay.exportimport.kernel.lar.StagedModelType;
+
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.model.FragmentCollectionModel;
 import com.liferay.fragment.model.FragmentCollectionSoap;
@@ -32,6 +34,7 @@ import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 
@@ -69,6 +72,7 @@ public class FragmentCollectionModelImpl extends BaseModelImpl<FragmentCollectio
 	 */
 	public static final String TABLE_NAME = "FragmentCollection";
 	public static final Object[][] TABLE_COLUMNS = {
+			{ "uuid_", Types.VARCHAR },
 			{ "fragmentCollectionId", Types.BIGINT },
 			{ "groupId", Types.BIGINT },
 			{ "companyId", Types.BIGINT },
@@ -83,6 +87,7 @@ public class FragmentCollectionModelImpl extends BaseModelImpl<FragmentCollectio
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP = new HashMap<String, Integer>();
 
 	static {
+		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("fragmentCollectionId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
@@ -95,7 +100,7 @@ public class FragmentCollectionModelImpl extends BaseModelImpl<FragmentCollectio
 		TABLE_COLUMNS_MAP.put("description", Types.VARCHAR);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table FragmentCollection (fragmentCollectionId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,fragmentCollectionKey VARCHAR(75) null,name VARCHAR(75) null,description STRING null)";
+	public static final String TABLE_SQL_CREATE = "create table FragmentCollection (uuid_ VARCHAR(75) null,fragmentCollectionId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,fragmentCollectionKey VARCHAR(75) null,name VARCHAR(75) null,description STRING null)";
 	public static final String TABLE_SQL_DROP = "drop table FragmentCollection";
 	public static final String ORDER_BY_JPQL = " ORDER BY fragmentCollection.name ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY FragmentCollection.name ASC";
@@ -111,9 +116,11 @@ public class FragmentCollectionModelImpl extends BaseModelImpl<FragmentCollectio
 	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(com.liferay.fragment.service.util.ServiceProps.get(
 				"value.object.column.bitmask.enabled.com.liferay.fragment.model.FragmentCollection"),
 			true);
-	public static final long FRAGMENTCOLLECTIONKEY_COLUMN_BITMASK = 1L;
-	public static final long GROUPID_COLUMN_BITMASK = 2L;
-	public static final long NAME_COLUMN_BITMASK = 4L;
+	public static final long COMPANYID_COLUMN_BITMASK = 1L;
+	public static final long FRAGMENTCOLLECTIONKEY_COLUMN_BITMASK = 2L;
+	public static final long GROUPID_COLUMN_BITMASK = 4L;
+	public static final long NAME_COLUMN_BITMASK = 8L;
+	public static final long UUID_COLUMN_BITMASK = 16L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -128,6 +135,7 @@ public class FragmentCollectionModelImpl extends BaseModelImpl<FragmentCollectio
 
 		FragmentCollection model = new FragmentCollectionImpl();
 
+		model.setUuid(soapModel.getUuid());
 		model.setFragmentCollectionId(soapModel.getFragmentCollectionId());
 		model.setGroupId(soapModel.getGroupId());
 		model.setCompanyId(soapModel.getCompanyId());
@@ -203,6 +211,7 @@ public class FragmentCollectionModelImpl extends BaseModelImpl<FragmentCollectio
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("uuid", getUuid());
 		attributes.put("fragmentCollectionId", getFragmentCollectionId());
 		attributes.put("groupId", getGroupId());
 		attributes.put("companyId", getCompanyId());
@@ -222,6 +231,12 @@ public class FragmentCollectionModelImpl extends BaseModelImpl<FragmentCollectio
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		String uuid = (String)attributes.get("uuid");
+
+		if (uuid != null) {
+			setUuid(uuid);
+		}
+
 		Long fragmentCollectionId = (Long)attributes.get("fragmentCollectionId");
 
 		if (fragmentCollectionId != null) {
@@ -286,6 +301,30 @@ public class FragmentCollectionModelImpl extends BaseModelImpl<FragmentCollectio
 
 	@JSON
 	@Override
+	public String getUuid() {
+		if (_uuid == null) {
+			return "";
+		}
+		else {
+			return _uuid;
+		}
+	}
+
+	@Override
+	public void setUuid(String uuid) {
+		if (_originalUuid == null) {
+			_originalUuid = _uuid;
+		}
+
+		_uuid = uuid;
+	}
+
+	public String getOriginalUuid() {
+		return GetterUtil.getString(_originalUuid);
+	}
+
+	@JSON
+	@Override
 	public long getFragmentCollectionId() {
 		return _fragmentCollectionId;
 	}
@@ -326,7 +365,19 @@ public class FragmentCollectionModelImpl extends BaseModelImpl<FragmentCollectio
 
 	@Override
 	public void setCompanyId(long companyId) {
+		_columnBitmask |= COMPANYID_COLUMN_BITMASK;
+
+		if (!_setOriginalCompanyId) {
+			_setOriginalCompanyId = true;
+
+			_originalCompanyId = _companyId;
+		}
+
 		_companyId = companyId;
+	}
+
+	public long getOriginalCompanyId() {
+		return _originalCompanyId;
 	}
 
 	@JSON
@@ -468,6 +519,12 @@ public class FragmentCollectionModelImpl extends BaseModelImpl<FragmentCollectio
 		_description = description;
 	}
 
+	@Override
+	public StagedModelType getStagedModelType() {
+		return new StagedModelType(PortalUtil.getClassNameId(
+				FragmentCollection.class.getName()));
+	}
+
 	public long getColumnBitmask() {
 		return _columnBitmask;
 	}
@@ -499,6 +556,7 @@ public class FragmentCollectionModelImpl extends BaseModelImpl<FragmentCollectio
 	public Object clone() {
 		FragmentCollectionImpl fragmentCollectionImpl = new FragmentCollectionImpl();
 
+		fragmentCollectionImpl.setUuid(getUuid());
 		fragmentCollectionImpl.setFragmentCollectionId(getFragmentCollectionId());
 		fragmentCollectionImpl.setGroupId(getGroupId());
 		fragmentCollectionImpl.setCompanyId(getCompanyId());
@@ -569,9 +627,15 @@ public class FragmentCollectionModelImpl extends BaseModelImpl<FragmentCollectio
 	public void resetOriginalValues() {
 		FragmentCollectionModelImpl fragmentCollectionModelImpl = this;
 
+		fragmentCollectionModelImpl._originalUuid = fragmentCollectionModelImpl._uuid;
+
 		fragmentCollectionModelImpl._originalGroupId = fragmentCollectionModelImpl._groupId;
 
 		fragmentCollectionModelImpl._setOriginalGroupId = false;
+
+		fragmentCollectionModelImpl._originalCompanyId = fragmentCollectionModelImpl._companyId;
+
+		fragmentCollectionModelImpl._setOriginalCompanyId = false;
 
 		fragmentCollectionModelImpl._setModifiedDate = false;
 
@@ -585,6 +649,14 @@ public class FragmentCollectionModelImpl extends BaseModelImpl<FragmentCollectio
 	@Override
 	public CacheModel<FragmentCollection> toCacheModel() {
 		FragmentCollectionCacheModel fragmentCollectionCacheModel = new FragmentCollectionCacheModel();
+
+		fragmentCollectionCacheModel.uuid = getUuid();
+
+		String uuid = fragmentCollectionCacheModel.uuid;
+
+		if ((uuid != null) && (uuid.length() == 0)) {
+			fragmentCollectionCacheModel.uuid = null;
+		}
 
 		fragmentCollectionCacheModel.fragmentCollectionId = getFragmentCollectionId();
 
@@ -650,9 +722,11 @@ public class FragmentCollectionModelImpl extends BaseModelImpl<FragmentCollectio
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(21);
+		StringBundler sb = new StringBundler(23);
 
-		sb.append("{fragmentCollectionId=");
+		sb.append("{uuid=");
+		sb.append(getUuid());
+		sb.append(", fragmentCollectionId=");
 		sb.append(getFragmentCollectionId());
 		sb.append(", groupId=");
 		sb.append(getGroupId());
@@ -679,12 +753,16 @@ public class FragmentCollectionModelImpl extends BaseModelImpl<FragmentCollectio
 
 	@Override
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(34);
+		StringBundler sb = new StringBundler(37);
 
 		sb.append("<model><model-name>");
 		sb.append("com.liferay.fragment.model.FragmentCollection");
 		sb.append("</model-name>");
 
+		sb.append(
+			"<column><column-name>uuid</column-name><column-value><![CDATA[");
+		sb.append(getUuid());
+		sb.append("]]></column-value></column>");
 		sb.append(
 			"<column><column-name>fragmentCollectionId</column-name><column-value><![CDATA[");
 		sb.append(getFragmentCollectionId());
@@ -735,11 +813,15 @@ public class FragmentCollectionModelImpl extends BaseModelImpl<FragmentCollectio
 	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
 			FragmentCollection.class
 		};
+	private String _uuid;
+	private String _originalUuid;
 	private long _fragmentCollectionId;
 	private long _groupId;
 	private long _originalGroupId;
 	private boolean _setOriginalGroupId;
 	private long _companyId;
+	private long _originalCompanyId;
+	private boolean _setOriginalCompanyId;
 	private long _userId;
 	private String _userName;
 	private Date _createDate;

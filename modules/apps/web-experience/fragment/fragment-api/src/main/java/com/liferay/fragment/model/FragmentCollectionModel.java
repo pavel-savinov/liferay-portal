@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.CacheModel;
 import com.liferay.portal.kernel.model.GroupedModel;
 import com.liferay.portal.kernel.model.ShardedModel;
+import com.liferay.portal.kernel.model.StagedAuditedModel;
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.io.Serializable;
@@ -44,7 +45,7 @@ import java.util.Date;
  */
 @ProviderType
 public interface FragmentCollectionModel extends BaseModel<FragmentCollection>,
-	GroupedModel, ShardedModel {
+	GroupedModel, ShardedModel, StagedAuditedModel {
 	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
@@ -64,6 +65,23 @@ public interface FragmentCollectionModel extends BaseModel<FragmentCollection>,
 	 * @param primaryKey the primary key of this fragment collection
 	 */
 	public void setPrimaryKey(long primaryKey);
+
+	/**
+	 * Returns the uuid of this fragment collection.
+	 *
+	 * @return the uuid of this fragment collection
+	 */
+	@AutoEscape
+	@Override
+	public String getUuid();
+
+	/**
+	 * Sets the uuid of this fragment collection.
+	 *
+	 * @param uuid the uuid of this fragment collection
+	 */
+	@Override
+	public void setUuid(String uuid);
 
 	/**
 	 * Returns the fragment collection ID of this fragment collection.
