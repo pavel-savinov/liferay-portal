@@ -124,6 +124,24 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 		return document;
 	}
 
+	private void _validateAttribute(Element element, String attribute)
+		throws FragmentEntryContentException {
+
+		if (element.hasAttr(attribute)) {
+			return;
+		}
+
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", getClass());
+
+		throw new FragmentEntryContentException(
+			LanguageUtil.format(
+				resourceBundle,
+				"you-must-define-all-require-attributes-x-for-each-editable-" +
+					"element",
+				String.join(StringPool.COMMA, _REQUIRED_ATTRIBUTES)));
+	}
+
 	private void _validateDuplicatedIds(String html)
 		throws FragmentEntryContentException {
 
@@ -161,21 +179,30 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 
 		for (Element element : document.getElementsByTag("lfr-editable")) {
 			for (String attribute : _REQUIRED_ATTRIBUTES) {
-				if (element.hasAttr(attribute)) {
-					continue;
-				}
-
-				ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
-					"content.Language", getClass());
-
-				throw new FragmentEntryContentException(
-					LanguageUtil.format(
-						resourceBundle,
-						"you-must-define-all-require-attributes-x-for-each-" +
-							"editable-element",
-						String.join(StringPool.COMMA, _REQUIRED_ATTRIBUTES)));
+				_validateAttribute(element, attribute);
 			}
+
+			_validateValidType(element);
 		}
+	}
+
+	private void _validateValidType(Element element)
+		throws FragmentEntryContentException {
+
+		EditableElementParser editableElementParser =
+			_editableElementParsers.get(element.attr("type"));
+
+		if (editableElementParser != null) {
+			return;
+		}
+
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", getClass());
+
+		throw new FragmentEntryContentException(
+			LanguageUtil.get(
+				resourceBundle,
+				"you-must-define-a-valid-type-for-each-editable-element"));
 	}
 
 	private static final String[] _REQUIRED_ATTRIBUTES = {"id", "type"};
