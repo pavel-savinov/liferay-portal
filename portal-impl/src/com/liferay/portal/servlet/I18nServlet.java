@@ -162,47 +162,50 @@ public class I18nServlet extends HttpServlet {
 
 		String i18nLanguageCode = i18nLanguageId;
 
-		Locale siteDefaultLocale = null;
-
-		try {
-			int[] friendlyURLIndices = PortalUtil.getGroupFriendlyURLIndex(
-				path);
-
-			String friendlyURL = path.substring(
-				friendlyURLIndices[0], friendlyURLIndices[1]);
-
-			Group siteGroup = GroupLocalServiceUtil.getFriendlyURLGroup(
-				(Long)request.getAttribute(WebKeys.COMPANY_ID), friendlyURL);
-
-			siteDefaultLocale = PortalUtil.getSiteDefaultLocale(siteGroup);
-
-			if (!LanguageUtil.isSameLanguage(locale, siteDefaultLocale)) {
-				siteDefaultLocale = LanguageUtil.getLocale(
-					siteGroup.getGroupId(), locale.getLanguage());
-			}
-		}
-		catch (Exception e) {
-			siteDefaultLocale = LocaleUtil.getDefault();
-
-			if (!LanguageUtil.isSameLanguage(locale, siteDefaultLocale)) {
-				siteDefaultLocale = LanguageUtil.getLocale(
-					locale.getLanguage());
-			}
-		}
-
-		String siteDefaultLanguageId = LanguageUtil.getLanguageId(
-			siteDefaultLocale);
-
-		if (siteDefaultLanguageId.startsWith(i18nLanguageId)) {
-			locale = siteDefaultLocale;
-
-			i18nPath = StringPool.SLASH + locale.getLanguage();
-		}
-
 		if (locale != null) {
-			i18nLanguageId = LocaleUtil.toLanguageId(locale);
+			Locale siteDefaultLocale = null;
 
-			i18nLanguageCode = locale.getLanguage();
+			try {
+				int[] friendlyURLIndices = PortalUtil.getGroupFriendlyURLIndex(
+					path);
+
+				String friendlyURL = path.substring(
+					friendlyURLIndices[0], friendlyURLIndices[1]);
+
+				Group siteGroup = GroupLocalServiceUtil.getFriendlyURLGroup(
+					(Long) request.getAttribute(WebKeys.COMPANY_ID),
+					friendlyURL);
+
+				siteDefaultLocale = PortalUtil.getSiteDefaultLocale(siteGroup);
+
+				if (!LanguageUtil.isSameLanguage(locale, siteDefaultLocale)) {
+					siteDefaultLocale = LanguageUtil.getLocale(
+						siteGroup.getGroupId(), locale.getLanguage());
+				}
+			}
+			catch (Exception e) {
+				siteDefaultLocale = LocaleUtil.getDefault();
+
+				if (!LanguageUtil.isSameLanguage(locale, siteDefaultLocale)) {
+					siteDefaultLocale = LanguageUtil.getLocale(
+						locale.getLanguage());
+				}
+			}
+
+			String siteDefaultLanguageId = LanguageUtil.getLanguageId(
+				siteDefaultLocale);
+
+			if (siteDefaultLanguageId.startsWith(i18nLanguageId)) {
+				locale = siteDefaultLocale;
+
+				i18nPath = StringPool.SLASH + locale.getLanguage();
+			}
+
+			if (locale != null) {
+				i18nLanguageId = LocaleUtil.toLanguageId(locale);
+
+				i18nLanguageCode = locale.getLanguage();
+			}
 		}
 
 		if (!PropsValues.LOCALE_USE_DEFAULT_IF_NOT_AVAILABLE &&
