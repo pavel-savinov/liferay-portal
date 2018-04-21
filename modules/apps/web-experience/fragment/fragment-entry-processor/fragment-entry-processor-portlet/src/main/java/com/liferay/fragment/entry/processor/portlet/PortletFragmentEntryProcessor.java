@@ -80,7 +80,7 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 
 		Document document = _getDocument(html);
 
-		Map<String, Integer> instanceIds = new HashMap<>();
+		Map<String, Integer> instanceIdPositions = new HashMap<>();
 
 		for (Element element : document.select("*")) {
 			String tagName = element.tagName();
@@ -109,37 +109,30 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 
 			String portletPreferences = StringPool.BLANK;
 
-			int postfix = GetterUtil.getInteger(instanceIds.get(alias));
+			int position = GetterUtil.getInteger(
+				instanceIdPositions.get(alias));
 
-			StringBundler instanceIdSB = new StringBundler(3);
-
-			instanceIdSB.append(fragmentEntryLink.getFragmentEntryLinkId());
-			instanceIdSB.append("_");
-			instanceIdSB.append(postfix);
+			String instanceId = _getInstanceId(
+				fragmentEntryLink.getFragmentEntryLinkId(), position);
 
 			if (originalFragmentEntryLink != null) {
-				StringBundler originalInstanceIdSB = new StringBundler(3);
-
-				originalInstanceIdSB.append(
-					originalFragmentEntryLink.getFragmentEntryLinkId());
-				originalInstanceIdSB.append("_");
-				originalInstanceIdSB.append(postfix);
+				String originalInstanceId = _getInstanceId(
+					originalFragmentEntryLink.getFragmentEntryLinkId(),
+					position);
 
 				String defaultPreferences = _getPreferences(
-					portletName, originalFragmentEntryLink,
-					originalInstanceIdSB.toString(), StringPool.BLANK);
+					portletName, originalFragmentEntryLink, originalInstanceId,
+					StringPool.BLANK);
 
 				portletPreferences = _getPreferences(
-					portletName, fragmentEntryLink, instanceIdSB.toString(),
+					portletName, fragmentEntryLink, instanceId,
 					defaultPreferences);
 			}
 
-			instanceIds.put(alias, ++postfix);
+			instanceIdPositions.put(alias, ++position);
 
 			runtimeTagElement.attr("defaultPreferences", portletPreferences);
-
-			runtimeTagElement.attr("instanceId", instanceIdSB.toString());
-
+			runtimeTagElement.attr("instanceId", instanceId);
 			runtimeTagElement.attr("persistSettings=false", true);
 			runtimeTagElement.attr("portletName", portletName);
 
@@ -162,8 +155,7 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 				Objects.equals(mode, PortletMode.EDIT.toString())) {
 
 				portletElement.appendChild(
-					_getPortletTopperElement(
-						portletName, instanceIdSB.toString()));
+					_getPortletTopperElement(portletName, instanceId));
 			}
 
 			portletElement.appendChild(runtimeTagElement);
@@ -253,6 +245,10 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 		document.outputSettings(outputSettings);
 
 		return document;
+	}
+
+	private String _getInstanceId(long fragmentEntryLinkId, int position) {
+		return fragmentEntryLinkId + "_" + position;
 	}
 
 	private Element _getPortletMenuElement(
