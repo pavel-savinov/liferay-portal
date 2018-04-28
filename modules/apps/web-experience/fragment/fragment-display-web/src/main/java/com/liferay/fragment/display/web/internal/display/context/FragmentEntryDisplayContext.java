@@ -252,7 +252,6 @@ public class FragmentEntryDisplayContext {
 
 		HttpServletRequest request = PortalUtil.getHttpServletRequest(
 			_renderRequest);
-
 		HttpServletResponse response = PortalUtil.getHttpServletResponse(
 			_renderResponse);
 
