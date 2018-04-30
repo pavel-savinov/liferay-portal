@@ -16,6 +16,7 @@ package com.liferay.product.navigation.control.menu.web.internal;
 
 import com.liferay.exportimport.kernel.staging.Staging;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutTypeController;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
@@ -23,6 +24,7 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.product.navigation.control.menu.BaseJSPProductNavigationControlMenuEntry;
 import com.liferay.product.navigation.control.menu.ProductNavigationControlMenuEntry;
 import com.liferay.product.navigation.control.menu.constants.ProductNavigationControlMenuCategoryKeys;
@@ -68,6 +70,14 @@ public class AddContentProductNavigationControlMenuEntry
 		}
 
 		Layout layout = themeDisplay.getLayout();
+
+		Group group = layout.getGroup();
+
+		if (group.hasStagingGroup() && !group.isStagingGroup() &&
+			PropsValues.STAGING_LIVE_GROUP_LOCKING_ENABLED) {
+
+			return false;
+		}
 
 		if (!layout.isTypePortlet()) {
 			return false;
