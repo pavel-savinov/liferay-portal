@@ -14,10 +14,16 @@
 	]>}
 	{@param pathThemeImages: string}
 	{@param portletNamespace: string}
+    {@param? _handleCopyLayoutClick: ?}
+    {@param? _handlePermissionLinkClick: ?}
+    {@param? _handleDeleteItemClick: ?}
 
 	<ul class="border col-11 col-lg-4 col-md-6 layout-column mb-0 p-0 show-quick-actions-on-hover" ref="layoutItemsWrapper">
 		{foreach $layoutColumnItem in $layoutColumn}
 			{call .layoutColumnItem}
+				{param handleCopyLayoutClick: $_handleCopyLayoutClick /}
+				{param handlePermissionLinkClick: $_handlePermissionLinkClick /}
+				{param handleDeleteItemClick: $_handleDeleteItemClick /}
 				{param layoutColumnItem: $layoutColumnItem /}
 				{param pathThemeImages: $pathThemeImages /}
 				{param portletNamespace: $portletNamespace /}
@@ -52,6 +58,9 @@
 	]}
 	{@param pathThemeImages: string}
 	{@param portletNamespace: string}
+    {@param? handleCopyLayoutClick: ?}
+    {@param? handlePermissionLinkClick: ?}
+    {@param? handleDeleteItemClick: ?}
 
 	{let $listGroupItemClasses kind="text"}
 		list-group-item
@@ -97,59 +106,23 @@
 
 		<div class="flex-col">
 			<div aria-expanded="false" aria-haspopup="true" class="dropdown dropdown-action mt-0">
-				<button class="btn btn-link p-1" data-toggle="dropdown" type="button">
+				<button class="btn btn-link p-1" data-onclick="_toggleDropdown" data-plid="{$layoutColumnItem.plid}" type="button">
 					{call .lexiconIcon}
 						{param name: 'ellipsis-v' /}
 						{param pathThemeImages: $pathThemeImages /}
 					{/call}
 				</button>
 
-				<div class="dropdown-menu">
-					<a class="dropdown-item" href="{$layoutColumnItem.actionURLs['viewLayoutURL']}">
-						{msg desc=""}view{/msg}
-					</a>
-
-					{if $layoutColumnItem.actionURLs['configureURL']}
-						<a class="dropdown-item" href="{$layoutColumnItem.actionURLs['configureURL']}">
-							{msg desc=""}configure{/msg}
-						</a>
-					{/if}
-
-					{if $layoutColumnItem.actionURLs['copyLayoutURL']}
-						<a class="dropdown-item" data-onclick="_handleCopyLayoutClick" href="{$layoutColumnItem.actionURLs['copyLayoutURL']}">
-							{msg desc=""}copy-page{/msg}
-						</a>
-					{/if}
-
-					{let $permissionLinkAttributes kind="attributes"}
-						class="dropdown-item layout-permissions-link lfr-icon-item"
-						data-onclick="_handlePermissionLinkClick"
-						href="{$layoutColumnItem.actionURLs['permissionsURL']}"
-						id="{$portletNamespace}{$layoutColumnItem.plid}_permissions"
-					{/let}
-
-					{if $layoutColumnItem.actionURLs['permissionsURL']}
-						<a {$permissionLinkAttributes}>
-							{msg desc=""}permissions{/msg}
-						</a>
-					{/if}
-
-					{if $layoutColumnItem.actionURLs['orphanPortletsURL']}
-						<a class="dropdown-item" href="{$layoutColumnItem.actionURLs['orphanPortletsURL']}">
-							{msg desc=""}orphan-portlets{/msg}
-						</a>
-					{/if}
-
-					{if $layoutColumnItem.actionURLs['deleteURL']}
-						<a
-							class="dropdown-item"
-							data-onclick="_handleDeleteItemClick"
-							href="{$layoutColumnItem.actionURLs['deleteURL']}"
-						>
-							{msg desc=""}delete{/msg}
-						</a>
-					{/if}
-				</div>
+				{call com.liferay.layout.admin.web.LayoutActions.render}
+					{param handleCopyLayoutClick: $handleCopyLayoutClick /}
+					{param handlePermissionLinkClick: $handlePermissionLinkClick /}
+					{param handleDeleteItemClick: $handleDeleteItemClick /}
+					{param layoutColumnItem: $layoutColumnItem /}
+					{param portalElement: '#clay_dropdown_portal' /}
+					{param portletNamespace: $portletNamespace /}
+					{param ref: 'dropdown' + $layoutColumnItem.plid /}
+					{param visible: false /}
+				{/call}
 			</div>
 		</div>
 
