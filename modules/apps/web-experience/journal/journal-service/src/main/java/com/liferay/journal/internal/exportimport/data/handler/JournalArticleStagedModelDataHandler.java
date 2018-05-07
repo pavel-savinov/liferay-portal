@@ -81,7 +81,6 @@ import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
@@ -1036,7 +1035,6 @@ public class JournalArticleStagedModelDataHandler
 	}
 
 	@Reference(
-		policy = ReferencePolicy.DYNAMIC,
 		policyOption = ReferencePolicyOption.GREEDY,
 		target = "(model.class.name=com.liferay.journal.model.JournalArticle)",
 		unbind = "-"

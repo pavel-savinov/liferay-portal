@@ -29,7 +29,6 @@ import java.util.regex.Pattern;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
@@ -99,7 +98,6 @@ public class HTMLImageAttachmentElementHandler
 	}
 
 	@Reference(
-		policy = ReferencePolicy.DYNAMIC,
 		policyOption = ReferencePolicyOption.GREEDY,
 		target = "(&(format=html)(html.tag.name=img))"
 	)

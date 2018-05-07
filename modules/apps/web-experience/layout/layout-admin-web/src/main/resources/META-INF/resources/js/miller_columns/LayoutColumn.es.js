@@ -1,9 +1,11 @@
 import Component from 'metal-component';
-import {Config} from 'metal-state';
 import Soy from 'metal-soy';
+import {Align} from 'metal-position';
+import {Config} from 'metal-state';
 
 import OpenSimpleInputModal from 'frontend-js-web/liferay/modal/commands/OpenSimpleInputModal.es';
 import templates from './LayoutColumn.soy';
+import './LayoutActions.es';
 
 /**
  * LayoutColumn
@@ -75,6 +77,18 @@ class LayoutColumn extends Component {
 		) {
 			event.preventDefault();
 		}
+	}
+
+	_toggleDropdown(event) {
+		const dropdown = this.refs[`dropdown${event.delegateTarget.getAttribute('data-plid')}`];
+
+		Align.align(
+			dropdown.element,
+			event.delegateTarget,
+			Align.BottomLeft
+		);
+
+		dropdown.visible = !dropdown.visible;
 	}
 }
 

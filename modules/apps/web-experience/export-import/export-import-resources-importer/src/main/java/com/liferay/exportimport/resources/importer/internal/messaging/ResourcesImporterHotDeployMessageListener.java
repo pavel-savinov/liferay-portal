@@ -201,7 +201,7 @@ public class ResourcesImporterHotDeployMessageListener
 
 	@Reference(
 		cardinality = ReferenceCardinality.OPTIONAL,
-		policy = ReferencePolicy.DYNAMIC,
+		policy = ReferencePolicy.STATIC,
 		policyOption = ReferencePolicyOption.GREEDY
 	)
 	protected void setDestinationFactory(

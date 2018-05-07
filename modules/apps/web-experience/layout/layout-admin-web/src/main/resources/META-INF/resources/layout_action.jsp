@@ -22,62 +22,30 @@ ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_
 Layout curLayout = (Layout)row.getObject();
 %>
 
-<liferay-ui:icon-menu
-	direction="left-side"
-	icon="<%= StringPool.BLANK %>"
-	markupView="lexicon"
-	message="<%= StringPool.BLANK %>"
-	showWhenSingleIcon="<%= true %>"
->
-	<liferay-ui:icon
-		message="view"
-		url="<%= layoutsAdminDisplayContext.getViewLayoutURL(curLayout) %>"
-	/>
+<clay:dropdown-menu
+	label="<%= LanguageUtil.get(request, "share") %>"
+	icon="share"
+	style="secondary"
+	triggerCssClasses="btn-outline-borderless btn-sm"
+	items="<%=
+		new JSPDropdownItemList(pageContext) {
+			{
+				for (int i = 0; i < types.length; i++) {
+					SocialBookmark socialBookmark = SocialBookmarksRegistryUtil.getSocialBookmark(types[i]);
+					final String type = types[i];
 
-	<c:if test="<%= layoutsAdminDisplayContext.showConfigureAction(curLayout) %>">
-		<liferay-ui:icon
-			message="configure"
-			url="<%= layoutsAdminDisplayContext.getConfigureLayoutURL(curLayout) %>"
-		/>
-	</c:if>
-
-	<c:if test="<%= layoutsAdminDisplayContext.showAddChildPageAction(curLayout) %>">
-		<liferay-ui:icon
-			message="add-child-page"
-			url="<%= layoutsAdminDisplayContext.getSelectLayoutPageTemplateEntryURL(layoutsAdminDisplayContext.getFirstLayoutPageTemplateCollectionId(), curLayout.getPlid()) %>"
-		/>
-	</c:if>
-
-	<c:if test="<%= layoutsAdminDisplayContext.showCopyLayoutAction(curLayout) %>">
-		<liferay-ui:icon
-			cssClass="copy-layout-action-option"
-			message="copy-page"
-			url="javascript:;"
-		/>
-	</c:if>
-
-	<c:if test="<%= layoutsAdminDisplayContext.showPermissionsAction(curLayout) %>">
-		<liferay-ui:icon
-			message="permissions"
-			method="get"
-			url="<%= layoutsAdminDisplayContext.getPermissionsURL(curLayout) %>"
-			useDialog="<%= true %>"
-		/>
-	</c:if>
-
-	<c:if test="<%= layoutsAdminDisplayContext.showOrphanPortletsAction(curLayout) %>">
-		<liferay-ui:icon
-			message="orphan-portlets"
-			url="<%= layoutsAdminDisplayContext.getOrphanPortletsURL(curLayout) %>"
-		/>
-	</c:if>
-
-	<c:if test="<%= layoutsAdminDisplayContext.showDeleteAction(curLayout) %>">
-		<liferay-ui:icon-delete
-			url="<%= layoutsAdminDisplayContext.getDeleteLayoutURL(curLayout) %>"
-		/>
-	</c:if>
-</liferay-ui:icon-menu>
+					if (socialBookmark != null) {
+						add(
+							dropdownItem -> {
+								dropdownItem.setHref("javascript:" + SocialBookmarksTagUtil.getClickJSCall(className, classPK, type, socialBookmark.getPostURL(title, url), url));
+								dropdownItem.setLabel(socialBookmark.getName(request.getLocale()));
+							});
+					}
+				}
+			}
+		}
+	%>"
+/>
 
 <%
 String autoSiteNavigationMenuNames = layoutsAdminDisplayContext.getAutoSiteNavigationMenuNames();
