@@ -345,6 +345,12 @@ if (portletDecorateObj != null) {
 	request.removeAttribute(WebKeys.PORTLET_DECORATE);
 }
 
+String layoutMode = ParamUtil.getString(request, "p_l_mode", Constants.VIEW);
+
+if (!layoutMode.equals(Constants.EDIT)) {
+	portletDecorate = false;
+}
+
 portletDisplay.recycle();
 
 portletDisplay.setActive(portlet.isActive());
@@ -793,13 +799,8 @@ else if (portletDisplay.isModePrint()) {
 	urlBack = urlPrint.toString();
 }
 else if (portletDisplay.isStateMax()) {
-	if (portletDisplay.getId().startsWith("WSRP_")) {
-		urlBack = portletDisplay.getURLBack();
-	}
-	else {
-		urlBack = ParamUtil.getString(renderRequestImpl, "returnToFullPageURL");
-		urlBack = PortalUtil.escapeRedirect(urlBack);
-	}
+	urlBack = ParamUtil.getString(renderRequestImpl, "returnToFullPageURL");
+	urlBack = PortalUtil.escapeRedirect(urlBack);
 
 	if (Validator.isNull(urlBack)) {
 		urlBack = urlMax.toString();
@@ -852,6 +853,10 @@ if (portlet.isActive() && portlet.isReady() && supportsMimeType && (invokerPortl
 
 		if (portletVisibility != null) {
 			request.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, portletVisibility);
+
+			if (portletVisibility && layoutMode.equals(Constants.VIEW)) {
+				bufferCacheServletResponse.setCharBuffer(null);
+			}
 		}
 
 		renderResponseImpl.transferHeaders(bufferCacheServletResponse);

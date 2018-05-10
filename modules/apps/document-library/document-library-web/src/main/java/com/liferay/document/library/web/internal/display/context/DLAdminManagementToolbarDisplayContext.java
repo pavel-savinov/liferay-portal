@@ -125,7 +125,7 @@ public class DLAdminManagementToolbarDisplayContext {
 										Constants.CHECKIN, "'}); void(0);"));
 								dropdownItem.setIcon("unlock");
 								dropdownItem.setLabel(
-									LanguageUtil.get(_request, "unlock"));
+									LanguageUtil.get(_request, "checkin"));
 								dropdownItem.setQuickAction(true);
 							}));
 
@@ -140,7 +140,8 @@ public class DLAdminManagementToolbarDisplayContext {
 										Constants.CHECKOUT, "'}); void(0);"));
 								dropdownItem.setIcon("lock");
 								dropdownItem.setLabel(
-									LanguageUtil.get(_request, "lock"));
+									LanguageUtil.get(
+										_request, "checkout[document]"));
 								dropdownItem.setQuickAction(true);
 							}));
 
@@ -197,6 +198,8 @@ public class DLAdminManagementToolbarDisplayContext {
 
 		clearResultsURL.setParameter(
 			"mvcRenderCommandName", "/document_library/view");
+		clearResultsURL.setParameter(
+			"folderId", String.valueOf(_getFolderId()));
 
 		return clearResultsURL.toString();
 	}
@@ -268,15 +271,22 @@ public class DLAdminManagementToolbarDisplayContext {
 		long repositoryId = _getRepositoryId();
 
 		searchURL.setParameter("repositoryId", String.valueOf(repositoryId));
+
+		long searchRepositoryId = ParamUtil.getLong(
+			_request, "searchRepositoryId", repositoryId);
+
 		searchURL.setParameter(
-			"searchRepositoryId", String.valueOf(repositoryId));
+			"searchRepositoryId", String.valueOf(searchRepositoryId));
 
 		long folderId = _getFolderId();
 
 		searchURL.setParameter("folderId", String.valueOf(folderId));
-		searchURL.setParameter("searchFolderId", String.valueOf(folderId));
+
+		long searchFolderId = ParamUtil.getLong(
+			_request, "searchFolderId", folderId);
+
 		searchURL.setParameter(
-			"showRepositoryTabs", Boolean.toString(folderId == 0));
+			"searchFolderId", String.valueOf(searchFolderId));
 
 		searchURL.setParameter("showSearchInfo", Boolean.TRUE.toString());
 
@@ -288,34 +298,7 @@ public class DLAdminManagementToolbarDisplayContext {
 	}
 
 	public PortletURL getSortingURL() {
-		int deltaEntry = ParamUtil.getInteger(_request, "deltaEntry");
-
-		PortletURL sortingURL = _liferayPortletResponse.createRenderURL();
-
-		long folderId = _getFolderId();
-
-		if (folderId == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-			sortingURL.setParameter(
-				"mvcRenderCommandName", "/document_library/view");
-		}
-		else {
-			sortingURL.setParameter(
-				"mvcRenderCommandName", "/document_library/view_folder");
-		}
-
-		sortingURL.setParameter("navigation", _getNavigation());
-
-		if (deltaEntry > 0) {
-			sortingURL.setParameter("deltaEntry", String.valueOf(deltaEntry));
-		}
-
-		sortingURL.setParameter("folderId", String.valueOf(folderId));
-
-		long fileEntryTypeId = ParamUtil.getLong(
-			_request, "fileEntryTypeId", -1);
-
-		sortingURL.setParameter(
-			"fileEntryTypeId", String.valueOf(fileEntryTypeId));
+		PortletURL sortingURL = _getCurrentSortingURL();
 
 		sortingURL.setParameter(
 			"orderByType",
@@ -425,12 +408,37 @@ public class DLAdminManagementToolbarDisplayContext {
 		return _dlPortletInstanceSettingsHelper.isShowSearch();
 	}
 
-	public boolean isShowSearchInfo() {
-		if (_isSearch() && ParamUtil.getBoolean(_request, "showSearchInfo")) {
-			return true;
+	private PortletURL _getCurrentSortingURL() {
+		int deltaEntry = ParamUtil.getInteger(_request, "deltaEntry");
+
+		PortletURL sortingURL = _liferayPortletResponse.createRenderURL();
+
+		long folderId = _getFolderId();
+
+		if (folderId == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+			sortingURL.setParameter(
+				"mvcRenderCommandName", "/document_library/view");
+		}
+		else {
+			sortingURL.setParameter(
+				"mvcRenderCommandName", "/document_library/view_folder");
 		}
 
-		return false;
+		sortingURL.setParameter("navigation", _getNavigation());
+
+		if (deltaEntry > 0) {
+			sortingURL.setParameter("deltaEntry", String.valueOf(deltaEntry));
+		}
+
+		sortingURL.setParameter("folderId", String.valueOf(folderId));
+
+		long fileEntryTypeId = ParamUtil.getLong(
+			_request, "fileEntryTypeId", -1);
+
+		sortingURL.setParameter(
+			"fileEntryTypeId", String.valueOf(fileEntryTypeId));
+
+		return sortingURL;
 	}
 
 	private String _getDisplayStyle() {
@@ -558,6 +566,10 @@ public class DLAdminManagementToolbarDisplayContext {
 	}
 
 	private long _getFolderId() {
+		if (_isSearch()) {
+			return ParamUtil.getLong(_request, "folderId");
+		}
+
 		return _dlAdminDisplayContext.getFolderId();
 	}
 
@@ -591,7 +603,8 @@ public class DLAdminManagementToolbarDisplayContext {
 								dropdownItem.setActive(
 									orderByCol.equals(_getOrderByCol()));
 								dropdownItem.setHref(
-									getSortingURL(), "orderByCol", orderByCol);
+									_getCurrentSortingURL(), "orderByCol",
+									orderByCol);
 								dropdownItem.setLabel(
 									LanguageUtil.get(
 										_request, orderByColEntry.getValue()));
