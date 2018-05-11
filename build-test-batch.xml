@@ -3450,7 +3450,9 @@ ${output.content}</echo>
 						<delete file="${project.dir}/build.services.diff.txt" />
 
 						<if>
-							<isset property="build.services.diff.txt.content" />
+							<not>
+								<equals arg1="${build.services.diff.txt.content}" arg2="" />
+							</not>
 							<then>
 								<echo message="${build.services.diff.txt.content}" />
 
@@ -3761,7 +3763,7 @@ information. Make sure to commit in all build services results.
 
 		<trycatch property="failure.property">
 			<try>
-				<gradle-execute dir="${project.dir}/modules/apps/foundation/petra" task="deploy">
+				<gradle-execute dir="${project.dir}/modules/apps/petra" task="deploy">
 					<arg value="-Dportal.build=true" />
 				</gradle-execute>
 

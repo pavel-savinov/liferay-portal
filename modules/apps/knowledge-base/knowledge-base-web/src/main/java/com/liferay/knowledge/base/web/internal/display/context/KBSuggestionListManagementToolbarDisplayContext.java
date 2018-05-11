@@ -108,13 +108,13 @@ public class KBSuggestionListManagementToolbarDisplayContext {
 	}
 
 	public PortletURL getSortingURL() throws PortletException {
-		PortletURL sortingURL = _getCurrentSortingURL();
+		PortletURL currentSortingURL = _getCurrentSortingURL();
 
-		sortingURL.setParameter(
+		currentSortingURL.setParameter(
 			"orderByType",
 			Objects.equals(getOrderByType(), "asc") ? "desc" : "asc");
 
-		return sortingURL;
+		return currentSortingURL;
 	}
 
 	public int getTotal() {
@@ -122,6 +122,12 @@ public class KBSuggestionListManagementToolbarDisplayContext {
 	}
 
 	public boolean isDisabled() {
+		String navigation = _getNavigation();
+
+		if (navigation.equals("all") && !_searchContainer.hasResults()) {
+			return true;
+		}
+
 		return false;
 	}
 
