@@ -56,13 +56,19 @@ LayoutPageTemplateDisplayContext layoutPageTemplateDisplayContext = new LayoutPa
 			row.setCssClass("entry-card lfr-asset-item " + row.getCssClass());
 
 			String imagePreviewURL = layoutPageTemplateEntry.getImagePreviewURL(themeDisplay);
+
+			String layoutPageTemplateEntryActionJSP = "/layout_page_template_entry_action.jsp";
+
+			if (layoutPageTemplateEntry.getLayoutPrototypeId() > 0) {
+				layoutPageTemplateEntryActionJSP = "/layout_prototype_action.jsp";
+			}
 			%>
 
 			<liferay-ui:search-container-column-text>
 				<c:choose>
 					<c:when test="<%= Validator.isNotNull(imagePreviewURL) %>">
 						<liferay-frontend:vertical-card
-							actionJsp="/layout_page_template_entry_action.jsp"
+							actionJsp="<%= layoutPageTemplateEntryActionJSP %>"
 							actionJspServletContext="<%= application %>"
 							cssClass="entry-display-style"
 							imageCSSClass="aspect-ratio-bg-contain"
@@ -84,7 +90,7 @@ LayoutPageTemplateDisplayContext layoutPageTemplateDisplayContext = new LayoutPa
 					</c:when>
 					<c:otherwise>
 						<liferay-frontend:icon-vertical-card
-							actionJsp="/layout_page_template_entry_action.jsp"
+							actionJsp="<%= layoutPageTemplateEntryActionJSP %>"
 							actionJspServletContext="<%= application %>"
 							cssClass="entry-display-style"
 							icon="page"
