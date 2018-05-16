@@ -15,8 +15,6 @@
 package com.liferay.layout.page.template.service.impl;
 
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
-import com.liferay.html.preview.model.HtmlPreviewEntry;
-import com.liferay.html.preview.service.HtmlPreviewEntryLocalService;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.exception.DuplicateLayoutPageTemplateEntryException;
 import com.liferay.layout.page.template.exception.LayoutPageTemplateEntryNameException;
@@ -28,7 +26,6 @@ import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -48,7 +45,7 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 	public LayoutPageTemplateEntry addLayoutPageTemplateEntry(
 			long userId, long groupId, long layoutPageTemplateCollectionId,
 			String name, int type, long[] fragmentEntryIds, int status,
-			ServiceContext serviceContext)
+			long layoutPrototypeId, ServiceContext serviceContext)
 		throws PortalException {
 
 		// Layout page template entry
@@ -79,14 +76,7 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 		layoutPageTemplateEntry.setStatusByUserId(userId);
 		layoutPageTemplateEntry.setStatusByUserName(user.getFullName());
 		layoutPageTemplateEntry.setStatusDate(new Date());
-
-		// HTML preview
-
-		HtmlPreviewEntry htmlPreviewEntry = _updateHtmlPreviewEntry(
-			layoutPageTemplateEntry, serviceContext);
-
-		layoutPageTemplateEntry.setHtmlPreviewEntryId(
-			htmlPreviewEntry.getHtmlPreviewEntryId());
+		layoutPageTemplateEntry.setLayoutPrototypeId(layoutPrototypeId);
 
 		layoutPageTemplateEntryPersistence.update(layoutPageTemplateEntry);
 
@@ -105,6 +95,18 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 			layoutPageTemplateEntry, serviceContext);
 
 		return layoutPageTemplateEntry;
+	}
+
+	@Override
+	public LayoutPageTemplateEntry addLayoutPageTemplateEntry(
+			long userId, long groupId, long layoutPageTemplateCollectionId,
+			String name, int type, long[] fragmentEntryIds, int status,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		return addLayoutPageTemplateEntry(
+			userId, groupId, layoutPageTemplateCollectionId, name, type,
+			fragmentEntryIds, status, 0, serviceContext);
 	}
 
 	@Override
@@ -162,11 +164,6 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 					LayoutPageTemplateEntry.class.getName()),
 				layoutPageTemplateEntry.getLayoutPageTemplateEntryId());
 
-		// HTML preview
-
-		_htmlPreviewEntryLocalService.deleteHtmlPreviewEntry(
-			layoutPageTemplateEntry.getHtmlPreviewEntryId());
-
 		// Resources
 
 		resourceLocalService.deleteResource(
@@ -195,6 +192,14 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 		return layoutPageTemplateEntryPersistence.fetchByPrimaryKey(
 			layoutPageTemplateEntryId);
+	}
+
+	@Override
+	public LayoutPageTemplateEntry fetchLayoutPageTemplateEntry(
+		long groupId, long layoutPrototypeId) {
+
+		return layoutPageTemplateEntryPersistence.fetchByG_LP(
+			groupId, layoutPrototypeId);
 	}
 
 	@Override
@@ -432,10 +437,6 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 			layoutPageTemplateEntryId, fragmentEntryIds, editableValues,
 			serviceContext);
 
-		// HTML preview
-
-		_updateHtmlPreviewEntry(layoutPageTemplateEntry, serviceContext);
-
 		return layoutPageTemplateEntry;
 	}
 
@@ -461,36 +462,7 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 		}
 	}
 
-	private HtmlPreviewEntry _updateHtmlPreviewEntry(
-			LayoutPageTemplateEntry layoutPageTemplateEntry,
-			ServiceContext serviceContext)
-		throws PortalException {
-
-		HtmlPreviewEntry htmlPreviewEntry =
-			_htmlPreviewEntryLocalService.fetchHtmlPreviewEntry(
-				layoutPageTemplateEntry.getHtmlPreviewEntryId());
-
-		if (htmlPreviewEntry == null) {
-			return _htmlPreviewEntryLocalService.addHtmlPreviewEntry(
-				layoutPageTemplateEntry.getUserId(),
-				layoutPageTemplateEntry.getGroupId(),
-				classNameLocalService.getClassNameId(
-					LayoutPageTemplateEntry.class),
-				layoutPageTemplateEntry.getLayoutPageTemplateEntryId(),
-				layoutPageTemplateEntry.getContent(), ContentTypes.IMAGE_PNG,
-				serviceContext);
-		}
-
-		return _htmlPreviewEntryLocalService.updateHtmlPreviewEntry(
-			layoutPageTemplateEntry.getHtmlPreviewEntryId(),
-			layoutPageTemplateEntry.getContent(), ContentTypes.IMAGE_PNG,
-			serviceContext);
-	}
-
 	@ServiceReference(type = FragmentEntryLinkLocalService.class)
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
-
-	@ServiceReference(type = HtmlPreviewEntryLocalService.class)
-	private HtmlPreviewEntryLocalService _htmlPreviewEntryLocalService;
 
 }

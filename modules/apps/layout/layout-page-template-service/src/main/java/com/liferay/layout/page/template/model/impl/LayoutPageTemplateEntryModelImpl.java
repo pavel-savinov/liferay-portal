@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.model.CacheModel;
+import com.liferay.portal.kernel.model.ModelWrapper;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -89,7 +90,8 @@ public class LayoutPageTemplateEntryModelImpl extends BaseModelImpl<LayoutPageTe
 			{ "status", Types.INTEGER },
 			{ "statusByUserId", Types.BIGINT },
 			{ "statusByUserName", Types.VARCHAR },
-			{ "statusDate", Types.TIMESTAMP }
+			{ "statusDate", Types.TIMESTAMP },
+			{ "layoutPrototypeId", Types.BIGINT }
 		};
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP = new HashMap<String, Integer>();
 
@@ -112,9 +114,10 @@ public class LayoutPageTemplateEntryModelImpl extends BaseModelImpl<LayoutPageTe
 		TABLE_COLUMNS_MAP.put("statusByUserId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("statusByUserName", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("statusDate", Types.TIMESTAMP);
+		TABLE_COLUMNS_MAP.put("layoutPrototypeId", Types.BIGINT);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table LayoutPageTemplateEntry (layoutPageTemplateEntryId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,layoutPageTemplateCollectionId LONG,classNameId LONG,classTypeId LONG,name VARCHAR(75) null,type_ INTEGER,htmlPreviewEntryId LONG,defaultTemplate BOOLEAN,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null)";
+	public static final String TABLE_SQL_CREATE = "create table LayoutPageTemplateEntry (layoutPageTemplateEntryId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,layoutPageTemplateCollectionId LONG,classNameId LONG,classTypeId LONG,name VARCHAR(75) null,type_ INTEGER,htmlPreviewEntryId LONG,defaultTemplate BOOLEAN,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,layoutPrototypeId LONG)";
 	public static final String TABLE_SQL_DROP = "drop table LayoutPageTemplateEntry";
 	public static final String ORDER_BY_JPQL = " ORDER BY layoutPageTemplateEntry.name ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY LayoutPageTemplateEntry.name ASC";
@@ -135,9 +138,10 @@ public class LayoutPageTemplateEntryModelImpl extends BaseModelImpl<LayoutPageTe
 	public static final long DEFAULTTEMPLATE_COLUMN_BITMASK = 4L;
 	public static final long GROUPID_COLUMN_BITMASK = 8L;
 	public static final long LAYOUTPAGETEMPLATECOLLECTIONID_COLUMN_BITMASK = 16L;
-	public static final long NAME_COLUMN_BITMASK = 32L;
-	public static final long STATUS_COLUMN_BITMASK = 64L;
-	public static final long TYPE_COLUMN_BITMASK = 128L;
+	public static final long LAYOUTPROTOTYPEID_COLUMN_BITMASK = 32L;
+	public static final long NAME_COLUMN_BITMASK = 64L;
+	public static final long STATUS_COLUMN_BITMASK = 128L;
+	public static final long TYPE_COLUMN_BITMASK = 256L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -171,6 +175,7 @@ public class LayoutPageTemplateEntryModelImpl extends BaseModelImpl<LayoutPageTe
 		model.setStatusByUserId(soapModel.getStatusByUserId());
 		model.setStatusByUserName(soapModel.getStatusByUserName());
 		model.setStatusDate(soapModel.getStatusDate());
+		model.setLayoutPrototypeId(soapModel.getLayoutPrototypeId());
 
 		return model;
 	}
@@ -256,6 +261,7 @@ public class LayoutPageTemplateEntryModelImpl extends BaseModelImpl<LayoutPageTe
 		attributes.put("statusByUserId", getStatusByUserId());
 		attributes.put("statusByUserName", getStatusByUserName());
 		attributes.put("statusDate", getStatusDate());
+		attributes.put("layoutPrototypeId", getLayoutPrototypeId());
 
 		attributes.put("entityCacheEnabled", isEntityCacheEnabled());
 		attributes.put("finderCacheEnabled", isFinderCacheEnabled());
@@ -373,6 +379,12 @@ public class LayoutPageTemplateEntryModelImpl extends BaseModelImpl<LayoutPageTe
 
 		if (statusDate != null) {
 			setStatusDate(statusDate);
+		}
+
+		Long layoutPrototypeId = (Long)attributes.get("layoutPrototypeId");
+
+		if (layoutPrototypeId != null) {
+			setLayoutPrototypeId(layoutPrototypeId);
 		}
 	}
 
@@ -748,6 +760,29 @@ public class LayoutPageTemplateEntryModelImpl extends BaseModelImpl<LayoutPageTe
 		_statusDate = statusDate;
 	}
 
+	@JSON
+	@Override
+	public long getLayoutPrototypeId() {
+		return _layoutPrototypeId;
+	}
+
+	@Override
+	public void setLayoutPrototypeId(long layoutPrototypeId) {
+		_columnBitmask |= LAYOUTPROTOTYPEID_COLUMN_BITMASK;
+
+		if (!_setOriginalLayoutPrototypeId) {
+			_setOriginalLayoutPrototypeId = true;
+
+			_originalLayoutPrototypeId = _layoutPrototypeId;
+		}
+
+		_layoutPrototypeId = layoutPrototypeId;
+	}
+
+	public long getOriginalLayoutPrototypeId() {
+		return _originalLayoutPrototypeId;
+	}
+
 	@Override
 	public boolean isApproved() {
 		if (getStatus() == WorkflowConstants.STATUS_APPROVED) {
@@ -877,6 +912,7 @@ public class LayoutPageTemplateEntryModelImpl extends BaseModelImpl<LayoutPageTe
 		layoutPageTemplateEntryImpl.setStatusByUserId(getStatusByUserId());
 		layoutPageTemplateEntryImpl.setStatusByUserName(getStatusByUserName());
 		layoutPageTemplateEntryImpl.setStatusDate(getStatusDate());
+		layoutPageTemplateEntryImpl.setLayoutPrototypeId(getLayoutPrototypeId());
 
 		layoutPageTemplateEntryImpl.resetOriginalValues();
 
@@ -969,6 +1005,10 @@ public class LayoutPageTemplateEntryModelImpl extends BaseModelImpl<LayoutPageTe
 
 		layoutPageTemplateEntryModelImpl._setOriginalStatus = false;
 
+		layoutPageTemplateEntryModelImpl._originalLayoutPrototypeId = layoutPageTemplateEntryModelImpl._layoutPrototypeId;
+
+		layoutPageTemplateEntryModelImpl._setOriginalLayoutPrototypeId = false;
+
 		layoutPageTemplateEntryModelImpl._columnBitmask = 0;
 	}
 
@@ -1051,12 +1091,14 @@ public class LayoutPageTemplateEntryModelImpl extends BaseModelImpl<LayoutPageTe
 			layoutPageTemplateEntryCacheModel.statusDate = Long.MIN_VALUE;
 		}
 
+		layoutPageTemplateEntryCacheModel.layoutPrototypeId = getLayoutPrototypeId();
+
 		return layoutPageTemplateEntryCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(37);
+		StringBundler sb = new StringBundler(39);
 
 		sb.append("{layoutPageTemplateEntryId=");
 		sb.append(getLayoutPageTemplateEntryId());
@@ -1094,6 +1136,8 @@ public class LayoutPageTemplateEntryModelImpl extends BaseModelImpl<LayoutPageTe
 		sb.append(getStatusByUserName());
 		sb.append(", statusDate=");
 		sb.append(getStatusDate());
+		sb.append(", layoutPrototypeId=");
+		sb.append(getLayoutPrototypeId());
 		sb.append("}");
 
 		return sb.toString();
@@ -1101,7 +1145,7 @@ public class LayoutPageTemplateEntryModelImpl extends BaseModelImpl<LayoutPageTe
 
 	@Override
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(58);
+		StringBundler sb = new StringBundler(61);
 
 		sb.append("<model><model-name>");
 		sb.append(
@@ -1180,6 +1224,10 @@ public class LayoutPageTemplateEntryModelImpl extends BaseModelImpl<LayoutPageTe
 			"<column><column-name>statusDate</column-name><column-value><![CDATA[");
 		sb.append(getStatusDate());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>layoutPrototypeId</column-name><column-value><![CDATA[");
+		sb.append(getLayoutPrototypeId());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -1188,7 +1236,7 @@ public class LayoutPageTemplateEntryModelImpl extends BaseModelImpl<LayoutPageTe
 
 	private static final ClassLoader _classLoader = LayoutPageTemplateEntry.class.getClassLoader();
 	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
-			LayoutPageTemplateEntry.class
+			LayoutPageTemplateEntry.class, ModelWrapper.class
 		};
 	private long _layoutPageTemplateEntryId;
 	private long _groupId;
@@ -1224,6 +1272,9 @@ public class LayoutPageTemplateEntryModelImpl extends BaseModelImpl<LayoutPageTe
 	private long _statusByUserId;
 	private String _statusByUserName;
 	private Date _statusDate;
+	private long _layoutPrototypeId;
+	private long _originalLayoutPrototypeId;
+	private boolean _setOriginalLayoutPrototypeId;
 	private long _columnBitmask;
 	private LayoutPageTemplateEntry _escapedModel;
 }

@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.service.persistence.CompanyProvider;
 import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -47,6 +48,7 @@ import com.liferay.portal.spring.extender.service.ServiceReference;
 import java.io.Serializable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 
 import java.util.Collections;
 import java.util.Date;
@@ -3110,6 +3112,233 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	private static final String _FINDER_COLUMN_G_T_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
 	private static final String _FINDER_COLUMN_G_T_TYPE_2 = "layoutPageTemplateEntry.type = ?";
 	private static final String _FINDER_COLUMN_G_T_TYPE_2_SQL = "layoutPageTemplateEntry.type_ = ?";
+	public static final FinderPath FINDER_PATH_FETCH_BY_G_LP = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
+			LayoutPageTemplateEntryImpl.class, FINDER_CLASS_NAME_ENTITY,
+			"fetchByG_LP",
+			new String[] { Long.class.getName(), Long.class.getName() },
+			LayoutPageTemplateEntryModelImpl.GROUPID_COLUMN_BITMASK |
+			LayoutPageTemplateEntryModelImpl.LAYOUTPROTOTYPEID_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_G_LP = new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_LP",
+			new String[] { Long.class.getName(), Long.class.getName() });
+
+	/**
+	 * Returns the layout page template entry where groupId = &#63; and layoutPrototypeId = &#63; or throws a {@link NoSuchPageTemplateEntryException} if it could not be found.
+	 *
+	 * @param groupId the group ID
+	 * @param layoutPrototypeId the layout prototype ID
+	 * @return the matching layout page template entry
+	 * @throws NoSuchPageTemplateEntryException if a matching layout page template entry could not be found
+	 */
+	@Override
+	public LayoutPageTemplateEntry findByG_LP(long groupId,
+		long layoutPrototypeId) throws NoSuchPageTemplateEntryException {
+		LayoutPageTemplateEntry layoutPageTemplateEntry = fetchByG_LP(groupId,
+				layoutPrototypeId);
+
+		if (layoutPageTemplateEntry == null) {
+			StringBundler msg = new StringBundler(6);
+
+			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+			msg.append("groupId=");
+			msg.append(groupId);
+
+			msg.append(", layoutPrototypeId=");
+			msg.append(layoutPrototypeId);
+
+			msg.append("}");
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(msg.toString());
+			}
+
+			throw new NoSuchPageTemplateEntryException(msg.toString());
+		}
+
+		return layoutPageTemplateEntry;
+	}
+
+	/**
+	 * Returns the layout page template entry where groupId = &#63; and layoutPrototypeId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param groupId the group ID
+	 * @param layoutPrototypeId the layout prototype ID
+	 * @return the matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
+	 */
+	@Override
+	public LayoutPageTemplateEntry fetchByG_LP(long groupId,
+		long layoutPrototypeId) {
+		return fetchByG_LP(groupId, layoutPrototypeId, true);
+	}
+
+	/**
+	 * Returns the layout page template entry where groupId = &#63; and layoutPrototypeId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param groupId the group ID
+	 * @param layoutPrototypeId the layout prototype ID
+	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @return the matching layout page template entry, or <code>null</code> if a matching layout page template entry could not be found
+	 */
+	@Override
+	public LayoutPageTemplateEntry fetchByG_LP(long groupId,
+		long layoutPrototypeId, boolean retrieveFromCache) {
+		Object[] finderArgs = new Object[] { groupId, layoutPrototypeId };
+
+		Object result = null;
+
+		if (retrieveFromCache) {
+			result = finderCache.getResult(FINDER_PATH_FETCH_BY_G_LP,
+					finderArgs, this);
+		}
+
+		if (result instanceof LayoutPageTemplateEntry) {
+			LayoutPageTemplateEntry layoutPageTemplateEntry = (LayoutPageTemplateEntry)result;
+
+			if ((groupId != layoutPageTemplateEntry.getGroupId()) ||
+					(layoutPrototypeId != layoutPageTemplateEntry.getLayoutPrototypeId())) {
+				result = null;
+			}
+		}
+
+		if (result == null) {
+			StringBundler query = new StringBundler(4);
+
+			query.append(_SQL_SELECT_LAYOUTPAGETEMPLATEENTRY_WHERE);
+
+			query.append(_FINDER_COLUMN_G_LP_GROUPID_2);
+
+			query.append(_FINDER_COLUMN_G_LP_LAYOUTPROTOTYPEID_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(groupId);
+
+				qPos.add(layoutPrototypeId);
+
+				List<LayoutPageTemplateEntry> list = q.list();
+
+				if (list.isEmpty()) {
+					finderCache.putResult(FINDER_PATH_FETCH_BY_G_LP,
+						finderArgs, list);
+				}
+				else {
+					LayoutPageTemplateEntry layoutPageTemplateEntry = list.get(0);
+
+					result = layoutPageTemplateEntry;
+
+					cacheResult(layoutPageTemplateEntry);
+
+					if ((layoutPageTemplateEntry.getGroupId() != groupId) ||
+							(layoutPageTemplateEntry.getLayoutPrototypeId() != layoutPrototypeId)) {
+						finderCache.putResult(FINDER_PATH_FETCH_BY_G_LP,
+							finderArgs, layoutPageTemplateEntry);
+					}
+				}
+			}
+			catch (Exception e) {
+				finderCache.removeResult(FINDER_PATH_FETCH_BY_G_LP, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		if (result instanceof List<?>) {
+			return null;
+		}
+		else {
+			return (LayoutPageTemplateEntry)result;
+		}
+	}
+
+	/**
+	 * Removes the layout page template entry where groupId = &#63; and layoutPrototypeId = &#63; from the database.
+	 *
+	 * @param groupId the group ID
+	 * @param layoutPrototypeId the layout prototype ID
+	 * @return the layout page template entry that was removed
+	 */
+	@Override
+	public LayoutPageTemplateEntry removeByG_LP(long groupId,
+		long layoutPrototypeId) throws NoSuchPageTemplateEntryException {
+		LayoutPageTemplateEntry layoutPageTemplateEntry = findByG_LP(groupId,
+				layoutPrototypeId);
+
+		return remove(layoutPageTemplateEntry);
+	}
+
+	/**
+	 * Returns the number of layout page template entries where groupId = &#63; and layoutPrototypeId = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param layoutPrototypeId the layout prototype ID
+	 * @return the number of matching layout page template entries
+	 */
+	@Override
+	public int countByG_LP(long groupId, long layoutPrototypeId) {
+		FinderPath finderPath = FINDER_PATH_COUNT_BY_G_LP;
+
+		Object[] finderArgs = new Object[] { groupId, layoutPrototypeId };
+
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(3);
+
+			query.append(_SQL_COUNT_LAYOUTPAGETEMPLATEENTRY_WHERE);
+
+			query.append(_FINDER_COLUMN_G_LP_GROUPID_2);
+
+			query.append(_FINDER_COLUMN_G_LP_LAYOUTPROTOTYPEID_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(groupId);
+
+				qPos.add(layoutPrototypeId);
+
+				count = (Long)q.uniqueResult();
+
+				finderCache.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception e) {
+				finderCache.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_G_LP_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_LP_LAYOUTPROTOTYPEID_2 = "layoutPageTemplateEntry.layoutPrototypeId = ?";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_G_L_LIKEN =
 		new FinderPath(LayoutPageTemplateEntryModelImpl.ENTITY_CACHE_ENABLED,
 			LayoutPageTemplateEntryModelImpl.FINDER_CACHE_ENABLED,
@@ -16367,6 +16596,12 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				layoutPageTemplateEntry.getName()
 			}, layoutPageTemplateEntry);
 
+		finderCache.putResult(FINDER_PATH_FETCH_BY_G_LP,
+			new Object[] {
+				layoutPageTemplateEntry.getGroupId(),
+				layoutPageTemplateEntry.getLayoutPrototypeId()
+			}, layoutPageTemplateEntry);
+
 		layoutPageTemplateEntry.resetOriginalValues();
 	}
 
@@ -16454,6 +16689,16 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			false);
 		finderCache.putResult(FINDER_PATH_FETCH_BY_G_N, args,
 			layoutPageTemplateEntryModelImpl, false);
+
+		args = new Object[] {
+				layoutPageTemplateEntryModelImpl.getGroupId(),
+				layoutPageTemplateEntryModelImpl.getLayoutPrototypeId()
+			};
+
+		finderCache.putResult(FINDER_PATH_COUNT_BY_G_LP, args, Long.valueOf(1),
+			false);
+		finderCache.putResult(FINDER_PATH_FETCH_BY_G_LP, args,
+			layoutPageTemplateEntryModelImpl, false);
 	}
 
 	protected void clearUniqueFindersCache(
@@ -16478,6 +16723,27 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 
 			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_N, args);
 			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_N, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+					layoutPageTemplateEntryModelImpl.getGroupId(),
+					layoutPageTemplateEntryModelImpl.getLayoutPrototypeId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_LP, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_LP, args);
+		}
+
+		if ((layoutPageTemplateEntryModelImpl.getColumnBitmask() &
+				FINDER_PATH_FETCH_BY_G_LP.getColumnBitmask()) != 0) {
+			Object[] args = new Object[] {
+					layoutPageTemplateEntryModelImpl.getOriginalGroupId(),
+					layoutPageTemplateEntryModelImpl.getOriginalLayoutPrototypeId()
+				};
+
+			finderCache.removeResult(FINDER_PATH_COUNT_BY_G_LP, args);
+			finderCache.removeResult(FINDER_PATH_FETCH_BY_G_LP, args);
 		}
 	}
 
@@ -16555,8 +16821,6 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	protected LayoutPageTemplateEntry removeImpl(
 		LayoutPageTemplateEntry layoutPageTemplateEntry) {
-		layoutPageTemplateEntry = toUnwrappedModel(layoutPageTemplateEntry);
-
 		Session session = null;
 
 		try {
@@ -16588,9 +16852,23 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	@Override
 	public LayoutPageTemplateEntry updateImpl(
 		LayoutPageTemplateEntry layoutPageTemplateEntry) {
-		layoutPageTemplateEntry = toUnwrappedModel(layoutPageTemplateEntry);
-
 		boolean isNew = layoutPageTemplateEntry.isNew();
+
+		if (!(layoutPageTemplateEntry instanceof LayoutPageTemplateEntryModelImpl)) {
+			InvocationHandler invocationHandler = null;
+
+			if (ProxyUtil.isProxyClass(layoutPageTemplateEntry.getClass())) {
+				invocationHandler = ProxyUtil.getInvocationHandler(layoutPageTemplateEntry);
+
+				throw new IllegalArgumentException(
+					"Implement ModelWrapper in layoutPageTemplateEntry proxy " +
+					invocationHandler.getClass());
+			}
+
+			throw new IllegalArgumentException(
+				"Implement ModelWrapper in custom LayoutPageTemplateEntry implementation " +
+				layoutPageTemplateEntry.getClass());
+		}
 
 		LayoutPageTemplateEntryModelImpl layoutPageTemplateEntryModelImpl = (LayoutPageTemplateEntryModelImpl)layoutPageTemplateEntry;
 
@@ -16967,39 +17245,6 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		layoutPageTemplateEntry.resetOriginalValues();
 
 		return layoutPageTemplateEntry;
-	}
-
-	protected LayoutPageTemplateEntry toUnwrappedModel(
-		LayoutPageTemplateEntry layoutPageTemplateEntry) {
-		if (layoutPageTemplateEntry instanceof LayoutPageTemplateEntryImpl) {
-			return layoutPageTemplateEntry;
-		}
-
-		LayoutPageTemplateEntryImpl layoutPageTemplateEntryImpl = new LayoutPageTemplateEntryImpl();
-
-		layoutPageTemplateEntryImpl.setNew(layoutPageTemplateEntry.isNew());
-		layoutPageTemplateEntryImpl.setPrimaryKey(layoutPageTemplateEntry.getPrimaryKey());
-
-		layoutPageTemplateEntryImpl.setLayoutPageTemplateEntryId(layoutPageTemplateEntry.getLayoutPageTemplateEntryId());
-		layoutPageTemplateEntryImpl.setGroupId(layoutPageTemplateEntry.getGroupId());
-		layoutPageTemplateEntryImpl.setCompanyId(layoutPageTemplateEntry.getCompanyId());
-		layoutPageTemplateEntryImpl.setUserId(layoutPageTemplateEntry.getUserId());
-		layoutPageTemplateEntryImpl.setUserName(layoutPageTemplateEntry.getUserName());
-		layoutPageTemplateEntryImpl.setCreateDate(layoutPageTemplateEntry.getCreateDate());
-		layoutPageTemplateEntryImpl.setModifiedDate(layoutPageTemplateEntry.getModifiedDate());
-		layoutPageTemplateEntryImpl.setLayoutPageTemplateCollectionId(layoutPageTemplateEntry.getLayoutPageTemplateCollectionId());
-		layoutPageTemplateEntryImpl.setClassNameId(layoutPageTemplateEntry.getClassNameId());
-		layoutPageTemplateEntryImpl.setClassTypeId(layoutPageTemplateEntry.getClassTypeId());
-		layoutPageTemplateEntryImpl.setName(layoutPageTemplateEntry.getName());
-		layoutPageTemplateEntryImpl.setType(layoutPageTemplateEntry.getType());
-		layoutPageTemplateEntryImpl.setHtmlPreviewEntryId(layoutPageTemplateEntry.getHtmlPreviewEntryId());
-		layoutPageTemplateEntryImpl.setDefaultTemplate(layoutPageTemplateEntry.isDefaultTemplate());
-		layoutPageTemplateEntryImpl.setStatus(layoutPageTemplateEntry.getStatus());
-		layoutPageTemplateEntryImpl.setStatusByUserId(layoutPageTemplateEntry.getStatusByUserId());
-		layoutPageTemplateEntryImpl.setStatusByUserName(layoutPageTemplateEntry.getStatusByUserName());
-		layoutPageTemplateEntryImpl.setStatusDate(layoutPageTemplateEntry.getStatusDate());
-
-		return layoutPageTemplateEntryImpl;
 	}
 
 	/**

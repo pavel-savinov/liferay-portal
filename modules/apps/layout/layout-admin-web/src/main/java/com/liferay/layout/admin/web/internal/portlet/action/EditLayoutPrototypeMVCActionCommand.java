@@ -15,6 +15,9 @@
 package com.liferay.layout.admin.web.internal.portlet.action;
 
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
+import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
+import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
+import com.liferay.layout.page.template.service.LayoutPageTemplateEntryService;
 import com.liferay.portal.kernel.model.LayoutPrototype;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -68,11 +71,30 @@ public class EditLayoutPrototypeMVCActionCommand extends BaseMVCActionCommand {
 				nameMap, descriptionMap, active, serviceContext);
 		}
 		else {
-			_layoutPrototypeService.updateLayoutPrototype(
-				layoutPrototypeId, nameMap, descriptionMap, active,
-				serviceContext);
+			LayoutPrototype layoutPrototype =
+				_layoutPrototypeService.updateLayoutPrototype(
+					layoutPrototypeId, nameMap, descriptionMap, active,
+					serviceContext);
+
+			LayoutPageTemplateEntry layoutPageTemplateEntry =
+				_layoutPageTemplateEntryLocalService.
+					fetchLayoutPageTemplateEntry(
+						serviceContext.getScopeGroupId(), layoutPrototypeId);
+
+			if (layoutPageTemplateEntry != null) {
+				_layoutPageTemplateEntryService.updateLayoutPageTemplateEntry(
+					layoutPageTemplateEntry.getLayoutPageTemplateEntryId(),
+					layoutPrototype.getName(serviceContext.getLocale(), true));
+			}
 		}
 	}
+
+	@Reference
+	private LayoutPageTemplateEntryLocalService
+		_layoutPageTemplateEntryLocalService;
+
+	@Reference
+	private LayoutPageTemplateEntryService _layoutPageTemplateEntryService;
 
 	@Reference
 	private LayoutPrototypeService _layoutPrototypeService;
