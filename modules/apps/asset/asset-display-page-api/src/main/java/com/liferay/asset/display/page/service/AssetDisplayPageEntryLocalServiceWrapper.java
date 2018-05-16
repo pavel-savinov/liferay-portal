@@ -48,9 +48,9 @@ public class AssetDisplayPageEntryLocalServiceWrapper
 
 	@Override
 	public com.liferay.asset.display.page.model.AssetDisplayPageEntry addAssetDisplayPageEntry(
-		long assetEntryId, long layoutId) {
+		long assetEntryId, long layoutPageTemplateEntryId) {
 		return _assetDisplayPageEntryLocalService.addAssetDisplayPageEntry(assetEntryId,
-			layoutId);
+			layoutPageTemplateEntryId);
 	}
 
 	/**
@@ -236,6 +236,11 @@ public class AssetDisplayPageEntryLocalServiceWrapper
 	@Override
 	public int getAssetDisplayPageEntriesCount() {
 		return _assetDisplayPageEntryLocalService.getAssetDisplayPageEntriesCount();
+	}
+
+	@Override
+	public int getAssetDisplayPageEntriesCount(long layoutPageTemplateEntryId) {
+		return _assetDisplayPageEntryLocalService.getAssetDisplayPageEntriesCount(layoutPageTemplateEntryId);
 	}
 
 	/**
