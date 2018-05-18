@@ -98,7 +98,7 @@ portletURL.setParameter("keywords", keywords);
 		</liferay-frontend:management-bar-action-buttons>
 	</c:if>
 
-	<c:if test="<%= ddmDisplay.isShowAddButton(themeDisplay.getScopeGroup()) && DDMTemplatePermission.containsAddTemplatePermission(permissionChecker, groupId, classNameId, scopeClassNameId) %>">
+	<c:if test="<%= (classNameId == 0) || (ddmDisplay.isShowAddButton(themeDisplay.getScopeGroup()) && DDMTemplatePermission.containsAddTemplatePermission(permissionChecker, groupId, classNameId, scopeClassNameId)) %>">
 		<liferay-frontend:management-bar-buttons>
 			<liferay-util:include page="/template_add_buttons.jsp" servletContext="<%= application %>">
 				<liferay-util:param name="groupId" value="<%= String.valueOf(groupId) %>" />
