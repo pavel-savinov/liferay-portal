@@ -1,5 +1,31 @@
+import com.liferay.gradle.util.copy.StripPathSegmentsAction
+
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
+
+configurations {
+	html2canvas
+}
+
+String html2canvasVersion = "1.0.0-alpha.12"
+
+task buildHtml2canvas(type: Copy)
+
+buildHtml2canvas {
+	eachFile new StripPathSegmentsAction(5)
+
+	from {
+		zipTree(configurations.html2canvas.singleFile)
+	}
+
+	include "META-INF/resources/webjars/html2canvas/${html2canvasVersion}/dist/html2canvas.min.js"
+	includeEmptyDirs = false
+	into "classes/META-INF/resources"
+}
+
+classes {
+	dependsOn buildHtml2canvas
+}
 
 dependencies {
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "default"
@@ -24,6 +50,8 @@ dependencies {
 	compileOnly project(":core:registry-api")
 
 	soyCompile project(":apps:frontend-js:frontend-js-web")
+
+	html2canvas group: "org.webjars.npm", name: "github-com-niklasvh-html2canvas", transitive: false, version: html2canvasVersion
 }
 
 replaceSoyTranslation {
