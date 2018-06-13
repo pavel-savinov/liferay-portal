@@ -92,9 +92,9 @@ public class AssetDisplayLayoutTypeController
 			request.setAttribute(WebKeys.PORTLET_DECORATE, Boolean.FALSE);
 		}
 
-		String assetDisplayURL = _portal.getCurrentCompleteURL(request);
-
-		request.setAttribute(WebKeys.ASSET_ENTRY_VIEW_URL, assetDisplayURL);
+		request.setAttribute(
+			WebKeys.ASSET_ENTRY_VIEW_URL,
+			_portal.getCurrentCompleteURL(request));
 
 		return super.includeLayoutContent(request, response, layout);
 	}

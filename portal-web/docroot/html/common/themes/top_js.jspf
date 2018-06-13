@@ -191,19 +191,16 @@
 			getCanonicalURL: function() {
 
 				<%
-				String completeURL = PortalUtil.getCurrentCompleteURL(request);
+				String canonicalURL = GetterUtil.getString(request.getAttribute(WebKeys.ASSET_ENTRY_VIEW_URL));
 
-				String assetEntryViewURL = GetterUtil.getString(request.getAttribute(WebKeys.ASSET_ENTRY_VIEW_URL));
+				if (Validator.isNull(canonicalURL)) {
+				     String completeURL = PortalUtil.getCurrentCompleteURL(request);
+
+				     canonicalURL = PortalUtil.getCanonicalURL(completeURL, themeDisplay, layout, true, false);
+				}
 				%>
 
-				<c:choose>
-					<c:when test="<%= Validator.isNotNull(assetEntryViewURL) %>">
-						return '<%= assetEntryViewURL %>';
-					</c:when>
-					<c:otherwise>
-						return '<%= PortalUtil.getCanonicalURL(completeURL, themeDisplay, layout, true, false) %>';
-					</c:otherwise>
-				</c:choose>
+				return '<%= canonicalURL %>';
 			},
 			getCDNBaseURL: function() {
 				return '<%= themeDisplay.getCDNBaseURL() %>';
