@@ -191,10 +191,16 @@
 			getCanonicalURL: function() {
 
 				<%
-				String completeURL = PortalUtil.getCurrentCompleteURL(request);
+				String canonicalURL = GetterUtil.getString(request.getAttribute(WebKeys.ASSET_ENTRY_VIEW_URL));
+
+				if (Validator.isNull(canonicalURL)) {
+				     String completeURL = PortalUtil.getCurrentCompleteURL(request);
+
+				     canonicalURL = PortalUtil.getCanonicalURL(completeURL, themeDisplay, layout, true, false);
+				}
 				%>
 
-				return '<%= PortalUtil.getCanonicalURL(completeURL, themeDisplay, layout, true, false) %>';
+				return '<%= canonicalURL %>';
 			},
 			getCDNBaseURL: function() {
 				return '<%= themeDisplay.getCDNBaseURL() %>';
