@@ -850,31 +850,40 @@ public class JournalArticleIndexer extends BaseIndexer<JournalArticle> {
 				Field.SNIPPET + StringPool.UNDERLINE + Field.DESCRIPTION,
 				Field.DESCRIPTION);
 
-			if (Validator.isBlank(description)) {
+			String snippet = document.get(
+				snippetLocale,
+				Field.SNIPPET + StringPool.UNDERLINE + Field.CONTENT,
+				Field.CONTENT);
+
+			if (Validator.isNull(description)) {
 				content = _html.stripHtml(articleDisplay.getDescription());
+
+				if (Validator.isNotNull(snippet)) {
+					if (Validator.isNotNull(content)) {
+						Set<String> highlights = new HashSet<>();
+
+						HighlightUtil.addSnippet(
+							document, highlights, snippet, "temp");
+
+						content = HighlightUtil.highlight(
+							content, ArrayUtil.toStringArray(highlights),
+							HighlightUtil.HIGHLIGHT_TAG_OPEN,
+							HighlightUtil.HIGHLIGHT_TAG_CLOSE);
+					}
+					else {
+						content = _stripAndHighlight(snippet);
+					}
+				}
+
+				if (Validator.isNull(content)) {
+					content = _html.extractText(articleDisplay.getContent());
+				}
 			}
 			else {
 				content = _stripAndHighlight(description);
 			}
 
 			content = _html.replaceNewLine(content);
-
-			if (Validator.isBlank(content)) {
-				content = _html.extractText(articleDisplay.getContent());
-			}
-
-			String snippet = document.get(
-				snippetLocale,
-				Field.SNIPPET + StringPool.UNDERLINE + Field.CONTENT);
-
-			Set<String> highlights = new HashSet<>();
-
-			HighlightUtil.addSnippet(document, highlights, snippet, "temp");
-
-			content = HighlightUtil.highlight(
-				content, ArrayUtil.toStringArray(highlights),
-				HighlightUtil.HIGHLIGHT_TAG_OPEN,
-				HighlightUtil.HIGHLIGHT_TAG_CLOSE);
 		}
 		catch (Exception e) {
 			if (_log.isDebugEnabled()) {
