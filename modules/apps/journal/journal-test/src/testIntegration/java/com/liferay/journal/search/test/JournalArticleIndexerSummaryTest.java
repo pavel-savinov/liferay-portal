@@ -94,11 +94,12 @@ public class JournalArticleIndexerSummaryTest {
 	@Test
 	public void testGetSummary() throws Exception {
 		String content = "test content";
+		String indexedContent = "test content ";
 		String title = "test title";
 
 		Document document = getDocument(title, content);
 
-		_summaryFixture.assertSummary(title, content, document);
+		_summaryFixture.assertSummary(title, indexedContent, document);
 	}
 
 	@Test
@@ -133,7 +134,7 @@ public class JournalArticleIndexerSummaryTest {
 
 		setFields(staleTitle, staleContent, document);
 
-		_summaryFixture.assertSummary(staleTitle, content, document);
+		_summaryFixture.assertSummary(staleTitle, staleContent, document);
 	}
 
 	@Test
@@ -145,7 +146,7 @@ public class JournalArticleIndexerSummaryTest {
 
 		String staleHighlightedContent = StringBundler.concat(
 			HighlightUtil.HIGHLIGHT_TAG_OPEN, "test",
-			HighlightUtil.HIGHLIGHT_TAG_CLOSE, " stale content");
+			HighlightUtil.HIGHLIGHT_TAG_CLOSE, " content");
 		String staleHighlightedTitle = StringBundler.concat(
 			HighlightUtil.HIGHLIGHT_TAG_OPEN, "test",
 			HighlightUtil.HIGHLIGHT_TAG_CLOSE, " stale title");
