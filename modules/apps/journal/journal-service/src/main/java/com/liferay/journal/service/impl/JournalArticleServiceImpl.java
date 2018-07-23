@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.security.permission.resource.PortletResourcePer
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -804,8 +805,10 @@ public class JournalArticleServiceImpl extends JournalArticleServiceBaseImpl {
 
 		folderIds.add(folderId);
 
-		return journalArticleFinder.filterFindByG_F(
-			groupId, folderIds, queryDefinition);
+		Locale siteDefaultLocale = LocaleUtil.getSiteDefault();
+
+		return journalArticleFinder.filterFindByG_F_L(
+			groupId, folderIds, siteDefaultLocale, queryDefinition);
 	}
 
 	/**
@@ -843,8 +846,10 @@ public class JournalArticleServiceImpl extends JournalArticleServiceBaseImpl {
 
 		folderIds.add(folderId);
 
-		return journalArticleFinder.filterFindByG_F(
-			groupId, folderIds, queryDefinition);
+		Locale siteDefaultLocale = LocaleUtil.getSiteDefault();
+
+		return journalArticleFinder.filterFindByG_F_L(
+			groupId, folderIds, siteDefaultLocale, queryDefinition);
 	}
 
 	/**
