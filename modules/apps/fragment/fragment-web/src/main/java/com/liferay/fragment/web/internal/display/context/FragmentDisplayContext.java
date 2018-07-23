@@ -24,6 +24,7 @@ import com.liferay.fragment.service.FragmentEntryServiceUtil;
 import com.liferay.fragment.web.internal.configuration.FragmentPortletConfiguration;
 import com.liferay.fragment.web.internal.constants.FragmentWebKeys;
 import com.liferay.fragment.web.internal.security.permission.resource.FragmentPermission;
+import com.liferay.fragment.web.internal.util.SoyContextFactoryUtil;
 import com.liferay.fragment.web.util.FragmentPortletUtil;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
@@ -48,6 +49,8 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.template.soy.utils.SoyContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -207,6 +210,38 @@ public class FragmentDisplayContext {
 			_request, "fragmentCollectionId", defaultFragmentCollectionId);
 
 		return _fragmentCollectionId;
+	}
+
+	public SoyContext getFragmentEditorDisplayContext() {
+		SoyContext soyContext = SoyContextFactoryUtil.createSoyContext();
+
+		SoyContext allowedStatusSoyContext = SoyContextFactoryUtil.createSoyContext();
+		allowedStatusSoyContext.put("approved", WorkflowConstants.STATUS_APPROVED + ""); // TODO
+		allowedStatusSoyContext.put("draft", WorkflowConstants.STATUS_DRAFT + ""); // TODO
+		soyContext.put("allowedStatus", allowedStatusSoyContext);
+
+		soyContext.put("fragmentCollectionId", getFragmentCollectionId());
+		soyContext.put("fragmentEntryId", getFragmentEntryId());
+		soyContext.put("initialCSS", getCssContent());
+		soyContext.put("initialHTML", getHtmlContent());
+		soyContext.put("initialJS", getJsContent());
+		soyContext.put("name", getName());
+
+		soyContext.put("portletNamespace", "TODO"); // TODO
+
+		soyContext.put("spritemap", "TODO"); // TODO
+
+		soyContext.put("status", getFragmentEntry().getStatus() + ""); // TODO
+
+		SoyContext urlsSoycontext = SoyContextFactoryUtil.createSoyContext();
+		urlsSoycontext.put("current", "TODO"); // TODO
+		urlsSoycontext.put("edit", "TODO"); // TODO
+		urlsSoycontext.put("preview", "TODO"); // TODO
+		urlsSoycontext.put("redirect", getRedirect());
+		urlsSoycontext.put("render", "TODO"); // TODO
+		soyContext.put("urls", urlsSoycontext);
+
+		return soyContext;
 	}
 
 	public SearchContainer getFragmentEntriesSearchContainer() {
@@ -465,6 +500,22 @@ public class FragmentDisplayContext {
 		return _jsContent;
 	}
 
+	public String getName() {
+		if (Validator.isNotNull(_name)) {
+			return _name;
+		}
+
+		_name = ParamUtil.getString(_request, "name");
+
+		FragmentEntry fragmentEntry = getFragmentEntry();
+
+		if ((fragmentEntry != null) && Validator.isNull(_name)) {
+			_name = fragmentEntry.getName();
+		}
+
+		return _name;
+	}
+
 	public String getOrderByType() {
 		if (Validator.isNotNull(_orderByType)) {
 			return _orderByType;
@@ -650,6 +701,7 @@ public class FragmentDisplayContext {
 	private final ItemSelector _itemSelector;
 	private String _jsContent;
 	private String _keywords;
+	private String _name;
 	private String _orderByCol;
 	private String _orderByType;
 	private final RenderRequest _renderRequest;
