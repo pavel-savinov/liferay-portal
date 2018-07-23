@@ -4238,8 +4238,10 @@ public class JournalArticleLocalServiceImpl
 		QueryDefinition<JournalArticle> queryDefinition = new QueryDefinition<>(
 			status, start, end, null);
 
-		return journalArticleFinder.findByG_F(
-			groupId, folderIds, queryDefinition);
+		Locale siteDefaultLocale = LocaleUtil.getSiteDefault();
+
+		return journalArticleFinder.findByG_F_L(
+			groupId, folderIds, siteDefaultLocale, queryDefinition);
 	}
 
 	/**
