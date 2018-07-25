@@ -205,7 +205,7 @@ public class SiteNavigationMenuPortletDataHandler
 			}
 		}
 
-		_createNavigationMenuIfLayoutSetPrototype(portletDataContext);
+		_checkLayoutSetPrototypeNavigationMenu(portletDataContext);
 
 		return portletPreferences;
 	}
@@ -248,7 +248,7 @@ public class SiteNavigationMenuPortletDataHandler
 		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
-	private void _createNavigationMenuIfLayoutSetPrototype(
+	private void _checkLayoutSetPrototypeNavigationMenu(
 			PortletDataContext portletDataContext)
 		throws PortalException {
 
