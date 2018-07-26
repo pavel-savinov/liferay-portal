@@ -6,7 +6,8 @@ A set of variables have been made available for the template developers:
 
 {$ddmTemplateId}: the current template id
 
-{$entries}: the list of pages that are being shown in this portlet
+{$entries}: the list of site navigation menu items that are being shown in this
+portlet
 
 {$entry}: the page when there's only one page
 

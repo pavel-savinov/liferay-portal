@@ -38,21 +38,29 @@ public interface SiteNavigationSiteMapPortletInstanceConfiguration {
 	@Meta.AD(name = "display-style", required = false)
 	public String displayStyle();
 
+	@Meta.AD(deflt = "0", name = "root-item-id", required = false)
+	public long rootItemId();
+
+	@Deprecated
 	@Meta.AD(name = "root-layout-uuid", required = false)
 	public String rootLayoutUuid();
 
 	@Meta.AD(deflt = "0", name = "display-depth", required = false)
 	public int displayDepth();
 
+	@Deprecated
 	@Meta.AD(deflt = "false", name = "include-root-in-tree", required = false)
 	public boolean includeRootInTree();
 
+	@Deprecated
 	@Meta.AD(deflt = "false", name = "show-current-page", required = false)
 	public boolean showCurrentPage();
 
+	@Deprecated
 	@Meta.AD(deflt = "false", name = "use-html-title", required = false)
 	public boolean useHtmlTitle();
 
+	@Deprecated
 	@Meta.AD(deflt = "false", name = "show-hidden-pages", required = false)
 	public boolean showHiddenPages();
 

@@ -5,7 +5,8 @@
 ##
 ##  $ddmTemplateId: the current template id
 ##
-##  $entries: the list of root layouts that are being shown in the portlet
+##  $entries: the list of site navigation menu items that are being shown in
+##  this portlet
 ##
 ##  $locale: the locale of the site
 ##
