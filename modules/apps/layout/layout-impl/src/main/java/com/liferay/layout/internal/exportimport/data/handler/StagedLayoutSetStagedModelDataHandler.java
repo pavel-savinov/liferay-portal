@@ -363,7 +363,7 @@ public class StagedLayoutSetStagedModelDataHandler
 
 		Group group = stagedLayoutSet.getGroup();
 
-		if (group.isLayoutPrototype()) {
+		if (group.isLayoutPrototype() && ArrayUtil.isEmpty(layoutIds)) {
 			layoutIds = _exportImportHelper.getAllLayoutIds(
 				group.getGroupId(), portletDataContext.isPrivateLayout());
 		}
