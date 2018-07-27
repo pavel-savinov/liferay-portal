@@ -401,13 +401,15 @@ public class PortletExportControllerImpl implements PortletExportController {
 				if (layout != null) {
 					Group liveGroup = layout.getGroup();
 
-					Group stagingGroup = liveGroup.getStagingGroup();
+					if (liveGroup.isStaged()) {
+						Group stagingGroup = liveGroup.getStagingGroup();
 
-					layout.setGroupId(stagingGroup.getGroupId());
+						layout.setGroupId(stagingGroup.getGroupId());
 
-					jxPortletPreferences =
-						PortletPreferencesFactoryUtil.getStrictPortletSetup(
-							layout, portletDataContext.getPortletId());
+						jxPortletPreferences =
+							PortletPreferencesFactoryUtil.getStrictPortletSetup(
+								layout, portletDataContext.getPortletId());
+					}
 
 					layout.setGroupId(liveGroup.getGroupId());
 				}
