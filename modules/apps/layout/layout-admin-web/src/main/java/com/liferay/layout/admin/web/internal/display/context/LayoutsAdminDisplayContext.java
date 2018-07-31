@@ -1030,6 +1030,18 @@ public class LayoutsAdminDisplayContext {
 
 		PortletURL portletURL = getPortletURL();
 
+		Layout layout = LayoutLocalServiceUtil.fetchLayout(plid);
+
+		if (layout != null) {
+			String navigation = "public-pages";
+
+			if (layout.isPrivateLayout()) {
+				navigation = "private-pages";
+			}
+
+			portletURL.setParameter("navigation", navigation);
+		}
+
 		portletURL.setParameter("selPlid", String.valueOf(plid));
 
 		breadcrumbEntryJSONObject.put("url", portletURL.toString());
