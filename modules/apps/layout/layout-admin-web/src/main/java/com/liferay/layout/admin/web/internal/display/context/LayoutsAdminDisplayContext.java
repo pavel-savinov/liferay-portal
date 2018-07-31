@@ -162,15 +162,23 @@ public class LayoutsAdminDisplayContext {
 		JSONArray breadcrumbEntriesJSONArray =
 			JSONFactoryUtil.createJSONArray();
 
-		breadcrumbEntriesJSONArray.put(
-			_getBreadcrumbEntryJSONObject(
-				LayoutConstants.DEFAULT_PLID, _getTitle(isPrivatePages())));
-
-		if (getSelPlid() == LayoutConstants.DEFAULT_PLID) {
-			return breadcrumbEntriesJSONArray;
-		}
+		boolean privatePages = isPrivatePages();
 
 		Layout selLayout = getSelLayout();
+
+		if (selLayout != null) {
+			privatePages = selLayout.isPrivateLayout();
+		}
+
+		breadcrumbEntriesJSONArray.put(
+			_getBreadcrumbEntryJSONObject(
+				LayoutConstants.DEFAULT_PLID, _getTitle(privatePages)));
+
+		if ((getSelPlid() == LayoutConstants.DEFAULT_PLID) ||
+			(selLayout == null)) {
+
+			return breadcrumbEntriesJSONArray;
+		}
 
 		if (selLayout == null) {
 			return breadcrumbEntriesJSONArray;
