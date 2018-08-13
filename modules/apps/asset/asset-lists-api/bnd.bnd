@@ -1,3 +1,8 @@
 Bundle-Name: Liferay Asset Lists API
 Bundle-SymbolicName: com.liferay.asset.lists.api
 Bundle-Version: 1.0.0
+Export-Package:\
+	com.liferay.asset.lists.exception,\
+	com.liferay.asset.lists.model,\
+	com.liferay.asset.lists.service,\
+	com.liferay.asset.lists.service.persistence
