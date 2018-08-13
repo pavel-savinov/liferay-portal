@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<beans
+	default-destroy-method="destroy"
+	default-init-method="afterPropertiesSet"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+>
+	<bean class="com.liferay.asset.lists.service.impl.AssetListLocalServiceImpl" id="com.liferay.asset.lists.service.AssetListLocalService" />
+	<bean class="com.liferay.asset.lists.service.impl.AssetListServiceImpl" id="com.liferay.asset.lists.service.AssetListService" />
+	<bean class="com.liferay.asset.lists.service.persistence.impl.AssetListPersistenceImpl" id="com.liferay.asset.lists.service.persistence.AssetListPersistence" parent="basePersistence" />
+</beans>
