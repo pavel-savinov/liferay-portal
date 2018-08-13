@@ -1,0 +1,7 @@
+buildService {
+	apiDir = "../asset-lists-api/src/main/java"
+	testDir = "../asset-lists-test/src/testIntegration/java"
+}
+
+dependencies {
+}
