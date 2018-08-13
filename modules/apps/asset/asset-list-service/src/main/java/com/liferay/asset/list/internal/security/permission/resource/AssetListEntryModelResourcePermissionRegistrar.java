@@ -14,21 +14,22 @@
 
 package com.liferay.asset.list.internal.security.permission.resource;
 
-import com.liferay.layout.page.template.constants.LayoutPageTemplateConstants;
-import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
-import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
+import com.liferay.asset.list.constants.AssetListConstants;
+import com.liferay.asset.list.model.AssetListEntry;
+import com.liferay.asset.list.service.AssetListEntryLocalService;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.util.HashMapDictionary;
+
+import java.util.Dictionary;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-
-import java.util.Dictionary;
 
 /**
  * @author Jürgen Kappler
@@ -40,16 +41,13 @@ public class AssetListEntryModelResourcePermissionRegistrar {
 	public void activate(BundleContext bundleContext) {
 		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
-		properties.put(
-			"model.class.name", LayoutPageTemplateEntry.class.getName());
+		properties.put("model.class.name", AssetListEntry.class.getName());
 
 		_serviceRegistration = bundleContext.registerService(
 			ModelResourcePermission.class,
 			ModelResourcePermissionFactory.create(
-				LayoutPageTemplateEntry.class,
-				LayoutPageTemplateEntry::getLayoutPageTemplateEntryId,
-				_layoutPageTemplateEntryLocalService::
-					getLayoutPageTemplateEntry,
+				AssetListEntry.class, AssetListEntry::getAssetListEntryId,
+				_assetListEntryLocalService::getAssetListEntry,
 				_portletResourcePermission,
 				(modelResourcePermission, consumer) -> {
 				}),
@@ -62,11 +60,10 @@ public class AssetListEntryModelResourcePermissionRegistrar {
 	}
 
 	@Reference
-	private LayoutPageTemplateEntryLocalService
-		_layoutPageTemplateEntryLocalService;
+	private AssetListEntryLocalService _assetListEntryLocalService;
 
 	@Reference(
-		target = "(resource.name=" + LayoutPageTemplateConstants.RESOURCE_NAME + ")"
+		target = "(resource.name=" + AssetListConstants.RESOURCE_NAME + ")"
 	)
 	private PortletResourcePermission _portletResourcePermission;
 
