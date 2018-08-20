@@ -14,28 +14,50 @@
 
 package com.liferay.asset.list.service.impl;
 
+import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.base.AssetListEntryServiceBaseImpl;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.service.ServiceContext;
+
+import java.util.Map;
 
 /**
- * The implementation of the asset list entry remote service.
- *
- * <p>
- * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.asset.list.service.AssetListEntryService} interface.
- *
- * <p>
- * This is a remote service. Methods of this service are expected to have security checks based on the propagated JAAS credentials because this service can be accessed remotely.
- * </p>
- *
- * @author Brian Wing Shun Chan
- * @see AssetListEntryServiceBaseImpl
- * @see com.liferay.asset.list.service.AssetListEntryServiceUtil
+ * @author Jürgen Kappler
  */
 public class AssetListEntryServiceImpl extends AssetListEntryServiceBaseImpl {
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never reference this class directly. Always use {@link com.liferay.asset.list.service.AssetListEntryServiceUtil} to access the asset list entry remote service.
-	 */
+	@Override
+	public AssetListEntry addAssetListEntry(
+			long userId, long groupId, Map<String, String> titleMap,
+			Map<String, String> descriptionMap, int type,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		return assetListEntryLocalService.addAssetListEntry(
+			userId, groupId, titleMap, descriptionMap, type, serviceContext);
+	}
+
+	@Override
+	public AssetListEntry deleteAssetListEntry(long assetListEntryId)
+		throws PortalException {
+
+		return assetListEntryLocalService.deleteAssetListEntry(
+			assetListEntryId);
+	}
+
+	@Override
+	public AssetListEntry fetchAssetListEntry(long assetListEntryId) {
+		return assetListEntryLocalService.fetchAssetListEntry(assetListEntryId);
+	}
+
+	@Override
+	public AssetListEntry updateAssetListEntry(
+			long assetListEntryId, Map<String, String> titleMap,
+			Map<String, String> descriptionMap)
+		throws PortalException {
+
+		return assetListEntryLocalService.updateAssetListEntry(
+			assetListEntryId, titleMap, descriptionMap);
+	}
 
 }
