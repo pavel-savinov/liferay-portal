@@ -43,6 +43,10 @@
 			<finder-column name="groupId" />
 			<finder-column name="type" />
 		</finder>
+
+		<!-- References -->
+
+		<reference entity="User" package-path="com.liferay.portal" />
 	</entity>
 	<exceptions>
 		<exception>AssetListName</exception>

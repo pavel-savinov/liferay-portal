@@ -14,28 +14,91 @@
 
 package com.liferay.asset.lists.service.impl;
 
+import com.liferay.asset.lists.exception.NoSuchAssetListException;
+import com.liferay.asset.lists.model.AssetList;
 import com.liferay.asset.lists.service.base.AssetListLocalServiceBaseImpl;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.SystemEventConstants;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.systemevent.SystemEvent;
+
+import java.util.Date;
+import java.util.Locale;
+import java.util.Map;
 
 /**
- * The implementation of the asset list local service.
- *
- * <p>
- * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.asset.lists.service.AssetListLocalService} interface.
- *
- * <p>
- * This is a local service. Methods of this service will not have security checks based on the propagated JAAS credentials because this service can only be accessed from within the same VM.
- * </p>
- *
- * @author Brian Wing Shun Chan
- * @see AssetListLocalServiceBaseImpl
- * @see com.liferay.asset.lists.service.AssetListLocalServiceUtil
+ * @author Jürgen Kappler
  */
 public class AssetListLocalServiceImpl extends AssetListLocalServiceBaseImpl {
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never reference this class directly. Always use {@link com.liferay.asset.lists.service.AssetListLocalServiceUtil} to access the asset list local service.
-	 */
+	@Override
+	public AssetList addAssetList(
+			long userId, long groupId, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap, int type,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		User user = userLocalService.getUser(userId);
+
+		long assetListId = counterLocalService.increment();
+
+		AssetList assetList = assetListPersistence.create(assetListId);
+
+		assetList.setUuid(serviceContext.getUuid());
+		assetList.setGroupId(groupId);
+		assetList.setCompanyId(user.getCompanyId());
+		assetList.setUserId(user.getUserId());
+		assetList.setUserName(user.getFullName());
+		assetList.setCreateDate(serviceContext.getCreateDate(new Date()));
+		assetList.setModifiedDate(serviceContext.getModifiedDate(new Date()));
+		assetList.setNameMap(nameMap);
+		assetList.setDescriptionMap(descriptionMap);
+		assetList.setType(type);
+
+		assetListPersistence.update(assetList);
+
+		return assetList;
+	}
+
+	@Override
+	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
+	public AssetList deleteAssetList(AssetList assetList) {
+		assetListPersistence.remove(assetList);
+
+		return assetList;
+	}
+
+	@Override
+	public AssetList deleteAssetList(long assetListId)
+		throws NoSuchAssetListException {
+
+		AssetList assetList = assetListPersistence.fetchByPrimaryKey(
+			assetListId);
+
+		if (assetList == null) {
+			throw new NoSuchAssetListException();
+		}
+
+		return assetListLocalService.deleteAssetList(assetList);
+	}
+
+	@Override
+	public AssetList updateAssetList(
+			long assetListId, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap)
+		throws PortalException {
+
+		AssetList assetList = assetListPersistence.findByPrimaryKey(
+			assetListId);
+
+		assetList.setModifiedDate(new Date());
+		assetList.setNameMap(nameMap);
+		assetList.setDescriptionMap(descriptionMap);
+
+		assetListPersistence.update(assetList);
+
+		return assetList;
+	}
 
 }
