@@ -482,6 +482,60 @@ public interface AssetListPersistence extends BasePersistence<AssetList> {
 		throws NoSuchAssetListException;
 
 	/**
+	* Returns all the asset lists that the user has permission to view where groupId = &#63;.
+	*
+	* @param groupId the group ID
+	* @return the matching asset lists that the user has permission to view
+	*/
+	public java.util.List<AssetList> filterFindByGroupId(long groupId);
+
+	/**
+	* Returns a range of all the asset lists that the user has permission to view where groupId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AssetListModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param start the lower bound of the range of asset lists
+	* @param end the upper bound of the range of asset lists (not inclusive)
+	* @return the range of matching asset lists that the user has permission to view
+	*/
+	public java.util.List<AssetList> filterFindByGroupId(long groupId,
+		int start, int end);
+
+	/**
+	* Returns an ordered range of all the asset lists that the user has permissions to view where groupId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AssetListModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param start the lower bound of the range of asset lists
+	* @param end the upper bound of the range of asset lists (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching asset lists that the user has permission to view
+	*/
+	public java.util.List<AssetList> filterFindByGroupId(long groupId,
+		int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<AssetList> orderByComparator);
+
+	/**
+	* Returns the asset lists before and after the current asset list in the ordered set of asset lists that the user has permission to view where groupId = &#63;.
+	*
+	* @param assetListId the primary key of the current asset list
+	* @param groupId the group ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next asset list
+	* @throws NoSuchAssetListException if a asset list with the primary key could not be found
+	*/
+	public AssetList[] filterFindByGroupId_PrevAndNext(long assetListId,
+		long groupId,
+		com.liferay.portal.kernel.util.OrderByComparator<AssetList> orderByComparator)
+		throws NoSuchAssetListException;
+
+	/**
 	* Removes all the asset lists where groupId = &#63; from the database.
 	*
 	* @param groupId the group ID
@@ -495,6 +549,14 @@ public interface AssetListPersistence extends BasePersistence<AssetList> {
 	* @return the number of matching asset lists
 	*/
 	public int countByGroupId(long groupId);
+
+	/**
+	* Returns the number of asset lists that the user has permission to view where groupId = &#63;.
+	*
+	* @param groupId the group ID
+	* @return the number of matching asset lists that the user has permission to view
+	*/
+	public int filterCountByGroupId(long groupId);
 
 	/**
 	* Returns all the asset lists where groupId = &#63; and type = &#63;.
@@ -623,6 +685,64 @@ public interface AssetListPersistence extends BasePersistence<AssetList> {
 		throws NoSuchAssetListException;
 
 	/**
+	* Returns all the asset lists that the user has permission to view where groupId = &#63; and type = &#63;.
+	*
+	* @param groupId the group ID
+	* @param type the type
+	* @return the matching asset lists that the user has permission to view
+	*/
+	public java.util.List<AssetList> filterFindByG_T(long groupId, int type);
+
+	/**
+	* Returns a range of all the asset lists that the user has permission to view where groupId = &#63; and type = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AssetListModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param type the type
+	* @param start the lower bound of the range of asset lists
+	* @param end the upper bound of the range of asset lists (not inclusive)
+	* @return the range of matching asset lists that the user has permission to view
+	*/
+	public java.util.List<AssetList> filterFindByG_T(long groupId, int type,
+		int start, int end);
+
+	/**
+	* Returns an ordered range of all the asset lists that the user has permissions to view where groupId = &#63; and type = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link AssetListModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	* </p>
+	*
+	* @param groupId the group ID
+	* @param type the type
+	* @param start the lower bound of the range of asset lists
+	* @param end the upper bound of the range of asset lists (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching asset lists that the user has permission to view
+	*/
+	public java.util.List<AssetList> filterFindByG_T(long groupId, int type,
+		int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<AssetList> orderByComparator);
+
+	/**
+	* Returns the asset lists before and after the current asset list in the ordered set of asset lists that the user has permission to view where groupId = &#63; and type = &#63;.
+	*
+	* @param assetListId the primary key of the current asset list
+	* @param groupId the group ID
+	* @param type the type
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next asset list
+	* @throws NoSuchAssetListException if a asset list with the primary key could not be found
+	*/
+	public AssetList[] filterFindByG_T_PrevAndNext(long assetListId,
+		long groupId, int type,
+		com.liferay.portal.kernel.util.OrderByComparator<AssetList> orderByComparator)
+		throws NoSuchAssetListException;
+
+	/**
 	* Removes all the asset lists where groupId = &#63; and type = &#63; from the database.
 	*
 	* @param groupId the group ID
@@ -638,6 +758,15 @@ public interface AssetListPersistence extends BasePersistence<AssetList> {
 	* @return the number of matching asset lists
 	*/
 	public int countByG_T(long groupId, int type);
+
+	/**
+	* Returns the number of asset lists that the user has permission to view where groupId = &#63; and type = &#63;.
+	*
+	* @param groupId the group ID
+	* @param type the type
+	* @return the number of matching asset lists that the user has permission to view
+	*/
+	public int filterCountByG_T(long groupId, int type);
 
 	/**
 	* Caches the asset list in the entity cache if it is enabled.

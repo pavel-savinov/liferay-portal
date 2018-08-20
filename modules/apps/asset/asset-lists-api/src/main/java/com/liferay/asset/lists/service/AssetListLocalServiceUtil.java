@@ -54,6 +54,17 @@ public class AssetListLocalServiceUtil {
 		return getService().addAssetList(assetList);
 	}
 
+	public static com.liferay.asset.lists.model.AssetList addAssetList(
+		long userId, long groupId,
+		java.util.Map<java.util.Locale, String> nameMap,
+		java.util.Map<java.util.Locale, String> descriptionMap, int type,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .addAssetList(userId, groupId, nameMap, descriptionMap,
+			type, serviceContext);
+	}
+
 	/**
 	* Creates a new asset list with the primary key. Does not add the asset list to the database.
 	*
@@ -81,11 +92,13 @@ public class AssetListLocalServiceUtil {
 	*
 	* @param assetListId the primary key of the asset list
 	* @return the asset list that was removed
+	* @throws NoSuchAssetListException
 	* @throws PortalException if a asset list with the primary key could not be found
 	*/
 	public static com.liferay.asset.lists.model.AssetList deleteAssetList(
 		long assetListId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		throws com.liferay.asset.lists.exception.NoSuchAssetListException,
+			com.liferay.portal.kernel.exception.PortalException {
 		return getService().deleteAssetList(assetListId);
 	}
 
@@ -312,6 +325,13 @@ public class AssetListLocalServiceUtil {
 	public static com.liferay.asset.lists.model.AssetList updateAssetList(
 		com.liferay.asset.lists.model.AssetList assetList) {
 		return getService().updateAssetList(assetList);
+	}
+
+	public static com.liferay.asset.lists.model.AssetList updateAssetList(
+		long assetListId, java.util.Map<java.util.Locale, String> nameMap,
+		java.util.Map<java.util.Locale, String> descriptionMap)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().updateAssetList(assetListId, nameMap, descriptionMap);
 	}
 
 	public static AssetListLocalService getService() {

@@ -16,9 +16,20 @@ package com.liferay.asset.lists.service.http;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.asset.lists.service.AssetListServiceUtil;
+
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.LocalizationUtil;
+
+import java.rmi.RemoteException;
+
+import java.util.Locale;
+import java.util.Map;
+
 /**
  * Provides the SOAP utility for the
- * {@link com.liferay.asset.lists.service.AssetListServiceUtil} service utility. The
+ * {@link AssetListServiceUtil} service utility. The
  * static methods of this class calls the same methods of the service utility.
  * However, the signatures are different because it is difficult for SOAP to
  * support certain types.
@@ -53,9 +64,84 @@ import aQute.bnd.annotation.ProviderType;
  * @author Brian Wing Shun Chan
  * @see AssetListServiceHttp
  * @see com.liferay.asset.lists.model.AssetListSoap
- * @see com.liferay.asset.lists.service.AssetListServiceUtil
+ * @see AssetListServiceUtil
  * @generated
  */
 @ProviderType
 public class AssetListServiceSoap {
+	public static com.liferay.asset.lists.model.AssetListSoap addAssetList(
+		long userId, long groupId, String[] nameMapLanguageIds,
+		String[] nameMapValues, String[] descriptionMapLanguageIds,
+		String[] descriptionMapValues, int type,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws RemoteException {
+		try {
+			Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(nameMapLanguageIds,
+					nameMapValues);
+			Map<Locale, String> descriptionMap = LocalizationUtil.getLocalizationMap(descriptionMapLanguageIds,
+					descriptionMapValues);
+
+			com.liferay.asset.lists.model.AssetList returnValue = AssetListServiceUtil.addAssetList(userId,
+					groupId, nameMap, descriptionMap, type, serviceContext);
+
+			return com.liferay.asset.lists.model.AssetListSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.asset.lists.model.AssetListSoap deleteAssetList(
+		long assetListId) throws RemoteException {
+		try {
+			com.liferay.asset.lists.model.AssetList returnValue = AssetListServiceUtil.deleteAssetList(assetListId);
+
+			return com.liferay.asset.lists.model.AssetListSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.asset.lists.model.AssetListSoap fetchAssetList(
+		long assetListId) throws RemoteException {
+		try {
+			com.liferay.asset.lists.model.AssetList returnValue = AssetListServiceUtil.fetchAssetList(assetListId);
+
+			return com.liferay.asset.lists.model.AssetListSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.asset.lists.model.AssetListSoap updateAssetList(
+		long assetListId, String[] nameMapLanguageIds, String[] nameMapValues,
+		String[] descriptionMapLanguageIds, String[] descriptionMapValues)
+		throws RemoteException {
+		try {
+			Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(nameMapLanguageIds,
+					nameMapValues);
+			Map<Locale, String> descriptionMap = LocalizationUtil.getLocalizationMap(descriptionMapLanguageIds,
+					descriptionMapValues);
+
+			com.liferay.asset.lists.model.AssetList returnValue = AssetListServiceUtil.updateAssetList(assetListId,
+					nameMap, descriptionMap);
+
+			return com.liferay.asset.lists.model.AssetListSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	private static Log _log = LogFactoryUtil.getLog(AssetListServiceSoap.class);
 }

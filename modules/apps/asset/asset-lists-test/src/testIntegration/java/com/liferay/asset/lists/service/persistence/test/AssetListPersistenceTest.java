@@ -240,6 +240,12 @@ public class AssetListPersistenceTest {
 			getOrderByComparator());
 	}
 
+	@Test
+	public void testFilterFindByGroupId() throws Exception {
+		_persistence.filterFindByGroupId(0, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, getOrderByComparator());
+	}
+
 	protected OrderByComparator<AssetList> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create("AssetList", "uuid", true,
 			"assetListId", true, "groupId", true, "companyId", true, "userId",

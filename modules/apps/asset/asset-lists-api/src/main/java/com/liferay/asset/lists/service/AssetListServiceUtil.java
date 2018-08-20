@@ -42,6 +42,28 @@ public class AssetListServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.asset.lists.service.impl.AssetListServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
+	public static com.liferay.asset.lists.model.AssetList addAssetList(
+		long userId, long groupId,
+		java.util.Map<java.util.Locale, String> nameMap,
+		java.util.Map<java.util.Locale, String> descriptionMap, int type,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .addAssetList(userId, groupId, nameMap, descriptionMap,
+			type, serviceContext);
+	}
+
+	public static com.liferay.asset.lists.model.AssetList deleteAssetList(
+		long assetListId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().deleteAssetList(assetListId);
+	}
+
+	public static com.liferay.asset.lists.model.AssetList fetchAssetList(
+		long assetListId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().fetchAssetList(assetListId);
+	}
 
 	/**
 	* Returns the OSGi service identifier.
@@ -50,6 +72,13 @@ public class AssetListServiceUtil {
 	*/
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
+	}
+
+	public static com.liferay.asset.lists.model.AssetList updateAssetList(
+		long assetListId, java.util.Map<java.util.Locale, String> nameMap,
+		java.util.Map<java.util.Locale, String> descriptionMap)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().updateAssetList(assetListId, nameMap, descriptionMap);
 	}
 
 	public static AssetListService getService() {

@@ -32,6 +32,30 @@ public class AssetListServiceWrapper implements AssetListService,
 		_assetListService = assetListService;
 	}
 
+	@Override
+	public com.liferay.asset.lists.model.AssetList addAssetList(long userId,
+		long groupId, java.util.Map<java.util.Locale, String> nameMap,
+		java.util.Map<java.util.Locale, String> descriptionMap, int type,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _assetListService.addAssetList(userId, groupId, nameMap,
+			descriptionMap, type, serviceContext);
+	}
+
+	@Override
+	public com.liferay.asset.lists.model.AssetList deleteAssetList(
+		long assetListId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _assetListService.deleteAssetList(assetListId);
+	}
+
+	@Override
+	public com.liferay.asset.lists.model.AssetList fetchAssetList(
+		long assetListId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _assetListService.fetchAssetList(assetListId);
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -40,6 +64,15 @@ public class AssetListServiceWrapper implements AssetListService,
 	@Override
 	public String getOSGiServiceIdentifier() {
 		return _assetListService.getOSGiServiceIdentifier();
+	}
+
+	@Override
+	public com.liferay.asset.lists.model.AssetList updateAssetList(
+		long assetListId, java.util.Map<java.util.Locale, String> nameMap,
+		java.util.Map<java.util.Locale, String> descriptionMap)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _assetListService.updateAssetList(assetListId, nameMap,
+			descriptionMap);
 	}
 
 	@Override

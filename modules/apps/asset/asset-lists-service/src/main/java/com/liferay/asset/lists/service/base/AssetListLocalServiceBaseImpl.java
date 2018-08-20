@@ -16,6 +16,7 @@ package com.liferay.asset.lists.service.base;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.asset.lists.exception.NoSuchAssetListException;
 import com.liferay.asset.lists.model.AssetList;
 import com.liferay.asset.lists.service.AssetListLocalService;
 import com.liferay.asset.lists.service.persistence.AssetListPersistence;
@@ -46,6 +47,7 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
+import com.liferay.portal.kernel.service.persistence.UserPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -109,12 +111,13 @@ public abstract class AssetListLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param assetListId the primary key of the asset list
 	 * @return the asset list that was removed
+	 * @throws NoSuchAssetListException
 	 * @throws PortalException if a asset list with the primary key could not be found
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public AssetList deleteAssetList(long assetListId)
-		throws PortalException {
+		throws NoSuchAssetListException, PortalException {
 		return assetListPersistence.remove(assetListId);
 	}
 
@@ -485,6 +488,43 @@ public abstract class AssetListLocalServiceBaseImpl extends BaseLocalServiceImpl
 		this.counterLocalService = counterLocalService;
 	}
 
+	/**
+	 * Returns the user local service.
+	 *
+	 * @return the user local service
+	 */
+	public com.liferay.portal.kernel.service.UserLocalService getUserLocalService() {
+		return userLocalService;
+	}
+
+	/**
+	 * Sets the user local service.
+	 *
+	 * @param userLocalService the user local service
+	 */
+	public void setUserLocalService(
+		com.liferay.portal.kernel.service.UserLocalService userLocalService) {
+		this.userLocalService = userLocalService;
+	}
+
+	/**
+	 * Returns the user persistence.
+	 *
+	 * @return the user persistence
+	 */
+	public UserPersistence getUserPersistence() {
+		return userPersistence;
+	}
+
+	/**
+	 * Sets the user persistence.
+	 *
+	 * @param userPersistence the user persistence
+	 */
+	public void setUserPersistence(UserPersistence userPersistence) {
+		this.userPersistence = userPersistence;
+	}
+
 	public void afterPropertiesSet() {
 		persistedModelLocalServiceRegistry.register("com.liferay.asset.lists.model.AssetList",
 			assetListLocalService);
@@ -543,6 +583,10 @@ public abstract class AssetListLocalServiceBaseImpl extends BaseLocalServiceImpl
 	protected AssetListPersistence assetListPersistence;
 	@ServiceReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
 	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+	@ServiceReference(type = com.liferay.portal.kernel.service.UserLocalService.class)
+	protected com.liferay.portal.kernel.service.UserLocalService userLocalService;
+	@ServiceReference(type = UserPersistence.class)
+	protected UserPersistence userPersistence;
 	@ServiceReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
 }

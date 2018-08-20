@@ -16,6 +16,7 @@ package com.liferay.asset.lists.service;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.asset.lists.exception.NoSuchAssetListException;
 import com.liferay.asset.lists.model.AssetList;
 
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
@@ -28,10 +29,13 @@ import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.model.PersistedModel;
+import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -40,6 +44,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import java.io.Serializable;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Provides the local service interface for AssetList. Methods of this
@@ -73,6 +79,10 @@ public interface AssetListLocalService extends BaseLocalService,
 	@Indexable(type = IndexableType.REINDEX)
 	public AssetList addAssetList(AssetList assetList);
 
+	public AssetList addAssetList(long userId, long groupId,
+		Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
+		int type, ServiceContext serviceContext) throws PortalException;
+
 	/**
 	* Creates a new asset list with the primary key. Does not add the asset list to the database.
 	*
@@ -89,6 +99,7 @@ public interface AssetListLocalService extends BaseLocalService,
 	* @return the asset list that was removed
 	*/
 	@Indexable(type = IndexableType.DELETE)
+	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
 	public AssetList deleteAssetList(AssetList assetList);
 
 	/**
@@ -96,11 +107,12 @@ public interface AssetListLocalService extends BaseLocalService,
 	*
 	* @param assetListId the primary key of the asset list
 	* @return the asset list that was removed
+	* @throws NoSuchAssetListException
 	* @throws PortalException if a asset list with the primary key could not be found
 	*/
 	@Indexable(type = IndexableType.DELETE)
 	public AssetList deleteAssetList(long assetListId)
-		throws PortalException;
+		throws NoSuchAssetListException, PortalException;
 
 	/**
 	* @throws PortalException
@@ -281,4 +293,8 @@ public interface AssetListLocalService extends BaseLocalService,
 	*/
 	@Indexable(type = IndexableType.REINDEX)
 	public AssetList updateAssetList(AssetList assetList);
+
+	public AssetList updateAssetList(long assetListId,
+		Map<Locale, String> nameMap, Map<Locale, String> descriptionMap)
+		throws PortalException;
 }

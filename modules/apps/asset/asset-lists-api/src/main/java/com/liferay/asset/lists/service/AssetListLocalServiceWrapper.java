@@ -45,6 +45,16 @@ public class AssetListLocalServiceWrapper implements AssetListLocalService,
 		return _assetListLocalService.addAssetList(assetList);
 	}
 
+	@Override
+	public com.liferay.asset.lists.model.AssetList addAssetList(long userId,
+		long groupId, java.util.Map<java.util.Locale, String> nameMap,
+		java.util.Map<java.util.Locale, String> descriptionMap, int type,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _assetListLocalService.addAssetList(userId, groupId, nameMap,
+			descriptionMap, type, serviceContext);
+	}
+
 	/**
 	* Creates a new asset list with the primary key. Does not add the asset list to the database.
 	*
@@ -74,12 +84,14 @@ public class AssetListLocalServiceWrapper implements AssetListLocalService,
 	*
 	* @param assetListId the primary key of the asset list
 	* @return the asset list that was removed
+	* @throws NoSuchAssetListException
 	* @throws PortalException if a asset list with the primary key could not be found
 	*/
 	@Override
 	public com.liferay.asset.lists.model.AssetList deleteAssetList(
 		long assetListId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		throws com.liferay.asset.lists.exception.NoSuchAssetListException,
+			com.liferay.portal.kernel.exception.PortalException {
 		return _assetListLocalService.deleteAssetList(assetListId);
 	}
 
@@ -328,6 +340,15 @@ public class AssetListLocalServiceWrapper implements AssetListLocalService,
 	public com.liferay.asset.lists.model.AssetList updateAssetList(
 		com.liferay.asset.lists.model.AssetList assetList) {
 		return _assetListLocalService.updateAssetList(assetList);
+	}
+
+	@Override
+	public com.liferay.asset.lists.model.AssetList updateAssetList(
+		long assetListId, java.util.Map<java.util.Locale, String> nameMap,
+		java.util.Map<java.util.Locale, String> descriptionMap)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _assetListLocalService.updateAssetList(assetListId, nameMap,
+			descriptionMap);
 	}
 
 	@Override
