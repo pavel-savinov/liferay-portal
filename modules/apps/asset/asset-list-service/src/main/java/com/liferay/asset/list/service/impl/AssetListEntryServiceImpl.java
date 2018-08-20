@@ -14,28 +14,90 @@
 
 package com.liferay.asset.list.service.impl;
 
+import com.liferay.asset.list.constants.AssetListActionKeys;
+import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.base.AssetListEntryServiceBaseImpl;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
+import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.spring.extender.service.ServiceReference;
+
+import java.util.Map;
 
 /**
- * The implementation of the asset list entry remote service.
- *
- * <p>
- * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.asset.list.service.AssetListEntryService} interface.
- *
- * <p>
- * This is a remote service. Methods of this service are expected to have security checks based on the propagated JAAS credentials because this service can be accessed remotely.
- * </p>
- *
- * @author Brian Wing Shun Chan
- * @see AssetListEntryServiceBaseImpl
- * @see com.liferay.asset.list.service.AssetListEntryServiceUtil
+ * @author Jürgen Kappler
  */
 public class AssetListEntryServiceImpl extends AssetListEntryServiceBaseImpl {
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never reference this class directly. Always use {@link com.liferay.asset.list.service.AssetListEntryServiceUtil} to access the asset list entry remote service.
-	 */
+	@Override
+	public AssetListEntry addAssetListEntry(
+			long userId, long groupId, Map<String, String> titleMap,
+			Map<String, String> descriptionMap, int type,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		_portletResourcePermission.check(
+			getPermissionChecker(), groupId,
+			AssetListActionKeys.ADD_ASSET_LIST_ENTRY);
+
+		return assetListEntryLocalService.addAssetListEntry(
+			userId, groupId, titleMap, descriptionMap, type, serviceContext);
+	}
+
+	@Override
+	public AssetListEntry deleteAssetListEntry(long assetListEntryId)
+		throws PortalException {
+
+		_assetListEntryModelResourcePermission.check(
+			getPermissionChecker(), assetListEntryId, ActionKeys.DELETE);
+
+		return assetListEntryLocalService.deleteAssetListEntry(
+			assetListEntryId);
+	}
+
+	@Override
+	public AssetListEntry fetchAssetListEntry(long assetListEntryId)
+		throws PortalException {
+
+		AssetListEntry assetList =
+			assetListEntryLocalService.fetchAssetListEntry(assetListEntryId);
+
+		if (assetList != null) {
+			_portletResourcePermission.check(
+				getPermissionChecker(), assetList.getGroupId(),
+				ActionKeys.VIEW);
+		}
+
+		return assetList;
+	}
+
+	@Override
+	public AssetListEntry updateAssetListEntry(
+			long assetListEntryId, Map<String, String> titleMap,
+			Map<String, String> descriptionMap)
+		throws PortalException {
+
+		_assetListEntryModelResourcePermission.check(
+			getPermissionChecker(), assetListEntryId, ActionKeys.UPDATE);
+
+		return assetListEntryLocalService.updateAssetListEntry(
+			assetListEntryId, titleMap, descriptionMap);
+	}
+
+	private static volatile ModelResourcePermission<AssetListEntry>
+		_assetListEntryModelResourcePermission =
+			ModelResourcePermissionFactory.getInstance(
+				AssetListEntryServiceImpl.class,
+				"_assetListEntryModelResourcePermission", AssetListEntry.class);
+
+	@ServiceReference(
+		filterString = "(component.name=com.liferay.asset.list.internal.security.permission.resource.AssetListEntryPortletResourcePermission)",
+		type = PortletResourcePermission.class
+	)
+	private static volatile PortletResourcePermission
+		_portletResourcePermission;
 
 }
