@@ -14,29 +14,99 @@
 
 package com.liferay.asset.list.service.impl;
 
+import com.liferay.asset.list.exception.AssetListEntryTitleException;
+import com.liferay.asset.list.exception.NoSuchEntryException;
+import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.base.AssetListEntryLocalServiceBaseImpl;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.SystemEventConstants;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.kernel.util.Validator;
+
+import java.util.Date;
 
 /**
- * The implementation of the asset list entry local service.
- *
- * <p>
- * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.asset.list.service.AssetListEntryLocalService} interface.
- *
- * <p>
- * This is a local service. Methods of this service will not have security checks based on the propagated JAAS credentials because this service can only be accessed from within the same VM.
- * </p>
- *
- * @author Brian Wing Shun Chan
- * @see AssetListEntryLocalServiceBaseImpl
- * @see com.liferay.asset.list.service.AssetListEntryLocalServiceUtil
+ * @author Jürgen Kappler
  */
 public class AssetListEntryLocalServiceImpl
 	extends AssetListEntryLocalServiceBaseImpl {
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never reference this class directly. Always use {@link com.liferay.asset.list.service.AssetListEntryLocalServiceUtil} to access the asset list entry local service.
-	 */
+	@Override
+	public AssetListEntry addAssetListEntry(
+			long userId, long groupId, String title, int type,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		_validate(title);
+
+		User user = userLocalService.getUser(userId);
+
+		long assetListEntryId = counterLocalService.increment();
+
+		AssetListEntry assetListEntry = assetListEntryPersistence.create(
+			assetListEntryId);
+
+		assetListEntry.setUuid(serviceContext.getUuid());
+		assetListEntry.setGroupId(groupId);
+		assetListEntry.setCompanyId(user.getCompanyId());
+		assetListEntry.setUserId(user.getUserId());
+		assetListEntry.setUserName(user.getFullName());
+		assetListEntry.setCreateDate(serviceContext.getCreateDate(new Date()));
+		assetListEntry.setModifiedDate(
+			serviceContext.getModifiedDate(new Date()));
+		assetListEntry.setTitle(title);
+		assetListEntry.setType(type);
+
+		return assetListEntryPersistence.update(assetListEntry);
+	}
+
+	@Override
+	public AssetListEntry deleteAssetListEntry(AssetListEntry assetListEntry)
+		throws PortalException {
+
+		assetListEntryLocalService.deleteAssetListEntry(
+			assetListEntry.getAssetListEntryId());
+
+		return assetListEntry;
+	}
+
+	@Override
+	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
+	public AssetListEntry deleteAssetListEntry(long assetListEntryId)
+		throws PortalException {
+
+		AssetListEntry assetListEntry =
+			assetListEntryPersistence.fetchByPrimaryKey(assetListEntryId);
+
+		if (assetListEntry == null) {
+			throw new NoSuchEntryException();
+		}
+
+		return assetListEntryPersistence.remove(assetListEntryId);
+	}
+
+	@Override
+	public AssetListEntry updateAssetListEntry(
+			long assetListEntryId, String title)
+		throws PortalException {
+
+		_validate(title);
+
+		AssetListEntry assetListEntry =
+			assetListEntryPersistence.findByPrimaryKey(assetListEntryId);
+
+		assetListEntry.setModifiedDate(new Date());
+		assetListEntry.setTitle(title);
+
+		return assetListEntryPersistence.update(assetListEntry);
+	}
+
+	private void _validate(String title) throws PortalException {
+		if (Validator.isNull(title)) {
+			throw new AssetListEntryTitleException();
+		}
+	}
 
 }
