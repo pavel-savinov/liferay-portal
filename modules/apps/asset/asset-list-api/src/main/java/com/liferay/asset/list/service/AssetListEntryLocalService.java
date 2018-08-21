@@ -16,6 +16,7 @@ package com.liferay.asset.list.service;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.asset.list.exception.NoSuchEntryException;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.model.AssetListEntryLocalization;
 
@@ -29,10 +30,13 @@ import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.model.PersistedModel;
+import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -75,6 +79,10 @@ public interface AssetListEntryLocalService extends BaseLocalService,
 	@Indexable(type = IndexableType.REINDEX)
 	public AssetListEntry addAssetListEntry(AssetListEntry assetListEntry);
 
+	public AssetListEntry addAssetListEntry(long userId, long groupId,
+		Map<String, String> titleMap, Map<String, String> descriptionMap,
+		int type, ServiceContext serviceContext) throws PortalException;
+
 	/**
 	* Creates a new asset list entry with the primary key. Does not add the asset list entry to the database.
 	*
@@ -89,20 +97,24 @@ public interface AssetListEntryLocalService extends BaseLocalService,
 	*
 	* @param assetListEntry the asset list entry
 	* @return the asset list entry that was removed
+	* @throws PortalException
 	*/
 	@Indexable(type = IndexableType.DELETE)
-	public AssetListEntry deleteAssetListEntry(AssetListEntry assetListEntry);
+	public AssetListEntry deleteAssetListEntry(AssetListEntry assetListEntry)
+		throws PortalException;
 
 	/**
 	* Deletes the asset list entry with the primary key from the database. Also notifies the appropriate model listeners.
 	*
 	* @param assetListEntryId the primary key of the asset list entry
 	* @return the asset list entry that was removed
+	* @throws NoSuchEntryException
 	* @throws PortalException if a asset list entry with the primary key could not be found
 	*/
 	@Indexable(type = IndexableType.DELETE)
+	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
 	public AssetListEntry deleteAssetListEntry(long assetListEntryId)
-		throws PortalException;
+		throws NoSuchEntryException, PortalException;
 
 	/**
 	* @throws PortalException
@@ -297,6 +309,10 @@ public interface AssetListEntryLocalService extends BaseLocalService,
 	*/
 	@Indexable(type = IndexableType.REINDEX)
 	public AssetListEntry updateAssetListEntry(AssetListEntry assetListEntry);
+
+	public AssetListEntry updateAssetListEntry(long assetListEntryId,
+		Map<String, String> titleMap, Map<String, String> descriptionMap)
+		throws PortalException;
 
 	public AssetListEntryLocalization updateAssetListEntryLocalization(
 		AssetListEntry assetListEntry, String languageId, String title,
