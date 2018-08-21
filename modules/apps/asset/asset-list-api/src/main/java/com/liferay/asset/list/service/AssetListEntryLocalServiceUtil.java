@@ -54,6 +54,16 @@ public class AssetListEntryLocalServiceUtil {
 		return getService().addAssetListEntry(assetListEntry);
 	}
 
+	public static com.liferay.asset.list.model.AssetListEntry addAssetListEntry(
+		long userId, long groupId, java.util.Map<String, String> titleMap,
+		java.util.Map<String, String> descriptionMap, int type,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .addAssetListEntry(userId, groupId, titleMap,
+			descriptionMap, type, serviceContext);
+	}
+
 	/**
 	* Creates a new asset list entry with the primary key. Does not add the asset list entry to the database.
 	*
@@ -70,9 +80,11 @@ public class AssetListEntryLocalServiceUtil {
 	*
 	* @param assetListEntry the asset list entry
 	* @return the asset list entry that was removed
+	* @throws PortalException
 	*/
 	public static com.liferay.asset.list.model.AssetListEntry deleteAssetListEntry(
-		com.liferay.asset.list.model.AssetListEntry assetListEntry) {
+		com.liferay.asset.list.model.AssetListEntry assetListEntry)
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return getService().deleteAssetListEntry(assetListEntry);
 	}
 
@@ -81,11 +93,13 @@ public class AssetListEntryLocalServiceUtil {
 	*
 	* @param assetListEntryId the primary key of the asset list entry
 	* @return the asset list entry that was removed
+	* @throws NoSuchEntryException
 	* @throws PortalException if a asset list entry with the primary key could not be found
 	*/
 	public static com.liferay.asset.list.model.AssetListEntry deleteAssetListEntry(
 		long assetListEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		throws com.liferay.asset.list.exception.NoSuchEntryException,
+			com.liferay.portal.kernel.exception.PortalException {
 		return getService().deleteAssetListEntry(assetListEntryId);
 	}
 
@@ -331,6 +345,15 @@ public class AssetListEntryLocalServiceUtil {
 	public static com.liferay.asset.list.model.AssetListEntry updateAssetListEntry(
 		com.liferay.asset.list.model.AssetListEntry assetListEntry) {
 		return getService().updateAssetListEntry(assetListEntry);
+	}
+
+	public static com.liferay.asset.list.model.AssetListEntry updateAssetListEntry(
+		long assetListEntryId, java.util.Map<String, String> titleMap,
+		java.util.Map<String, String> descriptionMap)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .updateAssetListEntry(assetListEntryId, titleMap,
+			descriptionMap);
 	}
 
 	public static com.liferay.asset.list.model.AssetListEntryLocalization updateAssetListEntryLocalization(
