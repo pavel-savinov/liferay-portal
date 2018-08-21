@@ -16,14 +16,20 @@ package com.liferay.asset.list.service;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.asset.list.model.AssetListEntry;
+
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.service.BaseService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.transaction.Isolation;
+import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+
+import java.util.Map;
 
 /**
  * Provides the remote service interface for AssetListEntry. Methods of this
@@ -49,6 +55,16 @@ public interface AssetListEntryService extends BaseService {
 	 *
 	 * Never modify or reference this interface directly. Always use {@link AssetListEntryServiceUtil} to access the asset list entry remote service. Add custom service methods to {@link com.liferay.asset.list.service.impl.AssetListEntryServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+	public AssetListEntry addAssetListEntry(long userId, long groupId,
+		Map<String, String> titleMap, Map<String, String> descriptionMap,
+		int type, ServiceContext serviceContext) throws PortalException;
+
+	public AssetListEntry deleteAssetListEntry(long assetListEntryId)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public AssetListEntry fetchAssetListEntry(long assetListEntryId)
+		throws PortalException;
 
 	/**
 	* Returns the OSGi service identifier.
@@ -56,4 +72,8 @@ public interface AssetListEntryService extends BaseService {
 	* @return the OSGi service identifier
 	*/
 	public String getOSGiServiceIdentifier();
+
+	public AssetListEntry updateAssetListEntry(long assetListEntryId,
+		Map<String, String> titleMap, Map<String, String> descriptionMap)
+		throws PortalException;
 }
