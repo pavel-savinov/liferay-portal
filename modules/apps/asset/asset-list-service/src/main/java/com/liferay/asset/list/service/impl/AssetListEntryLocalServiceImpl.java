@@ -83,7 +83,7 @@ public class AssetListEntryLocalServiceImpl
 	@Override
 	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
 	public AssetListEntry deleteAssetListEntry(long assetListEntryId)
-		throws NoSuchEntryException {
+		throws PortalException {
 
 		AssetListEntry assetListEntry =
 			assetListEntryPersistence.fetchByPrimaryKey(assetListEntryId);
