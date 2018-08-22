@@ -19,6 +19,7 @@ import com.liferay.asset.list.service.base.AssetListEntryServiceBaseImpl;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -28,8 +29,8 @@ public class AssetListEntryServiceImpl extends AssetListEntryServiceBaseImpl {
 
 	@Override
 	public AssetListEntry addAssetListEntry(
-			long userId, long groupId, Map<String, String> titleMap,
-			Map<String, String> descriptionMap, int type,
+			long userId, long groupId, Map<Locale, String> titleMap,
+			Map<Locale, String> descriptionMap, int type,
 			ServiceContext serviceContext)
 		throws PortalException {
 
@@ -52,8 +53,8 @@ public class AssetListEntryServiceImpl extends AssetListEntryServiceBaseImpl {
 
 	@Override
 	public AssetListEntry updateAssetListEntry(
-			long assetListEntryId, Map<String, String> titleMap,
-			Map<String, String> descriptionMap)
+			long assetListEntryId, Map<Locale, String> titleMap,
+			Map<Locale, String> descriptionMap)
 		throws PortalException {
 
 		return assetListEntryLocalService.updateAssetListEntry(
