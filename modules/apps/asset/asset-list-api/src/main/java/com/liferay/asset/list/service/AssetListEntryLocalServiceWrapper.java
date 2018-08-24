@@ -87,14 +87,12 @@ public class AssetListEntryLocalServiceWrapper
 	*
 	* @param assetListEntryId the primary key of the asset list entry
 	* @return the asset list entry that was removed
-	* @throws NoSuchEntryException
 	* @throws PortalException if a asset list entry with the primary key could not be found
 	*/
 	@Override
 	public com.liferay.asset.list.model.AssetListEntry deleteAssetListEntry(
 		long assetListEntryId)
-		throws com.liferay.asset.list.exception.NoSuchEntryException,
-			com.liferay.portal.kernel.exception.PortalException {
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _assetListEntryLocalService.deleteAssetListEntry(assetListEntryId);
 	}
 

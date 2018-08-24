@@ -63,8 +63,7 @@ public interface AssetListEntryService extends BaseService {
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public AssetListEntry fetchAssetListEntry(long assetListEntryId)
-		throws PortalException;
+	public AssetListEntry fetchAssetListEntry(long assetListEntryId);
 
 	/**
 	* Returns the OSGi service identifier.

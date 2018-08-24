@@ -52,8 +52,7 @@ public class AssetListEntryServiceWrapper implements AssetListEntryService,
 
 	@Override
 	public com.liferay.asset.list.model.AssetListEntry fetchAssetListEntry(
-		long assetListEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		long assetListEntryId) {
 		return _assetListEntryService.fetchAssetListEntry(assetListEntryId);
 	}
 
