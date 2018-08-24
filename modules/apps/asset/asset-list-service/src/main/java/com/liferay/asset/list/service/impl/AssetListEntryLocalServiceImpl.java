@@ -16,10 +16,8 @@ package com.liferay.asset.list.service.impl;
 
 import com.liferay.asset.list.exception.NoSuchEntryException;
 import com.liferay.asset.list.model.AssetListEntry;
-import com.liferay.asset.list.model.AssetListEntryLocalization;
 import com.liferay.asset.list.service.base.AssetListEntryLocalServiceBaseImpl;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -61,13 +59,10 @@ public class AssetListEntryLocalServiceImpl
 			serviceContext.getModifiedDate(new Date()));
 		assetListEntry.setType(type);
 
-		Group group = groupLocalService.getGroup(groupId);
+		assetListEntryPersistence.update(assetListEntry);
 
 		_updateAssetListEntryLocalizations(
-			assetListEntryId, group.getCompanyId(), groupId, titleMap,
-			descriptionMap);
-
-		assetListEntryPersistence.update(assetListEntry);
+			assetListEntry, titleMap, descriptionMap);
 
 		return assetListEntry;
 	}
@@ -111,18 +106,18 @@ public class AssetListEntryLocalServiceImpl
 
 		assetListEntry.setModifiedDate(new Date());
 
-		_updateAssetListEntryLocalizations(
-			assetListEntryId, assetListEntry.getCompanyId(),
-			assetListEntry.getGroupId(), titleMap, descriptionMap);
-
 		assetListEntryPersistence.update(assetListEntry);
+
+		_updateAssetListEntryLocalizations(
+			assetListEntry, titleMap, descriptionMap);
 
 		return assetListEntry;
 	}
 
 	private void _updateAssetListEntryLocalizations(
-		long assetListEntryId, long companyId, long groupId,
-		Map<Locale, String> titleMap, Map<Locale, String> descriptionMap) {
+			AssetListEntry assetListEntry, Map<Locale, String> titleMap,
+			Map<Locale, String> descriptionMap)
+		throws PortalException {
 
 		for (Map.Entry<Locale, String> entry : titleMap.entrySet()) {
 			String title = entry.getValue();
@@ -135,37 +130,8 @@ public class AssetListEntryLocalServiceImpl
 
 			String description = descriptionMap.get(entry.getKey());
 
-			AssetListEntryLocalization existingAssetListEntryLocalization =
-				assetListEntryLocalizationPersistence.
-					fetchByAssetListEntryId_LanguageId(
-						assetListEntryId, languageId);
-
-			if (existingAssetListEntryLocalization != null) {
-				existingAssetListEntryLocalization.setTitle(title);
-				existingAssetListEntryLocalization.setDescription(description);
-
-				assetListEntryLocalizationPersistence.update(
-					existingAssetListEntryLocalization);
-
-				continue;
-			}
-
-			long assetListEntryLocalizationId = counterLocalService.increment(
-				AssetListEntryLocalization.class.getName());
-
-			AssetListEntryLocalization assetListEntryLocalization =
-				assetListEntryLocalizationPersistence.create(
-					assetListEntryLocalizationId);
-
-			assetListEntryLocalization.setCompanyId(companyId);
-			assetListEntryLocalization.setAssetListEntryId(assetListEntryId);
-			assetListEntryLocalization.setGroupId(groupId);
-			assetListEntryLocalization.setTitle(title);
-			assetListEntryLocalization.setDescription(description);
-			assetListEntryLocalization.setLanguageId(languageId);
-
-			assetListEntryLocalizationPersistence.update(
-				assetListEntryLocalization);
+			assetListEntryLocalService.updateAssetListEntryLocalization(
+				assetListEntry, languageId, title, description);
 		}
 	}
 
