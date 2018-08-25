@@ -1067,6 +1067,13 @@ public interface JournalArticleService extends BaseService {
 		long classPK) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<JournalArticle> getLatestArticles(long groupId, int status,
+		int start, int end, OrderByComparator<JournalArticle> obc);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getLatestArticlesCount(long groupId, int status);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<JournalArticle> getLayoutArticles(long groupId);
 
 	/**

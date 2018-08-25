@@ -1281,6 +1281,39 @@ public class JournalArticleServiceSoap {
 		}
 	}
 
+	public static com.liferay.journal.model.JournalArticleSoap[] getLatestArticles(
+		long groupId, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.journal.model.JournalArticle> obc)
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.journal.model.JournalArticle> returnValue =
+				JournalArticleServiceUtil.getLatestArticles(groupId, status,
+					start, end, obc);
+
+			return com.liferay.journal.model.JournalArticleSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static int getLatestArticlesCount(long groupId, int status)
+		throws RemoteException {
+		try {
+			int returnValue = JournalArticleServiceUtil.getLatestArticlesCount(groupId,
+					status);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static com.liferay.journal.model.JournalArticleSoap[] getLayoutArticles(
 		long groupId) throws RemoteException {
 		try {
