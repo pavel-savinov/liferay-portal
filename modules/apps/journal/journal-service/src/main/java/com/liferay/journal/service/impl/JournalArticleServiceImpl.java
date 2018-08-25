@@ -1466,6 +1466,24 @@ public class JournalArticleServiceImpl extends JournalArticleServiceBaseImpl {
 	}
 
 	@Override
+	public List<JournalArticle> getLatestArticles(
+		long groupId, int status, int start, int end,
+		OrderByComparator<JournalArticle> obc) {
+
+		QueryDefinition<JournalArticle> queryDefinition = new QueryDefinition<>(
+			status, start, end, obc);
+
+		return journalArticleFinder.filterFindByG_ST(
+			groupId, status, queryDefinition);
+	}
+
+	@Override
+	public int getLatestArticlesCount(long groupId, int status) {
+		return journalArticleFinder.countByG_ST(
+			groupId, status, new QueryDefinition<JournalArticle>(status));
+	}
+
+	@Override
 	public List<JournalArticle> getLayoutArticles(long groupId) {
 		return journalArticlePersistence.filterFindByG_NotL(
 			groupId, new String[] {null, StringPool.BLANK});
