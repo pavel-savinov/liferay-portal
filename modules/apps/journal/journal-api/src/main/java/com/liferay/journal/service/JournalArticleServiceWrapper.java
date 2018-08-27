@@ -1225,6 +1225,19 @@ public class JournalArticleServiceWrapper implements JournalArticleService,
 	}
 
 	@Override
+	public java.util.List<com.liferay.journal.model.JournalArticle> getLatestArticles(
+		long groupId, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.journal.model.JournalArticle> obc) {
+		return _journalArticleService.getLatestArticles(groupId, status, start,
+			end, obc);
+	}
+
+	@Override
+	public int getLatestArticlesCount(long groupId, int status) {
+		return _journalArticleService.getLatestArticlesCount(groupId, status);
+	}
+
+	@Override
 	public java.util.List<com.liferay.journal.model.JournalArticle> getLayoutArticles(
 		long groupId) {
 		return _journalArticleService.getLayoutArticles(groupId);

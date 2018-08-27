@@ -1201,6 +1201,16 @@ public class JournalArticleServiceUtil {
 		return getService().getLatestArticle(groupId, className, classPK);
 	}
 
+	public static java.util.List<com.liferay.journal.model.JournalArticle> getLatestArticles(
+		long groupId, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<com.liferay.journal.model.JournalArticle> obc) {
+		return getService().getLatestArticles(groupId, status, start, end, obc);
+	}
+
+	public static int getLatestArticlesCount(long groupId, int status) {
+		return getService().getLatestArticlesCount(groupId, status);
+	}
+
 	public static java.util.List<com.liferay.journal.model.JournalArticle> getLayoutArticles(
 		long groupId) {
 		return getService().getLayoutArticles(groupId);
