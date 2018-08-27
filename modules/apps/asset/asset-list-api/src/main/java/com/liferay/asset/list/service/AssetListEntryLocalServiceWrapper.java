@@ -46,6 +46,15 @@ public class AssetListEntryLocalServiceWrapper
 		return _assetListEntryLocalService.addAssetListEntry(assetListEntry);
 	}
 
+	@Override
+	public com.liferay.asset.list.model.AssetListEntry addAssetListEntry(
+		long userId, long groupId, String title, int type,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _assetListEntryLocalService.addAssetListEntry(userId, groupId,
+			title, type, serviceContext);
+	}
+
 	/**
 	* Creates a new asset list entry with the primary key. Does not add the asset list entry to the database.
 	*
@@ -63,10 +72,12 @@ public class AssetListEntryLocalServiceWrapper
 	*
 	* @param assetListEntry the asset list entry
 	* @return the asset list entry that was removed
+	* @throws PortalException
 	*/
 	@Override
 	public com.liferay.asset.list.model.AssetListEntry deleteAssetListEntry(
-		com.liferay.asset.list.model.AssetListEntry assetListEntry) {
+		com.liferay.asset.list.model.AssetListEntry assetListEntry)
+		throws com.liferay.portal.kernel.exception.PortalException {
 		return _assetListEntryLocalService.deleteAssetListEntry(assetListEntry);
 	}
 
@@ -331,6 +342,14 @@ public class AssetListEntryLocalServiceWrapper
 	public com.liferay.asset.list.model.AssetListEntry updateAssetListEntry(
 		com.liferay.asset.list.model.AssetListEntry assetListEntry) {
 		return _assetListEntryLocalService.updateAssetListEntry(assetListEntry);
+	}
+
+	@Override
+	public com.liferay.asset.list.model.AssetListEntry updateAssetListEntry(
+		long assetListEntryId, String title)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _assetListEntryLocalService.updateAssetListEntry(assetListEntryId,
+			title);
 	}
 
 	@Override
