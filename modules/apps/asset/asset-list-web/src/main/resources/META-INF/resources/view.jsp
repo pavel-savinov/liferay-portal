@@ -61,6 +61,10 @@
 					<strong><%= assetListDisplayContext.getAssetListEntryType(assetListEntry.getType()) %></strong>
 				</h6>
 			</liferay-ui:search-container-column-text>
+
+			<liferay-ui:search-container-column-jsp
+				path="/asset_list_entry_action.jsp"
+			/>
 		</liferay-ui:search-container-row>
 
 		<liferay-ui:search-iterator
