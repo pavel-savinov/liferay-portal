@@ -16,6 +16,14 @@
 
 <%@ include file="/init.jsp" %>
 
+<clay:management-toolbar
+	actionDropdownItems="<%= assetListDisplayContext.getAssetListEntryActionItemsDropdownItems() %>"
+	componentId="assetListEntriesEntriesManagementToolbar"
+	creationMenu="<%= assetListDisplayContext.getCreationMenu() %>"
+	searchContainerId="assetListEntries"
+	showSearch="<%= false %>"
+/>
+
 <aui:form cssClass="container-fluid-1280" name="fm">
 	<liferay-ui:search-container
 		id="assetListEntries"
@@ -26,6 +34,15 @@
 			keyProperty="assetListEntryId"
 			modelVar="assetListEntry"
 		>
+
+			<%
+			PortletURL editArticleURL = liferayPortletResponse.createRenderURL();
+
+			editArticleURL.setParameter("mvcPath", "/edit_asset_list_entry.jsp");
+			editArticleURL.setParameter("redirect", currentURL);
+			editArticleURL.setParameter("assetListEntryId", String.valueOf(assetListEntry.getAssetListEntryId()));
+			%>
+
 			<liferay-ui:search-container-column-icon
 				icon="list"
 				toggleRowChecker="<%= false %>"
@@ -35,7 +52,9 @@
 				colspan="<%= 2 %>"
 			>
 				<h5>
-					<%= assetListEntry.getTitle() %>
+					<aui:a href="<%= editArticleURL.toString() %>">
+						<%= assetListEntry.getTitle() %>
+					</aui:a>
 				</h5>
 
 				<h6 class="text-default">
@@ -50,3 +69,30 @@
 		/>
 	</liferay-ui:search-container>
 </aui:form>
+
+<aui:script>
+	var deleteSelectedAssetListEntries = function() {
+		if (confirm('<liferay-ui:message key="are-you-sure-you-want-to-delete-this" />')) {
+			submitForm(document.querySelector('#<portlet:namespace />fm'), '<portlet:actionURL name="/asset_list/delete_asset_list_entry"><portlet:param name="redirect" value="<%= currentURL %>" /></portlet:actionURL>');
+		}
+	}
+
+	var ACTIONS = {
+		'deleteSelectedAssetListEntries': deleteSelectedAssetListEntries
+	};
+
+	Liferay.componentReady('assetListEntriesEntriesManagementToolbar').then(
+		function(managementToolbar) {
+			managementToolbar.on(
+				'actionItemClicked',
+					function(event) {
+						var itemData = event.data.item.data;
+
+						if (itemData && itemData.action && ACTIONS[itemData.action]) {
+							ACTIONS[itemData.action]();
+						}
+					}
+				);
+		}
+	);
+</aui:script>

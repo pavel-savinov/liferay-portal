@@ -17,6 +17,9 @@ package com.liferay.asset.list.web.internal.display.context;
 import com.liferay.asset.list.constants.AssetListEntryTypeConstants;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.AssetListEntryServiceUtil;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -28,6 +31,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.List;
 
+import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
@@ -104,6 +108,22 @@ public class AssetListDisplayContext {
 		return _assetListEntry;
 	}
 
+	public List<DropdownItem> getAssetListEntryActionItemsDropdownItems() {
+		return new DropdownItemList() {
+			{
+				add(
+					dropdownItem -> {
+						dropdownItem.putData(
+							"action", "deleteSelectedAssetListEntries");
+						dropdownItem.setIcon("times-circle");
+						dropdownItem.setLabel(
+							LanguageUtil.get(_request, "delete"));
+						dropdownItem.setQuickAction(true);
+					});
+			}
+		};
+	}
+
 	public long getAssetListEntryId() {
 		if (_assetListEntryId != null) {
 			return _assetListEntryId;
@@ -137,6 +157,28 @@ public class AssetListDisplayContext {
 		}
 
 		return LanguageUtil.get(_request, assetListEntryType);
+	}
+
+	public CreationMenu getCreationMenu() {
+		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		PortletURL addAssetListEntry = _renderResponse.createRenderURL();
+
+		addAssetListEntry.setParameter("mvcPath", "/edit_asset_list_entry.jsp");
+		addAssetListEntry.setParameter(
+			"redirect", themeDisplay.getURLCurrent());
+
+		return new CreationMenu() {
+			{
+				addPrimaryDropdownItem(
+					dropdownItem -> {
+						dropdownItem.setHref(addAssetListEntry.toString());
+						dropdownItem.setLabel(
+							LanguageUtil.get(_request, "add"));
+					});
+			}
+		};
 	}
 
 	public boolean isAssetListEntryTypeDynamic() {
