@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -90,6 +91,41 @@ public class AssetListDisplayContext {
 		return _assetListEntriesSearchContainer;
 	}
 
+	public AssetListEntry getAssetListEntry() {
+		if (_assetListEntry != null) {
+			return _assetListEntry;
+		}
+
+		long assetListEntryId = getAssetListEntryId();
+
+		_assetListEntry = AssetListEntryServiceUtil.fetchAssetListEntry(
+			assetListEntryId);
+
+		return _assetListEntry;
+	}
+
+	public long getAssetListEntryId() {
+		if (_assetListEntryId != null) {
+			return _assetListEntryId;
+		}
+
+		_assetListEntryId = ParamUtil.getLong(_request, "assetListEntryId");
+
+		return _assetListEntryId;
+	}
+
+	public String getAssetListEntryTitle() {
+		String title = "new-asset-list";
+
+		AssetListEntry assetListEntry = getAssetListEntry();
+
+		if (assetListEntry != null) {
+			title = assetListEntry.getTitle();
+		}
+
+		return LanguageUtil.get(_request, title);
+	}
+
 	public String getAssetListEntryType(int type) {
 		String assetListEntryType = StringPool.BLANK;
 
@@ -103,8 +139,42 @@ public class AssetListDisplayContext {
 		return LanguageUtil.get(_request, assetListEntryType);
 	}
 
+	public boolean isAssetListEntryTypeDynamic() {
+		AssetListEntry assetListEntry = getAssetListEntry();
+
+		if (assetListEntry == null) {
+			return false;
+		}
+
+		if (assetListEntry.getType() ==
+				AssetListEntryTypeConstants.TYPE_DYNAMIC) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	public boolean isAssetListEntryTypeManual() {
+		AssetListEntry assetListEntry = getAssetListEntry();
+
+		if (assetListEntry == null) {
+			return false;
+		}
+
+		if (assetListEntry.getType() ==
+				AssetListEntryTypeConstants.TYPE_MANUAL) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	private Integer _assetListEntriesCount;
 	private SearchContainer _assetListEntriesSearchContainer;
+	private AssetListEntry _assetListEntry;
+	private Long _assetListEntryId;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
 	private final HttpServletRequest _request;
