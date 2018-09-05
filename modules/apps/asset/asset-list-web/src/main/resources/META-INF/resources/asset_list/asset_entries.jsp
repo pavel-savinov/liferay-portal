@@ -74,12 +74,12 @@ List<AssetEntry> assetEntries = AssetPublisherUtil.getAssetEntries(renderRequest
 		/>
 
 		<liferay-ui:search-container-column-jsp
-			path="/configuration/asset_selection_action.jsp"
+			path="/asset_list/asset_selection_action.jsp"
 		/>
 
 		<liferay-ui:search-container-column-jsp
 			cssClass="entry-action-column"
-			path="/configuration/asset_selection_order_action.jsp"
+			path="/asset_list/asset_selection_order_action.jsp"
 		/>
 	</liferay-ui:search-container-row>
 
