@@ -67,56 +67,61 @@ PanelCategoryHelper panelCategoryHelper = (PanelCategoryHelper)request.getAttrib
 							</span>
 						</div>
 
-						<div class="autofit-col autofit-col-end">
-							<div class="dropdown">
-								<a aria-expanded="false" class="dropdown-toggle icon-monospaced" data-toggle="dropdown" href="javascript:;">
-									<aui:icon image="cog" markupView="lexicon" />
-								</a>
+						<%
+						String portletId = themeDisplay.getPpid();
 
-								<%
-								String portletId = themeDisplay.getPpid();
+						if (Validator.isNull(portletId) || !panelCategoryHelper.containsPortlet(portletId, PanelCategoryKeys.SITE_ADMINISTRATION_CONTENT, permissionChecker, curSite)) {
+							portletId = panelCategoryHelper.getFirstPortletId(PanelCategoryKeys.SITE_ADMINISTRATION_CONTENT, permissionChecker, curSite);
+						}
 
-								if (Validator.isNull(portletId) || !panelCategoryHelper.containsPortlet(portletId, PanelCategoryKeys.SITE_ADMINISTRATION_CONTENT, permissionChecker, curSite)) {
-									portletId = panelCategoryHelper.getFirstPortletId(PanelCategoryKeys.SITE_ADMINISTRATION_CONTENT, permissionChecker, curSite);
+						final PortletURL portletURL = PortalUtil.getControlPanelPortletURL(request, curSite, portletId, 0, 0, PortletRequest.RENDER_PHASE);
+
+						final String itemLabel = LanguageUtil.get(locale, "default-scope");
+						
+						JSPDropdownItemList dropdownItems = new JSPDropdownItemList(pageContext){
+							{
+								add(
+									dropdownItem -> {
+										dropdownItem.setHref(portletURL.toString());
+										dropdownItem.setLabel(itemLabel);
+									}
+								);
+
+
+								for (Layout curScopeLayout : scopeLayouts) {
+									Group scopeGroup = curScopeLayout.getScopeGroup();
+
+									if (Validator.isNull(portletId) || !panelCategoryHelper.containsPortlet(portletId, PanelCategoryKeys.SITE_ADMINISTRATION_CONTENT, permissionChecker, scopeGroup)) {
+										portletId = panelCategoryHelper.getFirstPortletId(PanelCategoryKeys.SITE_ADMINISTRATION_CONTENT, permissionChecker, scopeGroup);
+									}
+
+									if (Validator.isNull(portletId)) {
+										continue;
+									}
+
+									final PortletURL portletURLa = PortalUtil.getControlPanelPortletURL(request, scopeGroup, portletId, 0, 0, PortletRequest.RENDER_PHASE);
+								
+									final String itemLabela = LanguageUtil.get(locale, HtmlUtil.escape(curScopeLayout.getName(locale)));
+
+									add(
+										dropdownItem -> {
+											dropdownItem.setHref(portletURLa.toString());
+											dropdownItem.setLabel(itemLabela);
+										}
+									);
 								}
 
-								PortletURL portletURL = PortalUtil.getControlPanelPortletURL(request, curSite, portletId, 0, 0, PortletRequest.RENDER_PHASE);
-								%>
-
-								<ul class="dropdown-menu dropdown-menu-left">
-									<li class="<%= (curScopeGroup.getGroupId() == curSite.getGroupId()) ? "active" : StringPool.BLANK %>">
-										<a class="truncate-text" href="<%= portletURL.toString() %>">
-											<liferay-ui:message key="default-scope" />
-										</a>
-									</li>
-
-									<%
-									for (Layout curScopeLayout : scopeLayouts) {
-										Group scopeGroup = curScopeLayout.getScopeGroup();
-
-										if (Validator.isNull(portletId) || !panelCategoryHelper.containsPortlet(portletId, PanelCategoryKeys.SITE_ADMINISTRATION_CONTENT, permissionChecker, scopeGroup)) {
-											portletId = panelCategoryHelper.getFirstPortletId(PanelCategoryKeys.SITE_ADMINISTRATION_CONTENT, permissionChecker, scopeGroup);
-										}
-
-										if (Validator.isNull(portletId)) {
-											continue;
-										}
-
-										portletURL = PortalUtil.getControlPanelPortletURL(request, scopeGroup, portletId, 0, 0, PortletRequest.RENDER_PHASE);
-									%>
-
-										<li class="<%= (curScopeGroup.getGroupId() == scopeGroup.getGroupId()) ? "active" : StringPool.BLANK %>">
-											<a class="truncate-text" href="<%= portletURL.toString() %>">
-												<liferay-ui:message key="<%= HtmlUtil.escape(curScopeLayout.getName(locale)) %>" />
-											</a>
-										</li>
-
-									<%
-									}
-									%>
-
-								</ul>
-							</div>
+								
+							}
+						};
+						%>
+						
+						<div class="autofit-col autofit-col-end">
+							<clay:dropdown-menu
+								dropdownItems="<%= dropdownItems %>"
+								icon="cog"
+								triggerCssClasses="dropdown-toggle icon-monospaced text-light"
+							/>
 						</div>
 					</div>
 
