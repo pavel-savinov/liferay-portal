@@ -24,10 +24,6 @@
 	/>
 </div>
 
-<%
-String taglibOnClick = "Liferay.fire('closeWindow', {id: Liferay.Util.getWindowName()});";
-%>
-
 <aui:button-row>
-	<aui:button cssClass="btn-lg" onClick="<%= taglibOnClick %>" value="close" />
+	<aui:button type="cancel" value="close" />
 </aui:button-row>
