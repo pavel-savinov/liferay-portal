@@ -33,71 +33,85 @@ List<AssetEntry> assetEntries = editAssetListDisplayContext.getAssetEntries(rend
 	<aui:input name="assetEntryOrder" type="hidden" />
 	<aui:input name="assetEntryType" type="hidden" />
 
-	<liferay-ui:search-container
-		compactEmptyResultsMessage="<%= true %>"
-		emptyResultsMessage="none"
-		iteratorURL="<%= currentURLObj %>"
-		total="<%= assetEntries.size() %>"
-	>
-		<liferay-ui:search-container-results
-			results="<%= assetEntries.subList(searchContainer.getStart(), searchContainer.getResultEnd()) %>"
-		/>
+	<liferay-frontend:edit-form-body>
+		<h3 class="sheet-subtitle">
+				<span class="autofit-padded-no-gutters autofit-row">
+					<span class="autofit-col autofit-col-expand">
+						<span class="heading-text">
+							<liferay-ui:message key="asset-entries" />
+						</span>
+					</span>
+				</span>
+		</h3>
 
-		<liferay-ui:search-container-row
-			className="com.liferay.asset.kernel.model.AssetEntry"
-			escapedModel="<%= true %>"
-			keyProperty="entryId"
-			modelVar="assetEntry"
-		>
-
-			<%
-			AssetRendererFactory<?> assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(assetEntry.getClassName());
-
-			AssetRenderer<?> assetRenderer = assetRendererFactory.getAssetRenderer(assetEntry.getClassPK(), AssetRendererFactory.TYPE_LATEST);
-			%>
-
-			<liferay-ui:search-container-column-text
-				name="title"
-				truncate="<%= true %>"
+		<liferay-frontend:fieldset-group>
+			<liferay-ui:search-container
+				compactEmptyResultsMessage="<%= true %>"
+				emptyResultsMessage="none"
+				iteratorURL="<%= currentURLObj %>"
+				total="<%= assetEntries.size() %>"
 			>
-				<%= HtmlUtil.escape(assetRenderer.getTitle(locale)) %>
+				<liferay-ui:search-container-results
+					results="<%= assetEntries.subList(searchContainer.getStart(), searchContainer.getResultEnd()) %>"
+				/>
 
-				<c:if test="<%= !assetEntry.isVisible() %>">
-					(<aui:workflow-status
-						markupView="lexicon"
-						showIcon="<%= false %>"
-						showLabel="<%= false %>"
-						status="<%= assetRenderer.getStatus() %>"
-						statusMessage='<%= (assetRenderer.getStatus() == 0) ? "not-visible" : WorkflowConstants.getStatusLabel(assetRenderer.getStatus()) %>'
-					/>)
-				</c:if>
-			</liferay-ui:search-container-column-text>
+				<liferay-ui:search-container-row
+					className="com.liferay.asset.kernel.model.AssetEntry"
+					escapedModel="<%= true %>"
+					keyProperty="entryId"
+					modelVar="assetEntry"
+				>
 
-			<liferay-ui:search-container-column-text
-				name="type"
-				value="<%= assetRendererFactory.getTypeName(locale) %>"
-			/>
+					<%
+					AssetRendererFactory<?> assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(assetEntry.getClassName());
 
-			<liferay-ui:search-container-column-date
-				name="modified-date"
-				value="<%= assetEntry.getModifiedDate() %>"
-			/>
+					AssetRenderer<?> assetRenderer = assetRendererFactory.getAssetRenderer(assetEntry.getClassPK(), AssetRendererFactory.TYPE_LATEST);
+					%>
 
-			<liferay-ui:search-container-column-jsp
-				path="/asset_list/asset_selection_action.jsp"
-			/>
+					<liferay-ui:search-container-column-text
+						name="title"
+						truncate="<%= true %>"
+					>
+						<%= HtmlUtil.escape(assetRenderer.getTitle(locale)) %>
 
-			<liferay-ui:search-container-column-jsp
-				cssClass="entry-action-column"
-				path="/asset_list/asset_selection_order_action.jsp"
-			/>
-		</liferay-ui:search-container-row>
+						<c:if test="<%= !assetEntry.isVisible() %>">
+							(<aui:workflow-status
+								markupView="lexicon"
+								showIcon="<%= false %>"
+								showLabel="<%= false %>"
+								status="<%= assetRenderer.getStatus() %>"
+								statusMessage='<%= (assetRenderer.getStatus() == 0) ? "not-visible" : WorkflowConstants.getStatusLabel(assetRenderer.getStatus()) %>'
+							/>)
+						</c:if>
+					</liferay-ui:search-container-column-text>
 
-		<liferay-ui:search-iterator
-			markupView="lexicon"
-			paginate="<%= total > SearchContainer.DEFAULT_DELTA %>"
-		/>
-	</liferay-ui:search-container>
+					<liferay-ui:search-container-column-text
+						name="type"
+						value="<%= assetRendererFactory.getTypeName(locale) %>"
+					/>
+
+					<liferay-ui:search-container-column-date
+						name="modified-date"
+						value="<%= assetEntry.getModifiedDate() %>"
+					/>
+
+					<liferay-ui:search-container-column-jsp
+						path="/asset_list/asset_selection_action.jsp"
+					/>
+
+					<liferay-ui:search-container-column-jsp
+						cssClass="entry-action-column"
+						path="/asset_list/asset_selection_order_action.jsp"
+					/>
+				</liferay-ui:search-container-row>
+
+				<liferay-ui:search-iterator
+					markupView="lexicon"
+					paginate="<%= total > SearchContainer.DEFAULT_DELTA %>"
+				/>
+			</liferay-ui:search-container>
+		</liferay-frontend:fieldset-group>
+	</liferay-frontend:edit-form-body>
 </liferay-frontend:edit-form>
 
 <%
