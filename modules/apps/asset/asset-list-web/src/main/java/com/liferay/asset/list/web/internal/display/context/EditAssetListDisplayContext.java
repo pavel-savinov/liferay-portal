@@ -16,6 +16,8 @@ package com.liferay.asset.list.web.internal.display.context;
 
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetCategory;
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.model.AssetVocabulary;
@@ -23,6 +25,7 @@ import com.liferay.asset.kernel.model.ClassType;
 import com.liferay.asset.kernel.model.ClassTypeField;
 import com.liferay.asset.kernel.model.ClassTypeReader;
 import com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil;
+import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetTagLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetVocabularyServiceUtil;
 import com.liferay.asset.list.constants.AssetListWebKeys;
@@ -32,6 +35,8 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.Layout;
@@ -41,8 +46,10 @@ import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
+import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -54,15 +61,20 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.sites.kernel.util.SitesUtil;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
@@ -83,6 +95,133 @@ public class EditAssetListDisplayContext {
 	public static final String SCOPE_ID_LAYOUT_UUID_PREFIX = "LayoutUuid_";
 
 	public static final String SCOPE_ID_PARENT_GROUP_PREFIX = "ParentGroup_";
+
+	public static List<AssetEntry> getAssetEntries(
+			PortletRequest portletRequest,
+			PortletPreferences portletPreferences,
+			PermissionChecker permissionChecker, long[] groupIds,
+			boolean deleteMissingAssetEntries, boolean checkPermission,
+			boolean includeNonVisibleAssets, int type)
+		throws Exception {
+
+		String[] assetEntryXmls = portletPreferences.getValues(
+			"assetEntryXml", new String[0]);
+
+		List<AssetEntry> assetEntries = new ArrayList<>();
+
+		List<String> missingAssetEntryUuids = new ArrayList<>();
+
+		for (String assetEntryXml : assetEntryXmls) {
+			Document document = SAXReaderUtil.read(assetEntryXml);
+
+			Element rootElement = document.getRootElement();
+
+			String assetEntryUuid = rootElement.elementText("asset-entry-uuid");
+
+			String assetEntryType = rootElement.elementText("asset-entry-type");
+
+			AssetRendererFactory<?> assetRendererFactory =
+				AssetRendererFactoryRegistryUtil.
+					getAssetRendererFactoryByClassName(assetEntryType);
+
+			String portletId = null;
+
+			if (assetRendererFactory != null) {
+				portletId = assetRendererFactory.getPortletId();
+			}
+
+			AssetEntry assetEntry = null;
+
+			for (long groupId : groupIds) {
+				Group group = GroupLocalServiceUtil.fetchGroup(groupId);
+
+				if ((portletId != null) && group.isStagingGroup() &&
+					!group.isStagedPortlet(portletId)) {
+
+					groupId = group.getLiveGroupId();
+				}
+
+				assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
+					groupId, assetEntryUuid);
+
+				if (assetEntry != null) {
+					break;
+				}
+			}
+
+			if (assetEntry == null) {
+				if (deleteMissingAssetEntries) {
+					missingAssetEntryUuids.add(assetEntryUuid);
+				}
+
+				continue;
+			}
+
+			if (!assetEntry.isVisible() && !includeNonVisibleAssets) {
+				continue;
+			}
+
+			assetRendererFactory =
+				AssetRendererFactoryRegistryUtil.
+					getAssetRendererFactoryByClassName(
+						assetEntry.getClassName());
+
+			if (assetRendererFactory == null) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"No asset renderer factory associated with " +
+							assetEntry.getClassName());
+				}
+
+				continue;
+			}
+
+			AssetRenderer<?> assetRenderer =
+				assetRendererFactory.getAssetRenderer(
+					assetEntry.getClassPK(), type);
+
+			if (!assetRendererFactory.isActive(
+					permissionChecker.getCompanyId())) {
+
+				if (deleteMissingAssetEntries) {
+					missingAssetEntryUuids.add(assetEntryUuid);
+				}
+
+				continue;
+			}
+
+			if (checkPermission) {
+				if (!assetRenderer.isDisplayable() &&
+					!includeNonVisibleAssets) {
+
+					continue;
+				}
+				else if (!assetRenderer.hasViewPermission(permissionChecker)) {
+					assetRenderer = assetRendererFactory.getAssetRenderer(
+						assetEntry.getClassPK(),
+						AssetRendererFactory.TYPE_LATEST_APPROVED);
+
+					if (!assetRenderer.hasViewPermission(permissionChecker)) {
+						continue;
+					}
+				}
+			}
+
+			assetEntries.add(assetEntry);
+		}
+
+		if (deleteMissingAssetEntries) {
+			removeAndStoreSelection(missingAssetEntryUuids, portletPreferences);
+
+			if (!missingAssetEntryUuids.isEmpty()) {
+				SessionMessages.add(
+					portletRequest, "deletedMissingAssetEntries",
+					missingAssetEntryUuids);
+			}
+		}
+
+		return assetEntries;
+	}
 
 	public static long[] getClassNameIds(
 		UnicodeProperties properties, long[] availableClassNameIds) {
@@ -222,6 +361,42 @@ public class EditAssetListDisplayContext {
 		}
 
 		return ArrayUtil.toLongArray(groupIds);
+	}
+
+	public static void removeAndStoreSelection(
+			List<String> assetEntryUuids, PortletPreferences portletPreferences)
+		throws Exception {
+
+		if (assetEntryUuids.isEmpty()) {
+			return;
+		}
+
+		String[] assetEntryXmls = portletPreferences.getValues(
+			"assetEntryXml", new String[0]);
+
+		List<String> assetEntryXmlsList = ListUtil.fromArray(assetEntryXmls);
+
+		Iterator<String> itr = assetEntryXmlsList.iterator();
+
+		while (itr.hasNext()) {
+			String assetEntryXml = itr.next();
+
+			Document document = SAXReaderUtil.read(assetEntryXml);
+
+			Element rootElement = document.getRootElement();
+
+			String assetEntryUuid = rootElement.elementText("asset-entry-uuid");
+
+			if (assetEntryUuids.contains(assetEntryUuid)) {
+				itr.remove();
+			}
+		}
+
+		portletPreferences.setValues(
+			"assetEntryXml",
+			assetEntryXmlsList.toArray(new String[assetEntryXmlsList.size()]));
+
+		portletPreferences.store();
 	}
 
 	public EditAssetListDisplayContext(
@@ -774,6 +949,9 @@ public class EditAssetListDisplayContext {
 
 		return availableClassTypeIds;
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		EditAssetListDisplayContext.class);
 
 	private Boolean _anyAssetType;
 	private long[] _availableClassNameIds;

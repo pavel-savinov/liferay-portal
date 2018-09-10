@@ -18,9 +18,9 @@
 
 <%
 PortletURL configurationRenderURL = (PortletURL)request.getAttribute("configuration.jsp-configurationRenderURL");
-String eventName = "_" + HtmlUtil.escapeJS(assetPublisherDisplayContext.getPortletResource()) + "_selectAsset";
+String eventName = "_" + HtmlUtil.escapeJS(editAssetListDisplayContext.getPortletResource()) + "_selectAsset";
 
-List<AssetEntry> assetEntries = AssetPublisherUtil.getAssetEntries(renderRequest, portletPreferences, permissionChecker, assetPublisherDisplayContext.getGroupIds(), true, assetPublisherDisplayContext.isEnablePermissions(), true, AssetRendererFactory.TYPE_LATEST);
+List<AssetEntry> assetEntries = editAssetListDisplayContext.getAssetEntries(renderRequest, portletPreferences, permissionChecker, editAssetListDisplayContext.getGroupIds(), true, true, true, AssetRendererFactory.TYPE_LATEST);
 %>
 
 <liferay-ui:search-container
@@ -96,7 +96,7 @@ List<AssetEntry> assetEntries = AssetPublisherUtil.getAssetEntries(renderRequest
 </c:if>
 
 <%
-long[] groupIds = assetPublisherDisplayContext.getGroupIds();
+long[] groupIds = editAssetListDisplayContext.getGroupIds();
 
 for (long groupId : groupIds) {
 	Group group = GroupLocalServiceUtil.getGroup(groupId);
