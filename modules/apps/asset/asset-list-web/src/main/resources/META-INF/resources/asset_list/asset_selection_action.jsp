@@ -24,14 +24,14 @@ ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_
 int assetEntryOrder = searchContainer.getStart() + row.getPos();
 %>
 
-<liferay-portlet:actionURL portletConfiguration="<%= true %>" var="deleteURL">
-	<portlet:param name="<%= Constants.CMD %>" value="remove-selection" />
+<portlet:actionURL name="/asset_list/remove_asset_entry_selection" var="removeAssetEntrySelectionURL">
 	<portlet:param name="redirect" value="<%= currentURL %>" />
+	<portlet:param name="assetListEntryId" value="<%= String.valueOf(assetListDisplayContext.getAssetListEntryId()) %>" />
 	<portlet:param name="assetEntryOrder" value="<%= String.valueOf(assetEntryOrder) %>" />
-</liferay-portlet:actionURL>
+</portlet:actionURL>
 
 <liferay-ui:icon
-	icon="times"
+	icon="times-circle"
 	markupView="lexicon"
-	url="<%= deleteURL %>"
+	url="<%= removeAssetEntrySelectionURL %>"
 />
