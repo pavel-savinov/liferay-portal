@@ -17,83 +17,88 @@
 <%@ include file="/init.jsp" %>
 
 <%
-PortletURL configurationRenderURL = (PortletURL)request.getAttribute("configuration.jsp-configurationRenderURL");
 String eventName = "_" + HtmlUtil.escapeJS(editAssetListDisplayContext.getPortletResource()) + "_selectAsset";
 
-List<AssetEntry> assetEntries = editAssetListDisplayContext.getAssetEntries(renderRequest, portletPreferences, permissionChecker, editAssetListDisplayContext.getGroupIds(), true, true, true, AssetRendererFactory.TYPE_LATEST);
+List<AssetEntry> assetEntries = editAssetListDisplayContext.getAssetEntries(renderRequest, assetListDisplayContext.getAssetListEntry(), permissionChecker, editAssetListDisplayContext.getGroupIds(), true, true, true, AssetRendererFactory.TYPE_LATEST);
 %>
 
-<liferay-ui:search-container
-	compactEmptyResultsMessage="<%= true %>"
-	emptyResultsMessage="none"
-	iteratorURL="<%= configurationRenderURL %>"
-	total="<%= assetEntries.size() %>"
+<liferay-frontend:edit-form
+	method="post"
+	name="fm"
 >
-	<liferay-ui:search-container-results
-		results="<%= assetEntries.subList(searchContainer.getStart(), searchContainer.getResultEnd()) %>"
-	/>
+	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
+	<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
+	<aui:input name="assetListEntryId" type="hidden" value="<%= assetListDisplayContext.getAssetListEntryId() %>" />
+	<aui:input name="assetEntryId" type="hidden" />
+	<aui:input name="assetEntryOrder" type="hidden" />
+	<aui:input name="assetEntryType" type="hidden" />
 
-	<liferay-ui:search-container-row
-		className="com.liferay.asset.kernel.model.AssetEntry"
-		escapedModel="<%= true %>"
-		keyProperty="entryId"
-		modelVar="assetEntry"
+	<liferay-ui:search-container
+		compactEmptyResultsMessage="<%= true %>"
+		emptyResultsMessage="none"
+		iteratorURL="<%= currentURLObj %>"
+		total="<%= assetEntries.size() %>"
 	>
+		<liferay-ui:search-container-results
+			results="<%= assetEntries.subList(searchContainer.getStart(), searchContainer.getResultEnd()) %>"
+		/>
 
-		<%
-		AssetRendererFactory<?> assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(assetEntry.getClassName());
-
-		AssetRenderer<?> assetRenderer = assetRendererFactory.getAssetRenderer(assetEntry.getClassPK(), AssetRendererFactory.TYPE_LATEST);
-		%>
-
-		<liferay-ui:search-container-column-text
-			name="title"
-			truncate="<%= true %>"
+		<liferay-ui:search-container-row
+			className="com.liferay.asset.kernel.model.AssetEntry"
+			escapedModel="<%= true %>"
+			keyProperty="entryId"
+			modelVar="assetEntry"
 		>
-			<%= HtmlUtil.escape(assetRenderer.getTitle(locale)) %>
 
-			<c:if test="<%= !assetEntry.isVisible() %>">
-				(<aui:workflow-status
-					markupView="lexicon"
-					showIcon="<%= false %>"
-					showLabel="<%= false %>"
-					status="<%= assetRenderer.getStatus() %>"
-					statusMessage='<%= (assetRenderer.getStatus() == 0) ? "not-visible" : WorkflowConstants.getStatusLabel(assetRenderer.getStatus()) %>'
-				/>)
-			</c:if>
-		</liferay-ui:search-container-column-text>
+			<%
+			AssetRendererFactory<?> assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(assetEntry.getClassName());
 
-		<liferay-ui:search-container-column-text
-			name="type"
-			value="<%= assetRendererFactory.getTypeName(locale) %>"
+			AssetRenderer<?> assetRenderer = assetRendererFactory.getAssetRenderer(assetEntry.getClassPK(), AssetRendererFactory.TYPE_LATEST);
+			%>
+
+			<liferay-ui:search-container-column-text
+				name="title"
+				truncate="<%= true %>"
+			>
+				<%= HtmlUtil.escape(assetRenderer.getTitle(locale)) %>
+
+				<c:if test="<%= !assetEntry.isVisible() %>">
+					(<aui:workflow-status
+						markupView="lexicon"
+						showIcon="<%= false %>"
+						showLabel="<%= false %>"
+						status="<%= assetRenderer.getStatus() %>"
+						statusMessage='<%= (assetRenderer.getStatus() == 0) ? "not-visible" : WorkflowConstants.getStatusLabel(assetRenderer.getStatus()) %>'
+					/>)
+				</c:if>
+			</liferay-ui:search-container-column-text>
+
+			<liferay-ui:search-container-column-text
+				name="type"
+				value="<%= assetRendererFactory.getTypeName(locale) %>"
+			/>
+
+			<liferay-ui:search-container-column-date
+				name="modified-date"
+				value="<%= assetEntry.getModifiedDate() %>"
+			/>
+
+			<liferay-ui:search-container-column-jsp
+				path="/asset_list/asset_selection_action.jsp"
+			/>
+
+			<liferay-ui:search-container-column-jsp
+				cssClass="entry-action-column"
+				path="/asset_list/asset_selection_order_action.jsp"
+			/>
+		</liferay-ui:search-container-row>
+
+		<liferay-ui:search-iterator
+			markupView="lexicon"
+			paginate="<%= total > SearchContainer.DEFAULT_DELTA %>"
 		/>
-
-		<liferay-ui:search-container-column-date
-			name="modified-date"
-			value="<%= assetEntry.getModifiedDate() %>"
-		/>
-
-		<liferay-ui:search-container-column-jsp
-			path="/asset_list/asset_selection_action.jsp"
-		/>
-
-		<liferay-ui:search-container-column-jsp
-			cssClass="entry-action-column"
-			path="/asset_list/asset_selection_order_action.jsp"
-		/>
-	</liferay-ui:search-container-row>
-
-	<liferay-ui:search-iterator
-		markupView="lexicon"
-		paginate="<%= total > SearchContainer.DEFAULT_DELTA %>"
-	/>
-</liferay-ui:search-container>
-
-<c:if test='<%= SessionMessages.contains(renderRequest, "deletedMissingAssetEntries") %>'>
-	<div class="alert alert-info">
-		<liferay-ui:message key="the-selected-assets-have-been-removed-from-the-list-because-they-do-not-belong-in-the-scope-of-this-widget" />
-	</div>
-</c:if>
+	</liferay-ui:search-container>
+</liferay-frontend:edit-form>
 
 <%
 long[] groupIds = editAssetListDisplayContext.getGroupIds();
@@ -210,32 +215,32 @@ for (long groupId : groupIds) {
 
 <aui:script>
 	function <portlet:namespace />moveSelectionDown(assetEntryOrder) {
-		var form = AUI.$(document.<portlet:namespace />fm);
+		<portlet:namespace />fm.<portlet:namespace />assetEntryOrder.value = assetEntryOrder;
 
-		form.fm('<%= Constants.CMD %>').val('move-selection-down');
-		form.fm('redirect').val('<%= HtmlUtil.escapeJS(currentURL) %>');
-		form.fm('assetEntryOrder').val(assetEntryOrder);
+		<portlet:actionURL name="/asset_list/move_asset_entry_selection" var="moveAssetEntrySelectionDownURL">
+			<portlet:param name="moveDirection" value="<%= AssetListSelectionConstants.MOVE_DOWN %>" />
+		</portlet:actionURL>
 
-		submitForm(form);
+		submitForm(document.<portlet:namespace />fm, '<%= moveAssetEntrySelectionDownURL.toString() %>');
 	}
 
 	function <portlet:namespace />moveSelectionUp(assetEntryOrder) {
-		var form = AUI.$(document.<portlet:namespace />fm);
+		<portlet:namespace />fm.<portlet:namespace />assetEntryOrder.value = assetEntryOrder;
 
-		form.fm('<%= Constants.CMD %>').val('move-selection-up');
-		form.fm('redirect').val('<%= HtmlUtil.escapeJS(currentURL) %>');
-		form.fm('assetEntryOrder').val(assetEntryOrder);
+		<portlet:actionURL name="/asset_list/move_asset_entry_selection" var="moveAssetEntrySelectionUpURL">
+			<portlet:param name="moveDirection" value="<%= AssetListSelectionConstants.MOVE_UP %>" />
+		</portlet:actionURL>
 
-		submitForm(form);
+		submitForm(document.<portlet:namespace />fm, '<%= moveAssetEntrySelectionUpURL.toString() %>');
 	}
 
 	function selectAsset(assetEntryId, assetClassName, assetType, assetEntryTitle, groupName) {
-		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = 'add-selection';
-		document.<portlet:namespace />fm.<portlet:namespace />redirect.value = '<%= HtmlUtil.escapeJS(currentURL) %>';
-		document.<portlet:namespace />fm.<portlet:namespace />assetEntryId.value = assetEntryId;
-		document.<portlet:namespace />fm.<portlet:namespace />assetEntryType.value = assetClassName;
+		<portlet:namespace />fm.<portlet:namespace />assetEntryId.value = assetEntryId;
+		<portlet:namespace />fm.<portlet:namespace />assetEntryType.value = assetClassName;
 
-		submitForm(document.<portlet:namespace />fm);
+		<portlet:actionURL name="/asset_list/add_asset_entry_selection" var="addAssetEntrySelectionURL" />
+
+		submitForm(document.<portlet:namespace />fm, '<%= addAssetEntrySelectionURL.toString() %>');
 	}
 </aui:script>
 

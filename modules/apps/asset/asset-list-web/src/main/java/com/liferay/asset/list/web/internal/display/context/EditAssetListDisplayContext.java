@@ -29,6 +29,8 @@ import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetTagLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetVocabularyServiceUtil;
 import com.liferay.asset.list.constants.AssetListWebKeys;
+import com.liferay.asset.list.model.AssetListEntry;
+import com.liferay.asset.list.service.AssetListEntryServiceUtil;
 import com.liferay.dynamic.data.mapping.util.DDMIndexer;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -74,7 +76,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
@@ -97,15 +98,20 @@ public class EditAssetListDisplayContext {
 	public static final String SCOPE_ID_PARENT_GROUP_PREFIX = "ParentGroup_";
 
 	public static List<AssetEntry> getAssetEntries(
-			PortletRequest portletRequest,
-			PortletPreferences portletPreferences,
+			PortletRequest portletRequest, AssetListEntry assetListEntry,
 			PermissionChecker permissionChecker, long[] groupIds,
 			boolean deleteMissingAssetEntries, boolean checkPermission,
 			boolean includeNonVisibleAssets, int type)
 		throws Exception {
 
-		String[] assetEntryXmls = portletPreferences.getValues(
-			"assetEntryXml", new String[0]);
+		UnicodeProperties typeSettingsProperties = new UnicodeProperties(true);
+
+		typeSettingsProperties.fastLoad(assetListEntry.getTypeSettings());
+
+		String assetEntryXmlProperty = typeSettingsProperties.getProperty(
+			"assetEntryXml");
+
+		String[] assetEntryXmls = StringUtil.split(assetEntryXmlProperty);
 
 		List<AssetEntry> assetEntries = new ArrayList<>();
 
@@ -211,7 +217,7 @@ public class EditAssetListDisplayContext {
 		}
 
 		if (deleteMissingAssetEntries) {
-			removeAndStoreSelection(missingAssetEntryUuids, portletPreferences);
+			removeAndStoreSelection(assetListEntry, missingAssetEntryUuids);
 
 			if (!missingAssetEntryUuids.isEmpty()) {
 				SessionMessages.add(
@@ -364,15 +370,21 @@ public class EditAssetListDisplayContext {
 	}
 
 	public static void removeAndStoreSelection(
-			List<String> assetEntryUuids, PortletPreferences portletPreferences)
+			AssetListEntry assetListEntry, List<String> assetEntryUuids)
 		throws Exception {
 
 		if (assetEntryUuids.isEmpty()) {
 			return;
 		}
 
-		String[] assetEntryXmls = portletPreferences.getValues(
-			"assetEntryXml", new String[0]);
+		UnicodeProperties typeSettingsProperties = new UnicodeProperties(true);
+
+		typeSettingsProperties.fastLoad(assetListEntry.getTypeSettings());
+
+		String assetEntryXmlProperty = typeSettingsProperties.getProperty(
+			"assetEntryXml");
+
+		String[] assetEntryXmls = StringUtil.split(assetEntryXmlProperty);
 
 		List<String> assetEntryXmlsList = ListUtil.fromArray(assetEntryXmls);
 
@@ -392,11 +404,15 @@ public class EditAssetListDisplayContext {
 			}
 		}
 
-		portletPreferences.setValues(
-			"assetEntryXml",
-			assetEntryXmlsList.toArray(new String[assetEntryXmlsList.size()]));
+		assetEntryXmls = assetEntryXmlsList.toArray(
+			new String[assetEntryXmlsList.size()]);
 
-		portletPreferences.store();
+		typeSettingsProperties.put(
+			"assetEntryXml", String.join(StringPool.COMMA, assetEntryXmls));
+
+		AssetListEntryServiceUtil.updateAssetListEntrySettings(
+			assetListEntry.getAssetListEntryId(),
+			typeSettingsProperties.toString());
 	}
 
 	public EditAssetListDisplayContext(
