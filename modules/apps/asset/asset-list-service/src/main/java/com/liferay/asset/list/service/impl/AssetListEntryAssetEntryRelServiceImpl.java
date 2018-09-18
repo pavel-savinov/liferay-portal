@@ -22,6 +22,8 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 
+import java.util.List;
+
 /**
  * @author Pavel Savinov
  * @see AssetListEntryAssetEntryRelServiceBaseImpl
@@ -58,6 +60,39 @@ public class AssetListEntryAssetEntryRelServiceImpl
 
 		return assetListEntryAssetEntryRelLocalService.
 			deleteAssetListEntryAssetEntryRel(assetListEntryId, position);
+	}
+
+	@Override
+	public List<AssetListEntryAssetEntryRel> getAssetListEntryAssetEntryRels(
+			long assetListEntryId, int start, int end)
+		throws PortalException {
+
+		AssetListEntry assetListEntry =
+			assetListEntryLocalService.fetchAssetListEntry(assetListEntryId);
+
+		if (assetListEntry != null) {
+			_assetListEntryModelResourcePermission.check(
+				getPermissionChecker(), assetListEntry, ActionKeys.VIEW);
+		}
+
+		return assetListEntryAssetEntryRelLocalService.
+			getAssetListEntryAssetEntryRels(assetListEntryId, start, end);
+	}
+
+	@Override
+	public int getAssetListEntryAssetEntryRelsCount(long assetListEntryId)
+		throws PortalException {
+
+		AssetListEntry assetListEntry =
+			assetListEntryLocalService.fetchAssetListEntry(assetListEntryId);
+
+		if (assetListEntry != null) {
+			_assetListEntryModelResourcePermission.check(
+				getPermissionChecker(), assetListEntry, ActionKeys.VIEW);
+		}
+
+		return assetListEntryAssetEntryRelLocalService.
+			getAssetListEntryAssetEntryRelsCount(assetListEntryId);
 	}
 
 	@Override
