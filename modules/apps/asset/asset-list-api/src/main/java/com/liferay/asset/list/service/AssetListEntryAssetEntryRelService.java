@@ -16,6 +16,8 @@ package com.liferay.asset.list.service;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.asset.list.model.AssetListEntryAssetEntryRel;
+
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
@@ -23,7 +25,10 @@ import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.service.BaseService;
 import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.transaction.Isolation;
+import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+
+import java.util.List;
 
 /**
  * Provides the remote service interface for AssetListEntryAssetEntryRel. Methods of this
@@ -49,6 +54,19 @@ public interface AssetListEntryAssetEntryRelService extends BaseService {
 	 *
 	 * Never modify or reference this interface directly. Always use {@link AssetListEntryAssetEntryRelServiceUtil} to access the asset list entry asset entry rel remote service. Add custom service methods to {@link com.liferay.asset.list.service.impl.AssetListEntryAssetEntryRelServiceImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+	public AssetListEntryAssetEntryRel addAssetListEntryAssetEntryRel(
+		long assetListEntryId, long assetEntryId) throws PortalException;
+
+	public AssetListEntryAssetEntryRel deleteAssetListEntryAssetEntryRel(
+		long assetListEntryId, int position) throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<AssetListEntryAssetEntryRel> getAssetListEntryAssetEntryRels(
+		long assetListEntryId, int start, int end) throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getAssetListEntryAssetEntryRelsCount(long assetListEntryId)
+		throws PortalException;
 
 	/**
 	* Returns the OSGi service identifier.
@@ -56,4 +74,7 @@ public interface AssetListEntryAssetEntryRelService extends BaseService {
 	* @return the OSGi service identifier
 	*/
 	public String getOSGiServiceIdentifier();
+
+	public AssetListEntryAssetEntryRel moveAssetEntry(long assetListEntryId,
+		int position, int newPosition) throws PortalException;
 }

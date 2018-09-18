@@ -34,6 +34,36 @@ public class AssetListEntryAssetEntryRelServiceWrapper
 		_assetListEntryAssetEntryRelService = assetListEntryAssetEntryRelService;
 	}
 
+	@Override
+	public com.liferay.asset.list.model.AssetListEntryAssetEntryRel addAssetListEntryAssetEntryRel(
+		long assetListEntryId, long assetEntryId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _assetListEntryAssetEntryRelService.addAssetListEntryAssetEntryRel(assetListEntryId,
+			assetEntryId);
+	}
+
+	@Override
+	public com.liferay.asset.list.model.AssetListEntryAssetEntryRel deleteAssetListEntryAssetEntryRel(
+		long assetListEntryId, int position)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _assetListEntryAssetEntryRelService.deleteAssetListEntryAssetEntryRel(assetListEntryId,
+			position);
+	}
+
+	@Override
+	public java.util.List<com.liferay.asset.list.model.AssetListEntryAssetEntryRel> getAssetListEntryAssetEntryRels(
+		long assetListEntryId, int start, int end)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _assetListEntryAssetEntryRelService.getAssetListEntryAssetEntryRels(assetListEntryId,
+			start, end);
+	}
+
+	@Override
+	public int getAssetListEntryAssetEntryRelsCount(long assetListEntryId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _assetListEntryAssetEntryRelService.getAssetListEntryAssetEntryRelsCount(assetListEntryId);
+	}
+
 	/**
 	* Returns the OSGi service identifier.
 	*
@@ -42,6 +72,14 @@ public class AssetListEntryAssetEntryRelServiceWrapper
 	@Override
 	public String getOSGiServiceIdentifier() {
 		return _assetListEntryAssetEntryRelService.getOSGiServiceIdentifier();
+	}
+
+	@Override
+	public com.liferay.asset.list.model.AssetListEntryAssetEntryRel moveAssetEntry(
+		long assetListEntryId, int position, int newPosition)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _assetListEntryAssetEntryRelService.moveAssetEntry(assetListEntryId,
+			position, newPosition);
 	}
 
 	@Override

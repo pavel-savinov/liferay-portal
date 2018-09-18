@@ -42,6 +42,34 @@ public class AssetListEntryAssetEntryRelServiceUtil {
 	 *
 	 * Never modify this class directly. Add custom service methods to {@link com.liferay.asset.list.service.impl.AssetListEntryAssetEntryRelServiceImpl} and rerun ServiceBuilder to regenerate this class.
 	 */
+	public static com.liferay.asset.list.model.AssetListEntryAssetEntryRel addAssetListEntryAssetEntryRel(
+		long assetListEntryId, long assetEntryId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .addAssetListEntryAssetEntryRel(assetListEntryId,
+			assetEntryId);
+	}
+
+	public static com.liferay.asset.list.model.AssetListEntryAssetEntryRel deleteAssetListEntryAssetEntryRel(
+		long assetListEntryId, int position)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .deleteAssetListEntryAssetEntryRel(assetListEntryId, position);
+	}
+
+	public static java.util.List<com.liferay.asset.list.model.AssetListEntryAssetEntryRel> getAssetListEntryAssetEntryRels(
+		long assetListEntryId, int start, int end)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .getAssetListEntryAssetEntryRels(assetListEntryId, start, end);
+	}
+
+	public static int getAssetListEntryAssetEntryRelsCount(
+		long assetListEntryId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .getAssetListEntryAssetEntryRelsCount(assetListEntryId);
+	}
 
 	/**
 	* Returns the OSGi service identifier.
@@ -50,6 +78,13 @@ public class AssetListEntryAssetEntryRelServiceUtil {
 	*/
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
+	}
+
+	public static com.liferay.asset.list.model.AssetListEntryAssetEntryRel moveAssetEntry(
+		long assetListEntryId, int position, int newPosition)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .moveAssetEntry(assetListEntryId, position, newPosition);
 	}
 
 	public static AssetListEntryAssetEntryRelService getService() {
