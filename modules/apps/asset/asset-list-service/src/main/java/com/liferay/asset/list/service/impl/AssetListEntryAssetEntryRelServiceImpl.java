@@ -14,29 +14,71 @@
 
 package com.liferay.asset.list.service.impl;
 
+import com.liferay.asset.list.model.AssetListEntry;
+import com.liferay.asset.list.model.AssetListEntryAssetEntryRel;
 import com.liferay.asset.list.service.base.AssetListEntryAssetEntryRelServiceBaseImpl;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 
 /**
- * The implementation of the asset list entry asset entry rel remote service.
- *
- * <p>
- * All custom service methods should be put in this class. Whenever methods are added, rerun ServiceBuilder to copy their definitions into the {@link com.liferay.asset.list.service.AssetListEntryAssetEntryRelService} interface.
- *
- * <p>
- * This is a remote service. Methods of this service are expected to have security checks based on the propagated JAAS credentials because this service can be accessed remotely.
- * </p>
- *
- * @author Brian Wing Shun Chan
+ * @author Pavel Savinov
  * @see AssetListEntryAssetEntryRelServiceBaseImpl
  * @see com.liferay.asset.list.service.AssetListEntryAssetEntryRelServiceUtil
  */
 public class AssetListEntryAssetEntryRelServiceImpl
 	extends AssetListEntryAssetEntryRelServiceBaseImpl {
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never reference this class directly. Always use {@link com.liferay.asset.list.service.AssetListEntryAssetEntryRelServiceUtil} to access the asset list entry asset entry rel remote service.
-	 */
+	@Override
+	public AssetListEntryAssetEntryRel addAssetListEntryAssetEntryRel(
+			long assetListEntryId, long assetEntryId)
+		throws PortalException {
+
+		AssetListEntry assetListEntry =
+			assetListEntryLocalService.getAssetListEntry(assetListEntryId);
+
+		_assetListEntryModelResourcePermission.check(
+			getPermissionChecker(), assetListEntry, ActionKeys.UPDATE);
+
+		return assetListEntryAssetEntryRelLocalService.
+			addAssetListEntryAssetEntryRel(assetListEntryId, assetEntryId);
+	}
+
+	@Override
+	public AssetListEntryAssetEntryRel deleteAssetListEntryAssetEntryRel(
+			long assetListEntryId, int position)
+		throws PortalException {
+
+		AssetListEntry assetListEntry =
+			assetListEntryLocalService.getAssetListEntry(assetListEntryId);
+
+		_assetListEntryModelResourcePermission.check(
+			getPermissionChecker(), assetListEntry, ActionKeys.UPDATE);
+
+		return assetListEntryAssetEntryRelLocalService.
+			deleteAssetListEntryAssetEntryRel(assetListEntryId, position);
+	}
+
+	@Override
+	public AssetListEntryAssetEntryRel moveAssetEntry(
+			long assetListEntryId, int position, int newPosition)
+		throws PortalException {
+
+		AssetListEntry assetListEntry =
+			assetListEntryLocalService.getAssetListEntry(assetListEntryId);
+
+		_assetListEntryModelResourcePermission.check(
+			getPermissionChecker(), assetListEntry, ActionKeys.UPDATE);
+
+		return assetListEntryAssetEntryRelLocalService.moveAssetEntry(
+			assetListEntryId, position, newPosition);
+	}
+
+	private static volatile ModelResourcePermission<AssetListEntry>
+		_assetListEntryModelResourcePermission =
+			ModelResourcePermissionFactory.getInstance(
+				AssetListEntryServiceImpl.class,
+				"_assetListEntryModelResourcePermission", AssetListEntry.class);
 
 }
