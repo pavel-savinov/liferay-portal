@@ -17,7 +17,6 @@ package com.liferay.asset.list.service.impl;
 import com.liferay.asset.list.constants.AssetListEntryTypeConstants;
 import com.liferay.asset.list.exception.AssetListEntryTitleException;
 import com.liferay.asset.list.exception.DuplicateAssetListEntryTitleException;
-import com.liferay.asset.list.exception.NoSuchEntryException;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.base.AssetListEntryLocalServiceBaseImpl;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -129,11 +128,7 @@ public class AssetListEntryLocalServiceImpl
 		throws PortalException {
 
 		AssetListEntry assetListEntry =
-			assetListEntryPersistence.fetchByPrimaryKey(assetListEntryId);
-
-		if (assetListEntry == null) {
-			throw new NoSuchEntryException();
-		}
+			assetListEntryPersistence.findByPrimaryKey(assetListEntryId);
 
 		// Resources
 
