@@ -47,7 +47,7 @@ public class AssetListEntryServiceImpl extends AssetListEntryServiceBaseImpl {
 		_assetListEntryModelResourcePermission.check(
 			getPermissionChecker(), assetListEntry, ActionKeys.UPDATE);
 
-		assetListEntryAssetEntryRelLocalService.addAssetListEntryAssetEntryRel(
+		assetListEntryLocalService.addAssetEntrySelection(
 			assetListEntryId, assetEntryId);
 	}
 
@@ -74,8 +74,8 @@ public class AssetListEntryServiceImpl extends AssetListEntryServiceBaseImpl {
 		_assetListEntryModelResourcePermission.check(
 			getPermissionChecker(), assetListEntry, ActionKeys.UPDATE);
 
-		assetListEntryAssetEntryRelLocalService.
-			deleteAssetListEntryAssetEntryRel(assetListEntryId, position);
+		assetListEntryLocalService.deleteAssetEntrySelection(
+			assetListEntryId, position);
 	}
 
 	@Override
@@ -162,7 +162,7 @@ public class AssetListEntryServiceImpl extends AssetListEntryServiceBaseImpl {
 		_assetListEntryModelResourcePermission.check(
 			getPermissionChecker(), assetListEntry, ActionKeys.UPDATE);
 
-		assetListEntryAssetEntryRelLocalService.moveAssetListEntryAssetEntryRel(
+		assetListEntryLocalService.moveAssetEntrySelection(
 			assetListEntryId, position, newPosition);
 	}
 
