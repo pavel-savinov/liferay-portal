@@ -14,6 +14,7 @@
 
 package com.liferay.layout.type.controller.content.internal.listener;
 
+import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
@@ -53,6 +54,12 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 
 	@Override
 	public void onAfterCreate(Layout layout) throws ModelListenerException {
+		if (ExportImportThreadLocal.isImportInProcess() ||
+			ExportImportThreadLocal.isStagingInProcess()) {
+
+			return;
+		}
+
 		if (!Objects.equals(
 				layout.getType(),
 				ContentLayoutTypeControllerConstants.LAYOUT_TYPE_CONTENT)) {
