@@ -103,11 +103,11 @@ public class AssetListDisplayContext {
 
 		AssetListEntry assetListEntry = getAssetListEntry();
 
-		searchContainer.setResults(
-			assetListEntry.getAssetEntries(
-				searchContainer.getStart(), searchContainer.getEnd()));
+		List<AssetEntry> assetEntries = assetListEntry.getAssetEntries();
 
-		searchContainer.setTotal(searchContainer.getEnd());
+		searchContainer.setResults(assetEntries);
+
+		searchContainer.setTotal(assetEntries.size());
 
 		_assetListContentSearchContainer = searchContainer;
 
