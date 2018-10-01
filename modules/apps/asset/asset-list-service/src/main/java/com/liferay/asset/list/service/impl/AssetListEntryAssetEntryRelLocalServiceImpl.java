@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -40,8 +41,17 @@ public class AssetListEntryAssetEntryRelLocalServiceImpl
 			assetListEntryAssetEntryRelPersistence.create(
 				assetListEntryAssetEntryRelId);
 
+		assetListEntryAssetEntryRel.setUuid(serviceContext.getUuid());
+		assetListEntryAssetEntryRel.setGroupId(assetListEntry.getGroupId());
+		assetListEntryAssetEntryRel.setCompanyId(assetListEntry.getCompanyId());
+		assetListEntryAssetEntryRel.setUserId(assetListEntry.getUserId());
+		assetListEntryAssetEntryRel.setUserName(assetListEntry.getUserName());
 		assetListEntryAssetEntryRel.setAssetListEntryId(
 			assetListEntry.getAssetListEntryId());
+		assetListEntryAssetEntryRel.setCreateDate(
+			serviceContext.getCreateDate(new Date()));
+		assetListEntryAssetEntryRel.setModifiedDate(
+			serviceContext.getModifiedDate(new Date()));
 		assetListEntryAssetEntryRel.setAssetEntryId(assetEntryId);
 		assetListEntryAssetEntryRel.setPosition(
 			getAssetListEntryAssetEntryRelsCount(
