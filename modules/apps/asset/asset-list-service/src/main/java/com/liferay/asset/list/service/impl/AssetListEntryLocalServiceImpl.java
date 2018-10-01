@@ -52,7 +52,7 @@ public class AssetListEntryLocalServiceImpl
 		}
 
 		assetListEntryAssetEntryRelLocalService.addAssetListEntryAssetEntryRel(
-			assetListEntryId, assetEntryId);
+			assetListEntry, assetEntryId);
 	}
 
 	@Override

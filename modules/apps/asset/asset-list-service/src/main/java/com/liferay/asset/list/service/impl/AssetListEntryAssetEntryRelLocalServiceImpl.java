@@ -14,6 +14,7 @@
 
 package com.liferay.asset.list.service.impl;
 
+import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.model.AssetListEntryAssetEntryRel;
 import com.liferay.asset.list.service.base.AssetListEntryAssetEntryRelLocalServiceBaseImpl;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -29,7 +30,7 @@ public class AssetListEntryAssetEntryRelLocalServiceImpl
 
 	@Override
 	public AssetListEntryAssetEntryRel addAssetListEntryAssetEntryRel(
-		long assetListEntryId, long assetEntryId) {
+		AssetListEntry assetListEntry, long assetEntryId) {
 
 		long assetListEntryAssetEntryRelId = counterLocalService.increment();
 
@@ -37,10 +38,12 @@ public class AssetListEntryAssetEntryRelLocalServiceImpl
 			assetListEntryAssetEntryRelPersistence.create(
 				assetListEntryAssetEntryRelId);
 
-		assetListEntryAssetEntryRel.setAssetListEntryId(assetListEntryId);
+		assetListEntryAssetEntryRel.setAssetListEntryId(
+			assetListEntry.getAssetListEntryId());
 		assetListEntryAssetEntryRel.setAssetEntryId(assetEntryId);
 		assetListEntryAssetEntryRel.setPosition(
-			getAssetListEntryAssetEntryRelsCount(assetListEntryId));
+			getAssetListEntryAssetEntryRelsCount(
+				assetListEntry.getAssetListEntryId()));
 
 		return assetListEntryAssetEntryRelPersistence.update(
 			assetListEntryAssetEntryRel);
