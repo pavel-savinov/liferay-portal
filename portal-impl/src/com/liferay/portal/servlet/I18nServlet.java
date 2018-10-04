@@ -143,7 +143,9 @@ public class I18nServlet extends HttpServlet {
 
 		int pos = i18nLanguageId.lastIndexOf(CharPool.SLASH);
 
-		i18nLanguageId = i18nLanguageId.substring(pos + 1);
+		i18nLanguageId = StringUtil.replaceFirst(
+			i18nLanguageId.substring(pos + 1), CharPool.DASH,
+			CharPool.UNDERLINE);
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Language ID " + i18nLanguageId);
