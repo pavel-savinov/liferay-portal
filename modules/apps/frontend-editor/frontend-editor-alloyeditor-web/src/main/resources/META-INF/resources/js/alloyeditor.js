@@ -454,8 +454,10 @@ AUI.add(
 
 						var editable = nativeEditor.editable();
 
-						editable.changeAttr('dir', contentsLanguageDir);
-						editable.changeAttr('lang', contentsLanguage);
+						if (editable !== null) {
+							editable.changeAttr('dir', contentsLanguageDir);
+							editable.changeAttr('lang', contentsLanguage);
+						}
 					},
 
 					_onSetData: function(event) {
