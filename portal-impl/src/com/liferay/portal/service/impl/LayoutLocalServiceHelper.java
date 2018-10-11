@@ -408,7 +408,12 @@ public class LayoutLocalServiceHelper implements IdentifiableOSGiService {
 				StringPool.SLASH +
 					PortalUtil.getI18nPathLanguageId(locale, languageId);
 
+			String underlineI18nPathLanguageId = StringUtil.replace(
+				i18nPathLanguageId, StringPool.DASH, StringPool.UNDERLINE);
+
 			if (friendlyURL.startsWith(i18nPathLanguageId + StringPool.SLASH) ||
+				friendlyURL.startsWith(
+					underlineI18nPathLanguageId + StringPool.SLASH) ||
 				friendlyURL.startsWith(
 					StringPool.SLASH + languageId + StringPool.SLASH) ||
 				friendlyURL.equals(i18nPathLanguageId) ||
