@@ -177,8 +177,8 @@ public class FriendlyURLServletTest {
 		testGetI18nRedirect("/fr", "/en");
 		testGetI18nRedirect("/hu", "/hu");
 		testGetI18nRedirect("/en", "/en");
-		testGetI18nRedirect("/de_DE", "/de_DE");
-		testGetI18nRedirect("/en_US", "/en_US");
+		testGetI18nRedirect("/de_DE", "/de-DE");
+		testGetI18nRedirect("/en_US", "/en-US");
 	}
 
 	@Test(expected = NoSuchGroupException.class)
