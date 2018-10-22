@@ -22,7 +22,7 @@ import com.liferay.exportimport.portlet.preferences.processor.ExportImportPortle
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.site.navigation.constants.SiteNavigationConstants;
 import com.liferay.site.navigation.menu.web.internal.constants.SiteNavigationMenuPortletKeys;
 import com.liferay.site.navigation.model.SiteNavigationMenu;
@@ -73,19 +73,20 @@ public class SiteNavigationMenuExportImportPortletPreferencesProcessor
 				"Unable to export portlet permissions", pe);
 		}
 
-		String portletId = portletDataContext.getPortletId();
+		long siteNavigationMenuId = GetterUtil.getLong(
+			portletPreferences.getValue("siteNavigationMenuId", null));
 
-		String siteNavigationMenuId = portletPreferences.getValue(
-			"siteNavigationMenuId", null);
-		long scopeGroupId = portletDataContext.getScopeGroupId();
-
-		if (Validator.isNotNull(siteNavigationMenuId)) {
+		if (siteNavigationMenuId > 0) {
 			SiteNavigationMenu siteNavigationMenu =
 				_siteNavigationMenuLocalService.fetchSiteNavigationMenu(
-					GetterUtil.getLong(siteNavigationMenuId));
+					siteNavigationMenuId);
 
 			if (siteNavigationMenu != null) {
+				String portletId = portletDataContext.getPortletId();
+
 				String siteNavigationMenuUuid = siteNavigationMenu.getUuid();
+
+				long scopeGroupId = portletDataContext.getScopeGroupId();
 
 				SiteNavigationMenu siteNavigationMenuToExport =
 					_siteNavigationMenuLocalService.
@@ -118,26 +119,27 @@ public class SiteNavigationMenuExportImportPortletPreferencesProcessor
 				"Unable to import portlet permissions", pe);
 		}
 
-		String siteNavigationMenuId = portletPreferences.getValue(
-			"siteNavigationMenuId", null);
+		long importedSiteNavigationMenuId = GetterUtil.getLong(
+			portletPreferences.getValue("siteNavigationMenuId", null));
 
 		try {
-			if (Validator.isNotNull(siteNavigationMenuId)) {
+			if (importedSiteNavigationMenuId > 0) {
 				StagedModelDataHandlerUtil.importReferenceStagedModel(
 					portletDataContext, SiteNavigationMenu.class,
-					siteNavigationMenuId);
+					importedSiteNavigationMenuId);
 
 				Map<Long, Long> siteNavigationMenuIds =
 					(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 						SiteNavigationMenu.class);
 
-				Long newSiteNavigationMenuId = siteNavigationMenuIds.get(
-					GetterUtil.getLong(siteNavigationMenuId));
+				long siteNavigationMenuId = MapUtil.getLong(
+					siteNavigationMenuIds, importedSiteNavigationMenuId,
+					importedSiteNavigationMenuId);
 
-				if (newSiteNavigationMenuId != null) {
+				if (siteNavigationMenuId > 0) {
 					portletPreferences.setValue(
 						"siteNavigationMenuId",
-						String.valueOf(newSiteNavigationMenuId));
+						String.valueOf(siteNavigationMenuId));
 				}
 			}
 		}
