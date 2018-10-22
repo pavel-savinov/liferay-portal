@@ -19,9 +19,11 @@ import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.portlet.preferences.processor.Capability;
 import com.liferay.exportimport.portlet.preferences.processor.ExportImportPortletPreferencesProcessor;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.site.navigation.constants.SiteNavigationConstants;
 import com.liferay.site.navigation.menu.web.internal.constants.SiteNavigationMenuPortletKeys;
 import com.liferay.site.navigation.model.SiteNavigationMenu;
 import com.liferay.site.navigation.service.SiteNavigationMenuLocalService;
@@ -62,6 +64,15 @@ public class SiteNavigationMenuExportImportPortletPreferencesProcessor
 			PortletPreferences portletPreferences)
 		throws PortletDataException {
 
+		try {
+			portletDataContext.addPortletPermissions(
+				SiteNavigationConstants.RESOURCE_NAME);
+		}
+		catch (PortalException pe) {
+			throw new PortletDataException(
+				"Unable to export portlet permissions", pe);
+		}
+
 		String portletId = portletDataContext.getPortletId();
 
 		String siteNavigationMenuId = portletPreferences.getValue(
@@ -97,6 +108,15 @@ public class SiteNavigationMenuExportImportPortletPreferencesProcessor
 			PortletDataContext portletDataContext,
 			PortletPreferences portletPreferences)
 		throws PortletDataException {
+
+		try {
+			portletDataContext.importPortletPermissions(
+				SiteNavigationConstants.RESOURCE_NAME);
+		}
+		catch (PortalException pe) {
+			throw new PortletDataException(
+				"Unable to import portlet permissions", pe);
+		}
 
 		String siteNavigationMenuId = portletPreferences.getValue(
 			"siteNavigationMenuId", null);
