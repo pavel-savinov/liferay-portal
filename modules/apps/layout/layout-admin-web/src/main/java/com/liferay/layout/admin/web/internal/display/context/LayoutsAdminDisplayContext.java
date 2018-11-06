@@ -26,9 +26,12 @@ import com.liferay.layout.page.template.model.LayoutPageTemplateCollection;
 import com.liferay.layout.page.template.service.LayoutPageTemplateCollectionLocalServiceUtil;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryServiceUtil;
 import com.liferay.layout.page.template.util.comparator.LayoutPageTemplateCollectionNameComparator;
+import com.liferay.layout.util.comparator.LayoutLeftPlidComparator;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
+import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -57,6 +60,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
@@ -523,6 +527,58 @@ public class LayoutsAdminDisplayContext {
 		return layoutsJSONArray;
 	}
 
+	public SearchContainer getLayoutsSearchContainer() throws PortalException {
+		if (_layoutsSearchContainer != null) {
+			return _layoutsSearchContainer;
+		}
+
+		String emptyResultMessage = "there-are-no-public-pages";
+
+		if (isPrivateLayout()) {
+			emptyResultMessage = "there-are-no-private-pages";
+		}
+
+		SearchContainer layoutsSearchContainer = new SearchContainer(
+			_liferayPortletRequest, getPortletURL(), null, emptyResultMessage);
+
+		layoutsSearchContainer.setOrderByCol(_getOrderByCol());
+
+		String orderByType = _getOrderByType();
+
+		boolean orderByAsc = false;
+
+		if (orderByType.equals("asc")) {
+			orderByAsc = true;
+		}
+
+		OrderByComparator<Layout> orderByComparator =
+			new LayoutLeftPlidComparator(orderByAsc);
+
+		layoutsSearchContainer.setOrderByComparator(orderByComparator);
+
+		layoutsSearchContainer.setOrderByType(_getOrderByType());
+
+		EmptyOnClickRowChecker emptyOnClickRowChecker =
+			new EmptyOnClickRowChecker(_liferayPortletResponse);
+
+		layoutsSearchContainer.setRowChecker(emptyOnClickRowChecker);
+
+		int layoutsCount = LayoutLocalServiceUtil.getLayoutsCount(
+			getSelGroup(), isPrivateLayout());
+
+		List<Layout> layouts = LayoutLocalServiceUtil.getLayouts(
+			getSelGroupId(), isPrivateLayout(),
+			layoutsSearchContainer.getStart(), layoutsSearchContainer.getEnd(),
+			layoutsSearchContainer.getOrderByComparator());
+
+		layoutsSearchContainer.setTotal(layoutsCount);
+		layoutsSearchContainer.setResults(layouts);
+
+		_layoutsSearchContainer = layoutsSearchContainer;
+
+		return _layoutsSearchContainer;
+	}
+
 	public Group getLiveGroup() {
 		return _groupDisplayContextHelper.getLiveGroup();
 	}
@@ -873,6 +929,10 @@ public class LayoutsAdminDisplayContext {
 			return true;
 		}
 
+		return false;
+	}
+
+	public boolean isFlattenedView() {
 		return false;
 	}
 
@@ -1347,6 +1407,28 @@ public class LayoutsAdminDisplayContext {
 		return jsonArray;
 	}
 
+	private String _getOrderByCol() {
+		if (Validator.isNotNull(_orderByCol)) {
+			return _orderByCol;
+		}
+
+		_orderByCol = ParamUtil.getString(
+			_liferayPortletRequest, "orderByCol", "path");
+
+		return _orderByCol;
+	}
+
+	private String _getOrderByType() {
+		if (Validator.isNotNull(_orderByType)) {
+			return _orderByType;
+		}
+
+		_orderByType = ParamUtil.getString(
+			_liferayPortletRequest, "orderByType", "asc");
+
+		return _orderByType;
+	}
+
 	private String _getTitle(boolean privatePages) {
 		String title = "pages";
 
@@ -1389,8 +1471,11 @@ public class LayoutsAdminDisplayContext {
 	private String _homePageTitle;
 	private List<LayoutDescription> _layoutDescriptions;
 	private Long _layoutId;
+	private SearchContainer _layoutsSearchContainer;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
+	private String _orderByCol;
+	private String _orderByType;
 	private Long _parentLayoutId;
 	private Boolean _privateLayout;
 	private String _redirect;
