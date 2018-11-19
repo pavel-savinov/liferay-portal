@@ -19,6 +19,7 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetTagLocalServiceUtil;
@@ -28,6 +29,8 @@ import com.liferay.asset.list.model.AssetListEntryAssetEntryRel;
 import com.liferay.asset.list.service.AssetListEntryAssetEntryRelLocalServiceUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -37,8 +40,6 @@ import com.liferay.portal.kernel.util.UnicodeProperties;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Pavel Savinov
@@ -257,21 +258,46 @@ public class AssetListEntryImpl extends AssetListEntryBaseImpl {
 	}
 
 	private List<AssetEntry> _getManualAssetEntries(int start, int end) {
+		List<AssetEntry> assetEntries = new ArrayList<>();
+
 		List<AssetListEntryAssetEntryRel> assetListEntryAssetEntryRels =
 			AssetListEntryAssetEntryRelLocalServiceUtil.
 				getAssetListEntryAssetEntryRels(
 					getAssetListEntryId(), start, end);
 
-		Stream<AssetListEntryAssetEntryRel> stream =
-			assetListEntryAssetEntryRels.stream();
+		for (AssetListEntryAssetEntryRel assetListEntryAssetEntryRel :
+				assetListEntryAssetEntryRels) {
 
-		return stream.map(
-			assetListEntryAssetEntryRel ->
-				AssetEntryLocalServiceUtil.fetchEntry(
-					assetListEntryAssetEntryRel.getAssetEntryId())
-		).collect(
-			Collectors.toList()
-		);
+			AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
+				assetListEntryAssetEntryRel.getAssetEntryId());
+
+			if (assetEntry == null) {
+				continue;
+			}
+
+			if (!assetEntry.isVisible()) {
+				continue;
+			}
+
+			AssetRendererFactory assetRendererFactory =
+				AssetRendererFactoryRegistryUtil.
+					getAssetRendererFactoryByClassName(
+						assetEntry.getClassName());
+
+			if (assetRendererFactory == null) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"No asset renderer factory associated with " +
+							assetEntry.getClassName());
+				}
+
+				continue;
+			}
+
+			assetEntries.add(assetEntry);
+		}
+
+		return assetEntries;
 	}
 
 	private void _setCategoriesAndTags(
@@ -380,5 +406,8 @@ public class AssetListEntryImpl extends AssetListEntryBaseImpl {
 
 		assetEntryQuery.setNotAnyTagIds(notAnyAssetTagIds);
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		AssetListEntryImpl.class);
 
 }
