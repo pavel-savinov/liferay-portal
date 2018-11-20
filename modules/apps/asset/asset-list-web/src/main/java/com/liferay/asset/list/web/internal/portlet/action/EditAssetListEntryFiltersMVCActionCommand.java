@@ -20,8 +20,12 @@ import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.asset.list.constants.AssetListPortletKeys;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.AssetListEntryService;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -64,14 +68,25 @@ public class EditAssetListEntryFiltersMVCActionCommand
 			_assetListEntryService.fetchAssetListEntry(assetListEntryId);
 
 		if (assetListEntry != null) {
-			UnicodeProperties properties = new UnicodeProperties(true);
+			try {
+				UnicodeProperties properties = new UnicodeProperties(true);
 
-			properties.fastLoad(assetListEntry.getTypeSettings());
+				properties.fastLoad(assetListEntry.getTypeSettings());
 
-			updateQueryLogic(actionRequest, properties);
+				updateQueryLogic(actionRequest, properties);
 
-			_assetListEntryService.updateAssetListEntryTypeSettings(
-				assetListEntryId, properties.toString());
+				_assetListEntryService.updateAssetListEntryTypeSettings(
+					assetListEntryId, properties.toString());
+			}
+			catch (PortalException pe) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(pe, pe);
+				}
+
+				SessionErrors.add(actionRequest, pe.getClass(), pe);
+
+				sendRedirect(actionRequest, actionResponse);
+			}
 		}
 	}
 
@@ -170,6 +185,9 @@ public class EditAssetListEntryFiltersMVCActionCommand
 				queryRule.getName());
 		}
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		EditAssetListEntryFiltersMVCActionCommand.class);
 
 	@Reference
 	private AssetListEntryService _assetListEntryService;
