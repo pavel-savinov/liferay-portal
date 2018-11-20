@@ -18,12 +18,12 @@ import com.liferay.asset.kernel.exception.DuplicateQueryRuleException;
 import com.liferay.asset.kernel.model.AssetQueryRule;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.asset.list.constants.AssetListPortletKeys;
+import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.AssetListEntryService;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PropertiesParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -59,14 +59,19 @@ public class EditAssetListEntryFiltersMVCActionCommand
 		long assetListEntryId = ParamUtil.getLong(
 			actionRequest, "assetListEntryId");
 
-		UnicodeProperties typeSettingsProperties =
-			PropertiesParamUtil.getProperties(
-				actionRequest, "TypeSettingsProperties--");
+		AssetListEntry assetListEntry =
+			_assetListEntryService.fetchAssetListEntry(assetListEntryId);
 
-		updateQueryLogic(actionRequest, typeSettingsProperties);
+		if (assetListEntry != null) {
+			UnicodeProperties properties = new UnicodeProperties(true);
 
-		_assetListEntryService.updateAssetListEntryTypeSettingsProperties(
-			assetListEntryId, typeSettingsProperties.toString());
+			properties.fastLoad(assetListEntry.getTypeSettings());
+
+			updateQueryLogic(actionRequest, properties);
+
+			_assetListEntryService.updateAssetListEntryTypeSettings(
+				assetListEntryId, properties.toString());
+		}
 	}
 
 	protected AssetQueryRule getQueryRule(
