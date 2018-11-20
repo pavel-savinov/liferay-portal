@@ -984,6 +984,23 @@ public class LayoutsAdminDisplayContext {
 		return true;
 	}
 
+	public boolean isShowMarkAsHomePageLayout(Layout layout)
+		throws PortalException {
+
+		if (!isShowConfigureAction(layout)) {
+			return false;
+		}
+
+		if ((layout.getParentLayoutId() !=
+				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID) ||
+			(_getHomePagePlid(isPrivateLayout()) == layout.getPlid())) {
+
+			return false;
+		}
+
+		return true;
+	}
+
 	public boolean isShowOrphanPortletsAction(Layout layout)
 		throws PortalException {
 
@@ -1067,15 +1084,11 @@ public class LayoutsAdminDisplayContext {
 
 		if (isShowConfigureAction(layout)) {
 			jsonObject.put("editLayoutURL", getEditLayoutURL(layout));
+		}
 
-			if ((layout.getParentLayoutId() ==
-					LayoutConstants.DEFAULT_PARENT_LAYOUT_ID) &&
-				(_getHomePagePlid(isPrivateLayout()) != layout.getPlid())) {
-
-				jsonObject.put(
-					"markAsHomePageLayoutURL",
-					getMarkAsHomePageLayoutURL(layout));
-			}
+		if (isShowMarkAsHomePageLayout(layout)) {
+			jsonObject.put(
+				"markAsHomePageLayoutURL", getMarkAsHomePageLayoutURL(layout));
 		}
 
 		if (isShowOrphanPortletsAction(layout)) {
