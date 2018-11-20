@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.ArrayList;
@@ -133,6 +134,21 @@ public class EditAssetListEntryFiltersMVCActionCommand
 				"queryValues" + i, StringUtil.merge(queryRule.getValues()));
 
 			i++;
+		}
+
+		// Clear previous preferences that are now blank
+
+		String value = properties.getProperty("queryValues" + i);
+
+		while (Validator.isNotNull(value)) {
+			properties.remove("queryContains" + i);
+			properties.remove("queryAndOperator" + i);
+			properties.remove("queryName" + i);
+			properties.remove("queryValues" + i);
+
+			i++;
+
+			value = properties.getProperty("queryValues" + i);
 		}
 	}
 
