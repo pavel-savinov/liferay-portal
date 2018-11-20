@@ -45,21 +45,28 @@ Layout curLayout = (Layout)row.getObject();
 		/>
 	</c:if>
 
-	<c:if test="<%= layoutsAdminDisplayContext.showConfigureAction(curLayout) %>">
+	<c:if test="<%= layoutsAdminDisplayContext.isShowConfigureAction(curLayout) %>">
 		<liferay-ui:icon
 			message="configure"
 			url="<%= layoutsAdminDisplayContext.getConfigureLayoutURL(curLayout) %>"
 		/>
 	</c:if>
 
-	<c:if test="<%= layoutsAdminDisplayContext.showAddChildPageAction(curLayout) %>">
+	<c:if test="<%= layoutsAdminDisplayContext.isShowAddChildPageAction(curLayout) %>">
 		<liferay-ui:icon
 			message="add-child-page"
 			url="<%= layoutsAdminDisplayContext.getSelectLayoutPageTemplateEntryURL(layoutsAdminDisplayContext.getFirstLayoutPageTemplateCollectionId(), curLayout.getPlid(), curLayout.isPrivateLayout()) %>"
 		/>
 	</c:if>
 
-	<c:if test="<%= layoutsAdminDisplayContext.showCopyLayoutAction(curLayout) %>">
+	<c:if test="<%= layoutsAdminDisplayContext.isShowMarkAsHomePageLayout(curLayout) %>">
+		<liferay-ui:icon
+			message="mark-as-home-page"
+			url="<%= layoutsAdminDisplayContext.getMarkAsHomePageLayoutURL(curLayout) %>"
+		/>
+	</c:if>
+
+	<c:if test="<%= layoutsAdminDisplayContext.isShowCopyLayoutAction(curLayout) %>">
 		<liferay-ui:icon
 			cssClass="copy-layout-action-option"
 			message="copy-page"
@@ -67,7 +74,7 @@ Layout curLayout = (Layout)row.getObject();
 		/>
 	</c:if>
 
-	<c:if test="<%= layoutsAdminDisplayContext.showPermissionsAction(curLayout) %>">
+	<c:if test="<%= layoutsAdminDisplayContext.isShowPermissionsAction(curLayout) %>">
 		<liferay-ui:icon
 			message="permissions"
 			method="get"
@@ -76,14 +83,14 @@ Layout curLayout = (Layout)row.getObject();
 		/>
 	</c:if>
 
-	<c:if test="<%= layoutsAdminDisplayContext.showOrphanPortletsAction(curLayout) %>">
+	<c:if test="<%= layoutsAdminDisplayContext.isShowOrphanPortletsAction(curLayout) %>">
 		<liferay-ui:icon
 			message="orphan-widgets"
 			url="<%= layoutsAdminDisplayContext.getOrphanPortletsURL(curLayout) %>"
 		/>
 	</c:if>
 
-	<c:if test="<%= layoutsAdminDisplayContext.showDeleteAction(curLayout) %>">
+	<c:if test="<%= layoutsAdminDisplayContext.isShowDeleteAction(curLayout) %>">
 		<liferay-ui:icon-delete
 			url="<%= layoutsAdminDisplayContext.getDeleteLayoutURL(curLayout) %>"
 		/>

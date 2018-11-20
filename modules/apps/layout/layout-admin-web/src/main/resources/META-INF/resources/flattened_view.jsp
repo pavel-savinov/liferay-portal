@@ -33,6 +33,8 @@
 		<%
 		List<Layout> curLayouts = layout.getAncestors();
 
+		Collections.reverse(curLayouts);
+
 		StringBundler sb = new StringBundler((layouts.size() * 2) + 2);
 
 		sb.append("../ ");
@@ -67,6 +69,10 @@
 			cssClass="table-cell-ws-nowrap"
 			name="create-date"
 			property="createDate"
+		/>
+
+		<liferay-ui:search-container-column-jsp
+			path="/layout_action.jsp"
 		/>
 	</liferay-ui:search-container-row>
 
