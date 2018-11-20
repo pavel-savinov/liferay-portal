@@ -16,10 +16,10 @@
 
 <%@ include file="/init.jsp" %>
 
-<portlet:actionURL name="/asset_list/edit_asset_list_entry_settings" var="editAssetListEntrySettingsURL" />
+<portlet:actionURL name="/asset_list/edit_asset_list_entry_filters" var="editAssetListEntryFiltersURL" />
 
 <liferay-frontend:edit-form
-	action="<%= editAssetListEntrySettingsURL %>"
+	action="<%= editAssetListEntryFiltersURL %>"
 	method="post"
 	name="fm"
 >
