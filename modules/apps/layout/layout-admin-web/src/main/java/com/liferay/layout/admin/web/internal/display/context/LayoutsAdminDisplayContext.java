@@ -26,7 +26,6 @@ import com.liferay.layout.page.template.model.LayoutPageTemplateCollection;
 import com.liferay.layout.page.template.service.LayoutPageTemplateCollectionLocalServiceUtil;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryServiceUtil;
 import com.liferay.layout.page.template.util.comparator.LayoutPageTemplateCollectionNameComparator;
-import com.liferay.layout.service.LayoutLocalizationServiceUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -530,7 +529,7 @@ public class LayoutsAdminDisplayContext {
 		return layoutsJSONArray;
 	}
 
-	public SearchContainer getLayoutsSearchContainer() {
+	public SearchContainer getLayoutsSearchContainer() throws PortalException {
 		if (_layoutsSearchContainer != null) {
 			return _layoutsSearchContainer;
 		}
@@ -552,14 +551,13 @@ public class LayoutsAdminDisplayContext {
 
 		layoutsSearchContainer.setRowChecker(emptyOnClickRowChecker);
 
-		int layoutsCount = LayoutLocalizationServiceUtil.getLayoutsCount(
-			getSelGroupId(), isPrivateLayout(), _getKeywords(),
-			_themeDisplay.getLanguageId());
+		int layoutsCount = LayoutLocalServiceUtil.getLayoutsCount(
+			getSelGroup(), isPrivateLayout());
 
-		List<Layout> layouts = LayoutLocalizationServiceUtil.getLayouts(
-			getSelGroupId(), isPrivateLayout(), _getKeywords(),
-			_themeDisplay.getLanguageId(), layoutsSearchContainer.getStart(),
-			layoutsSearchContainer.getEnd());
+		List<Layout> layouts = LayoutLocalServiceUtil.getLayouts(
+			getSelGroupId(), isPrivateLayout(),
+			layoutsSearchContainer.getStart(), layoutsSearchContainer.getEnd(),
+			null);
 
 		layoutsSearchContainer.setTotal(layoutsCount);
 		layoutsSearchContainer.setResults(layouts);
@@ -920,6 +918,10 @@ public class LayoutsAdminDisplayContext {
 		}
 
 		return false;
+	}
+
+	public boolean isFlattenedView() {
+		return true;
 	}
 
 	public boolean isPagesTab() {
