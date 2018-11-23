@@ -72,6 +72,26 @@ public class SelectAssetDisplayPageDisplayContext {
 		_request = request;
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
+
+		_allowLayoutUuid = GetterUtil.getBoolean(
+			_request.getAttribute(
+				"liferay-asset:select-asset-display-page:allowLayoutUuid"));
+		_classNameId = GetterUtil.getLong(
+			_request.getAttribute(
+				"liferay-asset:select-asset-display-page:classNameId"));
+		_classPK = GetterUtil.getLong(
+			_request.getAttribute(
+				"liferay-asset:select-asset-display-page:classPK"));
+		_classTypeId = GetterUtil.getLong(
+			_request.getAttribute(
+				"liferay-asset:select-asset-display-page:classTypeId"));
+		_eventName = GetterUtil.getString(
+			_request.getAttribute(
+				"liferay-asset:select-asset-display-page:eventName"),
+			_liferayPortletResponse.getNamespace() + "selectDisplayPage");
+		_groupId = GetterUtil.getLong(
+			_request.getAttribute(
+				"liferay-asset:select-asset-display-page:groupId"));
 	}
 
 	public AssetDisplayPageEntry getAssetDisplayPageEntry() {
@@ -81,7 +101,7 @@ public class SelectAssetDisplayPageDisplayContext {
 
 		AssetDisplayPageEntry assetDisplayPageEntry =
 			AssetDisplayPageEntryLocalServiceUtil.fetchAssetDisplayPageEntry(
-				_getGroupId(), getClassNameId(), getClassPK());
+				_groupId, _classNameId, _classPK);
 
 		if (assetDisplayPageEntry != null) {
 			_assetDisplayPageEntry = assetDisplayPageEntry;
@@ -114,7 +134,7 @@ public class SelectAssetDisplayPageDisplayContext {
 			return _displayPageType;
 		}
 
-		if (getClassPK() == 0) {
+		if (_classPK == 0) {
 			_displayPageType = AssetDisplayPageConstants.TYPE_DEFAULT;
 
 			return _displayPageType;
@@ -143,58 +163,22 @@ public class SelectAssetDisplayPageDisplayContext {
 
 		AssetRendererFactory assetRendererFactory =
 			AssetRendererFactoryRegistryUtil.
-				getAssetRendererFactoryByClassNameId(getClassNameId());
+				getAssetRendererFactoryByClassNameId(_classNameId);
 
 		_assetTypeName = assetRendererFactory.getTypeName(
 			themeDisplay.getLocale());
 
-		if (getClassTypeId() > 0) {
+		if (_classTypeId > 0) {
 			ClassTypeReader classTypeReader =
 				assetRendererFactory.getClassTypeReader();
 
 			ClassType classType = classTypeReader.getClassType(
-				getClassTypeId(), themeDisplay.getLocale());
+				_classTypeId, themeDisplay.getLocale());
 
 			_assetTypeName = classType.getName();
 		}
 
 		return _assetTypeName;
-	}
-
-	public long getClassNameId() {
-		if (_classNameId != null) {
-			return _classNameId;
-		}
-
-		_classNameId = GetterUtil.getLong(
-			_request.getAttribute(
-				"liferay-asset:select-asset-display-page:classNameId"));
-
-		return _classNameId;
-	}
-
-	public long getClassPK() {
-		if (_classPK != null) {
-			return _classPK;
-		}
-
-		_classPK = GetterUtil.getLong(
-			_request.getAttribute(
-				"liferay-asset:select-asset-display-page:classPK"));
-
-		return _classPK;
-	}
-
-	public long getClassTypeId() {
-		if (_classTypeId != null) {
-			return _classTypeId;
-		}
-
-		_classTypeId = GetterUtil.getLong(
-			_request.getAttribute(
-				"liferay-asset:select-asset-display-page:classTypeId"));
-
-		return _classTypeId;
 	}
 
 	public String getDefaultAssetDisplayPageName() {
@@ -207,7 +191,7 @@ public class SelectAssetDisplayPageDisplayContext {
 		layoutPageTemplateEntry =
 			LayoutPageTemplateEntryServiceUtil.
 				fetchDefaultLayoutPageTemplateEntry(
-					_getGroupId(), getClassNameId(), getClassTypeId());
+					_groupId, _classNameId, _classTypeId);
 
 		if (layoutPageTemplateEntry != null) {
 			_defaultAssetDisplayPageName = layoutPageTemplateEntry.getName();
@@ -224,8 +208,8 @@ public class SelectAssetDisplayPageDisplayContext {
 		AssetDisplayPageSelectorCriterion assetDisplayPageSelectorCriterion =
 			new AssetDisplayPageSelectorCriterion();
 
-		assetDisplayPageSelectorCriterion.setClassNameId(getClassNameId());
-		assetDisplayPageSelectorCriterion.setClassTypeId(getClassTypeId());
+		assetDisplayPageSelectorCriterion.setClassNameId(_classNameId);
+		assetDisplayPageSelectorCriterion.setClassTypeId(_classTypeId);
 
 		List<ItemSelectorReturnType>
 			desiredAssetDisplayPageItemSelectorReturnTypes = new ArrayList<>();
@@ -238,7 +222,7 @@ public class SelectAssetDisplayPageDisplayContext {
 
 		criteria.add(assetDisplayPageSelectorCriterion);
 
-		if (isAllowLayoutUuid()) {
+		if (_allowLayoutUuid) {
 			LayoutItemSelectorCriterion layoutItemSelectorCriterion =
 				new LayoutItemSelectorCriterion();
 
@@ -258,7 +242,7 @@ public class SelectAssetDisplayPageDisplayContext {
 
 		PortletURL itemSelectorURL = itemSelector.getItemSelectorURL(
 			RequestBackedPortletURLFactoryUtil.create(_liferayPortletRequest),
-			getEventName(), criteria.toArray(new ItemSelectorCriterion[0]));
+			_eventName, criteria.toArray(new ItemSelectorCriterion[0]));
 
 		itemSelectorURL.setParameter("layoutUuid", getLayoutUuid());
 
@@ -296,40 +280,27 @@ public class SelectAssetDisplayPageDisplayContext {
 		return StringPool.BLANK;
 	}
 
-	public String getEventName() {
-		if (Validator.isNotNull(_eventName)) {
-			return _eventName;
-		}
-
-		_eventName = GetterUtil.getString(
-			_request.getAttribute(
-				"liferay-asset:select-asset-display-page:eventName"),
-			_liferayPortletResponse.getNamespace() + "selectDisplayPage");
-
-		return _eventName;
-	}
-
 	public Group getGroup() throws PortalException {
 		if (_group != null) {
 			return _group;
 		}
 
-		_group = GroupLocalServiceUtil.getGroup(_getGroupId());
+		_group = GroupLocalServiceUtil.getGroup(_groupId);
 
 		return _group;
 	}
 
 	public String getLayoutUuid() throws PortalException {
-		if (getClassPK() == 0) {
+		if (_classPK == 0) {
 			return null;
 		}
 
 		AssetRendererFactory assetRendererFactory =
 			AssetRendererFactoryRegistryUtil.
-				getAssetRendererFactoryByClassNameId(getClassNameId());
+				getAssetRendererFactoryByClassNameId(_classNameId);
 
 		AssetEntry assetEntry = assetRendererFactory.getAssetEntry(
-			PortalUtil.getClassName(getClassNameId()), getClassPK());
+			PortalUtil.getClassName(_classNameId), _classPK);
 
 		return assetEntry.getLayoutUuid();
 	}
@@ -340,20 +311,14 @@ public class SelectAssetDisplayPageDisplayContext {
 
 		AssetRendererFactory assetRendererFactory =
 			AssetRendererFactoryRegistryUtil.
-				getAssetRendererFactoryByClassNameId(getClassNameId());
+				getAssetRendererFactoryByClassNameId(_classNameId);
 
 		AssetRenderer assetRenderer = assetRendererFactory.getAssetRenderer(
-			getClassPK());
+			_classPK);
 
 		return assetRenderer.getURLViewInContext(
 			_liferayPortletRequest, _liferayPortletResponse,
 			themeDisplay.getURLCurrent());
-	}
-
-	public boolean isAllowLayoutUuid() {
-		return GetterUtil.getBoolean(
-			_request.getAttribute(
-				"liferay-asset:select-asset-display-page:allowLayoutUuid"));
 	}
 
 	public boolean isAssetDisplayPageTypeDefault() {
@@ -385,7 +350,7 @@ public class SelectAssetDisplayPageDisplayContext {
 	}
 
 	public boolean isURLViewInContext() throws Exception {
-		if (getClassPK() == 0) {
+		if (_classPK == 0) {
 			return false;
 		}
 
@@ -416,12 +381,6 @@ public class SelectAssetDisplayPageDisplayContext {
 		}
 
 		return layoutPageTemplateEntry.getName();
-	}
-
-	private long _getGroupId() {
-		return GetterUtil.getLong(
-			_request.getAttribute(
-				"liferay-asset:select-asset-display-page:groupId"));
 	}
 
 	private String _getLayoutBreadcrumb(Layout layout) throws Exception {
@@ -459,16 +418,18 @@ public class SelectAssetDisplayPageDisplayContext {
 		return sb.toString();
 	}
 
+	private final boolean _allowLayoutUuid;
 	private AssetDisplayPageEntry _assetDisplayPageEntry;
 	private Long _assetDisplayPageId;
 	private String _assetTypeName;
-	private Long _classNameId;
+	private final Long _classNameId;
 	private Long _classPK;
-	private Long _classTypeId;
+	private final Long _classTypeId;
 	private String _defaultAssetDisplayPageName;
 	private Integer _displayPageType;
-	private String _eventName;
+	private final String _eventName;
 	private Group _group;
+	private final long _groupId;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
 	private final HttpServletRequest _request;
