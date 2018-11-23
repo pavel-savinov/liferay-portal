@@ -94,29 +94,13 @@ public class SelectAssetDisplayPageDisplayContext {
 				"liferay-asset:select-asset-display-page:groupId"));
 	}
 
-	public AssetDisplayPageEntry getAssetDisplayPageEntry() {
-		if (_assetDisplayPageEntry != null) {
-			return _assetDisplayPageEntry;
-		}
-
-		AssetDisplayPageEntry assetDisplayPageEntry =
-			AssetDisplayPageEntryLocalServiceUtil.fetchAssetDisplayPageEntry(
-				_groupId, _classNameId, _classPK);
-
-		if (assetDisplayPageEntry != null) {
-			_assetDisplayPageEntry = assetDisplayPageEntry;
-		}
-
-		return _assetDisplayPageEntry;
-	}
-
 	public long getAssetDisplayPageId() {
 		if (_assetDisplayPageId != null) {
 			return _assetDisplayPageId;
 		}
 
 		AssetDisplayPageEntry assetDisplayPageEntry =
-			getAssetDisplayPageEntry();
+			_getAssetDisplayPageEntry();
 
 		if (assetDisplayPageEntry != null) {
 			_assetDisplayPageId =
@@ -127,30 +111,6 @@ public class SelectAssetDisplayPageDisplayContext {
 		}
 
 		return _assetDisplayPageId;
-	}
-
-	public int getAssetDisplayPageType() {
-		if (_displayPageType != null) {
-			return _displayPageType;
-		}
-
-		if (_classPK == 0) {
-			_displayPageType = AssetDisplayPageConstants.TYPE_DEFAULT;
-
-			return _displayPageType;
-		}
-
-		AssetDisplayPageEntry assetDisplayPageEntry =
-			getAssetDisplayPageEntry();
-
-		if (assetDisplayPageEntry == null) {
-			_displayPageType = AssetDisplayPageConstants.TYPE_NONE;
-		}
-		else {
-			_displayPageType = assetDisplayPageEntry.getType();
-		}
-
-		return _displayPageType;
 	}
 
 	public String getAssetTypeName() throws PortalException {
@@ -322,7 +282,7 @@ public class SelectAssetDisplayPageDisplayContext {
 	}
 
 	public boolean isAssetDisplayPageTypeDefault() {
-		if (getAssetDisplayPageType() ==
+		if (_getAssetDisplayPageType() ==
 				AssetDisplayPageConstants.TYPE_DEFAULT) {
 
 			return true;
@@ -332,7 +292,7 @@ public class SelectAssetDisplayPageDisplayContext {
 	}
 
 	public boolean isAssetDisplayPageTypeNone() {
-		if (getAssetDisplayPageType() == AssetDisplayPageConstants.TYPE_NONE) {
+		if (_getAssetDisplayPageType() == AssetDisplayPageConstants.TYPE_NONE) {
 			return true;
 		}
 
@@ -340,7 +300,7 @@ public class SelectAssetDisplayPageDisplayContext {
 	}
 
 	public boolean isAssetDisplayPageTypeSpecific() {
-		if (getAssetDisplayPageType() ==
+		if (_getAssetDisplayPageType() ==
 				AssetDisplayPageConstants.TYPE_SPECIFIC) {
 
 			return true;
@@ -365,6 +325,22 @@ public class SelectAssetDisplayPageDisplayContext {
 		return true;
 	}
 
+	private AssetDisplayPageEntry _getAssetDisplayPageEntry() {
+		if (_assetDisplayPageEntry != null) {
+			return _assetDisplayPageEntry;
+		}
+
+		AssetDisplayPageEntry assetDisplayPageEntry =
+			AssetDisplayPageEntryLocalServiceUtil.fetchAssetDisplayPageEntry(
+				_groupId, _classNameId, _classPK);
+
+		if (assetDisplayPageEntry != null) {
+			_assetDisplayPageEntry = assetDisplayPageEntry;
+		}
+
+		return _assetDisplayPageEntry;
+	}
+
 	private String _getAssetDisplayPageName() {
 		long assetDisplayPageId = getAssetDisplayPageId();
 
@@ -381,6 +357,30 @@ public class SelectAssetDisplayPageDisplayContext {
 		}
 
 		return layoutPageTemplateEntry.getName();
+	}
+
+	private int _getAssetDisplayPageType() {
+		if (_displayPageType != null) {
+			return _displayPageType;
+		}
+
+		if (_classPK == 0) {
+			_displayPageType = AssetDisplayPageConstants.TYPE_DEFAULT;
+
+			return _displayPageType;
+		}
+
+		AssetDisplayPageEntry assetDisplayPageEntry =
+			_getAssetDisplayPageEntry();
+
+		if (assetDisplayPageEntry == null) {
+			_displayPageType = AssetDisplayPageConstants.TYPE_NONE;
+		}
+		else {
+			_displayPageType = assetDisplayPageEntry.getType();
+		}
+
+		return _displayPageType;
 	}
 
 	private String _getLayoutBreadcrumb(Layout layout) throws Exception {
