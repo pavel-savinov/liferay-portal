@@ -112,7 +112,7 @@ public class LayoutsAdminManagementToolbarDisplayContext
 	@Override
 	protected String[] getOrderByKeys() {
 		if (_layoutsAdminDisplayContext.isFlattenedView()) {
-			return new String[] {"path"};
+			return new String[] {"create-date", "path"};
 		}
 
 		return super.getOrderByKeys();

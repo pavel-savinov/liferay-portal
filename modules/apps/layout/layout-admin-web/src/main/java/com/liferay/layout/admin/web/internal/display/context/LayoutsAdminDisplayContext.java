@@ -25,6 +25,7 @@ import com.liferay.layout.page.template.model.LayoutPageTemplateCollection;
 import com.liferay.layout.page.template.service.LayoutPageTemplateCollectionLocalServiceUtil;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryServiceUtil;
 import com.liferay.layout.page.template.util.comparator.LayoutPageTemplateCollectionNameComparator;
+import com.liferay.layout.util.comparator.LayoutCreateDateComparator;
 import com.liferay.layout.util.comparator.LayoutLeftPlidComparator;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -509,8 +510,14 @@ public class LayoutsAdminDisplayContext {
 			orderByAsc = true;
 		}
 
-		OrderByComparator<Layout> orderByComparator =
-			new LayoutLeftPlidComparator(orderByAsc);
+		OrderByComparator<Layout> orderByComparator = null;
+
+		if (Objects.equals(_getOrderByCol(), "create-date")) {
+			orderByComparator = new LayoutCreateDateComparator(orderByAsc);
+		}
+		else if (Objects.equals(_getOrderByCol(), "path")) {
+			orderByComparator = new LayoutLeftPlidComparator(orderByAsc);
+		}
 
 		layoutsSearchContainer.setOrderByComparator(orderByComparator);
 
