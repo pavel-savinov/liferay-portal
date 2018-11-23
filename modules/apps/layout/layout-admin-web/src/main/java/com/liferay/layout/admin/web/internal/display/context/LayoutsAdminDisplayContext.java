@@ -230,10 +230,6 @@ public class LayoutsAdminDisplayContext {
 			return breadcrumbEntriesJSONArray;
 		}
 
-		if (selLayout == null) {
-			return breadcrumbEntriesJSONArray;
-		}
-
 		List<Layout> layouts = selLayout.getAncestors();
 
 		Collections.reverse(layouts);
