@@ -27,11 +27,6 @@ Group group = selectAssetDisplayPageDisplayContext.getGroup();
 		</p>
 	</c:when>
 	<c:otherwise>
-		<liferay-ui:error-marker
-			key="<%= WebKeys.ERROR_SECTION %>"
-			value="display-page"
-		/>
-
 		<aui:input id="pagesContainerInput" ignoreRequestValue="<%= true %>" name="layoutUuid" type="hidden" value="<%= selectAssetDisplayPageDisplayContext.getLayoutUuid() %>" />
 
 		<aui:input id="assetDisplayPageIdInput" ignoreRequestValue="<%= true %>" name="assetDisplayPageId" type="hidden" value="<%= selectAssetDisplayPageDisplayContext.getAssetDisplayPageId() %>" />
