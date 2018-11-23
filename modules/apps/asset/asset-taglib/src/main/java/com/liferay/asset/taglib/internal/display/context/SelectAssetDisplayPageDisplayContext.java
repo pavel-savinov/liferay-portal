@@ -37,12 +37,10 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
-import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -240,16 +238,6 @@ public class SelectAssetDisplayPageDisplayContext {
 		return StringPool.BLANK;
 	}
 
-	public Group getGroup() throws PortalException {
-		if (_group != null) {
-			return _group;
-		}
-
-		_group = GroupLocalServiceUtil.getGroup(_groupId);
-
-		return _group;
-	}
-
 	public String getLayoutUuid() throws PortalException {
 		if (_classPK == 0) {
 			return null;
@@ -428,7 +416,6 @@ public class SelectAssetDisplayPageDisplayContext {
 	private String _defaultAssetDisplayPageName;
 	private Integer _displayPageType;
 	private final String _eventName;
-	private Group _group;
 	private final long _groupId;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;

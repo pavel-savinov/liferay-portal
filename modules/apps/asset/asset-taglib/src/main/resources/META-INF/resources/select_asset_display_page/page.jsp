@@ -16,153 +16,140 @@
 
 <%@ include file="/select_asset_display_page/init.jsp" %>
 
-<%
-Group group = selectAssetDisplayPageDisplayContext.getGroup();
-%>
+<aui:input id="pagesContainerInput" ignoreRequestValue="<%= true %>" name="layoutUuid" type="hidden" value="<%= selectAssetDisplayPageDisplayContext.getLayoutUuid() %>" />
 
-<c:choose>
-	<c:when test="<%= group.isLayout() %>">
-		<p class="text-muted">
-			<liferay-ui:message key="the-display-page-cannot-be-set-when-the-scope-of-the-entity-is-a-page" />
+<aui:input id="assetDisplayPageIdInput" ignoreRequestValue="<%= true %>" name="assetDisplayPageId" type="hidden" value="<%= selectAssetDisplayPageDisplayContext.getAssetDisplayPageId() %>" />
+
+<span><liferay-ui:message key="please-select-one-option" /></span>
+
+<liferay-frontend:fieldset
+	id='<%= renderResponse.getNamespace() + "eventsContainer" %>'
+>
+
+	<%
+	String defaultAssetDisplayPageName = selectAssetDisplayPageDisplayContext.getDefaultAssetDisplayPageName();
+
+	String taglibLabelTypeDefault = LanguageUtil.format(resourceBundle, "use-default-display-page-for-x-x", new Object[] {selectAssetDisplayPageDisplayContext.getAssetTypeName(), Validator.isNotNull(defaultAssetDisplayPageName) ? defaultAssetDisplayPageName : LanguageUtil.get(resourceBundle, "none")}, false);
+
+	if (Validator.isNull(defaultAssetDisplayPageName)) {
+		taglibLabelTypeDefault += " <span class=\"text-muted\">" + LanguageUtil.get(resourceBundle, "this-entity-will-not-be-referenceable-with-an-url") + "</span>";
+	}
+	%>
+
+	<aui:input checked="<%= selectAssetDisplayPageDisplayContext.isAssetDisplayPageTypeDefault() %>" label="<%= taglibLabelTypeDefault %>" name="displayPageType" type="radio" value="<%= AssetDisplayPageConstants.TYPE_DEFAULT %>" />
+
+	<aui:input checked="<%= selectAssetDisplayPageDisplayContext.isAssetDisplayPageTypeSpecific() %>" label="use-a-specific-display-page-for-the-entity" name="displayPageType" type="radio" value="<%= AssetDisplayPageConstants.TYPE_SPECIFIC %>" />
+
+	<div class="<%= selectAssetDisplayPageDisplayContext.isAssetDisplayPageTypeSpecific() ? StringPool.BLANK : "hide" %>" id="<portlet:namespace />displayPageContainer">
+		<p class="text-default">
+			<span class="<%= Validator.isNull(selectAssetDisplayPageDisplayContext.getDisplayPageName()) ? "hide" : StringPool.BLANK %>" id="<portlet:namespace />displayPageItemRemove" role="button">
+				<aui:icon cssClass="icon-monospaced" image="times" markupView="lexicon" />
+			</span>
+			<span id="<portlet:namespace />displayPageNameInput">
+				<c:choose>
+					<c:when test="<%= Validator.isNull(selectAssetDisplayPageDisplayContext.getDisplayPageName()) %>">
+						<span class="text-muted"><liferay-ui:message key="none" /></span>
+					</c:when>
+					<c:otherwise>
+						<%= selectAssetDisplayPageDisplayContext.getDisplayPageName() %>
+					</c:otherwise>
+				</c:choose>
+			</span>
 		</p>
-	</c:when>
-	<c:otherwise>
-		<aui:input id="pagesContainerInput" ignoreRequestValue="<%= true %>" name="layoutUuid" type="hidden" value="<%= selectAssetDisplayPageDisplayContext.getLayoutUuid() %>" />
 
-		<aui:input id="assetDisplayPageIdInput" ignoreRequestValue="<%= true %>" name="assetDisplayPageId" type="hidden" value="<%= selectAssetDisplayPageDisplayContext.getAssetDisplayPageId() %>" />
+		<aui:button name="chooseDisplayPage" value="choose" />
 
-		<span><liferay-ui:message key="please-select-one-option" /></span>
-
-		<liferay-frontend:fieldset
-			id='<%= renderResponse.getNamespace() + "eventsContainer" %>'
-		>
+		<c:if test="<%= selectAssetDisplayPageDisplayContext.isURLViewInContext() %>">
 
 			<%
-			String defaultAssetDisplayPageName = selectAssetDisplayPageDisplayContext.getDefaultAssetDisplayPageName();
+			Layout defaultDisplayLayout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(selectAssetDisplayPageDisplayContext.getLayoutUuid(), themeDisplay.getScopeGroupId(), false);
 
-			String taglibLabelTypeDefault = LanguageUtil.format(resourceBundle, "use-default-display-page-for-x-x", new Object[] {selectAssetDisplayPageDisplayContext.getAssetTypeName(), Validator.isNotNull(defaultAssetDisplayPageName) ? defaultAssetDisplayPageName : LanguageUtil.get(resourceBundle, "none")}, false);
-
-			if (Validator.isNull(defaultAssetDisplayPageName)) {
-				taglibLabelTypeDefault += " <span class=\"text-muted\">" + LanguageUtil.get(resourceBundle, "this-entity-will-not-be-referenceable-with-an-url") + "</span>";
+			if (defaultDisplayLayout == null) {
+				defaultDisplayLayout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(selectAssetDisplayPageDisplayContext.getLayoutUuid(), themeDisplay.getScopeGroupId(), true);
 			}
 			%>
 
-			<aui:input checked="<%= selectAssetDisplayPageDisplayContext.isAssetDisplayPageTypeDefault() %>" label="<%= taglibLabelTypeDefault %>" name="displayPageType" type="radio" value="<%= AssetDisplayPageConstants.TYPE_DEFAULT %>" />
+			<aui:a href="<%= selectAssetDisplayPageDisplayContext.getURLViewInContext() %>" target="blank">
+				<liferay-ui:message arguments="<%= HtmlUtil.escape(defaultDisplayLayout.getName(locale)) %>" key="view-content-in-x" translateArguments="<%= false %>" />
+			</aui:a>
+		</c:if>
+	</div>
 
-			<aui:input checked="<%= selectAssetDisplayPageDisplayContext.isAssetDisplayPageTypeSpecific() %>" label="use-a-specific-display-page-for-the-entity" name="displayPageType" type="radio" value="<%= AssetDisplayPageConstants.TYPE_SPECIFIC %>" />
+	<%
+	String taglibLabelTypeNone = LanguageUtil.get(resourceBundle, "none") + " <span class=\"text-muted\">" + LanguageUtil.get(resourceBundle, "this-entity-will-not-be-referenceable-with-an-url") + "</span>";
+	%>
 
-			<div class="<%= selectAssetDisplayPageDisplayContext.isAssetDisplayPageTypeSpecific() ? StringPool.BLANK : "hide" %>" id="<portlet:namespace />displayPageContainer">
-				<p class="text-default">
-					<span class="<%= Validator.isNull(selectAssetDisplayPageDisplayContext.getDisplayPageName()) ? "hide" : StringPool.BLANK %>" id="<portlet:namespace />displayPageItemRemove" role="button">
-						<aui:icon cssClass="icon-monospaced" image="times" markupView="lexicon" />
-					</span>
-					<span id="<portlet:namespace />displayPageNameInput">
-						<c:choose>
-							<c:when test="<%= Validator.isNull(selectAssetDisplayPageDisplayContext.getDisplayPageName()) %>">
-								<span class="text-muted"><liferay-ui:message key="none" /></span>
-							</c:when>
-							<c:otherwise>
-								<%= selectAssetDisplayPageDisplayContext.getDisplayPageName() %>
-							</c:otherwise>
-						</c:choose>
-					</span>
-				</p>
+	<aui:input checked="<%= selectAssetDisplayPageDisplayContext.isAssetDisplayPageTypeNone() %>" label="<%= taglibLabelTypeNone %>" name="displayPageType" type="radio" value="<%= AssetDisplayPageConstants.TYPE_NONE %>" />
+</liferay-frontend:fieldset>
 
-				<aui:button name="chooseDisplayPage" value="choose" />
+<aui:script use="liferay-item-selector-dialog">
+	var assetDisplayPageIdInput = $('#<portlet:namespace />assetDisplayPageIdInput');
+	var displayPageContainer = $('#<portlet:namespace />displayPageContainer');
+	var displayPageItemContainer = $('#<portlet:namespace />displayPageItemContainer');
+	var displayPageItemRemove = $('#<portlet:namespace />displayPageItemRemove');
+	var displayPageNameInput = $('#<portlet:namespace />displayPageNameInput');
+	var pagesContainerInput = $('#<portlet:namespace />pagesContainerInput');
 
-				<c:if test="<%= selectAssetDisplayPageDisplayContext.isURLViewInContext() %>">
+	$('#<portlet:namespace />chooseDisplayPage').on(
+		'click',
+		function(event) {
+			var itemSelectorDialog = new A.LiferayItemSelectorDialog(
+				{
+					eventName: '<%= selectAssetDisplayPageDisplayContext.getEventName() %>',
+					on: {
+						selectedItemChange: function(event) {
+							var selectedItem = event.newVal;
 
-					<%
-					Layout defaultDisplayLayout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(selectAssetDisplayPageDisplayContext.getLayoutUuid(), themeDisplay.getScopeGroupId(), false);
+							assetDisplayPageIdInput.val('');
 
-					if (defaultDisplayLayout == null) {
-						defaultDisplayLayout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(selectAssetDisplayPageDisplayContext.getLayoutUuid(), themeDisplay.getScopeGroupId(), true);
-					}
-					%>
+							pagesContainerInput.val('');
 
-					<aui:a href="<%= selectAssetDisplayPageDisplayContext.getURLViewInContext() %>" target="blank">
-						<liferay-ui:message arguments="<%= HtmlUtil.escape(defaultDisplayLayout.getName(locale)) %>" key="view-content-in-x" translateArguments="<%= false %>" />
-					</aui:a>
-				</c:if>
-			</div>
-
-			<%
-			String taglibLabelTypeNone = LanguageUtil.get(resourceBundle, "none") + " <span class=\"text-muted\">" + LanguageUtil.get(resourceBundle, "this-entity-will-not-be-referenceable-with-an-url") + "</span>";
-			%>
-
-			<aui:input checked="<%= selectAssetDisplayPageDisplayContext.isAssetDisplayPageTypeNone() %>" label="<%= taglibLabelTypeNone %>" name="displayPageType" type="radio" value="<%= AssetDisplayPageConstants.TYPE_NONE %>" />
-		</liferay-frontend:fieldset>
-
-		<aui:script use="liferay-item-selector-dialog">
-			var assetDisplayPageIdInput = $('#<portlet:namespace />assetDisplayPageIdInput');
-			var displayPageContainer = $('#<portlet:namespace />displayPageContainer');
-			var displayPageItemContainer = $('#<portlet:namespace />displayPageItemContainer');
-			var displayPageItemRemove = $('#<portlet:namespace />displayPageItemRemove');
-			var displayPageNameInput = $('#<portlet:namespace />displayPageNameInput');
-			var pagesContainerInput = $('#<portlet:namespace />pagesContainerInput');
-
-			$('#<portlet:namespace />chooseDisplayPage').on(
-				'click',
-				function(event) {
-					var itemSelectorDialog = new A.LiferayItemSelectorDialog(
-						{
-							eventName: '<%= selectAssetDisplayPageDisplayContext.getEventName() %>',
-							on: {
-								selectedItemChange: function(event) {
-									var selectedItem = event.newVal;
-
-									assetDisplayPageIdInput.val('');
-
-									pagesContainerInput.val('');
-
-									if (selectedItem) {
-										if (selectedItem.type === "asset-display-page") {
-											assetDisplayPageIdInput.val(selectedItem.id);
-										}
-										else {
-											pagesContainerInput.val(selectedItem.id);
-										}
-
-										displayPageNameInput.html(selectedItem.name);
-
-										displayPageItemRemove.removeClass('hide');
-									}
+							if (selectedItem) {
+								if (selectedItem.type === "asset-display-page") {
+									assetDisplayPageIdInput.val(selectedItem.id);
 								}
-							},
-							'strings.add': '<liferay-ui:message key="done" />',
-							title: '<liferay-ui:message key="select-page" />',
-							url: '<%= selectAssetDisplayPageDisplayContext.getDisplayPageItemSelectorURL() %>'
+								else {
+									pagesContainerInput.val(selectedItem.id);
+								}
+
+								displayPageNameInput.html(selectedItem.name);
+
+								displayPageItemRemove.removeClass('hide');
+							}
 						}
-					);
-
-					itemSelectorDialog.open();
+					},
+					'strings.add': '<liferay-ui:message key="done" />',
+					title: '<liferay-ui:message key="select-page" />',
+					url: '<%= selectAssetDisplayPageDisplayContext.getDisplayPageItemSelectorURL() %>'
 				}
 			);
 
-			displayPageItemRemove.on(
-				'click',
-				function(event) {
-					displayPageNameInput.html('<liferay-ui:message key="none" />');
+			itemSelectorDialog.open();
+		}
+	);
 
-					pagesContainerInput.val('');
+	displayPageItemRemove.on(
+		'click',
+		function(event) {
+			displayPageNameInput.html('<liferay-ui:message key="none" />');
 
-					displayPageItemRemove.addClass('hide');
-				}
-			);
+			pagesContainerInput.val('');
 
-			$('#<portlet:namespace />eventsContainer').on(
-				'change',
-				function(event) {
-					var target = event.target;
+			displayPageItemRemove.addClass('hide');
+		}
+	);
 
-					if (target && target.value === '<%= AssetDisplayPageConstants.TYPE_SPECIFIC %>') {
-						displayPageContainer.removeClass('hide');
-					}
-					else {
-						displayPageContainer.addClass('hide');
-					}
-				}
-			);
-		</aui:script>
-	</c:otherwise>
-</c:choose>
+	$('#<portlet:namespace />eventsContainer').on(
+		'change',
+		function(event) {
+			var target = event.target;
+
+			if (target && target.value === '<%= AssetDisplayPageConstants.TYPE_SPECIFIC %>') {
+				displayPageContainer.removeClass('hide');
+			}
+			else {
+				displayPageContainer.addClass('hide');
+			}
+		}
+	);
+</aui:script>
