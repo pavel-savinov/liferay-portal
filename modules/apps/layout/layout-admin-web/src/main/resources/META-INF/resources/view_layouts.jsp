@@ -26,12 +26,7 @@
 />
 
 <clay:management-toolbar
-	actionDropdownItems="<%= layoutsAdminDisplayContext.getActionDropdownItems() %>"
-	componentId="pagesManagementToolbar"
-	creationMenu="<%= layoutsAdminDisplayContext.isShowAddRootLayoutButton() ? layoutsAdminDisplayContext.getCreationMenu() : null %>"
-	itemsTotal="<%= layoutsAdminDisplayContext.getTotalItems() %>"
-	searchContainerId="pages"
-	showSearch="<%= false %>"
+	displayContext="<%= new LayoutsAdminManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, layoutsAdminDisplayContext) %>"
 />
 
 <liferay-ui:error exception="<%= LayoutTypeException.class %>">
