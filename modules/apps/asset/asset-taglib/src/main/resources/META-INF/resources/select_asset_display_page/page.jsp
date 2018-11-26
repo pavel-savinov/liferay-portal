@@ -42,16 +42,16 @@
 
 	<div class="<%= selectAssetDisplayPageDisplayContext.isAssetDisplayPageTypeSpecific() ? StringPool.BLANK : "hide" %>" id="<portlet:namespace />displayPageContainer">
 		<p class="text-default">
-			<span class="<%= Validator.isNull(selectAssetDisplayPageDisplayContext.getDisplayPageName()) ? "hide" : StringPool.BLANK %>" id="<portlet:namespace />displayPageItemRemove" role="button">
+			<span class="<%= Validator.isNull(selectAssetDisplayPageDisplayContext.getAssetDisplayPageName()) ? "hide" : StringPool.BLANK %>" id="<portlet:namespace />displayPageItemRemove" role="button">
 				<aui:icon cssClass="icon-monospaced" image="times" markupView="lexicon" />
 			</span>
 			<span id="<portlet:namespace />displayPageNameInput">
 				<c:choose>
-					<c:when test="<%= Validator.isNull(selectAssetDisplayPageDisplayContext.getDisplayPageName()) %>">
+					<c:when test="<%= Validator.isNull(selectAssetDisplayPageDisplayContext.getAssetDisplayPageName()) %>">
 						<span class="text-muted"><liferay-ui:message key="none" /></span>
 					</c:when>
 					<c:otherwise>
-						<%= selectAssetDisplayPageDisplayContext.getDisplayPageName() %>
+						<%= selectAssetDisplayPageDisplayContext.getAssetDisplayPageName() %>
 					</c:otherwise>
 				</c:choose>
 			</span>
@@ -79,7 +79,7 @@
 	String taglibLabelTypeNone = LanguageUtil.get(resourceBundle, "none") + " <span class=\"text-muted\">" + LanguageUtil.get(resourceBundle, "this-entity-will-not-be-referenceable-with-an-url") + "</span>";
 	%>
 
-	<aui:input checked="<%= selectAssetDisplayPageDisplayContext.isAssetDisplayPageTypeNone() %>" label="<%= taglibLabelTypeNone %>" name="displayPageType" type="radio" value="<%= AssetDisplayPageConstants.TYPE_NONE %>" />
+	<aui:input checked="<%= selectAssetDisplayPageDisplayContext.isAssetDisplayPageTypeNone() %>" label="<%= taglibLabelTypeNone %>" name="assetDisplayPageType" type="radio" value="<%= AssetDisplayPageConstants.TYPE_NONE %>" />
 </liferay-frontend:fieldset>
 
 <aui:script use="liferay-item-selector-dialog">
@@ -120,7 +120,7 @@
 					},
 					'strings.add': '<liferay-ui:message key="done" />',
 					title: '<liferay-ui:message key="select-page" />',
-					url: '<%= selectAssetDisplayPageDisplayContext.getDisplayPageItemSelectorURL() %>'
+					url: '<%= selectAssetDisplayPageDisplayContext.getAssetDisplayPageItemSelectorURL() %>'
 				}
 			);
 

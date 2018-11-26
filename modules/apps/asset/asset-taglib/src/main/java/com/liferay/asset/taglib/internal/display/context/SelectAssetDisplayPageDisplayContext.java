@@ -111,54 +111,7 @@ public class SelectAssetDisplayPageDisplayContext {
 		return _assetDisplayPageId;
 	}
 
-	public String getAssetTypeName() throws PortalException {
-		if (Validator.isNotNull(_assetTypeName)) {
-			return _assetTypeName;
-		}
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		AssetRendererFactory assetRendererFactory =
-			AssetRendererFactoryRegistryUtil.
-				getAssetRendererFactoryByClassNameId(_classNameId);
-
-		_assetTypeName = assetRendererFactory.getTypeName(
-			themeDisplay.getLocale());
-
-		if (_classTypeId > 0) {
-			ClassTypeReader classTypeReader =
-				assetRendererFactory.getClassTypeReader();
-
-			ClassType classType = classTypeReader.getClassType(
-				_classTypeId, themeDisplay.getLocale());
-
-			_assetTypeName = classType.getName();
-		}
-
-		return _assetTypeName;
-	}
-
-	public String getDefaultAssetDisplayPageName() {
-		if (_defaultAssetDisplayPageName != null) {
-			return _defaultAssetDisplayPageName;
-		}
-
-		LayoutPageTemplateEntry layoutPageTemplateEntry = null;
-
-		layoutPageTemplateEntry =
-			LayoutPageTemplateEntryServiceUtil.
-				fetchDefaultLayoutPageTemplateEntry(
-					_groupId, _classNameId, _classTypeId);
-
-		if (layoutPageTemplateEntry != null) {
-			_defaultAssetDisplayPageName = layoutPageTemplateEntry.getName();
-		}
-
-		return _defaultAssetDisplayPageName;
-	}
-
-	public String getDisplayPageItemSelectorURL() throws PortalException {
+	public String getAssetDisplayPageItemSelectorURL() throws PortalException {
 		ItemSelector itemSelector = ItemSelectorUtil.getItemSelector();
 
 		List<ItemSelectorCriterion> criteria = new ArrayList<>();
@@ -207,7 +160,7 @@ public class SelectAssetDisplayPageDisplayContext {
 		return itemSelectorURL.toString();
 	}
 
-	public String getDisplayPageName() throws Exception {
+	public String getAssetDisplayPageName() throws Exception {
 		String assetDisplayPageName = _getAssetDisplayPageName();
 
 		if (Validator.isNotNull(assetDisplayPageName)) {
@@ -236,6 +189,53 @@ public class SelectAssetDisplayPageDisplayContext {
 		}
 
 		return StringPool.BLANK;
+	}
+
+	public String getAssetTypeName() throws PortalException {
+		if (Validator.isNotNull(_assetTypeName)) {
+			return _assetTypeName;
+		}
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		AssetRendererFactory assetRendererFactory =
+			AssetRendererFactoryRegistryUtil.
+				getAssetRendererFactoryByClassNameId(_classNameId);
+
+		_assetTypeName = assetRendererFactory.getTypeName(
+			themeDisplay.getLocale());
+
+		if (_classTypeId > 0) {
+			ClassTypeReader classTypeReader =
+				assetRendererFactory.getClassTypeReader();
+
+			ClassType classType = classTypeReader.getClassType(
+				_classTypeId, themeDisplay.getLocale());
+
+			_assetTypeName = classType.getName();
+		}
+
+		return _assetTypeName;
+	}
+
+	public String getDefaultAssetDisplayPageName() {
+		if (_defaultAssetDisplayPageName != null) {
+			return _defaultAssetDisplayPageName;
+		}
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry = null;
+
+		layoutPageTemplateEntry =
+			LayoutPageTemplateEntryServiceUtil.
+				fetchDefaultLayoutPageTemplateEntry(
+					_groupId, _classNameId, _classTypeId);
+
+		if (layoutPageTemplateEntry != null) {
+			_defaultAssetDisplayPageName = layoutPageTemplateEntry.getName();
+		}
+
+		return _defaultAssetDisplayPageName;
 	}
 
 	public String getLayoutUuid() throws PortalException {
