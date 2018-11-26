@@ -45,12 +45,8 @@ public class SelectAssetDisplayPageTag extends IncludeTag {
 		return _groupId;
 	}
 
-	public boolean isAllowLayoutUuid() {
-		return _allowLayoutUuid;
-	}
-
-	public void setAllowLayoutUuid(boolean allowLayoutUuid) {
-		_allowLayoutUuid = allowLayoutUuid;
+	public boolean isShowPortletLayouts() {
+		return _showPortletLayouts;
 	}
 
 	public void setClassNameId(long classNameId) {
@@ -80,16 +76,20 @@ public class SelectAssetDisplayPageTag extends IncludeTag {
 		servletContext = ServletContextUtil.getServletContext();
 	}
 
+	public void setShowPortletLayouts(boolean showPortletLayouts) {
+		_showPortletLayouts = showPortletLayouts;
+	}
+
 	@Override
 	protected void cleanUp() {
 		super.cleanUp();
 
-		_allowLayoutUuid = false;
 		_classNameId = 0;
 		_classPK = 0;
 		_classTypeId = 0;
 		_eventName = null;
 		_groupId = 0;
+		_showPortletLayouts = false;
 	}
 
 	@Override
@@ -99,9 +99,6 @@ public class SelectAssetDisplayPageTag extends IncludeTag {
 
 	@Override
 	protected void setAttributes(HttpServletRequest request) {
-		request.setAttribute(
-			"liferay-asset:select-asset-display-page:allowLayoutUuid",
-			String.valueOf(_allowLayoutUuid));
 		request.setAttribute(
 			"liferay-asset:select-asset-display-page:classNameId",
 			String.valueOf(_classNameId));
@@ -116,15 +113,18 @@ public class SelectAssetDisplayPageTag extends IncludeTag {
 		request.setAttribute(
 			"liferay-asset:select-asset-display-page:groupId",
 			String.valueOf(_groupId));
+		request.setAttribute(
+			"liferay-asset:select-asset-display-page:showPortletLayouts",
+			String.valueOf(_showPortletLayouts));
 	}
 
 	private static final String _PAGE = "/select_asset_display_page/page.jsp";
 
-	private boolean _allowLayoutUuid;
 	private long _classNameId;
 	private long _classPK;
 	private long _classTypeId;
 	private String _eventName;
 	private long _groupId;
+	private boolean _showPortletLayouts;
 
 }

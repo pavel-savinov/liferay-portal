@@ -71,9 +71,6 @@ public class SelectAssetDisplayPageDisplayContext {
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
 
-		_allowLayoutUuid = GetterUtil.getBoolean(
-			_request.getAttribute(
-				"liferay-asset:select-asset-display-page:allowLayoutUuid"));
 		_classNameId = GetterUtil.getLong(
 			_request.getAttribute(
 				"liferay-asset:select-asset-display-page:classNameId"));
@@ -90,6 +87,9 @@ public class SelectAssetDisplayPageDisplayContext {
 		_groupId = GetterUtil.getLong(
 			_request.getAttribute(
 				"liferay-asset:select-asset-display-page:groupId"));
+		_showPortletLayouts = GetterUtil.getBoolean(
+			_request.getAttribute(
+				"liferay-asset:select-asset-display-page:showPortletLayouts"));
 	}
 
 	public long getAssetDisplayPageId() {
@@ -133,7 +133,7 @@ public class SelectAssetDisplayPageDisplayContext {
 
 		criteria.add(assetDisplayPageSelectorCriterion);
 
-		if (_allowLayoutUuid) {
+		if (_showPortletLayouts) {
 			LayoutItemSelectorCriterion layoutItemSelectorCriterion =
 				new LayoutItemSelectorCriterion();
 
@@ -406,7 +406,6 @@ public class SelectAssetDisplayPageDisplayContext {
 		return sb.toString();
 	}
 
-	private final boolean _allowLayoutUuid;
 	private AssetDisplayPageEntry _assetDisplayPageEntry;
 	private Long _assetDisplayPageId;
 	private String _assetTypeName;
@@ -420,5 +419,6 @@ public class SelectAssetDisplayPageDisplayContext {
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
 	private final HttpServletRequest _request;
+	private final boolean _showPortletLayouts;
 
 }

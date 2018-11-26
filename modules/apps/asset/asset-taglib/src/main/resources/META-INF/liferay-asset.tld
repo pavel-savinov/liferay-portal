@@ -553,12 +553,6 @@
 		<tag-class>com.liferay.asset.taglib.servlet.taglib.SelectAssetDisplayPageTag</tag-class>
 		<body-content>JSP</body-content>
 		<attribute>
-			<description>Allow selecting pages with Asset Publisher configured as a default Asset Publisher for the page.</description>
-			<name>allowLayoutUuid</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
 			<description>A class name ID of the asset type to select an asset display page for.</description>
 			<name>classNameId</name>
 			<required>true</required>
@@ -586,6 +580,12 @@
 			<description>A group ID of the entity to select an asset display page for.</description>
 			<name>groupId</name>
 			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>Allow selecting pages with Asset Publisher configured as a default Asset Publisher for the page.</description>
+			<name>showPortletLayouts</name>
+			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 	</tag>
