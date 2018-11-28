@@ -909,6 +909,10 @@ public class LayoutsAdminDisplayContext {
 	}
 
 	public boolean isFlattenedView() {
+		if (Objects.equals(getDisplayStyle(), "list")) {
+			return true;
+		}
+
 		return false;
 	}
 
