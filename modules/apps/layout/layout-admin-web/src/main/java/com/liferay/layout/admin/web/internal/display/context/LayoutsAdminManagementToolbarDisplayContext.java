@@ -19,12 +19,16 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.SafeConsumer;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.util.LocaleUtil;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -102,6 +106,33 @@ public class LayoutsAdminManagementToolbarDisplayContext
 	@Override
 	public String getSearchContainerId() {
 		return "pages";
+	}
+
+	@Override
+	public List<ViewTypeItem> getViewTypeItems() {
+		return new ViewTypeItemList(
+			getPortletURL(), _layoutsAdminDisplayContext.getDisplayStyle()) {
+
+			{
+				addTableViewTypeItem();
+
+				ViewTypeItem viewTypeItem = new ViewTypeItem();
+
+				viewTypeItem.setActive(
+					Objects.equals(
+						_layoutsAdminDisplayContext.getDisplayStyle(),
+						"miller-columns"));
+				viewTypeItem.setIcon("columns");
+				viewTypeItem.setHref(
+					getPortletURL(), "displayStyle", "miller-columns");
+				viewTypeItem.setLabel(
+					LanguageUtil.get(
+						LocaleUtil.getMostRelevantLocale(), "miller-columns"));
+
+				add(viewTypeItem);
+			}
+
+		};
 	}
 
 	@Override

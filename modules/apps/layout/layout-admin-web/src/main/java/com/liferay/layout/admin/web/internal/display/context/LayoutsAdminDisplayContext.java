@@ -296,6 +296,17 @@ public class LayoutsAdminDisplayContext {
 		return deleteLayoutURL.toString();
 	}
 
+	public String getDisplayStyle() {
+		if (Validator.isNotNull(_displayStyle)) {
+			return _displayStyle;
+		}
+
+		_displayStyle = ParamUtil.getString(
+			_request, "displayStyle", "miller-columns");
+
+		return _displayStyle;
+	}
+
 	public String getEditLayoutURL(Layout layout) throws PortalException {
 		if (!Objects.equals(layout.getType(), "content")) {
 			return StringPool.BLANK;
@@ -1431,6 +1442,7 @@ public class LayoutsAdminDisplayContext {
 
 	private Long _activeLayoutSetBranchId;
 	private String _backURL;
+	private String _displayStyle;
 	private final GroupDisplayContextHelper _groupDisplayContextHelper;
 	private Long _homePagePlid;
 	private String _homePageTitle;
