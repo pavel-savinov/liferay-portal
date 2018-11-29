@@ -25,11 +25,14 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.search.BaseIndexer;
+import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.IndexWriterHelper;
 import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Summary;
+import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.highlight.HighlightUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
@@ -74,7 +77,7 @@ public class LayoutIndexer extends BaseIndexer<Layout> {
 			Field.COMPANY_ID, Field.ENTRY_CLASS_NAME, Field.ENTRY_CLASS_PK,
 			Field.DEFAULT_LANGUAGE_ID, Field.GROUP_ID, Field.MODIFIED_DATE,
 			Field.SCOPE_GROUP_ID, Field.UID);
-		setDefaultSelectedLocalizedFieldNames(Field.CONTENT, Field.NAME);
+		setDefaultSelectedLocalizedFieldNames(Field.CONTENT, Field.TITLE);
 		setFilterSearch(true);
 		setPermissionAware(true);
 		setSelectAllLocales(true);
@@ -117,15 +120,26 @@ public class LayoutIndexer extends BaseIndexer<Layout> {
 					layout.getGroupId(), _portal.getClassNameId(Layout.class),
 					layout.getPlid());
 
+		for (String languageId : layout.getAvailableLanguageIds()) {
+			document.addText(
+				LocalizationUtil.getLocalizedName(Field.TITLE, languageId),
+				layout.getName(LocaleUtil.fromLanguageId(languageId)));
+		}
+
 		if (layoutPageTemplateStructure == null) {
 			return document;
 		}
 
+		HttpServletRequest request = null;
+		HttpServletResponse response = null;
+
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
-		HttpServletRequest request = serviceContext.getRequest();
-		HttpServletResponse response = serviceContext.getResponse();
+		if (serviceContext != null) {
+			request = serviceContext.getRequest();
+			response = serviceContext.getResponse();
+		}
 
 		for (String languageId : layout.getAvailableLanguageIds()) {
 			Locale locale = LocaleUtil.fromLanguageId(languageId);
@@ -156,7 +170,9 @@ public class LayoutIndexer extends BaseIndexer<Layout> {
 				document.get(Field.DEFAULT_LANGUAGE_ID));
 		}
 
-		String name = document.get(locale, Field.NAME);
+		String name = document.get(
+			locale, Field.SNIPPET + StringPool.UNDERLINE + Field.TITLE,
+			Field.TITLE);
 
 		String content = document.get(locale, Field.CONTENT);
 
