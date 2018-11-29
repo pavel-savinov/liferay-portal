@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.search.BaseIndexer;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
+import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.IndexWriterHelper;
@@ -119,6 +120,17 @@ public class LayoutIndexer extends BaseIndexer<Layout> {
 	}
 
 	@Override
+	public void postProcessSearchQuery(
+			BooleanQuery searchQuery, BooleanFilter fullQueryBooleanFilter,
+			SearchContext searchContext)
+		throws Exception {
+
+		addSearchLocalizedTerm(
+			searchQuery, searchContext, Field.CONTENT, false);
+		addSearchLocalizedTerm(searchQuery, searchContext, Field.TITLE, false);
+	}
+
+	@Override
 	protected void doDelete(Layout layout) throws Exception {
 		deleteDocument(layout.getCompanyId(), layout.getPlid());
 	}
@@ -131,6 +143,9 @@ public class LayoutIndexer extends BaseIndexer<Layout> {
 		document.addText(
 			Field.DEFAULT_LANGUAGE_ID, layout.getDefaultLanguageId());
 		document.addLocalizedText(Field.NAME, layout.getNameMap());
+		document.addNumberSortable("leftPlid", layout.getLeftPlid());
+		document.addText(
+			"privateLayout", String.valueOf(layout.isPrivateLayout()));
 		document.addText(Field.TYPE, layout.getType());
 
 		LayoutPageTemplateStructure layoutPageTemplateStructure =
