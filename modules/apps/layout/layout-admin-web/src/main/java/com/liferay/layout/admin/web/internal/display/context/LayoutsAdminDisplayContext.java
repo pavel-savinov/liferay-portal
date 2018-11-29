@@ -365,6 +365,16 @@ public class LayoutsAdminDisplayContext {
 		return _groupDisplayContextHelper.getGroupTypeSettings();
 	}
 
+	public String getKeywords() {
+		if (_keywords != null) {
+			return _keywords;
+		}
+
+		_keywords = ParamUtil.getString(_request, "keywords");
+
+		return _keywords;
+	}
+
 	public String getLayoutChildrenURL() {
 		PortletURL itemChildrenURL = _liferayPortletResponse.createActionURL();
 
@@ -540,10 +550,12 @@ public class LayoutsAdminDisplayContext {
 		layoutsSearchContainer.setRowChecker(emptyOnClickRowChecker);
 
 		int layoutsCount = LayoutLocalServiceUtil.getLayoutsCount(
-			getSelGroup(), isPrivateLayout());
+			getSelGroup(), isPrivateLayout(), getKeywords(),
+			new String[] {"content", "portlet"});
 
 		List<Layout> layouts = LayoutLocalServiceUtil.getLayouts(
-			getSelGroupId(), isPrivateLayout(),
+			getSelGroupId(), isPrivateLayout(), getKeywords(),
+			new String[] {"content", "portlet"},
 			layoutsSearchContainer.getStart(), layoutsSearchContainer.getEnd(),
 			layoutsSearchContainer.getOrderByComparator());
 
@@ -909,7 +921,9 @@ public class LayoutsAdminDisplayContext {
 	}
 
 	public boolean isFlattenedView() {
-		if (Objects.equals(getDisplayStyle(), "list")) {
+		if (Objects.equals(getDisplayStyle(), "list") ||
+			Validator.isNotNull(getKeywords())) {
+
 			return true;
 		}
 
@@ -1450,6 +1464,7 @@ public class LayoutsAdminDisplayContext {
 	private final GroupDisplayContextHelper _groupDisplayContextHelper;
 	private Long _homePagePlid;
 	private String _homePageTitle;
+	private String _keywords;
 	private List<LayoutDescription> _layoutDescriptions;
 	private Long _layoutId;
 	private SearchContainer _layoutsSearchContainer;
