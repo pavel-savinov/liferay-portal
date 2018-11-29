@@ -668,7 +668,9 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 				if (arguments.length == 6) {
 					showIncomplete = (Boolean)arguments[3];
 				}
-				else if (arguments.length == 7) {
+				else if ((arguments.length == 7) &&
+						 parameterTypes[3].equals(Boolean.TYPE)) {
+
 					showIncomplete = (Boolean)arguments[3];
 				}
 				else if (Arrays.equals(parameterTypes, _GET_LAYOUTS_TYPES)) {

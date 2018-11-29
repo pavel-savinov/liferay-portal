@@ -52,6 +52,14 @@ import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.model.impl.VirtualLayout;
+import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.QueryConfig;
+import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.systemevent.SystemEventHierarchyEntry;
@@ -1532,6 +1540,49 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	}
 
 	/**
+	 * Returns a range of all the layouts belonging to the group.
+	 *
+	 * @param  groupId the primary key of the group
+	 * @param  privateLayout whether the layout is private to the group
+	 * @param  keywords keywords
+	 * @param  types layout types
+	 * @param  start the lower bound of the range of layouts
+	 * @param  end the upper bound of the range of layouts (not inclusive)
+	 * @param  obc the comparator to order the layouts
+	 * @return the matching layouts, or <code>null</code> if no matches were
+	 *         found
+	 */
+	@Override
+	public List<Layout> getLayouts(
+			long groupId, boolean privateLayout, String keywords,
+			String[] types, int start, int end, OrderByComparator<Layout> obc)
+		throws PortalException {
+
+		if (Validator.isNull(keywords)) {
+			return getLayouts(groupId, privateLayout, start, end, obc);
+		}
+
+		Indexer<Layout> indexer = IndexerRegistryUtil.getIndexer(
+			Layout.class.getName());
+
+		Hits hits = indexer.search(
+			_buildSearchContext(
+				groupId, privateLayout, keywords, types, start, end, obc));
+
+		List<Document> documents = hits.toList();
+
+		List<Layout> layouts = new ArrayList<>(documents.size());
+
+		for (Document document : documents) {
+			layouts.add(
+				getLayout(
+					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK))));
+		}
+
+		return layouts;
+	}
+
+	/**
 	 * Returns the layout references for all the layouts that belong to the
 	 * company and belong to the portlet that matches the preferences.
 	 *
@@ -1642,6 +1693,26 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		dynamicQuery.add(layoutIdProperty.in(layoutIds));
 
 		return GetterUtil.getInteger(dynamicQueryCount(dynamicQuery));
+	}
+
+	@Override
+	public int getLayoutsCount(
+			Group group, boolean privateLayout, String keywords, String[] types)
+		throws PortalException {
+
+		if (Validator.isNull(keywords)) {
+			return getLayoutsCount(group, privateLayout, true);
+		}
+
+		Indexer<Layout> indexer = IndexerRegistryUtil.getIndexer(
+			Layout.class.getName());
+
+		Hits hits = indexer.search(
+			_buildSearchContext(
+				group.getGroupId(), privateLayout, keywords, types,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null));
+
+		return hits.getLength();
 	}
 
 	@Override
@@ -3460,6 +3531,40 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		return layouts;
 	}
 
+	private SearchContext _buildSearchContext(
+			long groupId, boolean privateLayout, String keywords,
+			String[] types, int start, int end, OrderByComparator<Layout> obc)
+		throws PortalException {
+
+		SearchContext searchContext = new SearchContext();
+
+		searchContext.setAttribute(Field.TITLE, keywords);
+		searchContext.setAttribute("paginationType", "more");
+		searchContext.setAttribute(
+			"privateLayout", String.valueOf(privateLayout));
+		searchContext.setAttribute(Field.TYPE, types);
+
+		Group group = groupLocalService.getGroup(groupId);
+
+		searchContext.setCompanyId(group.getCompanyId());
+
+		searchContext.setEnd(end);
+		searchContext.setGroupIds(new long[] {groupId});
+		searchContext.setKeywords(keywords);
+		searchContext.setStart(start);
+
+		if (obc != null) {
+			searchContext.setSorts(_getSortFromComparator(obc));
+		}
+
+		QueryConfig queryConfig = searchContext.getQueryConfig();
+
+		queryConfig.setHighlightEnabled(false);
+		queryConfig.setScoreEnabled(false);
+
+		return searchContext;
+	}
+
 	private List<Layout> _getChildLayouts(
 		LayoutSet layoutSet, long[] parentLayoutIds) {
 
@@ -3510,6 +3615,15 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		}
 
 		return parentLayout.getPlid();
+	}
+
+	private Sort _getSortFromComparator(OrderByComparator<Layout> obc) {
+		String[] fields = obc.getOrderByFields();
+
+		boolean reverse = !obc.isAscending();
+		String field = fields[0];
+
+		return new Sort(field, Sort.LONG_TYPE, reverse);
 	}
 
 	private List<Layout> _injectVirtualLayouts(
