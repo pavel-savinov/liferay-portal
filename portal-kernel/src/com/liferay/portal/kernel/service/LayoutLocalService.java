@@ -857,6 +857,24 @@ public interface LayoutLocalService extends BaseLocalService,
 		String type) throws PortalException;
 
 	/**
+	* Returns a range of all the layouts belonging to the group.
+	*
+	* @param groupId the primary key of the group
+	* @param privateLayout whether the layout is private to the group
+	* @param keywords keywords
+	* @param types layout types
+	* @param start the lower bound of the range of layouts
+	* @param end the upper bound of the range of layouts (not inclusive)
+	* @param obc the comparator to order the layouts
+	* @return the matching layouts, or <code>null</code> if no matches were
+	found
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<Layout> getLayouts(long groupId, boolean privateLayout,
+		String keywords, String[] types, int start, int end,
+		OrderByComparator<Layout> obc) throws PortalException;
+
+	/**
 	* Returns the layout references for all the layouts that belong to the
 	* company and belong to the portlet that matches the preferences.
 	*
@@ -925,6 +943,10 @@ public interface LayoutLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getLayoutsCount(Group group, boolean privateLayout,
 		long[] layoutIds);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getLayoutsCount(Group group, boolean privateLayout,
+		String keywords, String[] types) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getLayoutsCount(User user, boolean privateLayout)
