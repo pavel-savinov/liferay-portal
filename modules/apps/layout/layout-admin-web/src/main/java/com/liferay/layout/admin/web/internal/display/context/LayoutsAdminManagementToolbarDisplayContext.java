@@ -21,6 +21,7 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.SafeConsumer;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
@@ -29,6 +30,8 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 
 import java.util.List;
 import java.util.Objects;
+
+import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -69,6 +72,15 @@ public class LayoutsAdminManagementToolbarDisplayContext
 	}
 
 	@Override
+	public String getClearResultsURL() {
+		PortletURL clearResultsURL = getPortletURL();
+
+		clearResultsURL.setParameter("keywords", StringPool.BLANK);
+
+		return clearResultsURL.toString();
+	}
+
+	@Override
 	public String getComponentId() {
 		return "pagesManagementToolbar";
 	}
@@ -104,8 +116,20 @@ public class LayoutsAdminManagementToolbarDisplayContext
 	}
 
 	@Override
+	public String getSearchActionURL() {
+		PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+		return portletURL.toString();
+	}
+
+	@Override
 	public String getSearchContainerId() {
 		return "pages";
+	}
+
+	@Override
+	public String getSearchFormName() {
+		return "fm";
 	}
 
 	@Override
@@ -133,11 +157,6 @@ public class LayoutsAdminManagementToolbarDisplayContext
 			}
 
 		};
-	}
-
-	@Override
-	public Boolean isShowSearch() {
-		return false;
 	}
 
 	@Override
