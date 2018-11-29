@@ -25,7 +25,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.search.BaseIndexer;
-import com.liferay.portal.kernel.search.BooleanQuery;
+import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.IndexWriterHelper;
@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
+import com.liferay.portal.kernel.search.filter.TermsFilter;
 import com.liferay.portal.kernel.search.highlight.HighlightUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
@@ -101,6 +102,23 @@ public class LayoutIndexer extends BaseIndexer<Layout> {
 	}
 
 	@Override
+	public void postProcessContextBooleanFilter(
+			BooleanFilter contextBooleanFilter, SearchContext searchContext)
+		throws Exception {
+
+		String[] types = GetterUtil.getStringValues(
+			searchContext.getAttribute(Field.TYPE), new String[] {"content"});
+
+		if (ArrayUtil.isNotEmpty(types)) {
+			TermsFilter typeTermsFilter = new TermsFilter(Field.TYPE);
+
+			typeTermsFilter.addValues(types);
+
+			contextBooleanFilter.add(typeTermsFilter, BooleanClauseOccur.MUST);
+		}
+	}
+
+	@Override
 	protected void doDelete(Layout layout) throws Exception {
 		deleteDocument(layout.getCompanyId(), layout.getPlid());
 	}
@@ -113,6 +131,7 @@ public class LayoutIndexer extends BaseIndexer<Layout> {
 		document.addText(
 			Field.DEFAULT_LANGUAGE_ID, layout.getDefaultLanguageId());
 		document.addLocalizedText(Field.NAME, layout.getNameMap());
+		document.addText(Field.TYPE, layout.getType());
 
 		LayoutPageTemplateStructure layoutPageTemplateStructure =
 			_layoutPageTemplateStructureLocalService.
