@@ -129,6 +129,7 @@ public interface LayoutLocalService extends BaseLocalService,
 	* @return the layout
 	* @throws PortalException if a portal exception occurred
 	*/
+	@Indexable(type = IndexableType.REINDEX)
 	public Layout addLayout(long userId, long groupId, boolean privateLayout,
 		long parentLayoutId, Map<Locale, String> nameMap,
 		Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
@@ -217,6 +218,7 @@ public interface LayoutLocalService extends BaseLocalService,
 	* @param serviceContext the service context to be applied
 	* @throws PortalException if a portal exception occurred
 	*/
+	@Indexable(type = IndexableType.DELETE)
 	@SystemEvent(action = SystemEventConstants.ACTION_SKIP, type = SystemEventConstants.TYPE_DELETE)
 	public void deleteLayout(Layout layout, boolean updateLayoutSet,
 		ServiceContext serviceContext) throws PortalException;
