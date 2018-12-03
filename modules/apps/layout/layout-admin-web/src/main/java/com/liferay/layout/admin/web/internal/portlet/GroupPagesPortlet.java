@@ -54,6 +54,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upload.UploadException;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -135,6 +136,10 @@ public class GroupPagesPortlet extends MVCPortlet {
 		}
 		else {
 			try {
+				ThemeDisplay themeDisplay =
+					(ThemeDisplay)renderRequest.getAttribute(
+						WebKeys.THEME_DISPLAY);
+
 				List<LayoutPrototype> layoutPrototypes =
 					_layoutPrototypeLocalService.getLayoutPrototypes(
 						QueryUtil.ALL_POS, QueryUtil.ALL_POS);
@@ -147,7 +152,9 @@ public class GroupPagesPortlet extends MVCPortlet {
 
 					if (layoutPageTemplateEntry == null) {
 						_layoutPageTemplateEntryLocalService.
-							addLayoutPageTemplateEntry(layoutPrototype);
+							addLayoutPageTemplateEntry(
+								layoutPrototype,
+								themeDisplay.getCompanyGroupId());
 					}
 				}
 
