@@ -60,6 +60,27 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 		Company company = _companyLocalService.getCompany(
 			layoutPrototype.getCompanyId());
 
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
+		long groupId = company.getGroupId();
+
+		if (serviceContext != null) {
+			long scopeGroupId = serviceContext.getScopeGroupId();
+
+			if (scopeGroupId != 0) {
+				groupId = scopeGroupId;
+			}
+		}
+
+		return addLayoutPageTemplateEntry(layoutPrototype, groupId);
+	}
+
+	@Override
+	public LayoutPageTemplateEntry addLayoutPageTemplateEntry(
+			LayoutPrototype layoutPrototype, long groupId)
+		throws PortalException {
+
 		String nameXML = layoutPrototype.getName();
 
 		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
@@ -72,19 +93,6 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 		if (!layoutPrototype.isActive()) {
 			status = WorkflowConstants.STATUS_INACTIVE;
-		}
-
-		ServiceContext serviceContext =
-			ServiceContextThreadLocal.getServiceContext();
-
-		long groupId = company.getGroupId();
-
-		if (serviceContext != null) {
-			long scopeGroupId = serviceContext.getScopeGroupId();
-
-			if (scopeGroupId != 0) {
-				groupId = scopeGroupId;
-			}
 		}
 
 		return addLayoutPageTemplateEntry(
