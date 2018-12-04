@@ -19,6 +19,9 @@ package com.liferay.site.navigation.admin.web.internal.constants;
  */
 public class SiteNavigationAdminWebKeys {
 
+	public static final String SITE_NAVIGATION_MENU_ADMIN_DISPLAY_CONTEXT =
+		"SITE_NAVIGATION_MENU_ADMIN_DISPLAY_CONTEXT";
+
 	public static final String SITE_NAVIGATION_MENU_ITEM_TYPE_REGISTRY =
 		"SITE_NAVIGATION_MENU_ITEM_TYPE_REGISTRY";
 
