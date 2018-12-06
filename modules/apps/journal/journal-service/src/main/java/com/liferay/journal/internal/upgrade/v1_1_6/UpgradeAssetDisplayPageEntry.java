@@ -86,7 +86,8 @@ public class UpgradeAssetDisplayPageEntry extends UpgradeProcess {
 					SaveAssetDisplayPageEntryCallable
 						saveAssetDisplayPageEntryCallable =
 							new SaveAssetDisplayPageEntryCallable(
-								groupId, userId, resourcePrimKey);
+								groupId, userId, journalArticleClassNameId,
+								resourcePrimKey);
 
 					saveAssetDisplayPageEntryCallables.add(
 						saveAssetDisplayPageEntryCallable);
@@ -112,9 +113,6 @@ public class UpgradeAssetDisplayPageEntry extends UpgradeProcess {
 		}
 	}
 
-	private static final long _CLASS_NAME_ID = PortalUtil.getClassNameId(
-		JournalArticle.class);
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		UpgradeAssetDisplayPageEntry.class);
 
@@ -125,10 +123,11 @@ public class UpgradeAssetDisplayPageEntry extends UpgradeProcess {
 		implements Callable<Boolean> {
 
 		public SaveAssetDisplayPageEntryCallable(
-			long groupId, long userId, long classPK) {
+			long groupId, long userId, long classNameId, long classPK) {
 
 			_groupId = groupId;
 			_userId = userId;
+			_classNameId = classNameId;
 			_classPK = classPK;
 		}
 
@@ -140,7 +139,7 @@ public class UpgradeAssetDisplayPageEntry extends UpgradeProcess {
 				serviceContext.setUuid(PortalUUIDUtil.generate());
 
 				_assetDisplayPageEntryLocalService.addAssetDisplayPageEntry(
-					_userId, _groupId, _CLASS_NAME_ID, _classPK, 0,
+					_userId, _groupId, _classNameId, _classPK, 0,
 					AssetDisplayPageConstants.TYPE_SPECIFIC, serviceContext);
 			}
 			catch (Exception e) {
@@ -155,6 +154,7 @@ public class UpgradeAssetDisplayPageEntry extends UpgradeProcess {
 			return true;
 		}
 
+		private final long _classNameId;
 		private final long _classPK;
 		private final long _groupId;
 		private final long _userId;
