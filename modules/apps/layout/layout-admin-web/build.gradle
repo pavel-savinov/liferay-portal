@@ -12,6 +12,7 @@ dependencies {
 	compileOnly project(":apps:asset:asset-display-api")
 	compileOnly project(":apps:asset:asset-display-page-api")
 	compileOnly project(":apps:asset:asset-taglib")
+	compileOnly project(":apps:dynamic-data-mapping:dynamic-data-mapping-api")
 	compileOnly project(":apps:expando:expando-taglib")
 	compileOnly project(":apps:export-import:export-import-api")
 	compileOnly project(":apps:fragment:fragment-api")
