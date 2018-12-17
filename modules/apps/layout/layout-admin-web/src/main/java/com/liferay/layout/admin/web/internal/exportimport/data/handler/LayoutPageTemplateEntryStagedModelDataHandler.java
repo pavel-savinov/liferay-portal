@@ -16,6 +16,8 @@ package com.liferay.layout.admin.web.internal.exportimport.data.handler;
 
 import com.liferay.asset.display.page.model.AssetDisplayPageEntry;
 import com.liferay.asset.display.page.service.AssetDisplayPageEntryLocalService;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.exportimport.data.handler.base.BaseStagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
@@ -85,6 +87,15 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 				PortletDataContext.REFERENCE_TYPE_PARENT);
 		}
 
+		DDMStructure ddmStructure = _ddmStructureLocalService.fetchStructure(
+			layoutPageTemplateEntry.getClassTypeId());
+
+		if (ddmStructure != null) {
+			StagedModelDataHandlerUtil.exportReferenceStagedModel(
+				portletDataContext, layoutPageTemplateEntry, ddmStructure,
+				PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
+		}
+
 		_exportAssetDisplayPages(portletDataContext, layoutPageTemplateEntry);
 
 		_exportLayoutPageTemplateStructure(
@@ -151,6 +162,21 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 			layoutPageTemplateEntry.getLayoutPageTemplateCollectionId(),
 			layoutPageTemplateEntry.getLayoutPageTemplateCollectionId());
 
+		long classTypeId = layoutPageTemplateEntry.getClassTypeId();
+
+		if (classTypeId > 0) {
+			StagedModelDataHandlerUtil.importReferenceStagedModel(
+				portletDataContext, layoutPageTemplateEntry, DDMStructure.class,
+				Long.valueOf(classTypeId));
+
+			Map<Long, Long> structureIds =
+				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+					DDMStructure.class);
+
+			classTypeId = MapUtil.getLong(
+				structureIds, classTypeId, classTypeId);
+		}
+
 		LayoutPageTemplateEntry importedLayoutPageTemplateEntry =
 			(LayoutPageTemplateEntry)layoutPageTemplateEntry.clone();
 
@@ -158,6 +184,7 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 			portletDataContext.getScopeGroupId());
 		importedLayoutPageTemplateEntry.setLayoutPageTemplateCollectionId(
 			layoutPageTemplateCollectionId);
+		importedLayoutPageTemplateEntry.setClassTypeId(classTypeId);
 
 		LayoutPageTemplateEntry existingLayoutPageTemplateEntry =
 			_stagedModelRepository.fetchStagedModelByUuidAndGroupId(
@@ -394,6 +421,9 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 	@Reference
 	private AssetDisplayPageEntryLocalService
 		_assetDisplayPageEntryLocalService;
+
+	@Reference
+	private DDMStructureLocalService _ddmStructureLocalService;
 
 	@Reference
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
