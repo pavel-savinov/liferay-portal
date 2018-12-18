@@ -76,7 +76,7 @@ public class JournalContentPortletLayoutListener
 		try {
 			Layout layout = _layoutLocalService.getLayout(plid);
 
-			String articleId = getArticleId(layout, portletId);
+			String articleId = _getArticleId(layout, portletId);
 
 			if (Validator.isNull(articleId)) {
 				return;
@@ -114,7 +114,7 @@ public class JournalContentPortletLayoutListener
 		try {
 			Layout layout = _layoutLocalService.getLayout(plid);
 
-			String articleId = getArticleId(layout, portletId);
+			String articleId = _getArticleId(layout, portletId);
 
 			if (Validator.isNull(articleId)) {
 				return;
@@ -150,7 +150,7 @@ public class JournalContentPortletLayoutListener
 		try {
 			Layout layout = _layoutLocalService.getLayout(plid);
 
-			String articleId = getArticleId(layout, portletId);
+			String articleId = _getArticleId(layout, portletId);
 
 			if (Validator.isNull(articleId)) {
 				_journalContentSearchLocalService.deleteArticleContentSearch(
@@ -261,7 +261,7 @@ public class JournalContentPortletLayoutListener
 		return portletIds;
 	}
 
-	private String getArticleId(Layout layout, String portletId) {
+	private String _getArticleId(Layout layout, String portletId) {
 		PortletPreferences portletPreferences = null;
 
 		if (layout.isPortletEmbedded(portletId, layout.getGroupId())) {
@@ -272,12 +272,11 @@ public class JournalContentPortletLayoutListener
 					PortletKeys.PREFS_PLID_SHARED, portletId, null);
 		}
 		else {
-			portletPreferences =
-				PortletPreferencesFactoryUtil.getPortletSetup(
-					layout, portletId, StringPool.BLANK);
+			portletPreferences = PortletPreferencesFactoryUtil.getPortletSetup(
+				layout, portletId, StringPool.BLANK);
 		}
 
-		if (Validator.isNotNull(portletPreferences)) {
+		if (portletPreferences != null) {
 			return portletPreferences.getValue("articleId", null);
 		}
 
