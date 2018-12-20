@@ -72,6 +72,7 @@ import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -789,6 +790,13 @@ public class JournalArticleStagedModelDataHandler
 				}
 			}
 
+			Map<java.util.Locale, String> friendlyURLMap =
+				article.getFriendlyURLMap();
+
+			friendlyURLMap.keySet().forEach(
+				(key) -> friendlyURLMap.replace(key,
+					_http.decodeURL(friendlyURLMap.get(key))));
+
 			String articleURL = null;
 
 			boolean addGroupPermissions =
@@ -860,7 +868,7 @@ public class JournalArticleStagedModelDataHandler
 						article.getClassNameId(), ddmStructureId, articleId,
 						autoArticleId, article.getVersion(),
 						article.getTitleMap(), article.getDescriptionMap(),
-						article.getFriendlyURLMap(), article.getContent(),
+						friendlyURLMap, article.getContent(),
 						parentDDMStructureKey, parentDDMTemplateKey,
 						article.getLayoutUuid(), displayDateMonth,
 						displayDateDay, displayDateYear, displayDateHour,
@@ -878,7 +886,7 @@ public class JournalArticleStagedModelDataHandler
 						userId, existingArticle.getGroupId(), folderId,
 						existingArticle.getArticleId(), article.getVersion(),
 						article.getTitleMap(), article.getDescriptionMap(),
-						article.getFriendlyURLMap(), article.getContent(),
+						friendlyURLMap, article.getContent(),
 						parentDDMStructureKey, parentDDMTemplateKey,
 						article.getLayoutUuid(), displayDateMonth,
 						displayDateDay, displayDateYear, displayDateHour,
@@ -907,7 +915,7 @@ public class JournalArticleStagedModelDataHandler
 					userId, portletDataContext.getScopeGroupId(), folderId,
 					article.getClassNameId(), ddmStructureId, articleId,
 					autoArticleId, article.getVersion(), article.getTitleMap(),
-					article.getDescriptionMap(), article.getFriendlyURLMap(),
+					article.getDescriptionMap(), friendlyURLMap,
 					article.getContent(), parentDDMStructureKey,
 					parentDDMTemplateKey, article.getLayoutUuid(),
 					displayDateMonth, displayDateDay, displayDateYear,
@@ -1361,6 +1369,9 @@ public class JournalArticleStagedModelDataHandler
 
 	@Reference
 	private GroupLocalService _groupLocalService;
+
+	@Reference
+	private Http _http;
 
 	private ImageLocalService _imageLocalService;
 
