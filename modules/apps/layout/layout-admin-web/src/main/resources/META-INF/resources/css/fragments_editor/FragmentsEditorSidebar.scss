@@ -1,42 +1,44 @@
-@import "mixins";
+@import "./FragmentsEditorSidebarSection";
+
+@import "./FragmentsEditorSidebarSectionsButtons.scss";
 
 @import "./variables";
 
 .fragments-editor-sidebar {
 	box-shadow: none;
-	height: calc(100vh - #{$managementBarHeight});
-	pointer-events: none;
+	height: 100vh;
+	padding-left: $sidebarWidth - $sidebarButtonsWidth;
 	position: fixed;
 	right: 0;
-	top: $managementBarHeight;
-	transform: translateX(100%);
-	transition: transform $sidebarTransitionTimingFunction $sidebarTransitionDuration;
-	width: $sidebarWidth;
-	will-change: transform;
+	top: 0;
+	transition: padding-left ease $productMenuTransitionDuration;
+	will-change: padding-left;
 	z-index: $sidebarZIndex;
 
-	&-visible {
-		pointer-events: auto;
-		transform: translateX(0);
-	}
-
-	.sidebar-body {
+	&-content {
+		background-color: $sidebarContentBackgroundColor;
 		display: flex;
 		height: 100%;
-		padding: 0;
-
-		& > div {
-			flex-grow: 2;
-		}
 	}
 
-	.sidebar-body > .sidebar-section:first-child {
-		border-bottom: solid thin #CDCED9;
+	&-section {
+		border-left: $sidebarLeftBorderWidth solid $sidebarLeftBorderColor;
+		height: 100vh;
+		position: fixed;
+		right: $sidebarButtonsWidth;
+		transform: translateX(0);
+		transition: transform ease $productMenuTransitionDuration;
+		width: $sidebarWidth - $sidebarButtonsWidth;
+		will-change: transform;
+		z-index: $sidebarSectionZIndex;
 	}
 
-	@media (min-width: 768px) {
-		height: calc(100vh - #{desktopManagementBarHeight});
-		top: $desktopManagementBarHeight;
+	&--collapsed {
+		padding-left: 0;
+	}
+
+	&--collapsed > &-content > &-section {
+		transform: translateX(calc(100% + #{$sidebarButtonsWidth + $sidebarLeftBorderWidth}));
 	}
 
 	body.has-control-menu & {
@@ -46,150 +48,6 @@
 		@media (min-width: 768px) {
 			height: calc(100vh - #{$desktopControlMenuHeight});
 			top: $desktopControlMenuHeight;
-		}
-	}
-}
-
-.fragments-editor-sidebar-content {
-	background-color: $sidebarContentBackgroundColor;
-	border-left: $sidebarLeftBorderWidth solid $sidebarLeftBorderColor;
-	display: flex;
-	height: 100%;
-
-	&--hidden {
-		background-color: transparent;
-		border: none;
-		justify-content: flex-end;
-
-		.fragments-editor-sidebar-section {
-			display: none;
-		}
-	}
-}
-
-.fragments-editor-sidebar-section {
-	flex-grow: 2;
-	max-height: 100%;
-	overflow: scroll;
-	padding: 0 1rem 1rem;
-
-	&__card {
-		box-shadow: none;
-		margin-bottom: $sidebarCardMarginBottom;
-		padding: $sidebarCardPadding;
-
-		&-image {
-			border: 1px solid $sidebarCardImageBorderColor;
-			border-radius: 0;
-			max-height: $sidebarCardImageMaxHeight;
-			overflow: hidden;
-			text-align: center;
-
-			img {
-				width: 100%;
-			}
-		}
-
-		&-no-preview {
-			background-color: $sidebarCardNoPreviewBackgroundColor;
-			color: $sidebarCardTitleColor;
-			font-size: 24px;
-			height: 80px;
-			line-height: 80px;
-			text-align: center;
-		}
-
-		.card-body {
-			padding: 8px 0 0;
-
-			.btn {
-				z-index: $sidebarCardPlusButtonZIndex;
-			}
-
-			.card-title {
-				color: $sidebarCardTitleColor;
-				font-size: 12px;
-			}
-
-			.card-row {
-				min-height: 32px;
-			}
-		}
-	}
-
-	&__elements-panel {
-		.card {
-			flex-basis: $sidebarElementCardWidth;
-
-			.card-body {
-				text-align: center;
-
-				.btn {
-					display: none;
-				}
-			}
-		}
-
-		&-grid {
-			align-items: flex-start;
-			display: flex;
-			flex-wrap: wrap;
-			justify-content: space-between;
-		}
-	}
-
-	&__panel {
-		background-color: transparent;
-
-		& a {
-			font-size: 12px;
-			margin-bottom: $sidebarCardMarginBottom;
-		}
-	}
-
-	&__title {
-		font-size: 18px;
-		font-weight: bold;
-		margin: 24px 0;
-	}
-
-	.drag-handler {
-		background-color: transparent;
-		cursor: move;
-		display: block;
-		height: 100%;
-		position: absolute;
-		top: 0;
-		width: 100%;
-		z-index: $sidebarCardZIndex;
-	}
-
-	button.component-action {
-		cursor: pointer;
-	}
-
-	.sidebar-fragments-section > .navbar {
-		box-shadow: 0 1px 0 0 rgba(200, 200, 200, 0.2);
-		margin-bottom: 1.5rem;
-	}
-}
-
-.fragments-editor-sidebar-sections-buttons {
-	background-color: $sidebarButtonsBackgroundColor;
-	flex-direction: column;
-	padding-top: 16px;
-	width: $sidebarButtonsWidth;
-
-	&__btn {
-		border-radius: 0;
-		color: $sidebarButtonsColor;
-		height: $sidebarButtonsHeight;
-		padding: 7px 0;
-		width: $sidebarButtonsWidth;
-
-		&--active, &:active, &:focus, &:hover {
-			box-shadow: none;
-			color: $sidebarButtonsHoverColor;
 		}
 	}
 }

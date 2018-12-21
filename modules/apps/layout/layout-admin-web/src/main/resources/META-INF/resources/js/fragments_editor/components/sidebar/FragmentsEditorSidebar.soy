@@ -44,20 +44,27 @@
 	]}
 	{@param? store: ?}
 
-	<div class="fragments-editor-sidebar fragments-editor-sidebar-visible sidebar" id="">
-		<div class="sidebar-body">
-			{call com.liferay.layout.admin.web.FragmentsEditorSidebarContent.render}
-				{param elements: $elements /}
-				{param fragmentEntryLinks: $fragmentEntryLinks /}
-				{param fragmentsEditorSidebarVisible: $fragmentsEditorSidebarVisible ?: true /}
-				{param highlightMapping: $highlightMapping ?: false /}
-				{param layoutData: $layoutData /}
-				{param panels: $panels /}
-				{param sections: $sections /}
-				{param selectedMappingTypes: $selectedMappingTypes /}
-				{param spritemap: $spritemap /}
-				{param store: $store /}
-			{/call}
-		</div>
+	{let $sidebarClasses kind="text"}
+		fragments-editor-sidebar
+		{sp}sidebar
+
+		{if not $fragmentsEditorSidebarVisible}
+			{sp}fragments-editor-sidebar--collapsed
+		{/if}
+	{/let}
+
+	<div class="{$sidebarClasses}">
+		{call com.liferay.layout.admin.web.FragmentsEditorSidebarContent.render}
+			{param elements: $elements /}
+			{param fragmentEntryLinks: $fragmentEntryLinks /}
+			{param fragmentsEditorSidebarVisible: $fragmentsEditorSidebarVisible ?: true /}
+			{param highlightMapping: $highlightMapping ?: false /}
+			{param layoutData: $layoutData /}
+			{param panels: $panels /}
+			{param sections: $sections /}
+			{param selectedMappingTypes: $selectedMappingTypes /}
+			{param spritemap: $spritemap /}
+			{param store: $store /}
+		{/call}
 	</div>
 {/template}

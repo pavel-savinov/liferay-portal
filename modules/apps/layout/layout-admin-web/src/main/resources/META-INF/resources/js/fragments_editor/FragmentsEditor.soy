@@ -110,32 +110,30 @@
 			{param store: $store /}
 		{/call}
 
-		<div class="contextual-sidebar-content">
-			{call com.liferay.layout.admin.web.FragmentEntryLinkList.render}
-				{param activeItemId: $activeItemId /}
-				{param activeItemType: $activeItemType /}
-				{param defaultEditorConfigurations: $defaultEditorConfigurations /}
-				{param defaultLanguageId: $defaultLanguageId /}
-				{param fragmentEntryLinks: $fragmentEntryLinks /}
-				{param fragmentsEditorSidebarVisible: $fragmentsEditorSidebarVisible ?: true /}
-				{param dropTargetBorder: $dropTargetBorder /}
-				{param dropTargetItemId: $dropTargetItemId /}
-				{param dropTargetItemType: $dropTargetItemType /}
-				{param hoveredItemId: $hoveredItemId /}
-				{param hoveredItemType: $hoveredItemType /}
-				{param imageSelectorURL: $imageSelectorURL /}
-				{param languageId: $languageId /}
-				{param layoutData: $layoutData /}
-				{param highlightMapping: $highlightMapping /}
-				{param mappingFieldsURL: $mappingFieldsURL /}
-				{param portletNamespace: $portletNamespace /}
-				{param ref: 'fragmentsEditorRender' /}
-				{param selectedMappingTypes: $selectedMappingTypes /}
-				{param spritemap: $spritemap /}
-				{param store: $store /}
-				{param translating: $languageId != $defaultLanguageId /}
-			{/call}
-		</div>
+		{call com.liferay.layout.admin.web.FragmentEntryLinkList.render}
+			{param activeItemId: $activeItemId /}
+			{param activeItemType: $activeItemType /}
+			{param defaultEditorConfigurations: $defaultEditorConfigurations /}
+			{param defaultLanguageId: $defaultLanguageId /}
+			{param fragmentEntryLinks: $fragmentEntryLinks /}
+			{param fragmentsEditorSidebarVisible: $fragmentsEditorSidebarVisible ?: true /}
+			{param dropTargetBorder: $dropTargetBorder /}
+			{param dropTargetItemId: $dropTargetItemId /}
+			{param dropTargetItemType: $dropTargetItemType /}
+			{param hoveredItemId: $hoveredItemId /}
+			{param hoveredItemType: $hoveredItemType /}
+			{param imageSelectorURL: $imageSelectorURL /}
+			{param languageId: $languageId /}
+			{param layoutData: $layoutData /}
+			{param highlightMapping: $highlightMapping /}
+			{param mappingFieldsURL: $mappingFieldsURL /}
+			{param portletNamespace: $portletNamespace /}
+			{param ref: 'fragmentsEditorRender' /}
+			{param selectedMappingTypes: $selectedMappingTypes /}
+			{param spritemap: $spritemap /}
+			{param store: $store /}
+			{param translating: $languageId != $defaultLanguageId /}
+		{/call}
 
 		{if $mappingFieldsURL and $selectMappingDialogVisible}
 			{call com.liferay.layout.admin.web.SelectMappingDialog.render}

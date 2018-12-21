@@ -2,7 +2,7 @@
 
 @import "./variables";
 
-.contextual-sidebar-content > .fragment-entry-link-list {
+.fragment-entry-link-list {
 	margin-top: $managementBarHeight + $fragmentEntryLinkListPadding;
 
 	@media (min-width: 768px) {
@@ -11,10 +11,11 @@
 }
 
 .fragment-entry-link-list {
-	padding: 0;
+	padding: 0 ($fragmentEntryLinkListPadding + $sidebarButtonsWidth) 0 $fragmentEntryLinkListPadding;
+	transition: padding-right ease $productMenuTransitionDuration;
 
 	&--padded, &--padded.no-fragments-message {
-		padding-right: $contextualSidebarContentPadding;
+		padding-right: ($sidebarWidth + $fragmentEntryLinkListPadding);
 	}
 
 	&__row-section {

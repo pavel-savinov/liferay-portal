@@ -8,17 +8,18 @@
 	max-height: $managementBarHeight;
 	min-height: $managementBarHeight;
 	overflow: hidden;
+	padding-right: $sidebarButtonsWidth;
 	position: fixed;
 	top: $controlMenuHeight;
 	transition: ease $productMenuTransitionDuration;
-	transition-property: left, width;
+	transition-property: left, width, padding-right;
 	width: 100%;
 	will-change: left, width;
 	z-index: $managementBarZIndex;
 
 	body.open & {
-		left: $productMenuWidth;
-		width: calc(100% - #{$productMenuWidth});
+		left: $sidebarWidth;
+		width: calc(100% - #{$sidebarWidth});
 	}
 
 	& > .container-fluid {
@@ -26,7 +27,7 @@
 	}
 
 	&--padded {
-		padding-right: $contextualSidebarContentPadding;
+		padding-right: $sidebarWidth;
 	}
 
 	&__add-fragment-button {

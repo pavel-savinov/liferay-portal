@@ -6,9 +6,6 @@ $desktopManagementBarHeight: 50px;
 
 $productMenuTransitionDuration: 0.5s;
 
-$contextualSidebarContentPadding: 320px;
-$productMenuWidth: 320px;
-
 $draggableItemZIndex: 991;
 $fragmentEditableFieldTooltipZIndex: 4;
 $fragmentEntryLinkContentHoverZIndex: auto;
@@ -18,6 +15,7 @@ $managementBarZIndex: 4;
 $portletTopperZIndex: 1;
 $sidebarCardPlusButtonZIndex: 6;
 $sidebarCardZIndex: 5;
+$sidebarSectionZIndex: 3;
 $sidebarZIndex: 4;
 $topperHoverZIndex: 2;
 $topperZIndex: 1;
@@ -28,7 +26,7 @@ $fragmentEditableFieldGridDefaultColor: #A7A9BC;
 $fragmentEditableFieldGridSize: 8px;
 $fragmentEditableFieldGridTranslatedColor: #3DC513;
 
-$fragmentEntryLinkListPadding: 48px;
+$fragmentEntryLinkListPadding: 28px;
 $sectionMinimumHeight: 160px;
 
 $fragmentEntryLinkSectionBorder: 1px solid #CDCED9;
