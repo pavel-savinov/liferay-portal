@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author Pavel Savinov
+ * @author	  Pavel Savinov
  * @generated
  */
 public class AssetDisplayPageEntryTable {
