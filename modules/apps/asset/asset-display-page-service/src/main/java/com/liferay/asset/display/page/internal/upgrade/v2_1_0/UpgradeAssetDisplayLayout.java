@@ -131,9 +131,6 @@ public class UpgradeAssetDisplayLayout extends UpgradeProcess {
 					continue;
 				}
 
-				long assetDisplayPageEntryId = rs.getLong(
-					"assetDisplayPageEntryId");
-
 				long userId = rs.getLong("userId");
 				long groupId = rs.getLong("groupId");
 				long layoutPageTemplateEntryId = rs.getLong(
@@ -144,6 +141,9 @@ public class UpgradeAssetDisplayLayout extends UpgradeProcess {
 					_getPlid(
 						assetEntry, userId, groupId, layoutPageTemplateEntryId,
 						serviceContext));
+
+				long assetDisplayPageEntryId = rs.getLong(
+					"assetDisplayPageEntryId");
 
 				ps.setLong(2, assetDisplayPageEntryId);
 
