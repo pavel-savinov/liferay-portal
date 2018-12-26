@@ -15,7 +15,6 @@
 --%>
 
 <%@ include file="/init.jsp" %>
-
 <%
 FragmentsEditorDisplayContext fragmentsEditorDisplayContext = new FragmentsEditorDisplayContext(request, renderResponse);
 %>
@@ -27,6 +26,20 @@ FragmentsEditorDisplayContext fragmentsEditorDisplayContext = new FragmentsEdito
 <liferay-util:html-top>
 	<link href="<%= PortalUtil.getStaticResourceURL(request, PortalUtil.getPathModule() + "/layout-admin-web/css/fragments_editor/FragmentsEditorEditMode.css") %>" rel="stylesheet">
 </liferay-util:html-top>
+
+<soy:component-renderer
+	componentId='<%= renderResponse.getNamespace() + "sidebar" %>'
+	context="<%= fragmentsEditorDisplayContext.getFragmentsEditorSidebarContext() %>"
+	module="layout-admin-web/js/fragments_editor/components/sidebar/FragmentsEditorSidebarContent.es"
+	templateNamespace="com.liferay.layout.admin.web.FragmentsEditorSidebarContent.render"
+/>
+
+<soy:component-renderer
+	componentId='<%= renderResponse.getNamespace() + "sidebar" %>'
+	context="<%= fragmentsEditorDisplayContext.getFragmentsEditorSidebarContext() %>"
+	module="layout-admin-web/js/fragments_editor/components/sidebar/FragmentsEditorSidebar.es"
+	templateNamespace="com.liferay.layout.admin.web.FragmentsEditorSidebar.render"
+/>
 
 <soy:component-renderer
 	componentId='<%= renderResponse.getNamespace() + "fragments" %>'
