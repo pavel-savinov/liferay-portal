@@ -177,16 +177,11 @@ public class I18nServlet extends HttpServlet {
 			}
 		}
 
-		String i18nPath = StringPool.SLASH + i18nLanguageId;
-
 		if (siteDefaultLocale == null) {
 			if (PropsValues.LOCALE_USE_DEFAULT_IF_NOT_AVAILABLE) {
 				siteDefaultLocale = PortalUtil.getSiteDefaultLocale(siteGroup);
 
 				i18nLanguageCode = siteDefaultLocale.getLanguage();
-
-				i18nPath = StringPool.SLASH + i18nLanguageCode;
-
 				i18nLanguageId = LocaleUtil.toLanguageId(siteDefaultLocale);
 			}
 			else {
@@ -198,8 +193,6 @@ public class I18nServlet extends HttpServlet {
 				siteDefaultLocale);
 
 			if (siteDefaultLanguageId.startsWith(i18nLanguageId)) {
-				i18nPath = StringPool.SLASH + i18nLanguageCode;
-
 				i18nLanguageId = siteDefaultLanguageId;
 			}
 		}
@@ -210,6 +203,10 @@ public class I18nServlet extends HttpServlet {
 			_log.debug("Redirect " + redirect);
 		}
 
+		Locale i18nLocale = LocaleUtil.fromLanguageId(i18nLanguageId);
+
+		String i18nPath = StringPool.SLASH + i18nLocale.toLanguageTag();
+
 		return new I18nData(
 			i18nPath, i18nLanguageCode, i18nLanguageId, redirect);
 	}
@@ -217,12 +214,12 @@ public class I18nServlet extends HttpServlet {
 	protected I18nData getI18nData(Locale locale) throws PortalException {
 		String languageId = LocaleUtil.toLanguageId(locale);
 
-		String i18nPath = StringPool.SLASH + languageId;
+		String i18nPath = StringPool.SLASH + locale.toLanguageTag();
 
 		Locale defaultLocale = LanguageUtil.getLocale(locale.getLanguage());
 
 		if (LocaleUtil.equals(defaultLocale, locale)) {
-			i18nPath = StringPool.SLASH + defaultLocale.getLanguage();
+			i18nPath = StringPool.SLASH + defaultLocale.toLanguageTag();
 		}
 
 		return new I18nData(
