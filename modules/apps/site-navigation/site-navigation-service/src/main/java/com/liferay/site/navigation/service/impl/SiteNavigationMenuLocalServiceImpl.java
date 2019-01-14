@@ -161,20 +161,6 @@ public class SiteNavigationMenuLocalServiceImpl
 			SiteNavigationMenu siteNavigationMenu)
 		throws PortalException {
 
-		SiteNavigationMenu primarySiteNavigationMenu =
-			fetchPrimarySiteNavigationMenu(siteNavigationMenu.getGroupId());
-
-		int siteNavigationMenuCount = getSiteNavigationMenusCount(
-			siteNavigationMenu.getGroupId());
-
-		if ((primarySiteNavigationMenu != null) &&
-			(siteNavigationMenuCount > 1) &&
-			(primarySiteNavigationMenu.getSiteNavigationMenuId() ==
-				siteNavigationMenu.getSiteNavigationMenuId())) {
-
-			throw new RequiredPrimarySiteNavigationMenuException();
-		}
-
 		// Site navigation menu
 
 		siteNavigationMenuPersistence.remove(
