@@ -28,6 +28,7 @@ import com.liferay.site.navigation.exception.RequiredPrimarySiteNavigationMenuEx
 import com.liferay.site.navigation.model.SiteNavigationMenu;
 import com.liferay.site.navigation.service.SiteNavigationMenuLocalServiceUtil;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -83,6 +84,29 @@ public class SiteNavigationMenuServiceTest {
 			TestPropsValues.getUserId(),
 			_siteNavigationMenu.getSiteNavigationMenuId(),
 			SiteNavigationConstants.TYPE_SECONDARY, false, serviceContext);
+	}
+
+	@Test
+	public void updateSiteNavigationMenuType() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
+		SiteNavigationMenu siteNavigationMenu =
+			SiteNavigationMenuLocalServiceUtil.addSiteNavigationMenu(
+				TestPropsValues.getUserId(), _group.getGroupId(), "Primary",
+				SiteNavigationConstants.TYPE_PRIMARY, false, serviceContext);
+
+		SiteNavigationMenuLocalServiceUtil.addSiteNavigationMenu(
+			TestPropsValues.getUserId(), _group.getGroupId(), "New Primary",
+			SiteNavigationConstants.TYPE_PRIMARY, false, serviceContext);
+
+		siteNavigationMenu =
+			SiteNavigationMenuLocalServiceUtil.fetchSiteNavigationMenu(
+				siteNavigationMenu.getSiteNavigationMenuId());
+
+		Assert.assertEquals(
+			SiteNavigationConstants.TYPE_DEFAULT, siteNavigationMenu.getType());
 	}
 
 	@DeleteAfterTestRun
