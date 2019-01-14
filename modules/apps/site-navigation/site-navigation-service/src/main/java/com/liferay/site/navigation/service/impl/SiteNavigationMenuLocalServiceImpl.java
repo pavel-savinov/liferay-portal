@@ -131,17 +131,9 @@ public class SiteNavigationMenuLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		int type = SiteNavigationConstants.TYPE_DEFAULT;
-
-		int siteNavigationMenusCount = getSiteNavigationMenusCount(
-			serviceContext.getScopeGroupId());
-
-		if (siteNavigationMenusCount <= 0) {
-			type = SiteNavigationConstants.TYPE_PRIMARY;
-		}
-
 		return addSiteNavigationMenu(
-			userId, groupId, name, type, serviceContext);
+			userId, groupId, name, SiteNavigationConstants.TYPE_DEFAULT,
+			serviceContext);
 	}
 
 	@Override
