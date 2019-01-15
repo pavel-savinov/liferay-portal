@@ -23,6 +23,7 @@ import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -165,7 +166,11 @@ public class AssetDisplayPageEntryLocalServiceImpl
 				groupId, classNameId, assetEntry.getClassTypeId())
 		);
 
-		return layoutPageTemplateEntry.getPlid();
+		if (layoutPageTemplateEntry != null) {
+			return layoutPageTemplateEntry.getPlid();
+		}
+
+		return LayoutConstants.DEFAULT_PLID;
 	}
 
 	@ServiceReference(type = LayoutPageTemplateEntryService.class)
