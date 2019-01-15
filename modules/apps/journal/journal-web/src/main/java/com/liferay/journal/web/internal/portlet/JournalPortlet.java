@@ -1529,7 +1529,7 @@ public class JournalPortlet extends MVCPortlet {
 		}
 
 		LayoutPageTemplateEntry layoutPageTemplateEntry =
-			_layoutPageTemplateEntryLocalService.getLayoutPageTemplateEntry(
+			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
 				layoutPageTemplateEntryId);
 
 		if (layoutPageTemplateEntry != null) {
