@@ -32,6 +32,7 @@
 			<soy:component-renderer
 				context="<%= contextUseForAllWidth %>"
 				module="js/ToggleDisableInputs.es"
+				servletContext="<%= application %>"
 				templateNamespace="com.liferay.portlet.configuration.css.web.ToggleDisableInputs.render"
 			/>
 
@@ -89,6 +90,7 @@
 			<soy:component-renderer
 				context="<%= contextUseForAllStyle %>"
 				module="js/ToggleDisableInputs.es"
+				servletContext="<%= application %>"
 				templateNamespace="com.liferay.portlet.configuration.css.web.ToggleDisableInputs.render"
 			/>
 
@@ -157,6 +159,7 @@
 			<soy:component-renderer
 				context="<%= contextUseForAllColor %>"
 				module="js/ToggleDisableInputs.es"
+				servletContext="<%= application %>"
 				templateNamespace="com.liferay.portlet.configuration.css.web.ToggleDisableInputs.render"
 			/>
 
@@ -173,6 +176,7 @@
 			<soy:component-renderer
 				context="<%= contextBorderTop %>"
 				module="js/ColorPickerInput.es"
+				servletContext="<%= application %>"
 				templateNamespace="com.liferay.portlet.configuration.css.web.ColorPickerInput.render"
 			/>
 
@@ -191,6 +195,7 @@
 			<soy:component-renderer
 				context="<%= contextBorderRight %>"
 				module="js/ColorPickerInput.es"
+				servletContext="<%= application %>"
 				templateNamespace="com.liferay.portlet.configuration.css.web.ColorPickerInput.render"
 			/>
 
@@ -209,6 +214,7 @@
 			<soy:component-renderer
 				context="<%= contextBorderBottom %>"
 				module="js/ColorPickerInput.es"
+				servletContext="<%= application %>"
 				templateNamespace="com.liferay.portlet.configuration.css.web.ColorPickerInput.render"
 			/>
 
@@ -227,6 +233,7 @@
 			<soy:component-renderer
 				context="<%= contextBorderLeft %>"
 				module="js/ColorPickerInput.es"
+				servletContext="<%= application %>"
 				templateNamespace="com.liferay.portlet.configuration.css.web.ColorPickerInput.render"
 			/>
 		</aui:fieldset>
