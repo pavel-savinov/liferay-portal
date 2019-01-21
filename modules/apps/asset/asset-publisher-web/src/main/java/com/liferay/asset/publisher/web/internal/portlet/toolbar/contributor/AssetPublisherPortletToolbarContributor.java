@@ -15,6 +15,7 @@
 package com.liferay.asset.publisher.web.internal.portlet.toolbar.contributor;
 
 import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
+import com.liferay.asset.publisher.constants.AssetPublisherWebKeys;
 import com.liferay.asset.publisher.util.AssetPublisherHelper;
 import com.liferay.asset.publisher.web.internal.display.context.AssetPublisherDisplayContext;
 import com.liferay.asset.publisher.web.internal.util.AssetPublisherWebUtil;
@@ -80,10 +81,8 @@ public class AssetPublisherPortletToolbarContributor
 		throws Exception {
 
 		AssetPublisherDisplayContext assetPublisherDisplayContext =
-			new AssetPublisherDisplayContext(
-				null, _assetHelper, null, _assetPublisherHelper, null, null,
-				portletRequest, portletResponse,
-				portletRequest.getPreferences());
+			(AssetPublisherDisplayContext)portletRequest.getAttribute(
+				AssetPublisherWebKeys.ASSET_PUBLISHER_DISPLAY_CONTEXT);
 
 		if (!_isVisible(assetPublisherDisplayContext, portletRequest)) {
 			return;
