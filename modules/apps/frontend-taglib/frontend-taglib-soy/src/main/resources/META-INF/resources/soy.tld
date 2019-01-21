@@ -38,6 +38,12 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<attribute>
+			<description>The ServletContext object to use to resolve JS packages. The default value is to use the current portlet's ServletContext.</description>
+			<name>servletContext</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
 			<description>The Soy template's namespace.</description>
 			<name>templateNamespace</name>
 			<required>true</required>
@@ -88,6 +94,12 @@
 		<attribute>
 			<description>The AMD module of the component's JavaScript.</description>
 			<name>module</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description>The ServletContext object to use to resolve JS packages. The default value is to use the current portlet's ServletContext.</description>
+			<name>servletContext</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
