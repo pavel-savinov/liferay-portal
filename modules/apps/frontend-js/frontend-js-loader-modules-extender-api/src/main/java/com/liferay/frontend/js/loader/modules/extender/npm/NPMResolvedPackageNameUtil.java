@@ -28,6 +28,15 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class NPMResolvedPackageNameUtil {
 
+	/**
+	 * Get the NPM resolved package name associated to the current portlet.
+	 *
+	 * The current portlet is inferred from the portletResource parameter or
+	 * the {@link ServletContext} associated to the given request.
+	 * @param request
+	 * @return
+	 * @review
+	 */
 	public static String get(HttpServletRequest request) {
 		ServletContext servletContext = request.getServletContext();
 
@@ -43,6 +52,17 @@ public class NPMResolvedPackageNameUtil {
 			}
 		}
 
+		return get(servletContext);
+	}
+
+	/**
+	 * Get the NPM resolved package name associated to the bundle containing the
+	 * given servlet context.
+	 * @param servletContext
+	 * @return
+	 * @review
+	 */
+	public static String get(ServletContext servletContext) {
 		return (String)servletContext.getAttribute(
 			NPMResolvedPackageNameUtil.class.getName());
 	}
