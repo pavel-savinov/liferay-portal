@@ -23,7 +23,9 @@ import com.liferay.petra.lang.CentralizedThreadLocal;
 public class WorkflowThreadLocal {
 
 	public static boolean isEnabled() {
-		if (ExportImportThreadLocal.isImportInProcess()) {
+		if (ExportImportThreadLocal.isImportInProcess() &&
+			!ExportImportThreadLocal.isInitialLayoutStagingInProcess()) {
+
 			return false;
 		}
 
