@@ -23,6 +23,7 @@ import com.liferay.journal.model.JournalFolderConstants;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.service.JournalFolderLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.WorkflowDefinitionLink;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
@@ -34,6 +35,7 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.workflow.BaseWorkflowHandler;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowHandler;
+import com.liferay.staging.StagingGroupHelper;
 
 import java.io.Serializable;
 
@@ -81,6 +83,14 @@ public class JournalArticleWorkflowHandler
 			_portal.getSiteGroupId(article.getGroupId()),
 			_portal.getClassNameId(JournalArticle.class),
 			article.getDDMStructureKey(), true);
+
+		if (!_stagingGroupHelper.isLiveGroup(groupId)) {
+			Group liveGroup = _stagingGroupHelper.fetchLiveGroup(groupId);
+
+			if (liveGroup != null) {
+				groupId = liveGroup.getGroupId();
+			}
+		}
 
 		WorkflowDefinitionLink workflowDefinitionLink =
 			_workflowDefinitionLinkLocalService.fetchWorkflowDefinitionLink(
@@ -185,6 +195,9 @@ public class JournalArticleWorkflowHandler
 
 	@Reference
 	private Portal _portal;
+
+	@Reference
+	private StagingGroupHelper _stagingGroupHelper;
 
 	private WorkflowDefinitionLinkLocalService
 		_workflowDefinitionLinkLocalService;
