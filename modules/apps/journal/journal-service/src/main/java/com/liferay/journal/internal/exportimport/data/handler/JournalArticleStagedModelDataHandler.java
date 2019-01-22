@@ -79,6 +79,7 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portlet.documentlibrary.lar.FileEntryUtil;
 
@@ -816,9 +817,15 @@ public class JournalArticleStagedModelDataHandler
 				article.setStatus(WorkflowConstants.STATUS_EXPIRED);
 			}
 
-			if ((article.getStatus() != WorkflowConstants.STATUS_APPROVED) &&
-				(article.getStatus() != WorkflowConstants.STATUS_SCHEDULED)) {
+			boolean workflowEnabled = WorkflowThreadLocal.isEnabled();
 
+			if (article.isPending()) {
+				WorkflowThreadLocal.setEnabled(true);
+
+				serviceContext.setWorkflowAction(
+					WorkflowConstants.ACTION_PUBLISH);
+			}
+			else if (!article.isApproved() && !article.isScheduled()) {
 				serviceContext.setWorkflowAction(
 					WorkflowConstants.ACTION_SAVE_DRAFT);
 			}
@@ -943,7 +950,9 @@ public class JournalArticleStagedModelDataHandler
 				// Clean up initial publication
 
 				if (ExportImportThreadLocal.isInitialLayoutStagingInProcess() &&
-					(article.getStatus() == WorkflowConstants.STATUS_DRAFT)) {
+					((article.getStatus() == WorkflowConstants.STATUS_DRAFT) ||
+					 (article.getStatus() ==
+						 WorkflowConstants.STATUS_PENDING))) {
 
 					_journalArticleLocalService.deleteArticle(article);
 				}
@@ -975,6 +984,8 @@ public class JournalArticleStagedModelDataHandler
 			}
 			finally {
 				ServiceContextThreadLocal.popServiceContext();
+
+				WorkflowThreadLocal.setEnabled(workflowEnabled);
 			}
 
 			portletDataContext.importClassedModel(article, importedArticle);
