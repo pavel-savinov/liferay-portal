@@ -117,7 +117,6 @@ public class FragmentsEditorDisplayContext {
 			"addFragmentEntryLinkURL",
 			_getFragmentEntryActionURL(
 				"/content_layout/add_fragment_entry_link"));
-
 		soyContext.put(
 			"addPortletURL",
 			_getFragmentEntryActionURL("/content_layout/add_portlet"));
@@ -552,14 +551,7 @@ public class FragmentsEditorDisplayContext {
 					"title",
 					PortalUtil.getPortletTitle(
 						portlet, servletContext, _themeDisplay.getLocale()));
-
-				if (!portlet.isInstanceable()) {
-					portletSoyContext.put(
-						"used", _isUsed(portlet.getRootPortletId()));
-				}
-				else {
-					portletSoyContext.put("used", false);
-				}
+				portletSoyContext.put("used", _isUsed(portlet));
 
 				return portletSoyContext;
 			}
@@ -744,11 +736,13 @@ public class FragmentsEditorDisplayContext {
 		return _getWidgetCategoriesContexts(portletCategory);
 	}
 
-	private boolean _isUsed(String rootPortletId) {
+	private boolean _isUsed(Portlet portlet) {
+		if (portlet.isInstanceable()) {
+			return false;
+		}
+
 		try {
 			SoyContext fragmentEntryLinks = _getSoyContextFragmentEntryLinks();
-
-			boolean used = false;
 
 			for (Map.Entry<String, Object> entry :
 					fragmentEntryLinks.entrySet()) {
@@ -763,14 +757,12 @@ public class FragmentsEditorDisplayContext {
 
 				String html = soyHTMLDataValue.toString();
 
-				if (html.contains(rootPortletId)) {
-					used = true;
-
-					break;
+				if (html.contains(portlet.getRootPortletId())) {
+					return true;
 				}
 			}
 
-			return used;
+			return false;
 		}
 		catch (PortalException pe) {
 			_log.error("Unable to get fragment entry links", pe);

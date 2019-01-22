@@ -80,14 +80,11 @@ public class AddPortletMVCActionCommand extends BaseMVCActionCommand {
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			actionRequest);
 
-		FragmentEntryLink fragmentEntryLink =
-			_fragmentEntryLinkLocalService.addFragmentEntryLink(
-				serviceContext.getUserId(), serviceContext.getScopeGroupId(), 0,
-				classNameId, classPK, StringPool.BLANK,
-				_getPortletFragmentEntryLinkHTML(portletId), StringPool.BLANK,
-				null, 0, serviceContext);
-
-		return fragmentEntryLink;
+		return _fragmentEntryLinkLocalService.addFragmentEntryLink(
+			serviceContext.getUserId(), serviceContext.getScopeGroupId(), 0,
+			classNameId, classPK, StringPool.BLANK,
+			_getPortletFragmentEntryLinkHTML(portletId), StringPool.BLANK, null,
+			0, serviceContext);
 	}
 
 	@Override
