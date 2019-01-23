@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.layout.admin.web.internal.display.context;
+package com.liferay.layout.type.controller.content.internal.display.context;
 
 import com.liferay.asset.display.contributor.AssetDisplayContributor;
 import com.liferay.asset.display.contributor.AssetDisplayContributorTracker;
@@ -36,6 +36,7 @@ import com.liferay.item.selector.criteria.URLItemSelectorReturnType;
 import com.liferay.item.selector.criteria.image.criterion.ImageItemSelectorCriterion;
 import com.liferay.item.selector.criteria.url.criterion.URLItemSelectorCriterion;
 import com.liferay.layout.constants.LayoutAdminWebKeys;
+import com.liferay.layout.display.context.LayoutEditorDisplayContext;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryServiceUtil;
@@ -47,6 +48,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
+import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -69,22 +71,24 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.portlet.ActionRequest;
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
-import javax.portlet.RenderResponse;
 
 import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Jürgen Kappler
  */
-public class FragmentsEditorDisplayContext {
+public class LayoutPageTemplateEditorDisplayContext
+	implements LayoutEditorDisplayContext {
 
-	public FragmentsEditorDisplayContext(
-		HttpServletRequest request, RenderResponse renderResponse,
+	public LayoutPageTemplateEditorDisplayContext(
+		HttpServletRequest request, PortletResponse portletResponse,
 		String className, long classPK, boolean showMapping) {
 
 		_request = request;
-		_renderResponse = renderResponse;
+		_portletResponse = portletResponse;
 		_classPK = classPK;
 		_showMapping = showMapping;
 
@@ -92,6 +96,8 @@ public class FragmentsEditorDisplayContext {
 			(AssetDisplayContributorTracker)request.getAttribute(
 				LayoutAdminWebKeys.ASSET_DISPLAY_CONTRIBUTOR_TRACKER);
 		_classNameId = PortalUtil.getClassNameId(className);
+		_fragmentsEditorDisplayContext = new FragmentsEditorDisplayContext(
+			request, portletResponse);
 		_itemSelector = (ItemSelector)request.getAttribute(
 			LayoutAdminWebKeys.ITEM_SELECTOR);
 		_themeDisplay = (ThemeDisplay)request.getAttribute(
@@ -161,7 +167,7 @@ public class FragmentsEditorDisplayContext {
 
 		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
 			RequestBackedPortletURLFactoryUtil.create(_request),
-			_renderResponse.getNamespace() + "selectImage",
+			_portletResponse.getNamespace() + "selectImage",
 			_getImageItemSelectorCriterion(), _getURLItemSelectorCriterion());
 
 		soyContext.put("imageSelectorURL", itemSelectorURL.toString());
@@ -178,7 +184,7 @@ public class FragmentsEditorDisplayContext {
 		}
 
 		soyContext.put("panels", _getSoyContextPanels());
-		soyContext.put("portletNamespace", _renderResponse.getNamespace());
+		soyContext.put("portletNamespace", _portletResponse.getNamespace());
 
 		if (_classNameId == PortalUtil.getClassNameId(
 				LayoutPageTemplateEntry.class)) {
@@ -236,6 +242,25 @@ public class FragmentsEditorDisplayContext {
 		return _soyContext;
 	}
 
+	@Override
+	public SoyContext getFragmentEntryLinkListContext() throws PortalException {
+		return _fragmentsEditorDisplayContext.getFragmentEntryLinkListContext();
+	}
+
+	@Override
+	public SoyContext getFragmentsEditorSidebarContext()
+		throws PortalException {
+
+		return _fragmentsEditorDisplayContext.
+			getFragmentsEditorSidebarContext();
+	}
+
+	@Override
+	public SoyContext getFragmentsEditorToolbarContext() {
+		return _fragmentsEditorDisplayContext.
+			getFragmentsEditorToolbarContext();
+	}
+
 	private Map<String, Object> _getDefaultConfigurations() {
 		Map<String, Object> configurations = new HashMap<>();
 
@@ -284,7 +309,9 @@ public class FragmentsEditorDisplayContext {
 	}
 
 	private String _getFragmentEntryActionURL(String action) {
-		PortletURL actionURL = _renderResponse.createActionURL();
+		PortletURL actionURL = PortletURLFactoryUtil.create(
+			_request, PortalUtil.getPortletId(_request),
+			PortletRequest.ACTION_PHASE);
 
 		actionURL.setParameter(ActionRequest.ACTION_NAME, action);
 
@@ -472,7 +499,7 @@ public class FragmentsEditorDisplayContext {
 					"content",
 					FragmentEntryRenderUtil.renderFragmentEntryLink(
 						fragmentEntryLink, _request,
-						PortalUtil.getHttpServletResponse(_renderResponse)));
+						PortalUtil.getHttpServletResponse(_portletResponse)));
 				soyContext.put(
 					"editableValues",
 					JSONFactoryUtil.createJSONObject(
@@ -564,10 +591,11 @@ public class FragmentsEditorDisplayContext {
 		_assetDisplayContributorTracker;
 	private final long _classNameId;
 	private final long _classPK;
+	private final FragmentsEditorDisplayContext _fragmentsEditorDisplayContext;
 	private Long _groupId;
 	private final ItemSelector _itemSelector;
 	private LayoutPageTemplateEntry _layoutPageTemplateEntry;
-	private final RenderResponse _renderResponse;
+	private final PortletResponse _portletResponse;
 	private final HttpServletRequest _request;
 	private final boolean _showMapping;
 	private SoyContext _soyContext;
