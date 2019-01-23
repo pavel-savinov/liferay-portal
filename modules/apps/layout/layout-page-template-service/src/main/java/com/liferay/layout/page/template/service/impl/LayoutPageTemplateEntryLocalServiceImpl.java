@@ -140,13 +140,20 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 		// Layout
 
-		if (type == LayoutPageTemplateEntryTypeConstants.TYPE_DISPLAY_PAGE) {
-			Layout layout = _addLayout(
-				userId, groupId, classNameId, classTypeId, name,
-				serviceContext);
+		Layout layout = null;
 
-			layoutPageTemplateEntry.setPlid(layout.getPlid());
+		if (type == LayoutPageTemplateEntryTypeConstants.TYPE_DISPLAY_PAGE) {
+			layout = _addLayout(
+				userId, groupId, classNameId, classTypeId, name,
+				LayoutConstants.LAYOUT_TYPE_ASSET_DISPLAY, serviceContext);
 		}
+		else if (type == LayoutPageTemplateEntryTypeConstants.TYPE_BASIC) {
+			layout = _addLayout(
+				userId, groupId, classNameId, classTypeId, name,
+				LayoutConstants.LAYOUT_TYPE_CONTENT, serviceContext);
+		}
+
+		layoutPageTemplateEntry.setPlid(layout.getPlid());
 
 		layoutPageTemplateEntryPersistence.update(layoutPageTemplateEntry);
 
@@ -516,7 +523,20 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 			Layout layout = _addLayout(
 				layoutPageTemplateEntry.getUserId(),
 				layoutPageTemplateEntry.getGroupId(), classNameId, classTypeId,
-				layoutPageTemplateEntry.getName(), serviceContext);
+				layoutPageTemplateEntry.getName(),
+				LayoutConstants.LAYOUT_TYPE_ASSET_DISPLAY, serviceContext);
+
+			layoutPageTemplateEntry.setPlid(layout.getPlid());
+		}
+		else if ((layoutPageTemplateEntry.getType() ==
+					LayoutPageTemplateEntryTypeConstants.TYPE_BASIC) &&
+				 (layoutPageTemplateEntry.getPlid() == 0)) {
+
+			Layout layout = _addLayout(
+				layoutPageTemplateEntry.getUserId(),
+				layoutPageTemplateEntry.getGroupId(), classNameId, classTypeId,
+				layoutPageTemplateEntry.getName(),
+				LayoutConstants.LAYOUT_TYPE_CONTENT, serviceContext);
 
 			layoutPageTemplateEntry.setPlid(layout.getPlid());
 		}
@@ -695,7 +715,7 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 	private Layout _addLayout(
 			long userId, long groupId, long classNameId, long classTypeId,
-			String name, ServiceContext serviceContext)
+			String name, String type, ServiceContext serviceContext)
 		throws PortalException {
 
 		Map<Locale, String> titleMap = Collections.singletonMap(
@@ -717,8 +737,8 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 		return layoutLocalService.addLayout(
 			userId, groupId, false, 0, titleMap, titleMap, null, null, null,
-			LayoutConstants.LAYOUT_TYPE_ASSET_DISPLAY, StringPool.BLANK, true,
-			true, new HashMap<>(), serviceContext);
+			type, StringPool.BLANK, true, true, new HashMap<>(),
+			serviceContext);
 	}
 
 	@ServiceReference(type = CompanyLocalService.class)
