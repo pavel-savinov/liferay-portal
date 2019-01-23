@@ -17,6 +17,8 @@ package com.liferay.layout.type.controller.content.internal.controller;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.layout.constants.ContentLayoutTypeControllerWebKeys;
 import com.liferay.layout.constants.LayoutConstants;
+import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
+import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
 import com.liferay.portal.kernel.model.Layout;
@@ -115,6 +117,31 @@ public class ContentLayoutTypeController extends BaseLayoutTypeControllerImpl {
 			RequestDispatcher.INCLUDE_SERVLET_PATH);
 
 		try {
+			if (layout.isSystem()) {
+				request.setAttribute(
+					ContentLayoutTypeControllerWebKeys.CLASS_NAME,
+					LayoutPageTemplateEntry.class.getName());
+
+				LayoutPageTemplateEntry layoutPageTemplateEntry =
+					_layoutPageTemplateEntryLocalService.
+						fetchLayoutPageTemplateEntryByPlid(layout.getPlid());
+
+				if (layoutPageTemplateEntry != null) {
+					request.setAttribute(
+						ContentLayoutTypeControllerWebKeys.CLASS_PK,
+						layoutPageTemplateEntry.getLayoutPageTemplateEntryId());
+				}
+			}
+			else {
+				request.setAttribute(
+					ContentLayoutTypeControllerWebKeys.CLASS_NAME,
+					Layout.class.getName());
+
+				request.setAttribute(
+					ContentLayoutTypeControllerWebKeys.CLASS_PK,
+					layout.getPlid());
+			}
+
 			addAttributes(request);
 
 			requestDispatcher.include(request, servletResponse);
@@ -207,5 +234,9 @@ public class ContentLayoutTypeController extends BaseLayoutTypeControllerImpl {
 
 	@Reference
 	private ItemSelector _itemSelector;
+
+	@Reference
+	private LayoutPageTemplateEntryLocalService
+		_layoutPageTemplateEntryLocalService;
 
 }
