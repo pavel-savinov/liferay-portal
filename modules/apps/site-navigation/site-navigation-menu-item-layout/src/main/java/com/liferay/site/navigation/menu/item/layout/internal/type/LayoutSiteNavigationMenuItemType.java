@@ -86,9 +86,7 @@ public class LayoutSiteNavigationMenuItemType
 			return false;
 		}
 
-		if (!ArrayUtil.contains(
-				portletDataContext.getLayoutIds(), layout.getLayoutId())) {
-
+		if (!ArrayUtil.contains(portletDataContext.getLayoutIds(), layout.getLayoutId())) {
 			return false;
 		}
 
