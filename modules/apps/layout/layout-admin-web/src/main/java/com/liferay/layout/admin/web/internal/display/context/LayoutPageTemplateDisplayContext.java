@@ -28,6 +28,7 @@ import com.liferay.layout.admin.web.internal.constants.LayoutAdminWebKeys;
 import com.liferay.layout.admin.web.internal.security.permission.resource.LayoutPageTemplateCollectionPermission;
 import com.liferay.layout.admin.web.internal.security.permission.resource.LayoutPageTemplatePermission;
 import com.liferay.layout.admin.web.internal.util.LayoutPageTemplatePortletUtil;
+import com.liferay.layout.constants.ContentLayoutPortletKeys;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.model.LayoutPageTemplateCollection;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
@@ -39,15 +40,20 @@ import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutPrototype;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutPrototypeServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upload.UploadServletRequestConfigurationHelperUtil;
+import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -199,23 +205,20 @@ public class LayoutPageTemplateDisplayContext {
 			return layoutPrototypeGroup.getDisplayURL(themeDisplay, true);
 		}
 
-		PortletURL editLayoutPageTemplateEntryURL =
-			_renderResponse.createRenderURL();
+		Layout layout = LayoutLocalServiceUtil.getLayout(
+			layoutPageTemplateEntry.getPlid());
 
-		editLayoutPageTemplateEntryURL.setParameter(
-			"mvcRenderCommandName", "/layout/edit_layout_page_template_entry");
-		editLayoutPageTemplateEntryURL.setParameter(
-			"redirect", themeDisplay.getURLCurrent());
-		editLayoutPageTemplateEntryURL.setParameter(
-			"layoutPageTemplateEntryId",
-			String.valueOf(
-				layoutPageTemplateEntry.getLayoutPageTemplateEntryId()));
-		editLayoutPageTemplateEntryURL.setParameter(
-			"layoutPageTemplateCollectionId",
-			String.valueOf(
-				layoutPageTemplateEntry.getLayoutPageTemplateCollectionId()));
+		String layoutFullURL = PortalUtil.getLayoutFullURL(
+			layout, themeDisplay);
 
-		return editLayoutPageTemplateEntryURL.toString();
+		String namespace = PortalUtil.getPortletNamespace(
+			ContentLayoutPortletKeys.CONTENT_PAGE_EDITOR_PORTLET);
+
+		layoutFullURL = HttpUtil.setParameter(
+			layoutFullURL, namespace + "redirect",
+			themeDisplay.getURLCurrent());
+
+		return HttpUtil.setParameter(layoutFullURL, "p_l_mode", Constants.EDIT);
 	}
 
 	public List<DropdownItem> getFilterDropdownItems() {
