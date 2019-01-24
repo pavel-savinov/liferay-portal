@@ -19,6 +19,10 @@ package com.liferay.layout.constants;
  */
 public class ContentLayoutTypeControllerWebKeys {
 
+	public static final String CLASS_NAME = "CLASS_NAME";
+
+	public static final String CLASS_PK = "CLASS_PK";
+
 	public static final String ITEM_SELECTOR = "ITEM_SELECTOR";
 
 	public static final String LAYOUT_FRAGMENTS = "LAYOUT_FRAGMENTS";
