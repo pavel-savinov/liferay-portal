@@ -17,6 +17,7 @@ package com.liferay.layout.type.controller.content.internal.portlet;
 import com.liferay.layout.constants.ContentLayoutPortletKeys;
 import com.liferay.layout.constants.ContentLayoutTypeControllerWebKeys;
 import com.liferay.layout.type.controller.content.internal.display.context.FragmentsEditorDisplayContext;
+import com.liferay.layout.type.controller.content.internal.display.context.FragmentsEditorDisplayContextProvider;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.util.Portal;
 
@@ -70,8 +71,9 @@ public class ContentPageEditorPortlet extends MVCPortlet {
 					LIFERAY_SHARED_FRAGMENTS_EDITOR_DISPLAY_CONTEXT);
 
 		if (fragmentsEditorDisplayContext == null) {
-			fragmentsEditorDisplayContext = new FragmentsEditorDisplayContext(
-				request, renderResponse);
+			fragmentsEditorDisplayContext =
+				_fragmentsEditorDisplayContextProvider.
+					getFragmentsEditorDisplayContext(request);
 
 			request.setAttribute(
 				ContentLayoutTypeControllerWebKeys.
@@ -81,6 +83,10 @@ public class ContentPageEditorPortlet extends MVCPortlet {
 
 		super.doDispatch(renderRequest, renderResponse);
 	}
+
+	@Reference
+	private FragmentsEditorDisplayContextProvider
+		_fragmentsEditorDisplayContextProvider;
 
 	@Reference
 	private Portal _portal;
