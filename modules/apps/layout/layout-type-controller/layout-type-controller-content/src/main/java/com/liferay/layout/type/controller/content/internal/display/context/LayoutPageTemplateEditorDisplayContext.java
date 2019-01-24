@@ -21,38 +21,25 @@ import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.model.ClassType;
 import com.liferay.asset.kernel.model.ClassTypeReader;
 import com.liferay.fragment.constants.FragmentEntryTypeConstants;
-import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
-import com.liferay.fragment.service.FragmentCollectionServiceUtil;
 import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
 import com.liferay.fragment.service.FragmentEntryServiceUtil;
 import com.liferay.fragment.util.FragmentEntryRenderUtil;
 import com.liferay.item.selector.ItemSelector;
-import com.liferay.item.selector.ItemSelectorCriterion;
-import com.liferay.item.selector.ItemSelectorReturnType;
-import com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType;
-import com.liferay.item.selector.criteria.URLItemSelectorReturnType;
-import com.liferay.item.selector.criteria.image.criterion.ImageItemSelectorCriterion;
-import com.liferay.item.selector.criteria.url.criterion.URLItemSelectorCriterion;
+import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
 import com.liferay.layout.constants.LayoutAdminWebKeys;
-import com.liferay.layout.display.context.LayoutEditorDisplayContext;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryServiceUtil;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalServiceUtil;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.editor.configuration.EditorConfiguration;
-import com.liferay.portal.kernel.editor.configuration.EditorConfigurationFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
-import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -64,10 +51,7 @@ import com.liferay.portal.template.soy.util.SoyContext;
 import com.liferay.portal.template.soy.util.SoyContextFactoryUtil;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.portlet.ActionRequest;
@@ -81,11 +65,13 @@ import javax.servlet.http.HttpServletRequest;
  * @author Jürgen Kappler
  */
 public class LayoutPageTemplateEditorDisplayContext
-	implements LayoutEditorDisplayContext {
+	extends FragmentsEditorDisplayContext {
 
 	public LayoutPageTemplateEditorDisplayContext(
 		HttpServletRequest request, PortletResponse portletResponse,
 		String className, long classPK, boolean showMapping) {
+
+		super(request, portletResponse);
 
 		_request = request;
 		_portletResponse = portletResponse;
@@ -96,15 +82,14 @@ public class LayoutPageTemplateEditorDisplayContext
 			(AssetDisplayContributorTracker)request.getAttribute(
 				LayoutAdminWebKeys.ASSET_DISPLAY_CONTRIBUTOR_TRACKER);
 		_classNameId = PortalUtil.getClassNameId(className);
-		_fragmentsEditorDisplayContext = new FragmentsEditorDisplayContext(
-			request, portletResponse);
 		_itemSelector = (ItemSelector)request.getAttribute(
 			LayoutAdminWebKeys.ITEM_SELECTOR);
 		_themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
-	public SoyContext getEditorContext() throws PortalException {
+	@Override
+	public SoyContext getEditorContext() throws Exception {
 		if (_soyContext != null) {
 			return _soyContext;
 		}
@@ -113,7 +98,7 @@ public class LayoutPageTemplateEditorDisplayContext
 
 		soyContext.put(
 			"addFragmentEntryLinkURL",
-			_getFragmentEntryActionURL("/layout/add_fragment_entry_link"));
+			getFragmentEntryActionURL("/layout/add_fragment_entry_link"));
 
 		SoyContext availableLanguagesSoyContext =
 			SoyContextFactoryUtil.createSoyContext();
@@ -143,32 +128,31 @@ public class LayoutPageTemplateEditorDisplayContext
 		soyContext.put("classNameId", _classNameId);
 		soyContext.put("classPK", _classPK);
 		soyContext.put(
-			"defaultEditorConfigurations", _getDefaultConfigurations());
+			"defaultEditorConfigurations", getDefaultConfigurations());
 		soyContext.put("defaultLanguageId", _themeDisplay.getLanguageId());
 		soyContext.put(
 			"deleteFragmentEntryLinkURL",
-			_getFragmentEntryActionURL("/layout/delete_fragment_entry_link"));
+			getFragmentEntryActionURL("/layout/delete_fragment_entry_link"));
 		soyContext.put(
 			"editFragmentEntryLinkURL",
-			_getFragmentEntryActionURL("/layout/edit_fragment_entry_link"));
+			getFragmentEntryActionURL("/layout/edit_fragment_entry_link"));
 		soyContext.put(
 			"elements",
-			_getSoyContextFragmentCollections(
+			getSoyContextFragmentCollections(
 				FragmentEntryTypeConstants.TYPE_ELEMENT));
-		soyContext.put(
-			"fragmentEntryLinks", _getSoyContextFragmentEntryLinks());
+		soyContext.put("fragmentEntryLinks", getSoyContextFragmentEntryLinks());
 		soyContext.put(
 			"getAssetDisplayContributorsURL",
-			_getFragmentEntryActionURL(
+			getFragmentEntryActionURL(
 				"/layout/get_asset_display_contributors"));
 		soyContext.put(
 			"getAssetClassTypesURL",
-			_getFragmentEntryActionURL("/layout/get_asset_class_types"));
+			getFragmentEntryActionURL("/layout/get_asset_class_types"));
 
 		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
 			RequestBackedPortletURLFactoryUtil.create(_request),
 			_portletResponse.getNamespace() + "selectImage",
-			_getImageItemSelectorCriterion(), _getURLItemSelectorCriterion());
+			getImageItemSelectorCriterion(), getURLItemSelectorCriterion());
 
 		soyContext.put("imageSelectorURL", itemSelectorURL.toString());
 
@@ -180,36 +164,38 @@ public class LayoutPageTemplateEditorDisplayContext
 		if (_showMapping) {
 			soyContext.put(
 				"mappingFieldsURL",
-				_getFragmentEntryActionURL("/layout/get_mapping_fields"));
+				getFragmentEntryActionURL("/layout/get_mapping_fields"));
 		}
 
 		soyContext.put("panels", _getSoyContextPanels());
-		soyContext.put("portletNamespace", _portletResponse.getNamespace());
+		soyContext.put(
+			"portletNamespace",
+			PortalUtil.getPortletNamespace(LayoutAdminPortletKeys.GROUP_PAGES));
 
 		if (_classNameId == PortalUtil.getClassNameId(
 				LayoutPageTemplateEntry.class)) {
 
 			soyContext.put(
 				"publishLayoutPageTemplateEntryURL",
-				_getFragmentEntryActionURL(
+				getFragmentEntryActionURL(
 					"/layout/publish_layout_page_template_entry"));
-		}
-
-		soyContext.put(
-			"renderFragmentEntryURL",
-			_getFragmentEntryActionURL("/layout/render_fragment_entry"));
-		soyContext.put(
-			"sections",
-			_getSoyContextFragmentCollections(
-				FragmentEntryTypeConstants.TYPE_SECTION));
-
-		if (_showMapping) {
-			soyContext.put("selectedMappingTypes", _getSelectedMappingTypes());
 		}
 
 		String redirect = ParamUtil.getString(_request, "redirect");
 
 		soyContext.put("redirectURL", redirect);
+
+		soyContext.put(
+			"renderFragmentEntryURL",
+			getFragmentEntryActionURL("/layout/render_fragment_entry"));
+		soyContext.put(
+			"sections",
+			getSoyContextFragmentCollections(
+				FragmentEntryTypeConstants.TYPE_SECTION));
+
+		if (_showMapping) {
+			soyContext.put("selectedMappingTypes", _getSelectedMappingTypes());
+		}
 
 		soyContext.put(
 			"spritemap",
@@ -230,11 +216,11 @@ public class LayoutPageTemplateEditorDisplayContext
 
 		soyContext.put(
 			"updateLayoutPageTemplateDataURL",
-			_getFragmentEntryActionURL(
+			getFragmentEntryActionURL(
 				"/layout/update_layout_page_template_data"));
 		soyContext.put(
 			"updateLayoutPageTemplateEntryAssetTypeURL",
-			_getFragmentEntryActionURL(
+			getFragmentEntryActionURL(
 				"/layout/update_layout_page_template_entry_asset_type"));
 
 		_soyContext = soyContext;
@@ -243,79 +229,65 @@ public class LayoutPageTemplateEditorDisplayContext
 	}
 
 	@Override
-	public SoyContext getFragmentEntryLinkListContext() throws PortalException {
-		return _fragmentsEditorDisplayContext.getFragmentEntryLinkListContext();
-	}
-
-	@Override
-	public SoyContext getFragmentsEditorSidebarContext()
-		throws PortalException {
-
-		return _fragmentsEditorDisplayContext.
-			getFragmentsEditorSidebarContext();
-	}
-
-	@Override
-	public SoyContext getFragmentsEditorToolbarContext() {
-		return _fragmentsEditorDisplayContext.
-			getFragmentsEditorToolbarContext();
-	}
-
-	private Map<String, Object> _getDefaultConfigurations() {
-		Map<String, Object> configurations = new HashMap<>();
-
-		PortletDisplay portletDisplay = _themeDisplay.getPortletDisplay();
-
-		EditorConfiguration richTextEditorConfiguration =
-			EditorConfigurationFactoryUtil.getEditorConfiguration(
-				PortletIdCodec.decodePortletName(portletDisplay.getId()),
-				"fragmenEntryLinkRichTextEditor", StringPool.BLANK,
-				Collections.emptyMap(), _themeDisplay,
-				RequestBackedPortletURLFactoryUtil.create(_request));
-
-		configurations.put("rich-text", richTextEditorConfiguration.getData());
-
-		EditorConfiguration editorConfiguration =
-			EditorConfigurationFactoryUtil.getEditorConfiguration(
-				PortletIdCodec.decodePortletName(portletDisplay.getId()),
-				"fragmenEntryLinkEditor", StringPool.BLANK,
-				Collections.emptyMap(), _themeDisplay,
-				RequestBackedPortletURLFactoryUtil.create(_request));
-
-		configurations.put("text", editorConfiguration.getData());
-
-		return configurations;
-	}
-
-	private List<SoyContext> _getFragmentEntriesSoyContext(
-		List<FragmentEntry> fragmentEntries) {
-
-		List<SoyContext> soyContexts = new ArrayList<>();
-
-		for (FragmentEntry fragmentEntry : fragmentEntries) {
-			SoyContext soyContext = SoyContextFactoryUtil.createSoyContext();
-
-			soyContext.put(
-				"fragmentEntryId", fragmentEntry.getFragmentEntryId());
-			soyContext.put(
-				"imagePreviewURL",
-				fragmentEntry.getImagePreviewURL(_themeDisplay));
-			soyContext.put("name", fragmentEntry.getName());
-
-			soyContexts.add(soyContext);
-		}
-
-		return soyContexts;
-	}
-
-	private String _getFragmentEntryActionURL(String action) {
+	protected String getFragmentEntryActionURL(String action) {
 		PortletURL actionURL = PortletURLFactoryUtil.create(
-			_request, PortalUtil.getPortletId(_request),
+			_request, LayoutAdminPortletKeys.GROUP_PAGES,
 			PortletRequest.ACTION_PHASE);
 
 		actionURL.setParameter(ActionRequest.ACTION_NAME, action);
 
 		return actionURL.toString();
+	}
+
+	@Override
+	protected SoyContext getSoyContextFragmentEntryLinks()
+		throws PortalException {
+
+		SoyContext soyContexts = SoyContextFactoryUtil.createSoyContext();
+
+		List<FragmentEntryLink> fragmentEntryLinks =
+			FragmentEntryLinkLocalServiceUtil.getFragmentEntryLinks(
+				_getGroupId(), _classNameId, _classPK);
+
+		boolean isolated = _themeDisplay.isIsolated();
+
+		_themeDisplay.setIsolated(true);
+
+		try {
+			for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
+				FragmentEntry fragmentEntry =
+					FragmentEntryServiceUtil.fetchFragmentEntry(
+						fragmentEntryLink.getFragmentEntryId());
+
+				SoyContext soyContext =
+					SoyContextFactoryUtil.createSoyContext();
+
+				soyContext.putHTML(
+					"content",
+					FragmentEntryRenderUtil.renderFragmentEntryLink(
+						fragmentEntryLink, _request,
+						PortalUtil.getHttpServletResponse(_portletResponse)));
+				soyContext.put(
+					"editableValues",
+					JSONFactoryUtil.createJSONObject(
+						fragmentEntryLink.getEditableValues()));
+				soyContext.put(
+					"fragmentEntryId", fragmentEntry.getFragmentEntryId());
+				soyContext.put(
+					"fragmentEntryLinkId",
+					String.valueOf(fragmentEntryLink.getFragmentEntryLinkId()));
+				soyContext.put("name", fragmentEntry.getName());
+
+				soyContexts.put(
+					String.valueOf(fragmentEntryLink.getFragmentEntryLinkId()),
+					soyContext);
+			}
+		}
+		finally {
+			_themeDisplay.setIsolated(isolated);
+		}
+
+		return soyContexts;
 	}
 
 	private long _getGroupId() {
@@ -327,22 +299,6 @@ public class LayoutPageTemplateEditorDisplayContext
 			_request, "groupId", _themeDisplay.getScopeGroupId());
 
 		return _groupId;
-	}
-
-	private ItemSelectorCriterion _getImageItemSelectorCriterion() {
-		List<ItemSelectorReturnType> desiredItemSelectorReturnTypes =
-			new ArrayList<>();
-
-		desiredItemSelectorReturnTypes.add(
-			new FileEntryItemSelectorReturnType());
-
-		ItemSelectorCriterion imageItemSelectorCriterion =
-			new ImageItemSelectorCriterion();
-
-		imageItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
-			desiredItemSelectorReturnTypes);
-
-		return imageItemSelectorCriterion;
 	}
 
 	private String _getLayoutData() throws PortalException {
@@ -439,90 +395,6 @@ public class LayoutPageTemplateEditorDisplayContext
 		return soyContext;
 	}
 
-	private List<SoyContext> _getSoyContextFragmentCollections(int type) {
-		List<SoyContext> soyContexts = new ArrayList<>();
-
-		long groupId = _getGroupId();
-
-		List<FragmentCollection> fragmentCollections =
-			FragmentCollectionServiceUtil.getFragmentCollections(groupId);
-
-		for (FragmentCollection fragmentCollection : fragmentCollections) {
-			List<FragmentEntry> fragmentEntries =
-				FragmentEntryServiceUtil.getFragmentEntriesByType(
-					groupId, fragmentCollection.getFragmentCollectionId(), type,
-					WorkflowConstants.STATUS_APPROVED);
-
-			if (ListUtil.isEmpty(fragmentEntries)) {
-				continue;
-			}
-
-			SoyContext soyContext = SoyContextFactoryUtil.createSoyContext();
-
-			soyContext.put(
-				"fragmentCollectionId",
-				fragmentCollection.getFragmentCollectionId());
-			soyContext.put(
-				"fragmentEntries",
-				_getFragmentEntriesSoyContext(fragmentEntries));
-			soyContext.put("name", fragmentCollection.getName());
-
-			soyContexts.add(soyContext);
-		}
-
-		return soyContexts;
-	}
-
-	private SoyContext _getSoyContextFragmentEntryLinks()
-		throws PortalException {
-
-		SoyContext soyContexts = SoyContextFactoryUtil.createSoyContext();
-
-		List<FragmentEntryLink> fragmentEntryLinks =
-			FragmentEntryLinkLocalServiceUtil.getFragmentEntryLinks(
-				_getGroupId(), _classNameId, _classPK);
-
-		boolean isolated = _themeDisplay.isIsolated();
-
-		_themeDisplay.setIsolated(true);
-
-		try {
-			for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
-				FragmentEntry fragmentEntry =
-					FragmentEntryServiceUtil.fetchFragmentEntry(
-						fragmentEntryLink.getFragmentEntryId());
-
-				SoyContext soyContext =
-					SoyContextFactoryUtil.createSoyContext();
-
-				soyContext.putHTML(
-					"content",
-					FragmentEntryRenderUtil.renderFragmentEntryLink(
-						fragmentEntryLink, _request,
-						PortalUtil.getHttpServletResponse(_portletResponse)));
-				soyContext.put(
-					"editableValues",
-					JSONFactoryUtil.createJSONObject(
-						fragmentEntryLink.getEditableValues()));
-				soyContext.put(
-					"fragmentEntryId", fragmentEntry.getFragmentEntryId());
-				soyContext.put(
-					"fragmentEntryLinkId",
-					String.valueOf(fragmentEntryLink.getFragmentEntryLinkId()));
-				soyContext.put("name", fragmentEntry.getName());
-
-				soyContexts.put(
-					String.valueOf(fragmentEntryLink.getFragmentEntryLinkId()),
-					soyContext);
-			}
-		}
-		finally {
-			_themeDisplay.setIsolated(isolated);
-		}
-
-		return soyContexts;
-	}
-
 	private List<SoyContext> _getSoyContextPanels() {
 		List<SoyContext> soyContexts = new ArrayList<>();
 
@@ -572,26 +444,10 @@ public class LayoutPageTemplateEditorDisplayContext
 		return soyContexts;
 	}
 
-	private ItemSelectorCriterion _getURLItemSelectorCriterion() {
-		ItemSelectorCriterion urlItemSelectorCriterion =
-			new URLItemSelectorCriterion();
-
-		List<ItemSelectorReturnType> desiredItemSelectorReturnTypes =
-			new ArrayList<>();
-
-		desiredItemSelectorReturnTypes.add(new URLItemSelectorReturnType());
-
-		urlItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
-			desiredItemSelectorReturnTypes);
-
-		return urlItemSelectorCriterion;
-	}
-
 	private final AssetDisplayContributorTracker
 		_assetDisplayContributorTracker;
 	private final long _classNameId;
 	private final long _classPK;
-	private final FragmentsEditorDisplayContext _fragmentsEditorDisplayContext;
 	private Long _groupId;
 	private final ItemSelector _itemSelector;
 	private LayoutPageTemplateEntry _layoutPageTemplateEntry;
