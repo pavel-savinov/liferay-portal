@@ -125,8 +125,8 @@ class FragmentEntryLinkContent extends Component {
 	 * @inheritDoc
 	 * @review
 	 */
-	syncLanguageId() {
-		if (this.content) {
+	syncLanguageId(newLanguageId) {
+		if (this.content && (newLanguageId !== this.languageId)) {
 			this._renderContent(this.content);
 		}
 	}
