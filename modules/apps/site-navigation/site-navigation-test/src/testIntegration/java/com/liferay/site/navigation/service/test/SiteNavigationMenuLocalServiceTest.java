@@ -48,7 +48,7 @@ import org.junit.runner.RunWith;
  * @author Pavel Savinov
  */
 @RunWith(Arquillian.class)
-public class SiteNavigationMenuServiceTest {
+public class SiteNavigationMenuLocalServiceTest {
 
 	@ClassRule
 	@Rule
