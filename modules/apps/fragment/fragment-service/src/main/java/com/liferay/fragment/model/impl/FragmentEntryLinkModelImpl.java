@@ -91,6 +91,7 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 			{ "js", Types.VARCHAR },
 			{ "editableValues", Types.VARCHAR },
 			{ "position", Types.INTEGER },
+			{ "type_", Types.INTEGER },
 			{ "lastPropagationDate", Types.TIMESTAMP },
 			{ "namespace", Types.VARCHAR },
 			{ "lastPublishDate", Types.TIMESTAMP }
@@ -115,12 +116,13 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 		TABLE_COLUMNS_MAP.put("js", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("editableValues", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("position", Types.INTEGER);
+		TABLE_COLUMNS_MAP.put("type_", Types.INTEGER);
 		TABLE_COLUMNS_MAP.put("lastPropagationDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("namespace", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("lastPublishDate", Types.TIMESTAMP);
 	}
 
-	public static final String TABLE_SQL_CREATE = "create table FragmentEntryLink (uuid_ VARCHAR(75) null,fragmentEntryLinkId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,originalFragmentEntryLinkId LONG,fragmentEntryId LONG,classNameId LONG,classPK LONG,css STRING null,html STRING null,js STRING null,editableValues STRING null,position INTEGER,lastPropagationDate DATE null,namespace VARCHAR(75) null,lastPublishDate DATE null)";
+	public static final String TABLE_SQL_CREATE = "create table FragmentEntryLink (uuid_ VARCHAR(75) null,fragmentEntryLinkId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,originalFragmentEntryLinkId LONG,fragmentEntryId LONG,classNameId LONG,classPK LONG,css STRING null,html STRING null,js STRING null,editableValues STRING null,position INTEGER,type_ INTEGER,lastPropagationDate DATE null,namespace VARCHAR(75) null,lastPublishDate DATE null)";
 	public static final String TABLE_SQL_DROP = "drop table FragmentEntryLink";
 	public static final String ORDER_BY_JPQL = " ORDER BY fragmentEntryLink.classNameId ASC, fragmentEntryLink.classPK ASC, fragmentEntryLink.position ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY FragmentEntryLink.classNameId ASC, FragmentEntryLink.classPK ASC, FragmentEntryLink.position ASC";
@@ -269,6 +271,8 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 		attributeSetterBiConsumers.put("editableValues", (BiConsumer<FragmentEntryLink, String>)FragmentEntryLink::setEditableValues);
 		attributeGetterFunctions.put("position", FragmentEntryLink::getPosition);
 		attributeSetterBiConsumers.put("position", (BiConsumer<FragmentEntryLink, Integer>)FragmentEntryLink::setPosition);
+		attributeGetterFunctions.put("type", FragmentEntryLink::getType);
+		attributeSetterBiConsumers.put("type", (BiConsumer<FragmentEntryLink, Integer>)FragmentEntryLink::setType);
 		attributeGetterFunctions.put("lastPropagationDate", FragmentEntryLink::getLastPropagationDate);
 		attributeSetterBiConsumers.put("lastPropagationDate", (BiConsumer<FragmentEntryLink, Date>)FragmentEntryLink::setLastPropagationDate);
 		attributeGetterFunctions.put("namespace", FragmentEntryLink::getNamespace);
@@ -596,6 +600,16 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 	}
 
 	@Override
+	public int getType() {
+		return _type;
+	}
+
+	@Override
+	public void setType(int type) {
+		_type = type;
+	}
+
+	@Override
 	public Date getLastPropagationDate() {
 		return _lastPropagationDate;
 	}
@@ -684,6 +698,7 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 		fragmentEntryLinkImpl.setJs(getJs());
 		fragmentEntryLinkImpl.setEditableValues(getEditableValues());
 		fragmentEntryLinkImpl.setPosition(getPosition());
+		fragmentEntryLinkImpl.setType(getType());
 		fragmentEntryLinkImpl.setLastPropagationDate(getLastPropagationDate());
 		fragmentEntryLinkImpl.setNamespace(getNamespace());
 		fragmentEntryLinkImpl.setLastPublishDate(getLastPublishDate());
@@ -898,6 +913,8 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 
 		fragmentEntryLinkCacheModel.position = getPosition();
 
+		fragmentEntryLinkCacheModel.type = getType();
+
 		Date lastPropagationDate = getLastPropagationDate();
 
 		if (lastPropagationDate != null) {
@@ -1017,6 +1034,7 @@ public class FragmentEntryLinkModelImpl extends BaseModelImpl<FragmentEntryLink>
 	private String _js;
 	private String _editableValues;
 	private int _position;
+	private int _type;
 	private Date _lastPropagationDate;
 	private String _namespace;
 	private Date _lastPublishDate;

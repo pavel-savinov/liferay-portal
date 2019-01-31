@@ -5239,6 +5239,6 @@ public class FragmentEntryLinkPersistenceImpl extends BasePersistenceImpl<Fragme
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No FragmentEntryLink exists with the key {";
 	private static final Log _log = LogFactoryUtil.getLog(FragmentEntryLinkPersistenceImpl.class);
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(new String[] {
-				"uuid"
+				"uuid", "type"
 			});
 }

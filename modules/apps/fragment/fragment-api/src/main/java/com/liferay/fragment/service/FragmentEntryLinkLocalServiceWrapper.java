@@ -50,12 +50,37 @@ public class FragmentEntryLinkLocalServiceWrapper
 	public com.liferay.fragment.model.FragmentEntryLink addFragmentEntryLink(
 		long userId, long groupId, long originalFragmentEntryLinkId,
 		long fragmentEntryId, long classNameId, long classPK, String css,
+		String html, String js, String editableValues, int position, int type,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _fragmentEntryLinkLocalService.addFragmentEntryLink(userId,
+			groupId, originalFragmentEntryLinkId, fragmentEntryId, classNameId,
+			classPK, css, html, js, editableValues, position, type,
+			serviceContext);
+	}
+
+	@Override
+	public com.liferay.fragment.model.FragmentEntryLink addFragmentEntryLink(
+		long userId, long groupId, long originalFragmentEntryLinkId,
+		long fragmentEntryId, long classNameId, long classPK, String css,
 		String html, String js, String editableValues, int position,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _fragmentEntryLinkLocalService.addFragmentEntryLink(userId,
 			groupId, originalFragmentEntryLinkId, fragmentEntryId, classNameId,
 			classPK, css, html, js, editableValues, position, serviceContext);
+	}
+
+	@Override
+	public com.liferay.fragment.model.FragmentEntryLink addFragmentEntryLink(
+		long userId, long groupId, long fragmentEntryId, long classNameId,
+		long classPK, String css, String html, String js,
+		String editableValues, int position, int type,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return _fragmentEntryLinkLocalService.addFragmentEntryLink(userId,
+			groupId, fragmentEntryId, classNameId, classPK, css, html, js,
+			editableValues, position, type, serviceContext);
 	}
 
 	@Override

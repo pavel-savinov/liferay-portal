@@ -63,6 +63,7 @@ public class FragmentEntryLinkWrapper extends BaseModelWrapper<FragmentEntryLink
 		attributes.put("js", getJs());
 		attributes.put("editableValues", getEditableValues());
 		attributes.put("position", getPosition());
+		attributes.put("type", getType());
 		attributes.put("lastPropagationDate", getLastPropagationDate());
 		attributes.put("namespace", getNamespace());
 		attributes.put("lastPublishDate", getLastPublishDate());
@@ -173,6 +174,12 @@ public class FragmentEntryLinkWrapper extends BaseModelWrapper<FragmentEntryLink
 
 		if (position != null) {
 			setPosition(position);
+		}
+
+		Integer type = (Integer)attributes.get("type");
+
+		if (type != null) {
+			setType(type);
 		}
 
 		Date lastPropagationDate = (Date)attributes.get("lastPropagationDate");
@@ -382,6 +389,16 @@ public class FragmentEntryLinkWrapper extends BaseModelWrapper<FragmentEntryLink
 	@Override
 	public long getPrimaryKey() {
 		return model.getPrimaryKey();
+	}
+
+	/**
+	* Returns the type of this fragment entry link.
+	*
+	* @return the type of this fragment entry link
+	*/
+	@Override
+	public int getType() {
+		return model.getType();
 	}
 
 	/**
@@ -618,6 +635,16 @@ public class FragmentEntryLinkWrapper extends BaseModelWrapper<FragmentEntryLink
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		model.setPrimaryKey(primaryKey);
+	}
+
+	/**
+	* Sets the type of this fragment entry link.
+	*
+	* @param type the type of this fragment entry link
+	*/
+	@Override
+	public void setType(int type) {
+		model.setType(type);
 	}
 
 	/**
