@@ -3090,7 +3090,7 @@ public class SiteNavigationMenuItemPersistenceImpl extends BasePersistenceImpl<S
 					if ((siteNavigationMenuId != siteNavigationMenuItem.getSiteNavigationMenuId()) ||
 							!StringUtil.wildcardMatches(
 								siteNavigationMenuItem.getName(), name, '_',
-								'%', '\\', false)) {
+								'%', '\\', true)) {
 						list = null;
 
 						break;
@@ -3148,7 +3148,7 @@ public class SiteNavigationMenuItemPersistenceImpl extends BasePersistenceImpl<S
 				qPos.add(siteNavigationMenuId);
 
 				if (bindName) {
-					qPos.add(StringUtil.toLowerCase(name));
+					qPos.add(name);
 				}
 
 				if (!pagination) {
@@ -3451,7 +3451,7 @@ public class SiteNavigationMenuItemPersistenceImpl extends BasePersistenceImpl<S
 		qPos.add(siteNavigationMenuId);
 
 		if (bindName) {
-			qPos.add(StringUtil.toLowerCase(name));
+			qPos.add(name);
 		}
 
 		if (orderByComparator != null) {
@@ -3535,7 +3535,7 @@ public class SiteNavigationMenuItemPersistenceImpl extends BasePersistenceImpl<S
 				qPos.add(siteNavigationMenuId);
 
 				if (bindName) {
-					qPos.add(StringUtil.toLowerCase(name));
+					qPos.add(name);
 				}
 
 				count = (Long)q.uniqueResult();
@@ -3556,7 +3556,7 @@ public class SiteNavigationMenuItemPersistenceImpl extends BasePersistenceImpl<S
 	}
 
 	private static final String _FINDER_COLUMN_S_LIKEN_SITENAVIGATIONMENUID_2 = "siteNavigationMenuItem.siteNavigationMenuId = ? AND ";
-	private static final String _FINDER_COLUMN_S_LIKEN_NAME_2 = "lower(siteNavigationMenuItem.name) LIKE ?";
+	private static final String _FINDER_COLUMN_S_LIKEN_NAME_2 = "siteNavigationMenuItem.name LIKE ?";
 	private static final String _FINDER_COLUMN_S_LIKEN_NAME_3 = "(siteNavigationMenuItem.name IS NULL OR siteNavigationMenuItem.name LIKE '')";
 
 	public SiteNavigationMenuItemPersistenceImpl() {

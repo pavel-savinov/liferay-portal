@@ -4015,7 +4015,7 @@ public class FragmentEntryPersistenceImpl extends BasePersistenceImpl<FragmentEn
 							(fragmentCollectionId != fragmentEntry.getFragmentCollectionId()) ||
 							!StringUtil.wildcardMatches(
 								fragmentEntry.getName(), name, '_', '%', '\\',
-								false)) {
+								true)) {
 						list = null;
 
 						break;
@@ -4077,7 +4077,7 @@ public class FragmentEntryPersistenceImpl extends BasePersistenceImpl<FragmentEn
 				qPos.add(fragmentCollectionId);
 
 				if (bindName) {
-					qPos.add(StringUtil.toLowerCase(name));
+					qPos.add(name);
 				}
 
 				if (!pagination) {
@@ -4393,7 +4393,7 @@ public class FragmentEntryPersistenceImpl extends BasePersistenceImpl<FragmentEn
 		qPos.add(fragmentCollectionId);
 
 		if (bindName) {
-			qPos.add(StringUtil.toLowerCase(name));
+			qPos.add(name);
 		}
 
 		if (orderByComparator != null) {
@@ -4555,7 +4555,7 @@ public class FragmentEntryPersistenceImpl extends BasePersistenceImpl<FragmentEn
 			qPos.add(fragmentCollectionId);
 
 			if (bindName) {
-				qPos.add(StringUtil.toLowerCase(name));
+				qPos.add(name);
 			}
 
 			return (List<FragmentEntry>)QueryUtil.list(q, getDialect(), start,
@@ -4761,7 +4761,7 @@ public class FragmentEntryPersistenceImpl extends BasePersistenceImpl<FragmentEn
 		qPos.add(fragmentCollectionId);
 
 		if (bindName) {
-			qPos.add(StringUtil.toLowerCase(name));
+			qPos.add(name);
 		}
 
 		if (orderByComparator != null) {
@@ -4853,7 +4853,7 @@ public class FragmentEntryPersistenceImpl extends BasePersistenceImpl<FragmentEn
 				qPos.add(fragmentCollectionId);
 
 				if (bindName) {
-					qPos.add(StringUtil.toLowerCase(name));
+					qPos.add(name);
 				}
 
 				count = (Long)q.uniqueResult();
@@ -4930,7 +4930,7 @@ public class FragmentEntryPersistenceImpl extends BasePersistenceImpl<FragmentEn
 			qPos.add(fragmentCollectionId);
 
 			if (bindName) {
-				qPos.add(StringUtil.toLowerCase(name));
+				qPos.add(name);
 			}
 
 			Long count = (Long)q.uniqueResult();
@@ -4948,7 +4948,7 @@ public class FragmentEntryPersistenceImpl extends BasePersistenceImpl<FragmentEn
 	private static final String _FINDER_COLUMN_G_FCI_LIKEN_GROUPID_2 = "fragmentEntry.groupId = ? AND ";
 	private static final String _FINDER_COLUMN_G_FCI_LIKEN_FRAGMENTCOLLECTIONID_2 =
 		"fragmentEntry.fragmentCollectionId = ? AND ";
-	private static final String _FINDER_COLUMN_G_FCI_LIKEN_NAME_2 = "lower(fragmentEntry.name) LIKE ?";
+	private static final String _FINDER_COLUMN_G_FCI_LIKEN_NAME_2 = "fragmentEntry.name LIKE ?";
 	private static final String _FINDER_COLUMN_G_FCI_LIKEN_NAME_3 = "(fragmentEntry.name IS NULL OR fragmentEntry.name LIKE '')";
 	private FinderPath _finderPathWithPaginationFindByG_FCI_T;
 	private FinderPath _finderPathWithoutPaginationFindByG_FCI_T;
@@ -7002,8 +7002,7 @@ public class FragmentEntryPersistenceImpl extends BasePersistenceImpl<FragmentEn
 							(fragmentCollectionId != fragmentEntry.getFragmentCollectionId()) ||
 							!StringUtil.wildcardMatches(
 								fragmentEntry.getName(), name, '_', '%', '\\',
-								false) ||
-							(status != fragmentEntry.getStatus())) {
+								true) || (status != fragmentEntry.getStatus())) {
 						list = null;
 
 						break;
@@ -7067,7 +7066,7 @@ public class FragmentEntryPersistenceImpl extends BasePersistenceImpl<FragmentEn
 				qPos.add(fragmentCollectionId);
 
 				if (bindName) {
-					qPos.add(StringUtil.toLowerCase(name));
+					qPos.add(name);
 				}
 
 				qPos.add(status);
@@ -7402,7 +7401,7 @@ public class FragmentEntryPersistenceImpl extends BasePersistenceImpl<FragmentEn
 		qPos.add(fragmentCollectionId);
 
 		if (bindName) {
-			qPos.add(StringUtil.toLowerCase(name));
+			qPos.add(name);
 		}
 
 		qPos.add(status);
@@ -7571,7 +7570,7 @@ public class FragmentEntryPersistenceImpl extends BasePersistenceImpl<FragmentEn
 			qPos.add(fragmentCollectionId);
 
 			if (bindName) {
-				qPos.add(StringUtil.toLowerCase(name));
+				qPos.add(name);
 			}
 
 			qPos.add(status);
@@ -7783,7 +7782,7 @@ public class FragmentEntryPersistenceImpl extends BasePersistenceImpl<FragmentEn
 		qPos.add(fragmentCollectionId);
 
 		if (bindName) {
-			qPos.add(StringUtil.toLowerCase(name));
+			qPos.add(name);
 		}
 
 		qPos.add(status);
@@ -7883,7 +7882,7 @@ public class FragmentEntryPersistenceImpl extends BasePersistenceImpl<FragmentEn
 				qPos.add(fragmentCollectionId);
 
 				if (bindName) {
-					qPos.add(StringUtil.toLowerCase(name));
+					qPos.add(name);
 				}
 
 				qPos.add(status);
@@ -7966,7 +7965,7 @@ public class FragmentEntryPersistenceImpl extends BasePersistenceImpl<FragmentEn
 			qPos.add(fragmentCollectionId);
 
 			if (bindName) {
-				qPos.add(StringUtil.toLowerCase(name));
+				qPos.add(name);
 			}
 
 			qPos.add(status);
@@ -7986,7 +7985,7 @@ public class FragmentEntryPersistenceImpl extends BasePersistenceImpl<FragmentEn
 	private static final String _FINDER_COLUMN_G_FCI_LIKEN_S_GROUPID_2 = "fragmentEntry.groupId = ? AND ";
 	private static final String _FINDER_COLUMN_G_FCI_LIKEN_S_FRAGMENTCOLLECTIONID_2 =
 		"fragmentEntry.fragmentCollectionId = ? AND ";
-	private static final String _FINDER_COLUMN_G_FCI_LIKEN_S_NAME_2 = "lower(fragmentEntry.name) LIKE ? AND ";
+	private static final String _FINDER_COLUMN_G_FCI_LIKEN_S_NAME_2 = "fragmentEntry.name LIKE ? AND ";
 	private static final String _FINDER_COLUMN_G_FCI_LIKEN_S_NAME_3 = "(fragmentEntry.name IS NULL OR fragmentEntry.name LIKE '') AND ";
 	private static final String _FINDER_COLUMN_G_FCI_LIKEN_S_STATUS_2 = "fragmentEntry.status = ?";
 	private FinderPath _finderPathWithPaginationFindByG_FCI_T_S;

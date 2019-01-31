@@ -2633,7 +2633,7 @@ public class LayoutPageTemplateCollectionPersistenceImpl
 					if ((groupId != layoutPageTemplateCollection.getGroupId()) ||
 							!StringUtil.wildcardMatches(
 								layoutPageTemplateCollection.getName(), name,
-								'_', '%', '\\', false)) {
+								'_', '%', '\\', true)) {
 						list = null;
 
 						break;
@@ -2691,7 +2691,7 @@ public class LayoutPageTemplateCollectionPersistenceImpl
 				qPos.add(groupId);
 
 				if (bindName) {
-					qPos.add(StringUtil.toLowerCase(name));
+					qPos.add(name);
 				}
 
 				if (!pagination) {
@@ -2995,7 +2995,7 @@ public class LayoutPageTemplateCollectionPersistenceImpl
 		qPos.add(groupId);
 
 		if (bindName) {
-			qPos.add(StringUtil.toLowerCase(name));
+			qPos.add(name);
 		}
 
 		if (orderByComparator != null) {
@@ -3150,7 +3150,7 @@ public class LayoutPageTemplateCollectionPersistenceImpl
 			qPos.add(groupId);
 
 			if (bindName) {
-				qPos.add(StringUtil.toLowerCase(name));
+				qPos.add(name);
 			}
 
 			return (List<LayoutPageTemplateCollection>)QueryUtil.list(q,
@@ -3355,7 +3355,7 @@ public class LayoutPageTemplateCollectionPersistenceImpl
 		qPos.add(groupId);
 
 		if (bindName) {
-			qPos.add(StringUtil.toLowerCase(name));
+			qPos.add(name);
 		}
 
 		if (orderByComparator != null) {
@@ -3438,7 +3438,7 @@ public class LayoutPageTemplateCollectionPersistenceImpl
 				qPos.add(groupId);
 
 				if (bindName) {
-					qPos.add(StringUtil.toLowerCase(name));
+					qPos.add(name);
 				}
 
 				count = (Long)q.uniqueResult();
@@ -3509,7 +3509,7 @@ public class LayoutPageTemplateCollectionPersistenceImpl
 			qPos.add(groupId);
 
 			if (bindName) {
-				qPos.add(StringUtil.toLowerCase(name));
+				qPos.add(name);
 			}
 
 			Long count = (Long)q.uniqueResult();
@@ -3525,7 +3525,7 @@ public class LayoutPageTemplateCollectionPersistenceImpl
 	}
 
 	private static final String _FINDER_COLUMN_G_LIKEN_GROUPID_2 = "layoutPageTemplateCollection.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_LIKEN_NAME_2 = "lower(layoutPageTemplateCollection.name) LIKE ?";
+	private static final String _FINDER_COLUMN_G_LIKEN_NAME_2 = "layoutPageTemplateCollection.name LIKE ?";
 	private static final String _FINDER_COLUMN_G_LIKEN_NAME_3 = "(layoutPageTemplateCollection.name IS NULL OR layoutPageTemplateCollection.name LIKE '')";
 
 	public LayoutPageTemplateCollectionPersistenceImpl() {

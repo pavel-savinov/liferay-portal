@@ -2588,7 +2588,7 @@ public class AssetListEntryPersistenceImpl extends BasePersistenceImpl<AssetList
 					if ((groupId != assetListEntry.getGroupId()) ||
 							!StringUtil.wildcardMatches(
 								assetListEntry.getTitle(), title, '_', '%',
-								'\\', false)) {
+								'\\', true)) {
 						list = null;
 
 						break;
@@ -2646,7 +2646,7 @@ public class AssetListEntryPersistenceImpl extends BasePersistenceImpl<AssetList
 				qPos.add(groupId);
 
 				if (bindTitle) {
-					qPos.add(StringUtil.toLowerCase(title));
+					qPos.add(title);
 				}
 
 				if (!pagination) {
@@ -2941,7 +2941,7 @@ public class AssetListEntryPersistenceImpl extends BasePersistenceImpl<AssetList
 		qPos.add(groupId);
 
 		if (bindTitle) {
-			qPos.add(StringUtil.toLowerCase(title));
+			qPos.add(title);
 		}
 
 		if (orderByComparator != null) {
@@ -3092,7 +3092,7 @@ public class AssetListEntryPersistenceImpl extends BasePersistenceImpl<AssetList
 			qPos.add(groupId);
 
 			if (bindTitle) {
-				qPos.add(StringUtil.toLowerCase(title));
+				qPos.add(title);
 			}
 
 			return (List<AssetListEntry>)QueryUtil.list(q, getDialect(), start,
@@ -3290,7 +3290,7 @@ public class AssetListEntryPersistenceImpl extends BasePersistenceImpl<AssetList
 		qPos.add(groupId);
 
 		if (bindTitle) {
-			qPos.add(StringUtil.toLowerCase(title));
+			qPos.add(title);
 		}
 
 		if (orderByComparator != null) {
@@ -3373,7 +3373,7 @@ public class AssetListEntryPersistenceImpl extends BasePersistenceImpl<AssetList
 				qPos.add(groupId);
 
 				if (bindTitle) {
-					qPos.add(StringUtil.toLowerCase(title));
+					qPos.add(title);
 				}
 
 				count = (Long)q.uniqueResult();
@@ -3444,7 +3444,7 @@ public class AssetListEntryPersistenceImpl extends BasePersistenceImpl<AssetList
 			qPos.add(groupId);
 
 			if (bindTitle) {
-				qPos.add(StringUtil.toLowerCase(title));
+				qPos.add(title);
 			}
 
 			Long count = (Long)q.uniqueResult();
@@ -3460,7 +3460,7 @@ public class AssetListEntryPersistenceImpl extends BasePersistenceImpl<AssetList
 	}
 
 	private static final String _FINDER_COLUMN_G_LIKET_GROUPID_2 = "assetListEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_LIKET_TITLE_2 = "lower(assetListEntry.title) LIKE ?";
+	private static final String _FINDER_COLUMN_G_LIKET_TITLE_2 = "assetListEntry.title LIKE ?";
 	private static final String _FINDER_COLUMN_G_LIKET_TITLE_3 = "(assetListEntry.title IS NULL OR assetListEntry.title LIKE '')";
 	private FinderPath _finderPathWithPaginationFindByG_TY;
 	private FinderPath _finderPathWithoutPaginationFindByG_TY;

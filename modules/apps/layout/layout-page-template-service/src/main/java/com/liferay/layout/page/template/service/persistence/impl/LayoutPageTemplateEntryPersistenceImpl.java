@@ -5168,7 +5168,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 							(layoutPageTemplateCollectionId != layoutPageTemplateEntry.getLayoutPageTemplateCollectionId()) ||
 							!StringUtil.wildcardMatches(
 								layoutPageTemplateEntry.getName(), name, '_',
-								'%', '\\', false)) {
+								'%', '\\', true)) {
 						list = null;
 
 						break;
@@ -5230,7 +5230,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(layoutPageTemplateCollectionId);
 
 				if (bindName) {
-					qPos.add(StringUtil.toLowerCase(name));
+					qPos.add(name);
 				}
 
 				if (!pagination) {
@@ -5553,7 +5553,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(layoutPageTemplateCollectionId);
 
 		if (bindName) {
-			qPos.add(StringUtil.toLowerCase(name));
+			qPos.add(name);
 		}
 
 		if (orderByComparator != null) {
@@ -5717,7 +5717,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			qPos.add(layoutPageTemplateCollectionId);
 
 			if (bindName) {
-				qPos.add(StringUtil.toLowerCase(name));
+				qPos.add(name);
 			}
 
 			return (List<LayoutPageTemplateEntry>)QueryUtil.list(q,
@@ -5927,7 +5927,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(layoutPageTemplateCollectionId);
 
 		if (bindName) {
-			qPos.add(StringUtil.toLowerCase(name));
+			qPos.add(name);
 		}
 
 		if (orderByComparator != null) {
@@ -6021,7 +6021,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(layoutPageTemplateCollectionId);
 
 				if (bindName) {
-					qPos.add(StringUtil.toLowerCase(name));
+					qPos.add(name);
 				}
 
 				count = (Long)q.uniqueResult();
@@ -6099,7 +6099,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			qPos.add(layoutPageTemplateCollectionId);
 
 			if (bindName) {
-				qPos.add(StringUtil.toLowerCase(name));
+				qPos.add(name);
 			}
 
 			Long count = (Long)q.uniqueResult();
@@ -6117,7 +6117,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	private static final String _FINDER_COLUMN_G_L_LIKEN_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
 	private static final String _FINDER_COLUMN_G_L_LIKEN_LAYOUTPAGETEMPLATECOLLECTIONID_2 =
 		"layoutPageTemplateEntry.layoutPageTemplateCollectionId = ? AND ";
-	private static final String _FINDER_COLUMN_G_L_LIKEN_NAME_2 = "lower(layoutPageTemplateEntry.name) LIKE ?";
+	private static final String _FINDER_COLUMN_G_L_LIKEN_NAME_2 = "layoutPageTemplateEntry.name LIKE ?";
 	private static final String _FINDER_COLUMN_G_L_LIKEN_NAME_3 = "(layoutPageTemplateEntry.name IS NULL OR layoutPageTemplateEntry.name LIKE '')";
 	private FinderPath _finderPathWithPaginationFindByG_L_T;
 	private FinderPath _finderPathWithoutPaginationFindByG_L_T;
@@ -8196,7 +8196,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 					if ((groupId != layoutPageTemplateEntry.getGroupId()) ||
 							!StringUtil.wildcardMatches(
 								layoutPageTemplateEntry.getName(), name, '_',
-								'%', '\\', false) ||
+								'%', '\\', true) ||
 							(type != layoutPageTemplateEntry.getType())) {
 						list = null;
 
@@ -8257,7 +8257,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(groupId);
 
 				if (bindName) {
-					qPos.add(StringUtil.toLowerCase(name));
+					qPos.add(name);
 				}
 
 				qPos.add(type);
@@ -8575,7 +8575,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(groupId);
 
 		if (bindName) {
-			qPos.add(StringUtil.toLowerCase(name));
+			qPos.add(name);
 		}
 
 		qPos.add(type);
@@ -8738,7 +8738,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			qPos.add(groupId);
 
 			if (bindName) {
-				qPos.add(StringUtil.toLowerCase(name));
+				qPos.add(name);
 			}
 
 			qPos.add(type);
@@ -8945,7 +8945,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(groupId);
 
 		if (bindName) {
-			qPos.add(StringUtil.toLowerCase(name));
+			qPos.add(name);
 		}
 
 		qPos.add(type);
@@ -9034,7 +9034,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(groupId);
 
 				if (bindName) {
-					qPos.add(StringUtil.toLowerCase(name));
+					qPos.add(name);
 				}
 
 				qPos.add(type);
@@ -9110,7 +9110,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			qPos.add(groupId);
 
 			if (bindName) {
-				qPos.add(StringUtil.toLowerCase(name));
+				qPos.add(name);
 			}
 
 			qPos.add(type);
@@ -9128,7 +9128,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	}
 
 	private static final String _FINDER_COLUMN_G_T_LIKEN_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_T_LIKEN_NAME_2 = "lower(layoutPageTemplateEntry.name) LIKE ? AND ";
+	private static final String _FINDER_COLUMN_G_T_LIKEN_NAME_2 = "layoutPageTemplateEntry.name LIKE ? AND ";
 	private static final String _FINDER_COLUMN_G_T_LIKEN_NAME_3 = "(layoutPageTemplateEntry.name IS NULL OR layoutPageTemplateEntry.name LIKE '') AND ";
 	private static final String _FINDER_COLUMN_G_T_LIKEN_TYPE_2 = "layoutPageTemplateEntry.type = ?";
 	private static final String _FINDER_COLUMN_G_T_LIKEN_TYPE_2_SQL = "layoutPageTemplateEntry.type_ = ?";
@@ -10212,7 +10212,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 							(layoutPageTemplateCollectionId != layoutPageTemplateEntry.getLayoutPageTemplateCollectionId()) ||
 							!StringUtil.wildcardMatches(
 								layoutPageTemplateEntry.getName(), name, '_',
-								'%', '\\', false) ||
+								'%', '\\', true) ||
 							(status != layoutPageTemplateEntry.getStatus())) {
 						list = null;
 
@@ -10277,7 +10277,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(layoutPageTemplateCollectionId);
 
 				if (bindName) {
-					qPos.add(StringUtil.toLowerCase(name));
+					qPos.add(name);
 				}
 
 				qPos.add(status);
@@ -10617,7 +10617,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(layoutPageTemplateCollectionId);
 
 		if (bindName) {
-			qPos.add(StringUtil.toLowerCase(name));
+			qPos.add(name);
 		}
 
 		qPos.add(status);
@@ -10790,7 +10790,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			qPos.add(layoutPageTemplateCollectionId);
 
 			if (bindName) {
-				qPos.add(StringUtil.toLowerCase(name));
+				qPos.add(name);
 			}
 
 			qPos.add(status);
@@ -11007,7 +11007,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(layoutPageTemplateCollectionId);
 
 		if (bindName) {
-			qPos.add(StringUtil.toLowerCase(name));
+			qPos.add(name);
 		}
 
 		qPos.add(status);
@@ -11107,7 +11107,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(layoutPageTemplateCollectionId);
 
 				if (bindName) {
-					qPos.add(StringUtil.toLowerCase(name));
+					qPos.add(name);
 				}
 
 				qPos.add(status);
@@ -11190,7 +11190,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			qPos.add(layoutPageTemplateCollectionId);
 
 			if (bindName) {
-				qPos.add(StringUtil.toLowerCase(name));
+				qPos.add(name);
 			}
 
 			qPos.add(status);
@@ -11210,7 +11210,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	private static final String _FINDER_COLUMN_G_L_LIKEN_S_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
 	private static final String _FINDER_COLUMN_G_L_LIKEN_S_LAYOUTPAGETEMPLATECOLLECTIONID_2 =
 		"layoutPageTemplateEntry.layoutPageTemplateCollectionId = ? AND ";
-	private static final String _FINDER_COLUMN_G_L_LIKEN_S_NAME_2 = "lower(layoutPageTemplateEntry.name) LIKE ? AND ";
+	private static final String _FINDER_COLUMN_G_L_LIKEN_S_NAME_2 = "layoutPageTemplateEntry.name LIKE ? AND ";
 	private static final String _FINDER_COLUMN_G_L_LIKEN_S_NAME_3 = "(layoutPageTemplateEntry.name IS NULL OR layoutPageTemplateEntry.name LIKE '') AND ";
 	private static final String _FINDER_COLUMN_G_L_LIKEN_S_STATUS_2 = "layoutPageTemplateEntry.status = ?";
 	private FinderPath _finderPathWithPaginationFindByG_C_C_T;
@@ -14421,7 +14421,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 					if ((groupId != layoutPageTemplateEntry.getGroupId()) ||
 							!StringUtil.wildcardMatches(
 								layoutPageTemplateEntry.getName(), name, '_',
-								'%', '\\', false) ||
+								'%', '\\', true) ||
 							(type != layoutPageTemplateEntry.getType()) ||
 							(status != layoutPageTemplateEntry.getStatus())) {
 						list = null;
@@ -14485,7 +14485,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(groupId);
 
 				if (bindName) {
-					qPos.add(StringUtil.toLowerCase(name));
+					qPos.add(name);
 				}
 
 				qPos.add(type);
@@ -14818,7 +14818,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(groupId);
 
 		if (bindName) {
-			qPos.add(StringUtil.toLowerCase(name));
+			qPos.add(name);
 		}
 
 		qPos.add(type);
@@ -14989,7 +14989,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			qPos.add(groupId);
 
 			if (bindName) {
-				qPos.add(StringUtil.toLowerCase(name));
+				qPos.add(name);
 			}
 
 			qPos.add(type);
@@ -15201,7 +15201,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(groupId);
 
 		if (bindName) {
-			qPos.add(StringUtil.toLowerCase(name));
+			qPos.add(name);
 		}
 
 		qPos.add(type);
@@ -15299,7 +15299,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(groupId);
 
 				if (bindName) {
-					qPos.add(StringUtil.toLowerCase(name));
+					qPos.add(name);
 				}
 
 				qPos.add(type);
@@ -15381,7 +15381,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			qPos.add(groupId);
 
 			if (bindName) {
-				qPos.add(StringUtil.toLowerCase(name));
+				qPos.add(name);
 			}
 
 			qPos.add(type);
@@ -15401,7 +15401,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	}
 
 	private static final String _FINDER_COLUMN_G_T_LIKEN_S_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_T_LIKEN_S_NAME_2 = "lower(layoutPageTemplateEntry.name) LIKE ? AND ";
+	private static final String _FINDER_COLUMN_G_T_LIKEN_S_NAME_2 = "layoutPageTemplateEntry.name LIKE ? AND ";
 	private static final String _FINDER_COLUMN_G_T_LIKEN_S_NAME_3 = "(layoutPageTemplateEntry.name IS NULL OR layoutPageTemplateEntry.name LIKE '') AND ";
 	private static final String _FINDER_COLUMN_G_T_LIKEN_S_TYPE_2 = "layoutPageTemplateEntry.type = ? AND ";
 	private static final String _FINDER_COLUMN_G_T_LIKEN_S_TYPE_2_SQL = "layoutPageTemplateEntry.type_ = ? AND ";
@@ -15524,7 +15524,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 							(classTypeId != layoutPageTemplateEntry.getClassTypeId()) ||
 							!StringUtil.wildcardMatches(
 								layoutPageTemplateEntry.getName(), name, '_',
-								'%', '\\', false) ||
+								'%', '\\', true) ||
 							(type != layoutPageTemplateEntry.getType())) {
 						list = null;
 
@@ -15593,7 +15593,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(classTypeId);
 
 				if (bindName) {
-					qPos.add(StringUtil.toLowerCase(name));
+					qPos.add(name);
 				}
 
 				qPos.add(type);
@@ -15944,7 +15944,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(classTypeId);
 
 		if (bindName) {
-			qPos.add(StringUtil.toLowerCase(name));
+			qPos.add(name);
 		}
 
 		qPos.add(type);
@@ -16124,7 +16124,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			qPos.add(classTypeId);
 
 			if (bindName) {
-				qPos.add(StringUtil.toLowerCase(name));
+				qPos.add(name);
 			}
 
 			qPos.add(type);
@@ -16342,7 +16342,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(classTypeId);
 
 		if (bindName) {
-			qPos.add(StringUtil.toLowerCase(name));
+			qPos.add(name);
 		}
 
 		qPos.add(type);
@@ -16448,7 +16448,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(classTypeId);
 
 				if (bindName) {
-					qPos.add(StringUtil.toLowerCase(name));
+					qPos.add(name);
 				}
 
 				qPos.add(type);
@@ -16536,7 +16536,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			qPos.add(classTypeId);
 
 			if (bindName) {
-				qPos.add(StringUtil.toLowerCase(name));
+				qPos.add(name);
 			}
 
 			qPos.add(type);
@@ -16556,7 +16556,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
 	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_CLASSNAMEID_2 = "layoutPageTemplateEntry.classNameId = ? AND ";
 	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_CLASSTYPEID_2 = "layoutPageTemplateEntry.classTypeId = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_NAME_2 = "lower(layoutPageTemplateEntry.name) LIKE ? AND ";
+	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_NAME_2 = "layoutPageTemplateEntry.name LIKE ? AND ";
 	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_NAME_3 = "(layoutPageTemplateEntry.name IS NULL OR layoutPageTemplateEntry.name LIKE '') AND ";
 	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_TYPE_2 = "layoutPageTemplateEntry.type = ?";
 	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_TYPE_2_SQL = "layoutPageTemplateEntry.type_ = ?";
@@ -18859,7 +18859,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 							(classTypeId != layoutPageTemplateEntry.getClassTypeId()) ||
 							!StringUtil.wildcardMatches(
 								layoutPageTemplateEntry.getName(), name, '_',
-								'%', '\\', false) ||
+								'%', '\\', true) ||
 							(type != layoutPageTemplateEntry.getType()) ||
 							(status != layoutPageTemplateEntry.getStatus())) {
 						list = null;
@@ -18931,7 +18931,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(classTypeId);
 
 				if (bindName) {
-					qPos.add(StringUtil.toLowerCase(name));
+					qPos.add(name);
 				}
 
 				qPos.add(type);
@@ -19299,7 +19299,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(classTypeId);
 
 		if (bindName) {
-			qPos.add(StringUtil.toLowerCase(name));
+			qPos.add(name);
 		}
 
 		qPos.add(type);
@@ -19487,7 +19487,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			qPos.add(classTypeId);
 
 			if (bindName) {
-				qPos.add(StringUtil.toLowerCase(name));
+				qPos.add(name);
 			}
 
 			qPos.add(type);
@@ -19712,7 +19712,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 		qPos.add(classTypeId);
 
 		if (bindName) {
-			qPos.add(StringUtil.toLowerCase(name));
+			qPos.add(name);
 		}
 
 		qPos.add(type);
@@ -19824,7 +19824,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 				qPos.add(classTypeId);
 
 				if (bindName) {
-					qPos.add(StringUtil.toLowerCase(name));
+					qPos.add(name);
 				}
 
 				qPos.add(type);
@@ -19917,7 +19917,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 			qPos.add(classTypeId);
 
 			if (bindName) {
-				qPos.add(StringUtil.toLowerCase(name));
+				qPos.add(name);
 			}
 
 			qPos.add(type);
@@ -19939,7 +19939,7 @@ public class LayoutPageTemplateEntryPersistenceImpl extends BasePersistenceImpl<
 	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_S_GROUPID_2 = "layoutPageTemplateEntry.groupId = ? AND ";
 	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_S_CLASSNAMEID_2 = "layoutPageTemplateEntry.classNameId = ? AND ";
 	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_S_CLASSTYPEID_2 = "layoutPageTemplateEntry.classTypeId = ? AND ";
-	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_S_NAME_2 = "lower(layoutPageTemplateEntry.name) LIKE ? AND ";
+	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_S_NAME_2 = "layoutPageTemplateEntry.name LIKE ? AND ";
 	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_S_NAME_3 = "(layoutPageTemplateEntry.name IS NULL OR layoutPageTemplateEntry.name LIKE '') AND ";
 	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_S_TYPE_2 = "layoutPageTemplateEntry.type = ? AND ";
 	private static final String _FINDER_COLUMN_G_C_C_LIKEN_T_S_TYPE_2_SQL = "layoutPageTemplateEntry.type_ = ? AND ";

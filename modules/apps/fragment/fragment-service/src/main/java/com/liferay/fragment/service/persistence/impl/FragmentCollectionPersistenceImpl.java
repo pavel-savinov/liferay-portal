@@ -2603,7 +2603,7 @@ public class FragmentCollectionPersistenceImpl extends BasePersistenceImpl<Fragm
 					if ((groupId != fragmentCollection.getGroupId()) ||
 							!StringUtil.wildcardMatches(
 								fragmentCollection.getName(), name, '_', '%',
-								'\\', false)) {
+								'\\', true)) {
 						list = null;
 
 						break;
@@ -2661,7 +2661,7 @@ public class FragmentCollectionPersistenceImpl extends BasePersistenceImpl<Fragm
 				qPos.add(groupId);
 
 				if (bindName) {
-					qPos.add(StringUtil.toLowerCase(name));
+					qPos.add(name);
 				}
 
 				if (!pagination) {
@@ -2957,7 +2957,7 @@ public class FragmentCollectionPersistenceImpl extends BasePersistenceImpl<Fragm
 		qPos.add(groupId);
 
 		if (bindName) {
-			qPos.add(StringUtil.toLowerCase(name));
+			qPos.add(name);
 		}
 
 		if (orderByComparator != null) {
@@ -3110,7 +3110,7 @@ public class FragmentCollectionPersistenceImpl extends BasePersistenceImpl<Fragm
 			qPos.add(groupId);
 
 			if (bindName) {
-				qPos.add(StringUtil.toLowerCase(name));
+				qPos.add(name);
 			}
 
 			return (List<FragmentCollection>)QueryUtil.list(q, getDialect(),
@@ -3309,7 +3309,7 @@ public class FragmentCollectionPersistenceImpl extends BasePersistenceImpl<Fragm
 		qPos.add(groupId);
 
 		if (bindName) {
-			qPos.add(StringUtil.toLowerCase(name));
+			qPos.add(name);
 		}
 
 		if (orderByComparator != null) {
@@ -3392,7 +3392,7 @@ public class FragmentCollectionPersistenceImpl extends BasePersistenceImpl<Fragm
 				qPos.add(groupId);
 
 				if (bindName) {
-					qPos.add(StringUtil.toLowerCase(name));
+					qPos.add(name);
 				}
 
 				count = (Long)q.uniqueResult();
@@ -3463,7 +3463,7 @@ public class FragmentCollectionPersistenceImpl extends BasePersistenceImpl<Fragm
 			qPos.add(groupId);
 
 			if (bindName) {
-				qPos.add(StringUtil.toLowerCase(name));
+				qPos.add(name);
 			}
 
 			Long count = (Long)q.uniqueResult();
@@ -3479,7 +3479,7 @@ public class FragmentCollectionPersistenceImpl extends BasePersistenceImpl<Fragm
 	}
 
 	private static final String _FINDER_COLUMN_G_LIKEN_GROUPID_2 = "fragmentCollection.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_LIKEN_NAME_2 = "lower(fragmentCollection.name) LIKE ?";
+	private static final String _FINDER_COLUMN_G_LIKEN_NAME_2 = "fragmentCollection.name LIKE ?";
 	private static final String _FINDER_COLUMN_G_LIKEN_NAME_3 = "(fragmentCollection.name IS NULL OR fragmentCollection.name LIKE '')";
 
 	public FragmentCollectionPersistenceImpl() {
