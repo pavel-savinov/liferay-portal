@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.site.navigation.constants.SiteNavigationConstants;
 import com.liferay.site.navigation.exception.DuplicateSiteNavigationMenuException;
@@ -34,7 +35,6 @@ import com.liferay.site.navigation.model.SiteNavigationMenu;
 import com.liferay.site.navigation.service.SiteNavigationMenuLocalServiceUtil;
 import com.liferay.site.navigation.util.comparator.SiteNavigationMenuNameComparator;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -103,7 +103,7 @@ public class SiteNavigationMenuLocalServiceTest {
 		int nameMaxLength = ModelHintsUtil.getMaxLength(
 			SiteNavigationMenu.class.getName(), "name");
 
-		String nameExceedingMaxLength = _createSpecificLengthString(
+		String nameExceedingMaxLength = StringUtil.randomString(
 			nameMaxLength + 1);
 
 		SiteNavigationMenuLocalServiceUtil.addSiteNavigationMenu(
@@ -643,14 +643,6 @@ public class SiteNavigationMenuLocalServiceTest {
 
 		Assert.assertEquals(
 			siteNavigationMenu1.isAuto(), siteNavigationMenu2.isAuto());
-	}
-
-	private String _createSpecificLengthString(int length) {
-		char[] charArray = new char[length];
-
-		Arrays.fill(charArray, 'a');
-
-		return new String(charArray);
 	}
 
 	@DeleteAfterTestRun
