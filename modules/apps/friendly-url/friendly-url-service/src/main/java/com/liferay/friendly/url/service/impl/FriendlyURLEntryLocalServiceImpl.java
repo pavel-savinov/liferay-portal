@@ -500,8 +500,8 @@ public class FriendlyURLEntryLocalServiceImpl
 		}
 
 		for (Map.Entry<String, String> entry : urlTitleMap.entrySet()) {
-			String urlTitle = FriendlyURLNormalizerUtil.normalize(
-				entry.getValue());
+			String urlTitle = FriendlyURLNormalizerUtil.normalizeWithEncoding(
+				HttpUtil.decodePath(entry.getValue()));
 
 			if (!urlTitle.equals(existUrlTitleMap.get(entry.getKey()))) {
 				return false;
