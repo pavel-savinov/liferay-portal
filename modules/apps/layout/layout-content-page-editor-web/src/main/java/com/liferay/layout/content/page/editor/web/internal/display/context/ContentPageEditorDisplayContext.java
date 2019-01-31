@@ -14,6 +14,7 @@
 
 package com.liferay.layout.content.page.editor.web.internal.display.context;
 
+import com.liferay.fragment.constants.FragmentEntryLinkTypeConstants;
 import com.liferay.fragment.constants.FragmentEntryTypeConstants;
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.model.FragmentEntry;
@@ -39,6 +40,7 @@ import com.liferay.portal.kernel.editor.configuration.EditorConfigurationFactory
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -64,6 +66,11 @@ import javax.portlet.PortletURL;
 import javax.portlet.RenderResponse;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 /**
  * @author Eudaldo Alonso
@@ -223,7 +230,7 @@ public class ContentPageEditorDisplayContext {
 	}
 
 	protected SoyContext getFragmentEntrySoyContext(
-		FragmentEntry fragmentEntry, String content) {
+		FragmentEntry fragmentEntry) {
 
 		SoyContext soyContext = SoyContextFactoryUtil.createSoyContext();
 
@@ -359,6 +366,20 @@ public class ContentPageEditorDisplayContext {
 		return _panelSoyContexts;
 	}
 
+	protected SoyContext getPortletEntrySoyContext(String content) {
+		SoyContext soyContext = SoyContextFactoryUtil.createSoyContext();
+
+		String portletId = _getPortletId(content);
+
+		soyContext.put("fragmentEntryId", 0);
+		soyContext.put(
+			"name",
+			PortalUtil.getPortletTitle(portletId, themeDisplay.getLocale()));
+		soyContext.put("portletId", portletId);
+
+		return soyContext;
+	}
+
 	protected String getRedirect() {
 		if (_redirect != null) {
 			return _redirect;
@@ -442,8 +463,15 @@ public class ContentPageEditorDisplayContext {
 					"fragmentEntryLinkId",
 					String.valueOf(fragmentEntryLink.getFragmentEntryLinkId()));
 
-				soyContext.putAll(
-					getFragmentEntrySoyContext(fragmentEntry, content));
+				if (fragmentEntryLink.getType() ==
+						FragmentEntryLinkTypeConstants.TYPE_FRAGMENT) {
+
+					soyContext.putAll(
+						getFragmentEntrySoyContext(fragmentEntry));
+				}
+				else {
+					soyContext.putAll(getPortletEntrySoyContext(content));
+				}
 
 				soyContexts.put(
 					String.valueOf(fragmentEntryLink.getFragmentEntryLinkId()),
@@ -512,6 +540,23 @@ public class ContentPageEditorDisplayContext {
 		}
 
 		return soyContexts;
+	}
+
+	private String _getPortletId(String content) {
+		Document document = Jsoup.parse(content);
+
+		Elements elements = document.getElementsByAttributeValueStarting(
+			"id", "portlet_");
+
+		if (elements.size() != 1) {
+			return StringPool.BLANK;
+		}
+
+		Element element = elements.get(0);
+
+		String id = element.id();
+
+		return PortletIdCodec.decodePortletName(id.substring(8));
 	}
 
 	private Map<String, Object> _defaultConfigurations;
