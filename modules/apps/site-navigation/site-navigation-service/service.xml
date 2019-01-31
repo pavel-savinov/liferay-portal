@@ -100,7 +100,7 @@
 		</finder>
 		<finder name="S_LikeN" return-type="Collection">
 			<finder-column name="siteNavigationMenuId" />
-			<finder-column case-sensitive="false" comparator="LIKE" name="name" />
+			<finder-column comparator="LIKE" name="name" />
 		</finder>
 
 		<!-- References -->
