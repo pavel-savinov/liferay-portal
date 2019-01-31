@@ -15,6 +15,7 @@
 package com.liferay.fragment.service.impl;
 
 import com.liferay.document.library.kernel.util.DLUtil;
+import com.liferay.fragment.constants.FragmentEntryLinkTypeConstants;
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
@@ -58,7 +59,7 @@ public class FragmentEntryLinkLocalServiceImpl
 			long userId, long groupId, long originalFragmentEntryLinkId,
 			long fragmentEntryId, long classNameId, long classPK, String css,
 			String html, String js, String editableValues, int position,
-			ServiceContext serviceContext)
+			int type, ServiceContext serviceContext)
 		throws PortalException {
 
 		User user = userLocalService.getUser(userId);
@@ -101,6 +102,7 @@ public class FragmentEntryLinkLocalServiceImpl
 		fragmentEntryLink.setEditableValues(editableValues);
 
 		fragmentEntryLink.setPosition(position);
+		fragmentEntryLink.setType(type);
 		fragmentEntryLink.setLastPropagationDate(
 			serviceContext.getCreateDate(new Date()));
 		fragmentEntryLink.setNamespace(StringUtil.randomId());
@@ -108,6 +110,33 @@ public class FragmentEntryLinkLocalServiceImpl
 		fragmentEntryLinkPersistence.update(fragmentEntryLink);
 
 		return fragmentEntryLink;
+	}
+
+	@Override
+	public FragmentEntryLink addFragmentEntryLink(
+			long userId, long groupId, long originalFragmentEntryLinkId,
+			long fragmentEntryId, long classNameId, long classPK, String css,
+			String html, String js, String editableValues, int position,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		return addFragmentEntryLink(
+			userId, groupId, originalFragmentEntryLinkId, fragmentEntryId,
+			classNameId, classPK, css, html, js, editableValues, position,
+			FragmentEntryLinkTypeConstants.TYPE_FRAGMENT, serviceContext);
+	}
+
+	@Override
+	public FragmentEntryLink addFragmentEntryLink(
+			long userId, long groupId, long fragmentEntryId, long classNameId,
+			long classPK, String css, String html, String js,
+			String editableValues, int position, int type,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		return addFragmentEntryLink(
+			userId, groupId, 0, fragmentEntryId, classNameId, classPK, css,
+			html, js, editableValues, position, type, serviceContext);
 	}
 
 	@Override
