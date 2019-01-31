@@ -14,6 +14,7 @@
 
 package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
+import com.liferay.fragment.constants.FragmentEntryLinkTypeConstants;
 import com.liferay.fragment.exception.NoSuchEntryException;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
@@ -85,7 +86,7 @@ public class AddFragmentEntryLinkMVCActionCommand extends BaseMVCActionCommand {
 				serviceContext.getUserId(), serviceContext.getScopeGroupId(),
 				fragmentEntryId, classNameId, classPK, fragmentEntry.getCss(),
 				fragmentEntry.getHtml(), fragmentEntry.getJs(), null, 0,
-				serviceContext);
+				FragmentEntryLinkTypeConstants.TYPE_FRAGMENT, serviceContext);
 
 		String data = ParamUtil.getString(actionRequest, "data");
 

@@ -148,7 +148,7 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 								fragmentEntryLink.getJs(),
 								fragmentEntryLink.getEditableValues(),
 								fragmentEntryLink.getPosition(),
-								serviceContext);
+								fragmentEntryLink.getType(), serviceContext);
 
 						newFragmentEntryLinkIdsJSONArray.put(
 							newFragmentEntryLink.getFragmentEntryLinkId());

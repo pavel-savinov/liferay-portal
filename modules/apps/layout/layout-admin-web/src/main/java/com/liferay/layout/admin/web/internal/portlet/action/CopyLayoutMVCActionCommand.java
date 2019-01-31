@@ -213,7 +213,8 @@ public class CopyLayoutMVCActionCommand extends BaseMVCActionCommand {
 				fragmentEntryLink.getCss(), fragmentEntryLink.getHtml(),
 				fragmentEntryLink.getJs(),
 				fragmentEntryLink.getEditableValues(),
-				fragmentEntryLink.getPosition(), serviceContext);
+				fragmentEntryLink.getPosition(), fragmentEntryLink.getType(),
+				serviceContext);
 
 		List<String> portletIds =
 			_portletRegistry.getFragmentEntryLinkPortletIds(fragmentEntryLink);

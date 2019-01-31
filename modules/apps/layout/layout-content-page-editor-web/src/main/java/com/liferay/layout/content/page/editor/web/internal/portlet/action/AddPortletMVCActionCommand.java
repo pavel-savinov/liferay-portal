@@ -14,6 +14,7 @@
 
 package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
+import com.liferay.fragment.constants.FragmentEntryLinkTypeConstants;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.fragment.util.FragmentEntryRenderUtil;
@@ -85,7 +86,9 @@ public class AddPortletMVCActionCommand extends BaseMVCActionCommand {
 					serviceContext.getScopeGroupId(), 0, classNameId, classPK,
 					StringPool.BLANK,
 					_getPortletFragmentEntryLinkHTML(portletId),
-					StringPool.BLANK, null, 0, serviceContext);
+					StringPool.BLANK, null, 0,
+					FragmentEntryLinkTypeConstants.TYPE_PORTLET,
+					serviceContext);
 
 			jsonObject.put(
 				"content",

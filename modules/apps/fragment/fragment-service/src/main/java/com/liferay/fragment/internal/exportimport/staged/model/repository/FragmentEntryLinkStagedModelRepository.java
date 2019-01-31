@@ -64,7 +64,8 @@ public class FragmentEntryLinkStagedModelRepository
 			fragmentEntryLink.getClassNameId(), fragmentEntryLink.getClassPK(),
 			fragmentEntryLink.getCss(), fragmentEntryLink.getHtml(),
 			fragmentEntryLink.getJs(), fragmentEntryLink.getEditableValues(),
-			fragmentEntryLink.getPosition(), serviceContext);
+			fragmentEntryLink.getPosition(), fragmentEntryLink.getType(),
+			serviceContext);
 	}
 
 	@Override
