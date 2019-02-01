@@ -40,7 +40,6 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -359,10 +358,7 @@ public class JournalManagementToolbarDisplayContext
 
 	@Override
 	public String getSearchContainerId() {
-		String searchContainerId = ParamUtil.getString(
-			request, "searchContainerId");
-
-		return searchContainerId;
+		return "articles";
 	}
 
 	@Override
