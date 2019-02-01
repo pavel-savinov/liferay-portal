@@ -66,7 +66,9 @@ class EntriesDefaultEventHandler extends PortletBase {
 	}
 
 	deleteEntry(itemData) {
-		submitForm(document.hrefFm, itemData.deleteURL);
+		if (confirm(Liferay.Language.get('are-you-sure-you-want-to-delete-this'))) {
+			submitForm(document.hrefFm, itemData.deleteURL);
+		}
 	}
 
 }
