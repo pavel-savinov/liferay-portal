@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<taglib xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd">
+<taglib xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.1" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd">
 	<description><![CDATA[Provides the AUI component tags, prefixed with <code>aui:</code>.]]></description>
 	<tlib-version>1.0</tlib-version>
 	<short-name>aui</short-name>
@@ -293,6 +293,67 @@
 		</attribute>
 		<attribute>
 			<name>xs</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<dynamic-attributes>true</dynamic-attributes>
+	</tag>
+	<tag>
+		<description><![CDATA[Deprecated as of 7.0.0, with no direct replacement.]]></description>
+		<name>component</name>
+		<tag-class>com.liferay.taglib.aui.ComponentTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<name>defineVar</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>boolean</type>
+		</attribute>
+		<attribute>
+			<name>excludeAttributes</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>javaScriptAttributes</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>module</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>name</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>options</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>java.util.Map</type>
+		</attribute>
+		<attribute>
+			<name>scriptPosition</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>tagPageContext</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>javax.servlet.jsp.JspContext</type>
+		</attribute>
+		<attribute>
+			<name>useJavaScript</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>java.io.Serializable</type>
+		</attribute>
+		<attribute>
+			<name>var</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
@@ -1274,6 +1335,40 @@
 		<dynamic-attributes>true</dynamic-attributes>
 	</tag>
 	<tag>
+		<description><![CDATA[Deprecated as of 7.0.0, with no direct replacement.]]></description>
+		<name>panel</name>
+		<tag-class>com.liferay.taglib.aui.PanelTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<name>collapsed</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>boolean</type>
+		</attribute>
+		<attribute>
+			<name>collapsible</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>boolean</type>
+		</attribute>
+		<attribute>
+			<name>id</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>label</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>localizeLabel</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>boolean</type>
+		</attribute>
+	</tag>
+	<tag>
 		<description><![CDATA[Creates a row to hold <code>&lt;aui:col&gt;</code> components.]]></description>
 		<name>row</name>
 		<tag-class>com.liferay.taglib.aui.RowTag</tag-class>
@@ -1525,6 +1620,12 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 		<dynamic-attributes>true</dynamic-attributes>
+	</tag>
+	<tag>
+		<description><![CDATA[Deprecated as of 7.0.0, with no direct replacement. Creates a spacer component that enables JSP 2.1 server-side trimming of white spaces.]]></description>
+		<name>spacer</name>
+		<tag-class>com.liferay.taglib.aui.SpacerTag</tag-class>
+		<body-content>JSP</body-content>
 	</tag>
 	<tag>
 		<description><![CDATA[Creates a UI component for managing translation of associated content.]]></description>
