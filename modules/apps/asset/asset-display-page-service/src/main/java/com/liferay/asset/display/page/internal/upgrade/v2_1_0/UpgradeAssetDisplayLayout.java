@@ -118,7 +118,7 @@ public class UpgradeAssetDisplayLayout extends UpgradeProcess {
 		throws PortalException {
 
 		LayoutPageTemplateEntry layoutPageTemplateEntry = Optional.ofNullable(
-			_layoutPageTemplateEntryService.fetchLayoutPageTemplateEntry(
+			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
 				layoutPageTemplateEntryId)
 		).orElse(
 			_layoutPageTemplateEntryService.fetchDefaultLayoutPageTemplateEntry(
