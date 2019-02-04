@@ -18,6 +18,7 @@ import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
+import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.asset.model.AssetEntryUsage;
 import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
 import com.liferay.asset.service.AssetEntryUsageLocalService;
@@ -58,6 +59,21 @@ public class JournalArticleAssetEntryUsageRecorder
 
 	@Override
 	public void record(AssetEntry assetEntry) throws PortalException {
+		AssetRendererFactory assetRendererFactory =
+			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
+				assetEntry.getClassName());
+
+		AssetRenderer<JournalArticle> assetRenderer =
+			assetRendererFactory.getAssetRenderer(assetEntry.getClassPK());
+
+		JournalArticle article = assetRenderer.getAssetObject();
+
+		if (!article.isApproved()) {
+			assetEntry = _assetEntryLocalService.fetchEntry(
+				_portal.getClassNameId(JournalArticle.class),
+				article.getResourcePrimKey());
+		}
+
 		int count = _assetEntryUsageLocalService.getAssetEntryUsagesCount(
 			assetEntry.getEntryId(), StringPool.BLANK);
 
@@ -172,6 +188,9 @@ public class JournalArticleAssetEntryUsageRecorder
 				serviceContext);
 		}
 	}
+
+	@Reference
+	private AssetEntryLocalService _assetEntryLocalService;
 
 	@Reference
 	private AssetEntryUsageLocalService _assetEntryUsageLocalService;

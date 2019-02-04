@@ -691,8 +691,7 @@ public class JournalArticleActionDropdownItemsProvider {
 			PortletProvider.Action.VIEW);
 
 		AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
-			JournalArticle.class.getName(),
-			JournalArticleAssetRenderer.getClassPK(_article));
+			JournalArticle.class.getName(), _article.getResourcePrimKey());
 
 		return dropdownItem -> {
 			dropdownItem.setHref(
