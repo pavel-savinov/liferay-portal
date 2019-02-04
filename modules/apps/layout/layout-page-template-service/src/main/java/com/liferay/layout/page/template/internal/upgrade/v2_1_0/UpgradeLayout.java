@@ -14,8 +14,6 @@
 
 package com.liferay.layout.page.template.internal.upgrade.v2_1_0;
 
-import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
-import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.layout.constants.LayoutConstants;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.internal.upgrade.v2_0_0.util.LayoutPageTemplateEntryTable;
@@ -60,12 +58,11 @@ public class UpgradeLayout extends UpgradeProcess {
 	}
 
 	protected void upgradeLayout() throws Exception {
-		StringBundler sb = new StringBundler(4);
+		StringBundler sb = new StringBundler(3);
 
-		sb.append("select layoutPageTemplateEntryId, userId, groupId, ");
-		sb.append("classNameId, classTypeId, name, type_, layoutPrototypeId ");
-		sb.append("from LayoutPageTemplateEntry where plid is null or plid = ");
-		sb.append("0");
+		sb.append("select layoutPageTemplateEntryId, userId, groupId, name, ");
+		sb.append("type_, layoutPrototypeId from LayoutPageTemplateEntry ");
+		sb.append("where plid is null or plid = 0");
 
 		ServiceContext serviceContext = new ServiceContext();
 
@@ -80,8 +77,6 @@ public class UpgradeLayout extends UpgradeProcess {
 			while (rs.next()) {
 				long userId = rs.getLong("userId");
 				long groupId = rs.getLong("groupId");
-				long classNameId = rs.getLong("classNameId");
-				long classTypeId = rs.getLong("classTypeId");
 				String name = rs.getString("name");
 				int type = rs.getInt("type_");
 				long layoutPrototypeId = rs.getLong("layoutPrototypeId");
@@ -89,8 +84,8 @@ public class UpgradeLayout extends UpgradeProcess {
 				ps.setLong(
 					1,
 					_getPlid(
-						userId, groupId, classNameId, classTypeId, name, type,
-						layoutPrototypeId, serviceContext));
+						userId, groupId, name, type, layoutPrototypeId,
+						serviceContext));
 
 				long layoutPageTemplateEntryId = rs.getLong(
 					"layoutPageTemplateEntryId");
@@ -111,9 +106,8 @@ public class UpgradeLayout extends UpgradeProcess {
 	}
 
 	private long _getPlid(
-			long userId, long groupId, long classNameId, long classTypeId,
-			String name, int type, long layoutPrototypeId,
-			ServiceContext serviceContext)
+			long userId, long groupId, String name, int type,
+			long layoutPrototypeId, ServiceContext serviceContext)
 		throws Exception {
 
 		if ((type == LayoutPageTemplateEntryTypeConstants.TYPE_WIDGET_PAGE) &&
@@ -130,17 +124,6 @@ public class UpgradeLayout extends UpgradeProcess {
 
 		Map<Locale, String> titleMap = Collections.singletonMap(
 			LocaleUtil.getSiteDefault(), name);
-
-		if (classNameId > 0) {
-			AssetRendererFactory assetRendererFactory =
-				AssetRendererFactoryRegistryUtil.
-					getAssetRendererFactoryByClassNameId(classNameId);
-
-			titleMap = Collections.singletonMap(
-				LocaleUtil.getSiteDefault(),
-				assetRendererFactory.getTypeName(
-					LocaleUtil.getSiteDefault(), classTypeId));
-		}
 
 		String layoutType = LayoutConstants.LAYOUT_TYPE_ASSET_DISPLAY;
 
