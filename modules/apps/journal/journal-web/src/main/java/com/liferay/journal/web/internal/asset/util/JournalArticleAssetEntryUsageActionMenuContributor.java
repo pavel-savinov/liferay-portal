@@ -41,6 +41,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
@@ -81,10 +82,8 @@ public class JournalArticleAssetEntryUsageActionMenuContributor
 
 		return new DropdownItemList() {
 			{
-				JournalArticle approvedArticle =
-					_journalArticleLocalService.fetchLatestArticle(
-						assetEntry.getClassPK(),
-						WorkflowConstants.STATUS_APPROVED);
+				JournalArticle approvedArticle = _getApprovedArticle(
+					assetEntry.getClassPK());
 
 				ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 					WebKeys.THEME_DISPLAY);
@@ -93,15 +92,26 @@ public class JournalArticleAssetEntryUsageActionMenuContributor
 					_resourceBundleLoader.loadResourceBundle(
 						themeDisplay.getLocale());
 
-				add(
-					dropdownItem -> {
-						dropdownItem.setHref(
-							_getURL(
-								approvedArticle, assetEntryUsage.getClassPK(),
-								assetEntryUsage.getPortletId(), request));
-						dropdownItem.setLabel(
-							LanguageUtil.get(resourceBundle, "view-in-page"));
-					});
+				if (approvedArticle.isApproved()) {
+					add(
+						dropdownItem -> {
+							dropdownItem.setHref(
+								_getURL(
+									approvedArticle,
+									assetEntryUsage.getClassPK(),
+									assetEntryUsage.getPortletId(), request));
+							dropdownItem.setLabel(
+								LanguageUtil.get(
+									resourceBundle, "view-in-page"));
+							dropdownItem.setTarget("_blank");
+						});
+				}
+				else {
+					add(
+						_getPreviewScheduledArticleDropdownItem(
+							approvedArticle, assetEntryUsage, request,
+							resourceBundle));
+				}
 
 				boolean hasUpdatePermission = false;
 
@@ -124,6 +134,7 @@ public class JournalArticleAssetEntryUsageActionMenuContributor
 							dropdownItem.setLabel(
 								LanguageUtil.get(
 									resourceBundle, "preview-draft-in-page"));
+							dropdownItem.setTarget("_blank");
 						});
 				}
 
@@ -137,23 +148,49 @@ public class JournalArticleAssetEntryUsageActionMenuContributor
 							dropdownItem.setLabel(
 								LanguageUtil.get(
 									resourceBundle, "preview-pending-in-page"));
+							dropdownItem.setTarget("_blank");
 						});
 				}
 
-				if (article.isScheduled() && hasUpdatePermission) {
+				if (article.isScheduled() && hasUpdatePermission &&
+					!approvedArticle.isScheduled()) {
+
 					add(
-						dropdownItem -> {
-							dropdownItem.setHref(
-								_getURL(
-									article, assetEntryUsage.getClassPK(),
-									assetEntryUsage.getPortletId(), request));
-							dropdownItem.setLabel(
-								LanguageUtil.get(
-									resourceBundle,
-									"preview-scheduled-in-page"));
-						});
+						_getPreviewScheduledArticleDropdownItem(
+							article, assetEntryUsage, request, resourceBundle));
 				}
 			}
+		};
+	}
+
+	private JournalArticle _getApprovedArticle(long classPK) {
+		JournalArticle article = _journalArticleLocalService.fetchLatestArticle(
+			classPK, WorkflowConstants.STATUS_ANY, true);
+
+		if (!article.isApproved() && !article.isScheduled()) {
+			article = _journalArticleLocalService.fetchLatestArticle(
+				classPK,
+				new int[] {
+					WorkflowConstants.STATUS_APPROVED,
+					WorkflowConstants.STATUS_SCHEDULED
+				});
+		}
+
+		return article;
+	}
+
+	private Consumer<DropdownItem> _getPreviewScheduledArticleDropdownItem(
+		JournalArticle article, AssetEntryUsage assetEntryUsage,
+		HttpServletRequest request, ResourceBundle resourceBundle) {
+
+		return dropdownItem -> {
+			dropdownItem.setHref(
+				_getURL(
+					article, assetEntryUsage.getClassPK(),
+					assetEntryUsage.getPortletId(), request));
+			dropdownItem.setLabel(
+				LanguageUtil.get(resourceBundle, "preview-scheduled-in-page"));
+			dropdownItem.setTarget("_blank");
 		};
 	}
 
@@ -165,7 +202,8 @@ public class JournalArticleAssetEntryUsageActionMenuContributor
 			request, portletId, plid, PortletRequest.RENDER_PHASE);
 
 		if (!article.isApproved()) {
-			portletURL.setParameter("previewArticleId", article.getArticleId());
+			portletURL.setParameter(
+				"previewArticleId", String.valueOf(article.getId()));
 		}
 
 		return portletURL.toString() + "#portlet_" + portletId;
