@@ -95,8 +95,14 @@ public class FriendlyURLEntryLocalServiceImpl
 			friendlyURLEntryMapping.setClassPK(classPK);
 		}
 		else if (_containsAllURLTitles(friendlyURLEntryMapping, urlTitleMap)) {
-			return friendlyURLEntryPersistence.fetchByPrimaryKey(
-				friendlyURLEntryMapping.getFriendlyURLEntryId());
+			FriendlyURLEntry friendlyURLEntry =
+				friendlyURLEntryPersistence.fetchByPrimaryKey(
+					friendlyURLEntryMapping.getFriendlyURLEntryId());
+
+			_updateFriendlyURLEntryLocalizations(
+				friendlyURLEntry, classNameId, classPK, urlTitleMap);
+
+			return friendlyURLEntry;
 		}
 
 		long friendlyURLEntryId = counterLocalService.increment();
