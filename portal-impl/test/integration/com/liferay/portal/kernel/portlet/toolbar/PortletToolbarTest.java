@@ -16,6 +16,7 @@ package com.liferay.portal.kernel.portlet.toolbar;
 
 import com.liferay.portal.kernel.portlet.toolbar.bundle.portlettoolbar.TestPortletToolbarContributor;
 import com.liferay.portal.kernel.portlet.toolbar.contributor.locator.PortletToolbarContributorLocator;
+import com.liferay.portal.kernel.servlet.PortletServlet;
 import com.liferay.portal.kernel.servlet.taglib.ui.Menu;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -28,6 +29,8 @@ import java.util.List;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -58,9 +61,15 @@ public class PortletToolbarTest {
 
 		serviceDependencyManager.waitForDependencies(1000);
 
+		PortletRequest portletRequest = ProxyFactory.newDummyInstance(
+			PortletRequest.class);
+
+		portletRequest.setAttribute(
+			PortletServlet.PORTLET_SERVLET_REQUEST,
+			ProxyFactory.newDummyInstance(HttpServletRequest.class));
+
 		List<Menu> menus = portletToolbar.getPortletTitleMenus(
-			RandomTestUtil.randomString(),
-			ProxyFactory.newDummyInstance(PortletRequest.class),
+			RandomTestUtil.randomString(), portletRequest,
 			ProxyFactory.newDummyInstance(PortletResponse.class));
 
 		Assert.assertTrue(
