@@ -213,6 +213,14 @@ public class FriendlyURLEntryLocalServiceImpl
 	}
 
 	@Override
+	public FriendlyURLEntryLocalization deleteFriendlyURLEntryLocalization(
+		FriendlyURLEntryLocalization friendlyURLEntryLocalization) {
+
+		return friendlyURLEntryLocalizationPersistence.remove(
+			friendlyURLEntryLocalization);
+	}
+
+	@Override
 	public void deleteGroupFriendlyURLEntries(
 		final long groupId, final long classNameId) {
 
