@@ -133,6 +133,12 @@ public class FriendlyURLEntryLocalServiceUtil {
 		getService().deleteFriendlyURLEntry(groupId, clazz, classPK);
 	}
 
+	public static com.liferay.friendly.url.model.FriendlyURLEntryLocalization deleteFriendlyURLEntryLocalization(
+		com.liferay.friendly.url.model.FriendlyURLEntryLocalization friendlyURLEntryLocalization) {
+		return getService()
+				   .deleteFriendlyURLEntryLocalization(friendlyURLEntryLocalization);
+	}
+
 	public static void deleteGroupFriendlyURLEntries(long groupId,
 		long classNameId) {
 		getService().deleteGroupFriendlyURLEntries(groupId, classNameId);

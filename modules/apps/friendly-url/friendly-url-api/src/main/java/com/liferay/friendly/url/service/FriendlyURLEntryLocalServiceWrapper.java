@@ -131,6 +131,12 @@ public class FriendlyURLEntryLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.friendly.url.model.FriendlyURLEntryLocalization deleteFriendlyURLEntryLocalization(
+		com.liferay.friendly.url.model.FriendlyURLEntryLocalization friendlyURLEntryLocalization) {
+		return _friendlyURLEntryLocalService.deleteFriendlyURLEntryLocalization(friendlyURLEntryLocalization);
+	}
+
+	@Override
 	public void deleteGroupFriendlyURLEntries(long groupId, long classNameId) {
 		_friendlyURLEntryLocalService.deleteGroupFriendlyURLEntries(groupId,
 			classNameId);

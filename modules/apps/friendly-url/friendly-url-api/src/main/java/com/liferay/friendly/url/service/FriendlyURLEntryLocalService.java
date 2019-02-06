@@ -127,6 +127,9 @@ public interface FriendlyURLEntryLocalService extends BaseLocalService,
 	public void deleteFriendlyURLEntry(long groupId, Class<?> clazz,
 		long classPK) throws PortalException;
 
+	public FriendlyURLEntryLocalization deleteFriendlyURLEntryLocalization(
+		FriendlyURLEntryLocalization friendlyURLEntryLocalization);
+
 	public void deleteGroupFriendlyURLEntries(long groupId, long classNameId);
 
 	/**
