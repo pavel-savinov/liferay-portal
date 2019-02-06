@@ -159,6 +159,21 @@ public class FragmentEntryServiceImpl extends FragmentEntryServiceBaseImpl {
 	}
 
 	@Override
+	public FragmentEntry copyFragmentEntry(
+			long groupId, long fragmentEntryId, long fragmentCollectionId,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		_portletResourcePermission.check(
+			getPermissionChecker(), groupId,
+			FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES);
+
+		return fragmentEntryLocalService.copyFragmentEntry(
+			getUserId(), groupId, fragmentEntryId, fragmentCollectionId,
+			serviceContext);
+	}
+
+	@Override
 	public void deleteFragmentEntries(long[] fragmentEntriesIds)
 		throws PortalException {
 
