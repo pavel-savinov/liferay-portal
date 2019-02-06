@@ -152,6 +152,10 @@ public interface FragmentEntryLocalService extends BaseLocalService,
 		String css, String html, String js, long previewFileEntryId,
 		int status, ServiceContext serviceContext) throws PortalException;
 
+	public FragmentEntry copyFragmentEntry(long userId, long groupId,
+		long fragmentEntryId, long fragmentCollectionId,
+		ServiceContext serviceContext) throws PortalException;
+
 	/**
 	* Creates a new fragment entry with the primary key. Does not add the fragment entry to the database.
 	*

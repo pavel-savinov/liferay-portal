@@ -93,6 +93,10 @@ public interface FragmentEntryService extends BaseService {
 		String css, String html, String js, int status,
 		ServiceContext serviceContext) throws PortalException;
 
+	public FragmentEntry copyFragmentEntry(long groupId, long fragmentEntryId,
+		long fragmentCollectionId, ServiceContext serviceContext)
+		throws PortalException;
+
 	public void deleteFragmentEntries(long[] fragmentEntriesIds)
 		throws PortalException;
 

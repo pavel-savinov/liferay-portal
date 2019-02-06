@@ -121,6 +121,15 @@ public class FragmentEntryServiceUtil {
 			fragmentEntryKey, name, css, html, js, status, serviceContext);
 	}
 
+	public static com.liferay.fragment.model.FragmentEntry copyFragmentEntry(
+		long groupId, long fragmentEntryId, long fragmentCollectionId,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .copyFragmentEntry(groupId, fragmentEntryId,
+			fragmentCollectionId, serviceContext);
+	}
+
 	public static void deleteFragmentEntries(long[] fragmentEntriesIds)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		getService().deleteFragmentEntries(fragmentEntriesIds);

@@ -214,6 +214,23 @@ public class FragmentEntryServiceSoap {
 		}
 	}
 
+	public static com.liferay.fragment.model.FragmentEntrySoap copyFragmentEntry(
+		long groupId, long fragmentEntryId, long fragmentCollectionId,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws RemoteException {
+		try {
+			com.liferay.fragment.model.FragmentEntry returnValue = FragmentEntryServiceUtil.copyFragmentEntry(groupId,
+					fragmentEntryId, fragmentCollectionId, serviceContext);
+
+			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static void deleteFragmentEntries(long[] fragmentEntriesIds)
 		throws RemoteException {
 		try {

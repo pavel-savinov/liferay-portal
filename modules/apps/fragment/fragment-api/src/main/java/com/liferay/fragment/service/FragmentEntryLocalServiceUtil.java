@@ -226,6 +226,16 @@ public class FragmentEntryLocalServiceUtil {
 			serviceContext);
 	}
 
+	public static com.liferay.fragment.model.FragmentEntry copyFragmentEntry(
+		long userId, long groupId, long fragmentEntryId,
+		long fragmentCollectionId,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService()
+				   .copyFragmentEntry(userId, groupId, fragmentEntryId,
+			fragmentCollectionId, serviceContext);
+	}
+
 	/**
 	* Creates a new fragment entry with the primary key. Does not add the fragment entry to the database.
 	*
