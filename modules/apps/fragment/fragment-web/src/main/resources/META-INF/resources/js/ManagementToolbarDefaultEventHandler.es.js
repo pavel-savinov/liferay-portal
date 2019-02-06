@@ -25,6 +25,35 @@ class ManagementToolbarDefaultEventHandler extends PortletBase {
 		}
 	}
 
+	copySelectedFragmentEntries() {
+		const fragmentEntryIds = Liferay.Util.listCheckedExcept(
+			this.one('#fm'),
+			this.ns('allRowIds')
+		);
+
+		Liferay.Util.selectEntity(
+			{
+				dialog: {
+					constrain: true,
+					destroyOnHide: true,
+					modal: true
+				},
+				eventName: this.ns('selectFragmentCollection'),
+				id: this.ns('selectFragmentCollection'),
+				title: Liferay.Language.get('select-collection'),
+				uri: this.selectFragmentCollectionURL
+			},
+			function(selectedItem) {
+				if (selectedItem) {
+					this.one('#fragmentCollectionId').value = selectedItem.id;
+					this.one('#fragmentEntryIds').value = fragmentEntryIds;
+
+					submitForm(this.one('#fragmentEntryFm'), this.copyFragmentEntryURL);
+				}
+			}.bind(this)
+		);
+	}
+
 	deleteSelectedFragmentEntries() {
 		if (confirm(Liferay.Language.get('are-you-sure-you-want-to-delete-this'))) {
 			submitForm(this.one('#fm'), this.deleteFragmentEntriesURL);
@@ -66,7 +95,7 @@ class ManagementToolbarDefaultEventHandler extends PortletBase {
 					this.one('#fragmentCollectionId').value = selectedItem.id;
 					this.one('#fragmentEntryIds').value = fragmentEntryIds;
 
-					submitForm(this.one('#moveFragmentEntryFm'));
+					submitForm(this.one('#fragmentEntryFm'), this.moveFragmentEntryURL);
 				}
 			}.bind(this)
 		);
@@ -74,8 +103,10 @@ class ManagementToolbarDefaultEventHandler extends PortletBase {
 }
 
 ManagementToolbarDefaultEventHandler.STATE = {
+	copyFragmentEntryURL: Config.string(),
 	deleteFragmentEntriesURL: Config.string(),
 	exportFragmentEntriesURL: Config.string(),
+	moveFragmentEntryURL: Config.string(),
 	namespace: Config.string(),
 	selectFragmentCollectionURL: Config.string(),
 	spritemap: Config.string()

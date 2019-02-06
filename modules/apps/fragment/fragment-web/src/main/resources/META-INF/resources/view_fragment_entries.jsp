@@ -65,11 +65,15 @@ FragmentManagementToolbarDisplayContext fragmentManagementToolbarDisplayContext 
 	<aui:input name="fileEntryId" type="hidden" />
 </aui:form>
 
+<portlet:actionURL name="/fragment/copy_fragment_entry" var="copyFragmentEntryURL">
+	<portlet:param name="redirect" value="<%= currentURL %>" />
+</portlet:actionURL>
+
 <portlet:actionURL name="/fragment/move_fragment_entry" var="moveFragmentEntryURL">
 	<portlet:param name="redirect" value="<%= currentURL %>" />
 </portlet:actionURL>
 
-<aui:form action="<%= moveFragmentEntryURL %>" name="moveFragmentEntryFm">
+<aui:form name="fragmentEntryFm">
 	<aui:input name="fragmentEntryIds" type="hidden" />
 	<aui:input name="fragmentCollectionId" type="hidden" />
 </aui:form>
@@ -80,6 +84,8 @@ FragmentManagementToolbarDisplayContext fragmentManagementToolbarDisplayContext 
 			'<%= FragmentWebKeys.FRAGMENT_ENTRY_DROPDOWN_DEFAULT_EVENT_HANDLER %>',
 			new FragmentEntryDropdownDefaultEventHandler.default(
 				{
+					copyFragmentEntryURL: '<%= copyFragmentEntryURL %>',
+					moveFragmentEntryURL: '<%= moveFragmentEntryURL %>',
 					namespace: '<portlet:namespace />',
 					spritemap: '<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg'
 				}
@@ -97,8 +103,10 @@ FragmentManagementToolbarDisplayContext fragmentManagementToolbarDisplayContext 
 		'<%= fragmentManagementToolbarDisplayContext.getDefaultEventHandler() %>',
 		new ManagementToolbarDefaultEventHandler.default(
 			{
+				copyFragmentEntryURL: '<%= copyFragmentEntryURL %>',
 				deleteFragmentEntriesURL: '<portlet:actionURL name="/fragment/delete_fragment_entries"><portlet:param name="redirect" value="<%= currentURL %>" /></portlet:actionURL>',
 				exportFragmentEntriesURL: '<portlet:resourceURL id="/fragment/export_fragment_entries" />',
+				moveFragmentEntryURL: '<%= moveFragmentEntryURL %>',
 				namespace: '<portlet:namespace />',
 				selectFragmentCollectionURL: '<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcRenderCommandName" value="/fragment/select_fragment_collection" /></portlet:renderURL>',
 				spritemap: '<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg'
