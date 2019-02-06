@@ -19,6 +19,8 @@ import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.FragmentEntryProcessor;
 import com.liferay.fragment.processor.PortletRegistry;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
+import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
+import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -33,7 +35,6 @@ import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -143,11 +144,11 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 
 				String defaultPreferences = _getPreferences(
 					portletName, originalFragmentEntryLink, originalInstanceId,
-					StringPool.BLANK, true);
+					StringPool.BLANK);
 
 				portletPreferences = _getPreferences(
 					portletName, fragmentEntryLink, instanceId,
-					defaultPreferences, false);
+					defaultPreferences);
 			}
 			else {
 				Portlet portlet = _portletLocalService.getPortletById(
@@ -155,7 +156,7 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 
 				portletPreferences = _getPreferences(
 					portletName, fragmentEntryLink, instanceId,
-					portlet.getDefaultPreferences(), false);
+					portlet.getDefaultPreferences());
 			}
 
 			runtimeTagElement.attr("defaultPreferences", portletPreferences);
@@ -263,29 +264,35 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 
 	private String _getPreferences(
 			String portletName, FragmentEntryLink fragmentEntryLink,
-			String instanceId, String defaultPreferences, boolean controlPanel)
+			String instanceId, String defaultPreferences)
 		throws PortalException {
 
 		long groupId = fragmentEntryLink.getGroupId();
 
-		Layout layout = null;
+		long plid = PortletKeys.PREFS_PLID_SHARED;
 
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
 		if (serviceContext != null) {
-			if (groupId == 0) {
-				groupId = serviceContext.getScopeGroupId();
-			}
-
-			layout = _layoutLocalService.fetchLayout(serviceContext.getPlid());
+			groupId = serviceContext.getScopeGroupId();
 		}
 
 		Group group = _groupLocalService.getGroup(groupId);
 
-		if ((layout == null) || controlPanel) {
-			layout = _layoutLocalService.fetchLayout(
-				_portal.getControlPanelPlid(group.getCompanyId()));
+		if (fragmentEntryLink.getClassNameId() ==
+				_portal.getClassNameId(Layout.class)) {
+
+			plid = fragmentEntryLink.getClassPK();
+		}
+		else if (fragmentEntryLink.getClassNameId() ==
+					_portal.getClassNameId(LayoutPageTemplateEntry.class)) {
+
+			LayoutPageTemplateEntry layoutPageTemplateEntry =
+				_layoutPageTemplateEntryLocalService.getLayoutPageTemplateEntry(
+					fragmentEntryLink.getClassPK());
+
+			plid = layoutPageTemplateEntry.getPlid();
 		}
 
 		String portletId = PortletIdCodec.encode(
@@ -305,8 +312,8 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 			jxPortletPreferences =
 				PortletPreferencesFactoryUtil.getLayoutPortletSetup(
 					group.getCompanyId(), PortletKeys.PREFS_OWNER_ID_DEFAULT,
-					PortletKeys.PREFS_OWNER_TYPE_LAYOUT, layout.getPlid(),
-					portletId, defaultPreferences);
+					PortletKeys.PREFS_OWNER_TYPE_LAYOUT, plid, portletId,
+					defaultPreferences);
 
 			_updateLayoutPortletSetup(
 				portletPreferencesList, jxPortletPreferences);
@@ -352,7 +359,8 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 	private GroupLocalService _groupLocalService;
 
 	@Reference
-	private LayoutLocalService _layoutLocalService;
+	private LayoutPageTemplateEntryLocalService
+		_layoutPageTemplateEntryLocalService;
 
 	@Reference
 	private Portal _portal;

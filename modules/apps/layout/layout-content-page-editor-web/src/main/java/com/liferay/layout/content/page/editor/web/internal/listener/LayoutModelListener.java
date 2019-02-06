@@ -32,15 +32,19 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.ModelListener;
+import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchException;
+import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
@@ -64,15 +68,8 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 			return;
 		}
 
-		UnicodeProperties typeSettingsProperties =
-			layout.getTypeSettingsProperties();
-
-		long layoutPageTemplateEntryId = GetterUtil.getLong(
-			typeSettingsProperties.get("layoutPageTemplateEntryId"));
-
 		LayoutPageTemplateEntry layoutPageTemplateEntry =
-			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
-				layoutPageTemplateEntryId);
+			_getLayoutPageTemplateEntry(layout);
 
 		if (layoutPageTemplateEntry == null) {
 			_reindexLayout(layout);
@@ -87,7 +84,8 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 						layout.getGroupId(),
 						_portal.getClassNameId(
 							LayoutPageTemplateEntry.class.getName()),
-						layoutPageTemplateEntryId, true);
+						layoutPageTemplateEntry.getLayoutPageTemplateEntryId(),
+						true);
 
 			JSONObject dataJSONObject = JSONFactoryUtil.createJSONObject(
 				layoutPageTemplateStructure.getData());
@@ -187,6 +185,22 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 	}
 
 	@Override
+	public void onBeforeCreate(Layout layout) throws ModelListenerException {
+		if (!_isContentLayout(layout)) {
+			return;
+		}
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			_getLayoutPageTemplateEntry(layout);
+
+		if (layoutPageTemplateEntry == null) {
+			return;
+		}
+
+		_copyPortletPreferences(layoutPageTemplateEntry, layout);
+	}
+
+	@Override
 	public void onBeforeRemove(Layout layout) throws ModelListenerException {
 		if (!_isContentLayout(layout)) {
 			return;
@@ -210,6 +224,39 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 
 			throw new ModelListenerException(pe);
 		}
+	}
+
+	private void _copyPortletPreferences(
+		LayoutPageTemplateEntry layoutPageTemplateEntry, Layout layout) {
+
+		List<PortletPreferences> portletPreferencesList =
+			_portletPreferencesLocalService.getPortletPreferences(
+				PortletKeys.PREFS_OWNER_ID_DEFAULT,
+				PortletKeys.PREFS_OWNER_TYPE_LAYOUT,
+				layoutPageTemplateEntry.getPlid());
+
+		portletPreferencesList.forEach(
+			portletPreferences ->
+				_portletPreferencesLocalService.addPortletPreferences(
+					portletPreferences.getCompanyId(),
+					PortletKeys.PREFS_OWNER_ID_DEFAULT,
+					PortletKeys.PREFS_OWNER_TYPE_LAYOUT, layout.getPlid(),
+					portletPreferences.getPortletId(), null,
+					portletPreferences.getPreferences()));
+	}
+
+	private LayoutPageTemplateEntry _getLayoutPageTemplateEntry(Layout layout) {
+		UnicodeProperties typeSettingsProperties =
+			layout.getTypeSettingsProperties();
+
+		long layoutPageTemplateEntryId = GetterUtil.getLong(
+			typeSettingsProperties.get("layoutPageTemplateEntryId"));
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
+				layoutPageTemplateEntryId);
+
+		return layoutPageTemplateEntry;
 	}
 
 	private boolean _isContentLayout(Layout layout) {
@@ -253,5 +300,8 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 
 	@Reference
 	private Portal _portal;
+
+	@Reference
+	private PortletPreferencesLocalService _portletPreferencesLocalService;
 
 }
