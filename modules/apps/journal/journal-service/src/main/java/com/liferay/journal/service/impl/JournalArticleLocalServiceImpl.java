@@ -39,6 +39,7 @@ import com.liferay.expando.kernel.util.ExpandoBridgeUtil;
 import com.liferay.exportimport.kernel.exception.ExportImportContentValidationException;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.friendly.url.model.FriendlyURLEntry;
+import com.liferay.friendly.url.model.FriendlyURLEntryLocalization;
 import com.liferay.friendly.url.service.FriendlyURLEntryLocalService;
 import com.liferay.journal.configuration.JournalFileUploadsConfiguration;
 import com.liferay.journal.configuration.JournalGroupServiceConfiguration;
@@ -186,6 +187,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletPreferences;
 
@@ -8531,6 +8533,34 @@ public class JournalArticleLocalServiceImpl
 				article.getGroupId(),
 				classNameLocalService.getClassNameId(JournalArticle.class),
 				article.getResourcePrimKey());
+
+		Stream<FriendlyURLEntry> stream = friendlyURLEntries.stream();
+
+		stream.flatMap(
+			friendlyURLEntry -> {
+				List<FriendlyURLEntryLocalization>
+					friendlyURLEntryLocalizations =
+						friendlyURLEntryLocalService.
+							getFriendlyURLEntryLocalizations(
+								friendlyURLEntry.getFriendlyURLEntryId());
+
+				return friendlyURLEntryLocalizations.stream();
+			}
+
+		).forEach(
+			friendlyURLEntryLocalization -> {
+				String languageId =
+					friendlyURLEntryLocalization.getLanguageId();
+
+				String urlTitle = friendlyURLEntryLocalization.getUrlTitle();
+
+				if (!Objects.equals(urlTitleMap.get(languageId), urlTitle)) {
+					friendlyURLEntryLocalService.
+						deleteFriendlyURLEntryLocalization(
+							friendlyURLEntryLocalization);
+				}
+			}
+		);
 
 		FriendlyURLEntry newFriendlyURLEntry =
 			friendlyURLEntryLocalService.addFriendlyURLEntry(
