@@ -126,6 +126,10 @@ public class UpgradeAssetDisplayLayout extends UpgradeProcess {
 				assetEntry.getClassTypeId())
 		);
 
+		if (layoutPageTemplateEntry == null) {
+			return 0;
+		}
+
 		if (layoutPageTemplateEntry.getPlid() > 0) {
 			return layoutPageTemplateEntry.getPlid();
 		}
