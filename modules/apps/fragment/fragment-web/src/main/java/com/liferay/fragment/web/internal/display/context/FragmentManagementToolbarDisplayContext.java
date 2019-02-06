@@ -91,6 +91,15 @@ public class FragmentManagementToolbarDisplayContext
 					add(
 						dropdownItem -> {
 							dropdownItem.putData(
+								"action", "copySelectedFragmentEntries");
+							dropdownItem.setIcon("copy");
+							dropdownItem.setLabel(
+								LanguageUtil.get(request, "copy"));
+							dropdownItem.setQuickAction(true);
+						});
+					add(
+						dropdownItem -> {
+							dropdownItem.putData(
 								"action", "deleteSelectedFragmentEntries");
 							dropdownItem.setIcon("times-circle");
 							dropdownItem.setLabel(

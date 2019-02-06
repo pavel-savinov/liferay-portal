@@ -81,6 +81,7 @@ public class FragmentEntryActionDropdownItemsProvider {
 					add(_getEditFragmentEntryActionConsumer());
 					add(_getRenameFragmentEntryActionConsumer());
 					add(_getMoveFragmentEntryActionConsumer());
+					add(_getCopyFragmentEntryActionConsumer());
 					add(_getUpdateFragmentEntryPreviewActionConsumer());
 				}
 
@@ -98,6 +99,29 @@ public class FragmentEntryActionDropdownItemsProvider {
 					add(_getDeleteFragmentEntryActionConsumer());
 				}
 			}
+		};
+	}
+
+	private Consumer<DropdownItem> _getCopyFragmentEntryActionConsumer()
+		throws Exception {
+
+		PortletURL selectFragmentCollectionURL =
+			_renderResponse.createRenderURL();
+
+		selectFragmentCollectionURL.setParameter(
+			"mvcRenderCommandName", "/fragment/select_fragment_collection");
+
+		selectFragmentCollectionURL.setWindowState(LiferayWindowState.POP_UP);
+
+		return dropdownItem -> {
+			dropdownItem.putData("action", "copyFragmentEntry");
+			dropdownItem.putData(
+				"fragmentEntryId",
+				String.valueOf(_fragmentEntry.getFragmentEntryId()));
+			dropdownItem.putData(
+				"selectFragmentCollectionURL",
+				selectFragmentCollectionURL.toString());
+			dropdownItem.setLabel(LanguageUtil.get(_request, "copy"));
 		};
 	}
 
