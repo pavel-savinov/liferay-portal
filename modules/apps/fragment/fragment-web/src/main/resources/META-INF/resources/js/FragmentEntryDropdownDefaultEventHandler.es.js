@@ -12,10 +12,10 @@ class FragmentEntryDropdownDefaultEventHandler extends PortletBase {
 	}
 
 	copyFragmentEntry(itemData) {
-		this.one('#fragmentCollectionId').value = this.fragmentCollectionId;
+		this.one('#fragmentCollectionId').value = itemData.fragmentCollectionId;
 		this.one('#fragmentEntryIds').value = itemData.fragmentEntryId;
 
-		submitForm(this.one('#fragmentEntryFm'), this.copyFragmentEntryURL);
+		submitForm(this.one('#fragmentEntryFm'), itemData.copyFragmentEntryURL);
 	}
 
 	deleteFragmentEntry(itemData) {
@@ -42,7 +42,7 @@ class FragmentEntryDropdownDefaultEventHandler extends PortletBase {
 					this.one('#fragmentCollectionId').value = selectedItem.id;
 					this.one('#fragmentEntryIds').value = itemData.fragmentEntryId;
 
-					submitForm(this.one('#fragmentEntryFm'), this.moveFragmentEntryURL);
+					submitForm(this.one('#fragmentEntryFm'), itemData.moveFragmentEntryURL);
 				}
 			}.bind(this)
 		);

@@ -65,32 +65,14 @@ FragmentManagementToolbarDisplayContext fragmentManagementToolbarDisplayContext 
 	<aui:input name="fileEntryId" type="hidden" />
 </aui:form>
 
-<portlet:actionURL name="/fragment/copy_fragment_entry" var="copyFragmentEntryURL">
-	<portlet:param name="redirect" value="<%= currentURL %>" />
-</portlet:actionURL>
-
-<portlet:actionURL name="/fragment/move_fragment_entry" var="moveFragmentEntryURL">
-	<portlet:param name="redirect" value="<%= currentURL %>" />
-</portlet:actionURL>
-
 <aui:form name="fragmentEntryFm">
 	<aui:input name="fragmentEntryIds" type="hidden" />
 	<aui:input name="fragmentCollectionId" type="hidden" />
 </aui:form>
 
 <c:if test="<%= FragmentPermission.contains(permissionChecker, scopeGroupId, FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES) %>">
-
-	<%
-	Map<String, Object> context = new HashMap<>();
-
-	context.put("copyFragmentEntryURL", copyFragmentEntryURL);
-	context.put("fragmentCollectionId", fragmentDisplayContext.getFragmentCollectionId());
-	context.put("moveFragmentEntryURL", moveFragmentEntryURL);
-	%>
-
 	<liferay-frontend:component
 		componentId="<%= FragmentWebKeys.FRAGMENT_ENTRY_DROPDOWN_DEFAULT_EVENT_HANDLER %>"
-		context="<%= context %>"
 		module="js/FragmentEntryDropdownDefaultEventHandler.es"
 	/>
 </c:if>

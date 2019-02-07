@@ -113,8 +113,20 @@ public class FragmentEntryActionDropdownItemsProvider {
 
 		selectFragmentCollectionURL.setWindowState(LiferayWindowState.POP_UP);
 
+		PortletURL copyFragmentEntryURL = _renderResponse.createActionURL();
+
+		copyFragmentEntryURL.setParameter(
+			ActionRequest.ACTION_NAME, "/fragment/copy_fragment_entry");
+		copyFragmentEntryURL.setParameter(
+			"redirect", _themeDisplay.getURLCurrent());
+
 		return dropdownItem -> {
 			dropdownItem.putData("action", "copyFragmentEntry");
+			dropdownItem.putData(
+				"copyFragmentEntryURL", copyFragmentEntryURL.toString());
+			dropdownItem.putData(
+				"fragmentCollectionId",
+				String.valueOf(_fragmentEntry.getFragmentCollectionId()));
 			dropdownItem.putData(
 				"fragmentEntryId",
 				String.valueOf(_fragmentEntry.getFragmentEntryId()));
@@ -219,11 +231,20 @@ public class FragmentEntryActionDropdownItemsProvider {
 
 		selectFragmentCollectionURL.setWindowState(LiferayWindowState.POP_UP);
 
+		PortletURL moveFragmentEntryURL = _renderResponse.createActionURL();
+
+		moveFragmentEntryURL.setParameter(
+			ActionRequest.ACTION_NAME, "/fragment/move_fragment_entry");
+		moveFragmentEntryURL.setParameter(
+			"redirect", _themeDisplay.getURLCurrent());
+
 		return dropdownItem -> {
 			dropdownItem.putData("action", "moveFragmentEntry");
 			dropdownItem.putData(
 				"fragmentEntryId",
 				String.valueOf(_fragmentEntry.getFragmentEntryId()));
+			dropdownItem.putData(
+				"moveFragmentEntryURL", moveFragmentEntryURL.toString());
 			dropdownItem.putData(
 				"selectFragmentCollectionURL",
 				selectFragmentCollectionURL.toString());
