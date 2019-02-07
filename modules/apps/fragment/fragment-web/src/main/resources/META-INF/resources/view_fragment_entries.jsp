@@ -89,6 +89,7 @@ FragmentManagementToolbarDisplayContext fragmentManagementToolbarDisplayContext 
 
 	<liferay-frontend:component
 		componentId="<%= FragmentWebKeys.FRAGMENT_ENTRY_DROPDOWN_DEFAULT_EVENT_HANDLER %>"
+		context="<%= context %>"
 		module="js/FragmentEntryDropdownDefaultEventHandler.es"
 	/>
 </c:if>
