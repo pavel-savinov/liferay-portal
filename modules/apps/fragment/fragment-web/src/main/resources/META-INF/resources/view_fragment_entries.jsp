@@ -84,6 +84,7 @@ FragmentManagementToolbarDisplayContext fragmentManagementToolbarDisplayContext 
 	Map<String, Object> context = new HashMap<>();
 
 	context.put("copyFragmentEntryURL", copyFragmentEntryURL);
+	context.put("fragmentCollectionId", fragmentDisplayContext.getFragmentCollectionId());
 	context.put("moveFragmentEntryURL", moveFragmentEntryURL);
 	%>
 

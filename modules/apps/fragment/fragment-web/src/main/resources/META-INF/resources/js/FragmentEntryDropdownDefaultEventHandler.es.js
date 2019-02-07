@@ -12,27 +12,10 @@ class FragmentEntryDropdownDefaultEventHandler extends PortletBase {
 	}
 
 	copyFragmentEntry(itemData) {
-		Liferay.Util.selectEntity(
-			{
-				dialog: {
-					constrain: true,
-					destroyOnHide: true,
-					modal: true
-				},
-				eventName: this.ns('selectFragmentCollection'),
-				id: this.ns('selectFragmentCollection'),
-				title: Liferay.Language.get('select-collection'),
-				uri: itemData.selectFragmentCollectionURL
-			},
-			function(selectedItem) {
-				if (selectedItem) {
-					this.one('#fragmentCollectionId').value = selectedItem.id;
-					this.one('#fragmentEntryIds').value = itemData.fragmentEntryId;
+		this.one('#fragmentCollectionId').value = this.fragmentCollectionId;
+		this.one('#fragmentEntryIds').value = itemData.fragmentEntryId;
 
-					submitForm(this.one('#fragmentEntryFm'), this.copyFragmentEntryURL);
-				}
-			}.bind(this)
-		);
+		submitForm(this.one('#fragmentEntryFm'), this.copyFragmentEntryURL);
 	}
 
 	deleteFragmentEntry(itemData) {
@@ -121,6 +104,7 @@ class FragmentEntryDropdownDefaultEventHandler extends PortletBase {
 
 FragmentEntryDropdownDefaultEventHandler.STATE = {
 	copyFragmentEntryURL: Config.string(),
+	fragmentCollectionId: Config.string(),
 	moveFragmentEntryURL: Config.string(),
 	namespace: Config.string(),
 	spritemap: Config.string()

@@ -31,27 +31,10 @@ class ManagementToolbarDefaultEventHandler extends PortletBase {
 			this.ns('allRowIds')
 		);
 
-		Liferay.Util.selectEntity(
-			{
-				dialog: {
-					constrain: true,
-					destroyOnHide: true,
-					modal: true
-				},
-				eventName: this.ns('selectFragmentCollection'),
-				id: this.ns('selectFragmentCollection'),
-				title: Liferay.Language.get('select-collection'),
-				uri: this.selectFragmentCollectionURL
-			},
-			function(selectedItem) {
-				if (selectedItem) {
-					this.one('#fragmentCollectionId').value = selectedItem.id;
-					this.one('#fragmentEntryIds').value = fragmentEntryIds;
+		this.one('#fragmentCollectionId').value = this.fragmentCollectionId;
+		this.one('#fragmentEntryIds').value = fragmentEntryIds;
 
-					submitForm(this.one('#fragmentEntryFm'), this.copyFragmentEntryURL);
-				}
-			}.bind(this)
-		);
+		submitForm(this.one('#fragmentEntryFm'), this.copyFragmentEntryURL);
 	}
 
 	deleteSelectedFragmentEntries() {
@@ -106,6 +89,7 @@ ManagementToolbarDefaultEventHandler.STATE = {
 	copyFragmentEntryURL: Config.string(),
 	deleteFragmentEntriesURL: Config.string(),
 	exportFragmentEntriesURL: Config.string(),
+	fragmentCollectionId: Config.string(),
 	moveFragmentEntryURL: Config.string(),
 	namespace: Config.string(),
 	selectFragmentCollectionURL: Config.string(),

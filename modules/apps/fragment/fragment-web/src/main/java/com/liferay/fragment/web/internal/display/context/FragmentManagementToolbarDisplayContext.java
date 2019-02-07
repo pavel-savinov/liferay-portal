@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.HashMap;
@@ -161,6 +162,11 @@ public class FragmentManagementToolbarDisplayContext
 
 		componentContext.put(
 			"exportFragmentEntriesURL", exportFragmentEntriesURL.toString());
+
+		long fragmentCollectionId = ParamUtil.getLong(
+			liferayPortletRequest, "fragmentCollectionId");
+
+		componentContext.put("fragmentCollectionId", fragmentCollectionId);
 
 		PortletURL moveFragmentEntryURL =
 			liferayPortletResponse.createActionURL();
