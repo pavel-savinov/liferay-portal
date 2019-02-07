@@ -7153,25 +7153,7 @@ public class JournalArticleLocalServiceImpl
 
 		DDMStructure ddmStructure = article.getDDMStructure();
 
-		try {
-			checkStructure(article, ddmStructure);
-		}
-		catch (StructureDefinitionException sde) {
-			if (_log.isWarnEnabled()) {
-				StringBundler sb = new StringBundler(8);
-
-				sb.append("Article {groupId=");
-				sb.append(article.getGroupId());
-				sb.append(", articleId=");
-				sb.append(article.getArticleId());
-				sb.append(", version=");
-				sb.append(article.getVersion());
-				sb.append("} has content that does not match its structure: ");
-				sb.append(sde.getMessage());
-
-				_log.warn(sb.toString());
-			}
-		}
+		checkStructure(article, ddmStructure);
 	}
 
 	protected void checkStructure(
