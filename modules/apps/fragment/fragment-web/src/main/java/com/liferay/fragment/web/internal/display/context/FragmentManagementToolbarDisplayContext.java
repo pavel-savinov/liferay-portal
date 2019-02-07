@@ -98,7 +98,7 @@ public class FragmentManagementToolbarDisplayContext
 								"action", "copySelectedFragmentEntries");
 							dropdownItem.setIcon("paste");
 							dropdownItem.setLabel(
-								LanguageUtil.get(request, "copy"));
+								LanguageUtil.get(request, "make-a-copy"));
 							dropdownItem.setQuickAction(true);
 						});
 					add(

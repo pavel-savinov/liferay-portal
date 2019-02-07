@@ -121,7 +121,7 @@ public class FragmentEntryActionDropdownItemsProvider {
 			dropdownItem.putData(
 				"selectFragmentCollectionURL",
 				selectFragmentCollectionURL.toString());
-			dropdownItem.setLabel(LanguageUtil.get(_request, "copy"));
+			dropdownItem.setLabel(LanguageUtil.get(_request, "make-a-copy"));
 		};
 	}
 
