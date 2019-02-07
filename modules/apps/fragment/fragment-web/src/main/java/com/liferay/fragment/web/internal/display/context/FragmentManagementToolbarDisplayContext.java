@@ -96,7 +96,7 @@ public class FragmentManagementToolbarDisplayContext
 						dropdownItem -> {
 							dropdownItem.putData(
 								"action", "copySelectedFragmentEntries");
-							dropdownItem.setIcon("copy");
+							dropdownItem.setIcon("paste");
 							dropdownItem.setLabel(
 								LanguageUtil.get(request, "copy"));
 							dropdownItem.setQuickAction(true);
