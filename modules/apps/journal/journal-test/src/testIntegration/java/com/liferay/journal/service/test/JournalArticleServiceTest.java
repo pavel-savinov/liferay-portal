@@ -26,7 +26,6 @@ import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerDeserializeRespons
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
-import com.liferay.dynamic.data.mapping.service.DDMStructureServiceUtil;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMTemplateTestUtil;
@@ -39,12 +38,10 @@ import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.journal.service.JournalArticleServiceUtil;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
-import com.liferay.portal.kernel.service.ClassNameServiceUtil;
 import com.liferay.portal.kernel.service.PortalPreferencesLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
@@ -79,7 +76,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -184,7 +180,6 @@ public class JournalArticleServiceTest {
 			"test-journal-content-html-required-field.xml", requiredFields);
 	}
 
-	@Ignore
 	@Test(expected = StructureDefinitionException.class)
 	public void testCheckArticleWithInvalidStructure() throws Exception {
 		DDMStructure ddmStructure = DDMStructureTestUtil.addStructure(
@@ -202,11 +197,10 @@ public class JournalArticleServiceTest {
 
 		ReflectionTestUtil.invoke(
 			_journalArticleLocalServiceImplInstance, "checkStructure",
-			new Class<?>[] {JournalArticle.class, DDMStructure.class}, article,
-			ddmStructure);
+			new Class<?>[] {Long.TYPE, String.class, Double.TYPE},
+			article.getGroupId(), article.getArticleId(), article.getVersion());
 	}
 
-	@Ignore
 	@Test
 	public void testCheckArticleWithValidStructure() throws Exception {
 		Group group = GroupTestUtil.addGroup();
@@ -217,17 +211,10 @@ public class JournalArticleServiceTest {
 		JournalArticle article = JournalTestUtil.addArticle(
 			group.getGroupId(), parentFolder.getFolderId(), "title", "content");
 
-		ClassName className = ClassNameServiceUtil.fetchClassName(
-			JournalArticle.class.getName());
-
-		DDMStructure ddmStructure = DDMStructureServiceUtil.getStructure(
-			group.getGroupId(), className.getClassNameId(),
-			article.getDDMStructureKey());
-
 		ReflectionTestUtil.invoke(
 			_journalArticleLocalServiceImplInstance, "checkStructure",
-			new Class<?>[] {JournalArticle.class, DDMStructure.class}, article,
-			ddmStructure);
+			new Class<?>[] {Long.TYPE, String.class, Double.TYPE},
+			article.getGroupId(), article.getArticleId(), article.getVersion());
 	}
 
 	@Test
