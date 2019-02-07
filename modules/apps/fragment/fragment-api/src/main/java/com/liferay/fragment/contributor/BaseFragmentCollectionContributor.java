@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.Validator;
 import java.net.URL;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -40,6 +41,7 @@ import javax.servlet.ServletContext;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Reference;
 
@@ -59,11 +61,27 @@ public abstract class BaseFragmentCollectionContributor
 		return _name;
 	}
 
-	public abstract ServletContext getServletContext();
-
 	@Activate
-	protected void activate(BundleContext bundleContext) {
+	protected void activate(BundleContext bundleContext) throws Exception {
 		_bundle = bundleContext.getBundle();
+
+		Collection<ServiceReference<ServletContext>> serviceReferences =
+			bundleContext.getServiceReferences(
+				ServletContext.class,
+				"(service.bundleid=" + _bundle.getBundleId() + ")");
+
+		if (serviceReferences.size() != 1) {
+			_log.error(
+				"Incorrect servlet context for bundle " +
+					_bundle.getBundleId());
+
+			return;
+		}
+
+		Iterator<ServiceReference<ServletContext>> iterator =
+			serviceReferences.iterator();
+
+		_servletContext = bundleContext.getService(iterator.next());
 
 		readAndCheckFragmentCollectionStructure();
 	}
@@ -165,9 +183,7 @@ public abstract class BaseFragmentCollectionContributor
 			return StringPool.BLANK;
 		}
 
-		ServletContext servletContext = getServletContext();
-
-		return servletContext.getContextPath() + "/thumbnails/" + fileName;
+		return _servletContext.getContextPath() + "/thumbnails/" + fileName;
 	}
 
 	private JSONObject _getStructure(String path) throws Exception {
@@ -185,5 +201,6 @@ public abstract class BaseFragmentCollectionContributor
 	private Bundle _bundle;
 	private Map<Integer, List<FragmentEntry>> _fragmentEntries;
 	private String _name;
+	private ServletContext _servletContext;
 
 }
