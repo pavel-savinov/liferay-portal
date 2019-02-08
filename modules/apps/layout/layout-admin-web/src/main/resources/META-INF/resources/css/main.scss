@@ -25,6 +25,12 @@
 		position: absolute;
 	}
 
+	.friendly-url {
+		.input-group-item-shrink {
+			max-width: 50%;
+		}
+	}
+
 	.layout-type-img {
 		width: 100%;
 	}
