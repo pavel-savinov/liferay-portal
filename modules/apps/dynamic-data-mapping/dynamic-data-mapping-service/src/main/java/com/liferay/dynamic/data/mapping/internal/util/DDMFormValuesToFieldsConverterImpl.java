@@ -180,11 +180,11 @@ public class DDMFormValuesToFieldsConverterImpl
 	protected void setDDMFieldLocalizedValue(
 		Field ddmField, String type, Value value) {
 
-		for (Locale availableLocales : value.getAvailableLocales()) {
+		for (Locale availableLocale : value.getAvailableLocales()) {
 			Serializable serializable = FieldConstants.getSerializable(
-				type, value.getString(availableLocales));
+				type, value.getString(availableLocale), availableLocale);
 
-			ddmField.addValue(availableLocales, serializable);
+			ddmField.addValue(availableLocale, serializable);
 		}
 	}
 
