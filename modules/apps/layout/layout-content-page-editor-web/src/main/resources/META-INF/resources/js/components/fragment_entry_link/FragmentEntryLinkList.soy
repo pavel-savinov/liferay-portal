@@ -66,7 +66,6 @@
 				{call com.liferay.layout.content.page.editor.web.FragmentEntryLinkListSection.render}
 					{param _handleFragmentMove: $_handleFragmentMove /}
 					{param _handleSectionClick: $_handleSectionClick /}
-					{param _handleSectionFocusOut: $_handleSectionFocusOut /}
 					{param _handleSectionHoverStart: $_handleSectionHoverStart /}
 					{param _handleSectionKeyUp: $_handleSectionKeyUp /}
 					{param _handleSectionRemoveButtonClick: $_handleSectionRemoveButtonClick /}
@@ -74,6 +73,7 @@
 					{param defaultEditorConfigurations: $defaultEditorConfigurations /}
 					{param dropTargetItemTypes: $dropTargetItemTypes /}
 					{param empty: $row.empty /}
+					{param events: ['sectionFocusOut': $_handleSectionFocusOut]/}
 					{param fragmentEntryLinks: $fragmentEntryLinks /}
 					{param key: $row.rowId /}
 					{param mappingFieldsURL: $mappingFieldsURL /}

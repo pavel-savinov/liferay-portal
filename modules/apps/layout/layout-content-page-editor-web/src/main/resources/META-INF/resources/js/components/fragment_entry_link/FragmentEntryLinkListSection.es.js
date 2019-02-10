@@ -109,6 +109,15 @@ class FragmentEntryLinkListSection extends Component {
 		}
 	}
 
+	_handleSectionFocusOut() {
+		if (
+			(this.rowId !== this.activeItemId) &&
+			(this.activeItemType !== FRAGMENTS_EDITOR_ITEM_TYPES.section)
+		) {
+			this.emit('sectionFocusOut');
+		}
+	}
+
 }
 
 /**
