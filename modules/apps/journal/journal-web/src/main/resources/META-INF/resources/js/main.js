@@ -61,8 +61,7 @@ AUI.add(
 						var form = instance._getPrincipalForm();
 
 						var eventHandles = [
-							form.delegate('change', instance._onFormChanged, ':input', instance),
-							form.on('submit', instance._onFormSubmit, instance)
+							form.delegate('change', instance._onFormChanged, ':input', instance)
 						];
 
 						var basicPreviewButton = instance.one('#basicPreviewButton');
@@ -134,6 +133,8 @@ AUI.add(
 							var form = instance._getPrincipalForm();
 
 							instance.one(SELECTOR_ACTION_NAME, form).val(actionName);
+
+							instance._saveArticle(actionName);
 						}
 					},
 
@@ -141,18 +142,6 @@ AUI.add(
 						var instance = this;
 
 						instance._formChanged = true;
-					},
-
-					_onFormSubmit: function(event) {
-						var instance = this;
-
-						event.preventDefault();
-
-						var form = instance._getPrincipalForm();
-
-						var actionName = instance.one(SELECTOR_ACTION_NAME, form).val();
-
-						instance._saveArticle(actionName);
 					},
 
 					_onLocaleChange: function(event) {
