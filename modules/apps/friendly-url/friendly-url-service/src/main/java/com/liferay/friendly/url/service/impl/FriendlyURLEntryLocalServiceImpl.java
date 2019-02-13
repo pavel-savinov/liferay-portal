@@ -554,6 +554,8 @@ public class FriendlyURLEntryLocalServiceImpl
 
 				updateFriendlyURLLocalization(
 					existingFriendlyURLEntryLocalization);
+
+				continue;
 			}
 
 			updateFriendlyURLEntryLocalization(
