@@ -532,13 +532,28 @@ public class FriendlyURLEntryLocalServiceImpl
 				(existingFriendlyURLEntryLocalization.getClassPK() ==
 					classPK)) {
 
+				String existingLanguageId =
+					existingFriendlyURLEntryLocalization.getLanguageId();
+
+				if (!existingLanguageId.equals(entry.getKey())) {
+					String existingUrlTitle =
+						existingFriendlyURLEntryLocalization.getUrlTitle();
+
+					if (existingUrlTitle.equals(
+							urlTitleMap.get(existingLanguageId))) {
+
+						continue;
+					}
+
+					existingFriendlyURLEntryLocalization.setLanguageId(
+						entry.getKey());
+				}
+
 				existingFriendlyURLEntryLocalization.setFriendlyURLEntryId(
 					friendlyURLEntry.getFriendlyURLEntryId());
 
 				updateFriendlyURLLocalization(
 					existingFriendlyURLEntryLocalization);
-
-				continue;
 			}
 
 			updateFriendlyURLEntryLocalization(
