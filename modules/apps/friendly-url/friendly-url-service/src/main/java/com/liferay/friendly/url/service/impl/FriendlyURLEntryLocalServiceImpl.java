@@ -535,28 +535,25 @@ public class FriendlyURLEntryLocalServiceImpl
 				String existingLanguageId =
 					existingFriendlyURLEntryLocalization.getLanguageId();
 
-				if (existingLanguageId.equals(entry.getKey())) {
-					existingFriendlyURLEntryLocalization.setFriendlyURLEntryId(
-						friendlyURLEntry.getFriendlyURLEntryId());
+				if (!existingLanguageId.equals(entry.getKey())) {
+					String existingUrlTitle =
+						existingFriendlyURLEntryLocalization.getUrlTitle();
 
-					updateFriendlyURLLocalization(
-						existingFriendlyURLEntryLocalization);
+					if (existingUrlTitle.equals(
+							urlTitleMap.get(existingLanguageId))) {
 
-					continue;
+						continue;
+					}
+
+					existingFriendlyURLEntryLocalization.setLanguageId(
+						entry.getKey());
 				}
 
-				String urlTitle = urlTitleMap.get(existingLanguageId);
+				existingFriendlyURLEntryLocalization.setFriendlyURLEntryId(
+					friendlyURLEntry.getFriendlyURLEntryId());
 
-				if (!urlTitle.equals(
-						existingFriendlyURLEntryLocalization.getUrlTitle())) {
-
-					friendlyURLEntryLocalizationPersistence.remove(
-						existingFriendlyURLEntryLocalization.
-							getFriendlyURLEntryLocalizationId());
-				}
-				else {
-					continue;
-				}
+				updateFriendlyURLLocalization(
+					existingFriendlyURLEntryLocalization);
 			}
 
 			updateFriendlyURLEntryLocalization(
