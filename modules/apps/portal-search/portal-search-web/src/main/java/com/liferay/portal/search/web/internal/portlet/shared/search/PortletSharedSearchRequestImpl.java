@@ -25,7 +25,10 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcherManager;
+import com.liferay.portal.kernel.service.PortletLocalService;
+import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.search.legacy.searcher.SearchResponseBuilderFactory;
 import com.liferay.portal.search.web.internal.display.context.PortletRequestThemeDisplaySupplier;
 import com.liferay.portal.search.web.internal.display.context.ThemeDisplaySupplier;
@@ -194,6 +197,23 @@ public class PortletSharedSearchRequestImpl
 
 		List<Portlet> portlets = layoutTypePortlet.getAllPortlets(false);
 
+		List<com.liferay.portal.kernel.model.PortletPreferences>
+			portletPreferencesList =
+				portletPreferencesLocalService.getPortletPreferences(
+					PortletKeys.PREFS_OWNER_ID_DEFAULT,
+					PortletKeys.PREFS_OWNER_TYPE_LAYOUT, layout.getPlid());
+
+		portletPreferencesList.forEach(
+			portletPreferences -> {
+				Portlet portlet = portletLocalService.getPortletById(
+					themeDisplay.getCompanyId(),
+					portletPreferences.getPortletId());
+
+				if (!portlets.contains(portlet)) {
+					portlets.add(portlet);
+				}
+			});
+
 		return portlets.stream();
 	}
 
@@ -245,6 +265,12 @@ public class PortletSharedSearchRequestImpl
 
 	@Reference
 	protected FacetedSearcherManager facetedSearcherManager;
+
+	@Reference
+	protected PortletLocalService portletLocalService;
+
+	@Reference
+	protected PortletPreferencesLocalService portletPreferencesLocalService;
 
 	@Reference
 	protected PortletPreferencesLookup portletPreferencesLookup;
