@@ -369,14 +369,20 @@ function updateEditableValueReducer(state, actionType, payload) {
 
 				const {editableValues} = nextState.fragmentEntryLinks[payload.fragmentEntryLinkId];
 
+				const keysTreeArray = editableValueSegmentId ? [
+					EDITABLE_FRAGMENT_ENTRY_PROCESSOR,
+					editableId,
+					editableValueSegmentId,
+					editableValueId
+				] : [
+					EDITABLE_FRAGMENT_ENTRY_PROCESSOR,
+					editableId,
+					editableValueId
+				];
+
 				const nextEditableValues = setIn(
 					editableValues,
-					[
-						EDITABLE_FRAGMENT_ENTRY_PROCESSOR,
-						editableId,
-						editableValueSegmentId,
-						editableValueId
-					],
+					keysTreeArray,
 					editableValue
 				);
 
