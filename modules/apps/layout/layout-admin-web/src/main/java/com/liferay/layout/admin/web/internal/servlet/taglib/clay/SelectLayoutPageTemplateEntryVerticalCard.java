@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -64,6 +65,14 @@ public class SelectLayoutPageTemplateEntryVerticalCard implements VerticalCard {
 				"layoutPageTemplateEntryId",
 				String.valueOf(
 					_layoutPageTemplateEntry.getLayoutPageTemplateEntryId()));
+
+			long selPlid = ParamUtil.getLong(_request, "selPlid");
+			boolean privateLayout = ParamUtil.getBoolean(
+				_request, "privateLayout");
+
+			addLayoutURL.setParameter("selPlid", String.valueOf(selPlid));
+			addLayoutURL.setParameter(
+				"privateLayout", String.valueOf(privateLayout));
 
 			addLayoutURL.setWindowState(LiferayWindowState.POP_UP);
 
