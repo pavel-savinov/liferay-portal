@@ -1178,6 +1178,8 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 			assetEntryQuery.addAllTagIdsArray(allAssetTagIds);
 		}
 
+		anyAssetCategoryIds = _filterAssetCategoryIds(anyAssetCategoryIds);
+
 		assetEntryQuery.setAnyCategoryIds(anyAssetCategoryIds);
 
 		long[] anyAssetTagIds = _assetTagLocalService.getTagIds(
