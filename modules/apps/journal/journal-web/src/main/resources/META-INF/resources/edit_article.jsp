@@ -33,8 +33,43 @@ JournalEditArticleDisplayContext journalEditArticleDisplayContext = new JournalE
 	<portlet:param name="mvcPath" value="/edit_article.jsp" />
 </portlet:renderURL>
 
+<nav class="management-bar management-bar-light navbar navbar-expand-md site-navigation-management-bar">
+	<div class="container d-inline-flex">
+		<div class="col">
+			<c:if test="<%= journalWebConfiguration.changeableDefaultLanguage() %>">
+				<soy:component-renderer
+					context="<%= journalEditArticleDisplayContext.getChangeDefaultLanguageSoyContext() %>"
+					module="js/ChangeDefaultLanguage.es"
+					templateNamespace="com.liferay.journal.web.ChangeDefaultLanguage.render"
+				/>
+			</c:if>
+		</div>
+
+		<div class="col">
+			<ul class="float-right journal-article-button-row navbar-nav">
+				<li class="nav-item">
+					<aui:button cssClass="btn-sm mr-2 nav-btn" href="<%= journalEditArticleDisplayContext.getRedirect() %>" type="cancel" />
+				</li>
+
+				<li class="nav-item">
+					<c:if test="<%= journalEditArticleDisplayContext.getClassNameId() == JournalArticleConstants.CLASSNAME_ID_DEFAULT %>">
+						<aui:button cssClass="btn-sm mr-2 nav-btn" data-actionname='<%= ((article == null) || Validator.isNull(article.getArticleId())) ? "addArticle" : "updateArticle" %>' name="saveButton" primary="<%= false %>" type="submit" value="<%= journalEditArticleDisplayContext.getSaveButtonLabel() %>" />
+					</c:if>
+				</li>
+
+				<li class="nav-item">
+					<c:if test="<%= journalEditArticleDisplayContext.hasSavePermission() %>">
+						<aui:button cssClass="btn-sm nav-btn" data-actionname="<%= Constants.PUBLISH %>" disabled="<%= journalEditArticleDisplayContext.isPending() %>" name="publishButton" type="submit" value="<%= journalEditArticleDisplayContext.getPublishButtonLabel() %>" />
+					</c:if>
+				</li>
+			</ul>
+		</div>
+	</div>
+</nav>
+
 <liferay-frontend:edit-form
 	action="<%= editArticleActionURL %>"
+	cssClass="contextual-sidebar-content"
 	enctype="multipart/form-data"
 	method="post"
 	name="fm1"
@@ -121,34 +156,18 @@ JournalEditArticleDisplayContext journalEditArticleDisplayContext = new JournalE
 			</c:if>
 		</c:if>
 
-		<c:if test="<%= journalWebConfiguration.changeableDefaultLanguage() %>">
-			<soy:component-renderer
-				context="<%= journalEditArticleDisplayContext.getChangeDefaultLanguageSoyContext() %>"
-				module="js/ChangeDefaultLanguage.es"
-				templateNamespace="com.liferay.journal.web.ChangeDefaultLanguage.render"
-			/>
-		</c:if>
+		<liferay-util:include page="/article/content.jsp" servletContext="<%= application %>" />
 
-		<liferay-frontend:form-navigator
-			formModelBean="<%= article %>"
-			id="<%= FormNavigatorConstants.FORM_NAVIGATOR_ID_JOURNAL %>"
-			showButtons="<%= false %>"
-		/>
-	</liferay-frontend:edit-form-body>
-
-	<liferay-frontend:edit-form-footer>
-		<div class="journal-article-button-row">
-			<c:if test="<%= journalEditArticleDisplayContext.hasSavePermission() %>">
-				<aui:button data-actionname="<%= Constants.PUBLISH %>" disabled="<%= journalEditArticleDisplayContext.isPending() %>" name="publishButton" type="submit" value="<%= journalEditArticleDisplayContext.getPublishButtonLabel() %>" />
-
-				<c:if test="<%= journalEditArticleDisplayContext.getClassNameId() == JournalArticleConstants.CLASSNAME_ID_DEFAULT %>">
-					<aui:button data-actionname='<%= ((article == null) || Validator.isNull(article.getArticleId())) ? "addArticle" : "updateArticle" %>' name="saveButton" primary="<%= false %>" type="submit" value="<%= journalEditArticleDisplayContext.getSaveButtonLabel() %>" />
-				</c:if>
-			</c:if>
-
-			<aui:button href="<%= journalEditArticleDisplayContext.getRedirect() %>" type="cancel" />
+		<div class="contextual-sidebar contextual-sidebar-visible edit-article-sidebar sidebar-light">
+			<div class="sidebar-body">
+				<liferay-frontend:form-navigator
+					formModelBean="<%= article %>"
+					id="<%= FormNavigatorConstants.FORM_NAVIGATOR_ID_JOURNAL %>"
+					showButtons="<%= false %>"
+				/>
+			</div>
 		</div>
-	</liferay-frontend:edit-form-footer>
+	</liferay-frontend:edit-form-body>
 </liferay-frontend:edit-form>
 
 <aui:script use="liferay-portlet-journal">
