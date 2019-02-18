@@ -34,6 +34,7 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -173,7 +174,10 @@ public class UpgradeJournalArticleLocalizedValues extends UpgradeProcess {
 						String safeLocalizedDescription = _truncate(
 							localizedDescription, _MAX_LENGTH_DESCRIPTION);
 
-						if (localizedDescription != safeLocalizedDescription) {
+						if (!Objects.equals(
+								localizedDescription,
+								safeLocalizedDescription)) {
+
 							_log(articleId, "description");
 						}
 					}
