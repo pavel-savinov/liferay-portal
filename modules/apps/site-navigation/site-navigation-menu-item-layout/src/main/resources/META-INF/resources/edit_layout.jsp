@@ -39,7 +39,7 @@ Boolean useLayoutName = GetterUtil.getBoolean(request.getAttribute(SiteNavigatio
 <aui:fieldset>
 	<aui:input checked="<%= useLayoutName %>" helpMessage="use-layout-name-help" label="use-layout-name" name="TypeSettingsProperties--useLayoutName--" type="checkbox" />
 </aui:fieldset>
-	
+
 <div class="form-group input-text-wrapper text-default">
 	<div class="d-inline-block" id="<portlet:namespace />layoutItemRemove" role="button">
 		<aui:icon cssClass="icon-monospaced" image="times" markupView="lexicon" />
