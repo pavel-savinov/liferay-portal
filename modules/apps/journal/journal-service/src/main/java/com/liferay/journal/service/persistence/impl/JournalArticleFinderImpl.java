@@ -106,11 +106,11 @@ public class JournalArticleFinderImpl
 	public static final String FIND_BY_G_C_S =
 		JournalArticleFinder.class.getName() + ".findByG_C_S";
 
-	public static final String FIND_BY_G_U_F_C =
-		JournalArticleFinder.class.getName() + ".findByG_U_F_C";
-
 	public static final String FIND_BY_G_C_S_L =
 		JournalArticleFinder.class.getName() + ".findByG_C_S_L";
+
+	public static final String FIND_BY_G_U_F_C =
+		JournalArticleFinder.class.getName() + ".findByG_U_F_C";
 
 	public static final String FIND_BY_G_U_F_C_L =
 		JournalArticleFinder.class.getName() + ".findByG_U_F_C_L";
