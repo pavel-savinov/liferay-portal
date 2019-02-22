@@ -43,13 +43,13 @@ import org.osgi.service.component.annotations.Reference;
 	},
 	service = ProductNavigationControlMenuEntry.class
 )
-public class FragmentsGeneratorProductNavigationControlMenuEntry
+public class FragmentEntriesGeneratorProductNavigationControlMenuEntry
 	extends BaseJSPProductNavigationControlMenuEntry
 	implements ProductNavigationControlMenuEntry {
 
 	@Override
 	public String getIconJspPath() {
-		return "/entries/fragments_generator.jsp";
+		return "/entries/fragment_entries_generator.jsp";
 	}
 
 	@Override
