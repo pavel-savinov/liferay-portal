@@ -105,10 +105,10 @@ public class AssetListEntryLocalServiceImpl
 
 		// Resources
 
-		serviceContext.setAddGroupPermissions(true);
-		serviceContext.setAddGuestPermissions(true);
-
-		resourceLocalService.addModelResources(assetListEntry, serviceContext);
+		resourceLocalService.addResources(
+			assetListEntry.getCompanyId(), assetListEntry.getGroupId(),
+			assetListEntry.getUserId(), AssetListEntry.class.getName(),
+			assetListEntry.getPrimaryKey(), false, true, true);
 
 		return assetListEntry;
 	}
