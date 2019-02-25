@@ -23,16 +23,15 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.List;
 
-import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
@@ -136,28 +135,18 @@ public class AssetEntryActionDropdownItemsProvider {
 				return null;
 			}
 
-			PortletDisplay portletDisplay = _themeDisplay.getPortletDisplay();
-
-			PortletURL redirectURL =
-				_liferayPortletResponse.createLiferayPortletURL(
-					_themeDisplay.getPlid(), portletDisplay.getId(),
-					PortletRequest.RENDER_PHASE, false);
-
-			redirectURL.setParameter("mvcPath", "/add_asset_redirect.jsp");
-
-			if (_fullContentRedirect != null) {
-				redirectURL.setParameter("redirect", _fullContentRedirect);
-			}
-			else {
-				redirectURL.setParameter(
-					"redirect", _themeDisplay.getURLCurrent());
-			}
-
-			redirectURL.setWindowState(LiferayWindowState.POP_UP);
-
 			PortletURL editAssetEntryURL = _assetRenderer.getURLEdit(
 				_liferayPortletRequest, _liferayPortletResponse,
-				LiferayWindowState.POP_UP, redirectURL);
+				LiferayWindowState.MAXIMIZED, null);
+
+			if (Validator.isNotNull(_fullContentRedirect)) {
+				editAssetEntryURL.setParameter(
+					"redirect", _fullContentRedirect);
+			}
+			else {
+				editAssetEntryURL.setParameter(
+					"redirect", _themeDisplay.getURLCurrent());
+			}
 
 			if (editAssetEntryURL == null) {
 				return null;
