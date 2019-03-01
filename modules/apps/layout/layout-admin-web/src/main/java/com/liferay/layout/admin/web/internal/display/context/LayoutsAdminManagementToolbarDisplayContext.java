@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.portlet.PortletURL;
 
@@ -158,6 +159,17 @@ public class LayoutsAdminManagementToolbarDisplayContext
 		}
 
 		return super.getSortingOrder();
+	}
+
+	@Override
+	public Boolean isDisabled() {
+		String displayStyle = _layoutsAdminDisplayContext.getDisplayStyle();
+
+		if (Objects.equals(displayStyle, "miller-columns")) {
+			return false;
+		}
+
+		return super.isDisabled();
 	}
 
 	@Override
