@@ -16,7 +16,6 @@ package com.liferay.layout.page.template.internal.upgrade.v1_2_0;
 
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
-import com.liferay.layout.constants.LayoutConstants;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.util.LayoutPageTemplateStructureHelperUtil;
@@ -29,6 +28,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -107,7 +107,7 @@ public class UpgradeLayoutPageTemplateStructure extends UpgradeProcess {
 		actionableDynamicQuery.setAddCriteriaMethod(
 			dynamicQuery -> dynamicQuery.add(
 				RestrictionsFactoryUtil.eq(
-					"type", LayoutConstants.LAYOUT_TYPE_CONTENT)));
+					"type", LayoutConstants.TYPE_CONTENT)));
 		actionableDynamicQuery.setPerformActionMethod(
 			(Layout layout) -> {
 				Date createDate = layout.getCreateDate();
