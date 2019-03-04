@@ -17,6 +17,8 @@
 <%@ include file="/init.jsp" %>
 
 <%
+JournalManagementToolbarDisplayContext journalManagementToolbarDisplayContext = new JournalManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, journalDisplayContext, trashHelper);
+
 String title = journalDisplayContext.getFolderTitle();
 
 if (Validator.isNotNull(title)) {
@@ -36,12 +38,12 @@ if (Validator.isNotNull(title)) {
 />
 
 <clay:management-toolbar
-	displayContext="<%= journalManagementToolbarlDisplayContext %>"
+	displayContext="<%= journalManagementToolbarDisplayContext %>"
 />
 
 <liferay-frontend:component
-	componentId="<%= journalManagementToolbarlDisplayContext.getDefaultEventHandler() %>"
-	context="<%= journalManagementToolbarlDisplayContext.getComponentContext() %>"
+	componentId="<%= journalManagementToolbarDisplayContext.getDefaultEventHandler() %>"
+	context="<%= journalManagementToolbarDisplayContext.getComponentContext() %>"
 	module="js/ManagementToolbarDefaultEventHandler.es"
 />
 
@@ -69,6 +71,10 @@ if (Validator.isNotNull(title)) {
 			<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 			<aui:input name="groupId" type="hidden" value="<%= scopeGroupId %>" />
 			<aui:input name="newFolderId" type="hidden" />
+
+			<%
+			request.setAttribute("view.jsp-journalManagementToolbarDisplayContext", journalManagementToolbarDisplayContext);
+			%>
 
 			<c:choose>
 				<c:when test="<%= !journalDisplayContext.isSearch() %>">
