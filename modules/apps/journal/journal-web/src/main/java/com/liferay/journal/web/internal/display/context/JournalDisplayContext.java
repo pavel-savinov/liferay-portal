@@ -797,13 +797,10 @@ public class JournalDisplayContext {
 
 			articleSearchContainer.setRowChecker(entriesChecker);
 
-			if (_trashHelper != null) {
-				EntriesMover entriesMover = new EntriesMover(
-					_trashHelper.isTrashEnabled(
-						_themeDisplay.getScopeGroupId()));
+			EntriesMover entriesMover = new EntriesMover(
+				_trashHelper.isTrashEnabled(_themeDisplay.getScopeGroupId()));
 
-				articleSearchContainer.setRowMover(entriesMover);
-			}
+			articleSearchContainer.setRowMover(entriesMover);
 		}
 
 		if (isNavigationMine() || isNavigationRecent()) {
