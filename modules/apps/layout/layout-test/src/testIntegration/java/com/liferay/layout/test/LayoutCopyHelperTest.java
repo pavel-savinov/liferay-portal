@@ -15,9 +15,13 @@
 package com.liferay.layout.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
+import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
+import com.liferay.layout.page.template.util.LayoutPageTemplateStructureHelperUtil;
 import com.liferay.layout.util.LayoutCopyHelper;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
@@ -37,7 +41,9 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import javax.portlet.PortletPreferences;
 
@@ -65,17 +71,40 @@ public class LayoutCopyHelperTest {
 	}
 
 	@Test
-	public void testCopyLayoutFragmentEntryLinks() throws Exception {
+	public void testCopyContentLayoutStructure() throws Exception {
 		Layout sourceLayout = addLayout(_group.getGroupId(), StringPool.BLANK);
 
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
-		_fragmentEntryLinkLocalService.addFragmentEntryLink(
-			sourceLayout.getUserId(), sourceLayout.getGroupId(), 0,
+		List<FragmentEntryLink> fragmentEntryLinks = new ArrayList<>();
+
+		FragmentEntryLink fragmentEntryLink1 =
+			_fragmentEntryLinkLocalService.addFragmentEntryLink(
+				sourceLayout.getUserId(), sourceLayout.getGroupId(), 0,
+				_portal.getClassNameId(Layout.class), sourceLayout.getPlid(),
+				StringPool.BLANK, StringPool.BLANK, StringPool.BLANK,
+				StringPool.BLANK, 0, serviceContext);
+
+		fragmentEntryLinks.add(fragmentEntryLink1);
+
+		FragmentEntryLink fragmentEntryLink2 =
+			_fragmentEntryLinkLocalService.addFragmentEntryLink(
+				sourceLayout.getUserId(), sourceLayout.getGroupId(), 0,
+				_portal.getClassNameId(Layout.class), sourceLayout.getPlid(),
+				StringPool.BLANK, StringPool.BLANK, StringPool.BLANK,
+				StringPool.BLANK, 0, serviceContext);
+
+		fragmentEntryLinks.add(fragmentEntryLink2);
+
+		JSONObject jsonObject =
+			LayoutPageTemplateStructureHelperUtil.
+				generateContentLayoutStructure(fragmentEntryLinks);
+
+		_layoutPageTemplateStructureLocalService.addLayoutPageTemplateStructure(
+			sourceLayout.getUserId(), sourceLayout.getGroupId(),
 			_portal.getClassNameId(Layout.class), sourceLayout.getPlid(),
-			StringPool.BLANK, StringPool.BLANK, StringPool.BLANK,
-			StringPool.BLANK, 0, serviceContext);
+			jsonObject.toString(), serviceContext);
 
 		Layout targetLayout = addLayout(_group.getGroupId(), StringPool.BLANK);
 
@@ -92,6 +121,13 @@ public class LayoutCopyHelperTest {
 					targetLayout.getPlid())));
 
 		_layoutCopyHelper.copyLayout(sourceLayout, targetLayout);
+
+		Assert.assertNotNull(
+			_layoutPageTemplateStructureLocalService.
+				fetchLayoutPageTemplateStructure(
+					targetLayout.getGroupId(),
+					_portal.getClassNameId(Layout.class),
+					targetLayout.getPlid()));
 
 		Assert.assertTrue(
 			ListUtil.isNotEmpty(
@@ -189,6 +225,10 @@ public class LayoutCopyHelperTest {
 
 	@Inject
 	private LayoutLocalService _layoutLocalService;
+
+	@Inject
+	private LayoutPageTemplateStructureLocalService
+		_layoutPageTemplateStructureLocalService;
 
 	@Inject
 	private Portal _portal;
