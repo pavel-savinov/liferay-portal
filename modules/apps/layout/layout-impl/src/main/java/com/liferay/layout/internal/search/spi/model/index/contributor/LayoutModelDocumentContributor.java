@@ -56,6 +56,10 @@ public class LayoutModelDocumentContributor
 
 	@Override
 	public void contribute(Document document, Layout layout) {
+		if (layout.isSystem()) {
+			return;
+		}
+
 		document.addUID(CLASS_NAME, layout.getPlid());
 		document.addText(
 			Field.DEFAULT_LANGUAGE_ID, layout.getDefaultLanguageId());
