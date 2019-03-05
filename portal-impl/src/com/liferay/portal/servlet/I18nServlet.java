@@ -169,8 +169,7 @@ public class I18nServlet extends HttpServlet {
 					friendlyURLIndices[0], friendlyURLIndices[1]);
 
 				siteGroup = GroupLocalServiceUtil.getFriendlyURLGroup(
-					PortalInstances.getCompanyId(request),
-					friendlyURL);
+					PortalInstances.getCompanyId(request), friendlyURL);
 
 				siteDefaultLocale = LanguageUtil.getLocale(
 					siteGroup.getGroupId(), i18nLanguageCode);
