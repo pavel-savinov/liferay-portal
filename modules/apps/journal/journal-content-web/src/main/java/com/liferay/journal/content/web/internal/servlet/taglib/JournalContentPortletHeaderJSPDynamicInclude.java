@@ -52,11 +52,11 @@ public class JournalContentPortletHeaderJSPDynamicInclude
 			String key)
 		throws IOException {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
 		String layoutMode = ParamUtil.getString(
 			request, "p_l_mode", Constants.VIEW);
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
 
 		Layout layout = themeDisplay.getLayout();
 
