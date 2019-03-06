@@ -57,14 +57,14 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 		_sites.copyPortletSetups(sourceLayout, targetLayout);
 		_sites.copyPortletPermissions(targetLayout, sourceLayout);
 
-		_copyFragmentEntryLinks(sourceLayout, targetLayout);
+		_copyLayoutPageTemplateStructure(sourceLayout, targetLayout);
 
 		_copyPortletPreferences(sourceLayout, targetLayout);
 
 		return _layoutLocalService.getLayout(targetLayout.getPlid());
 	}
 
-	private void _copyFragmentEntryLinks(
+	private void _copyLayoutPageTemplateStructure(
 			Layout sourceLayout, Layout targetLayout)
 		throws Exception {
 
