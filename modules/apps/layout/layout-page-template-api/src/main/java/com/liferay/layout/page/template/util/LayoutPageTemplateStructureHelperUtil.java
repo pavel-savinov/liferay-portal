@@ -26,7 +26,10 @@ import java.util.List;
  * @author Jürgen
  */
 public class LayoutPageTemplateStructureHelperUtil {
-	public static JSONObject generateContentLayoutStructure(List<FragmentEntryLink> fragmentEntryLinks) {
+
+	public static JSONObject generateContentLayoutStructure(
+		List<FragmentEntryLink> fragmentEntryLinks) {
+
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 		JSONArray structureJSONArray = JSONFactoryUtil.createJSONArray();
@@ -76,4 +79,5 @@ public class LayoutPageTemplateStructureHelperUtil {
 
 		return jsonObject;
 	}
+
 }
