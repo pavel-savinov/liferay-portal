@@ -55,10 +55,10 @@ public class JournalContentPortletHeaderJSPDynamicInclude
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		Layout layout = themeDisplay.getLayout();
-
 		String layoutMode = ParamUtil.getString(
 			request, "p_l_mode", Constants.VIEW);
+
+		Layout layout = themeDisplay.getLayout();
 
 		if (StringUtil.equals(
 				layout.getType(), LayoutConstants.LAYOUT_TYPE_CONTENT) &&
