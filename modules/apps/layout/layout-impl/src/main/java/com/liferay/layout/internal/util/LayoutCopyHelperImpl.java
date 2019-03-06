@@ -29,6 +29,9 @@ import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.transaction.Propagation;
+import com.liferay.portal.kernel.transaction.TransactionConfig;
+import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.Validator;
@@ -37,6 +40,7 @@ import com.liferay.sites.kernel.util.Sites;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -53,15 +57,15 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 	public Layout copyLayout(Layout sourceLayout, Layout targetLayout)
 		throws Exception {
 
-		_sites.copyLookAndFeel(targetLayout, sourceLayout);
-		_sites.copyPortletSetups(sourceLayout, targetLayout);
-		_sites.copyPortletPermissions(targetLayout, sourceLayout);
+		Callable<Layout> callable = new CopyLayoutCallable(
+			sourceLayout, targetLayout);
 
-		_copyLayoutPageTemplateStructure(sourceLayout, targetLayout);
-
-		_copyPortletPreferences(sourceLayout, targetLayout);
-
-		return _layoutLocalService.getLayout(targetLayout.getPlid());
+		try {
+			return TransactionInvokerUtil.invoke(_transactionConfig, callable);
+		}
+		catch (Throwable t) {
+			throw new Exception(t);
+		}
 	}
 
 	private void _copyLayoutPageTemplateStructure(
@@ -217,6 +221,10 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 		}
 	}
 
+	private static final TransactionConfig _transactionConfig =
+		TransactionConfig.Factory.create(
+			Propagation.REQUIRED, new Class<?>[] {Exception.class});
+
 	@Reference
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
 
@@ -238,5 +246,30 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 
 	@Reference
 	private Sites _sites;
+
+	private class CopyLayoutCallable implements Callable<Layout> {
+
+		@Override
+		public Layout call() throws Exception {
+			_sites.copyLookAndFeel(_targetLayout, _sourceLayout);
+			_sites.copyPortletSetups(_sourceLayout, _targetLayout);
+			_sites.copyPortletPermissions(_targetLayout, _sourceLayout);
+
+			_copyLayoutPageTemplateStructure(_sourceLayout, _targetLayout);
+
+			_copyPortletPreferences(_sourceLayout, _targetLayout);
+
+			return _layoutLocalService.getLayout(_targetLayout.getPlid());
+		}
+
+		private CopyLayoutCallable(Layout sourceLayout, Layout targetLayout) {
+			_sourceLayout = sourceLayout;
+			_targetLayout = targetLayout;
+		}
+
+		private final Layout _sourceLayout;
+		private final Layout _targetLayout;
+
+	}
 
 }
