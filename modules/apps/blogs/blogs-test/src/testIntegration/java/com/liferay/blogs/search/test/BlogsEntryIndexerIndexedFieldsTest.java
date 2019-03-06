@@ -15,6 +15,9 @@
 package com.liferay.blogs.search.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -162,6 +165,7 @@ public class BlogsEntryIndexerIndexedFieldsTest {
 		_populateDates(blogsEntry, map);
 		_populateRoles(blogsEntry, map);
 		_populateTitle(blogsEntry, map);
+		_populateViewCount(blogsEntry, map);
 
 		return map;
 	}
@@ -203,6 +207,22 @@ public class BlogsEntryIndexerIndexedFieldsTest {
 			map.put(key, title);
 			map.put(key.concat("_sortable"), title);
 		}
+	}
+
+	private void _populateViewCount(
+			BlogsEntry blogsEntry, Map<String, String> map)
+		throws Exception {
+
+		AssetRendererFactory assetRendererFactory =
+			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClass(
+				BlogsEntry.class);
+
+		AssetEntry assetEntry = assetRendererFactory.getAssetEntry(
+			BlogsEntry.class.getName(), blogsEntry.getEntryId());
+
+		map.put("viewCount", String.valueOf(assetEntry.getViewCount()));
+		map.put(
+			"viewCount_sortable", String.valueOf(assetEntry.getViewCount()));
 	}
 
 	@DeleteAfterTestRun

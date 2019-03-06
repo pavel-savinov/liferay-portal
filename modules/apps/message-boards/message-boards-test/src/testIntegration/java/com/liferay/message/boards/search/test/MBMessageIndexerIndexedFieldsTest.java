@@ -15,6 +15,9 @@
 package com.liferay.message.boards.search.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.message.boards.model.MBCategory;
 import com.liferay.message.boards.model.MBMessage;
 import com.liferay.message.boards.model.MBThread;
@@ -179,6 +182,7 @@ public class MBMessageIndexerIndexedFieldsTest {
 		_populateDates(mbMessage, map);
 		_populateRoles(mbMessage, map);
 		_populateTitleContent(mbMessage, map);
+		_populateViewCount(mbMessage, map);
 
 		return map;
 	}
@@ -224,6 +228,22 @@ public class MBMessageIndexerIndexedFieldsTest {
 			map.put(key, title);
 			map.put(key.concat("_sortable"), title);
 		}
+	}
+
+	private void _populateViewCount(
+			MBMessage mbMessage, Map<String, String> map)
+		throws Exception {
+
+		AssetRendererFactory assetRendererFactory =
+			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClass(
+				MBMessage.class);
+
+		AssetEntry assetEntry = assetRendererFactory.getAssetEntry(
+			MBMessage.class.getName(), mbMessage.getMessageId());
+
+		map.put("viewCount", String.valueOf(assetEntry.getViewCount()));
+		map.put(
+			"viewCount_sortable", String.valueOf(assetEntry.getViewCount()));
 	}
 
 	private String _processContent(MBMessage message) {

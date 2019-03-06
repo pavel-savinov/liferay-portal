@@ -15,6 +15,9 @@
 package com.liferay.bookmarks.search.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.bookmarks.model.BookmarksFolder;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
@@ -176,6 +179,7 @@ public class BookmarksFolderIndexerIndexedFieldsTest {
 
 		_populateDates(bookmarksFolder, map);
 		_populateRoles(bookmarksFolder, map);
+		_populateViewCount(bookmarksFolder, map);
 
 		return map;
 	}
@@ -200,6 +204,22 @@ public class BookmarksFolderIndexerIndexedFieldsTest {
 			bookmarksFolder.getCompanyId(), BookmarksFolder.class.getName(),
 			bookmarksFolder.getFolderId(), bookmarksFolder.getGroupId(), null,
 			map);
+	}
+
+	private void _populateViewCount(
+			BookmarksFolder bookmarksFolder, Map<String, String> map)
+		throws Exception {
+
+		AssetRendererFactory assetRendererFactory =
+			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClass(
+				BookmarksFolder.class);
+
+		AssetEntry assetEntry = assetRendererFactory.getAssetEntry(
+			BookmarksFolder.class.getName(), bookmarksFolder.getFolderId());
+
+		map.put("viewCount", String.valueOf(assetEntry.getViewCount()));
+		map.put(
+			"viewCount_sortable", String.valueOf(assetEntry.getViewCount()));
 	}
 
 	@DeleteAfterTestRun

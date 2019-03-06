@@ -15,6 +15,9 @@
 package com.liferay.calendar.search.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.calendar.constants.CalendarActionKeys;
 import com.liferay.calendar.model.Calendar;
 import com.liferay.calendar.model.CalendarBooking;
@@ -177,7 +180,8 @@ public class CalendarBookingIndexerIndexedFieldsTest
 	}
 
 	protected void populateCalendarBooking(
-		CalendarBooking calendarBooking, Map<String, String> map) {
+			CalendarBooking calendarBooking, Map<String, String> map)
+		throws Exception {
 
 		map.put(
 			Field.CLASS_PK, String.valueOf(calendarBooking.getCalendarId()));
@@ -197,6 +201,7 @@ public class CalendarBookingIndexerIndexedFieldsTest
 			String.valueOf(calendarBooking.getStartTime()));
 
 		populateDates(calendarBooking, map);
+		_populateViewCount(calendarBooking, map);
 	}
 
 	protected void populateCalendarResource(
@@ -254,5 +259,22 @@ public class CalendarBookingIndexerIndexedFieldsTest
 
 	@Inject
 	protected Portal portal;
+
+	private void _populateViewCount(
+			CalendarBooking calendarBooking, Map<String, String> map)
+		throws Exception {
+
+		AssetRendererFactory assetRendererFactory =
+			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClass(
+				CalendarBooking.class);
+
+		AssetEntry assetEntry = assetRendererFactory.getAssetEntry(
+			CalendarBooking.class.getName(),
+			calendarBooking.getCalendarBookingId());
+
+		map.put("viewCount", String.valueOf(assetEntry.getViewCount()));
+		map.put(
+			"viewCount_sortable", String.valueOf(assetEntry.getViewCount()));
+	}
 
 }

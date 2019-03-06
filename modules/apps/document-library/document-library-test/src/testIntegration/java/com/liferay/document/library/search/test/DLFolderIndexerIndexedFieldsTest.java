@@ -15,6 +15,9 @@
 package com.liferay.document.library.search.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.test.util.search.DLFolderSearchFixture;
@@ -160,6 +163,7 @@ public class DLFolderIndexerIndexedFieldsTest extends BaseDLIndexerTestCase {
 		populateDates(dlFolder, map);
 		populateLocalizedTitles(dlFolder, map);
 		populateTreePath(dlFolder, map);
+		_populateViewCount(dlFolder, map);
 
 		indexedFieldsFixture.populatePriority("0.0", map);
 		indexedFieldsFixture.populateRoleIdFields(
@@ -205,6 +209,21 @@ public class DLFolderIndexerIndexedFieldsTest extends BaseDLIndexerTestCase {
 	}
 
 	protected DLFolderSearchFixture dlFolderSearchFixture;
+
+	private void _populateViewCount(DLFolder dlFolder, Map<String, String> map)
+		throws Exception {
+
+		AssetRendererFactory assetRendererFactory =
+			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClass(
+				DLFolder.class);
+
+		AssetEntry assetEntry = assetRendererFactory.getAssetEntry(
+			DLFolder.class.getName(), dlFolder.getFolderId());
+
+		map.put("viewCount", String.valueOf(assetEntry.getViewCount()));
+		map.put(
+			"viewCount_sortable", String.valueOf(assetEntry.getViewCount()));
+	}
 
 	private static final int _FOLDER_NAME_MAX_LENGTH = 100;
 
