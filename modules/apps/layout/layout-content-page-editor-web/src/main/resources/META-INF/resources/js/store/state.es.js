@@ -391,7 +391,7 @@ const INITIAL_STATE = {
 	 * @review
 	 * @type {!string}
 	 */
-	publishLayoutPageTemplateEntryURL: Config
+	publishURL: Config
 		.string()
 		.value(''),
 
