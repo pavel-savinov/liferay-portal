@@ -43,6 +43,7 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.PortletApp;
 import com.liferay.portal.kernel.model.PortletCategory;
@@ -167,6 +168,13 @@ public class ContentPageEditorDisplayContext {
 		soyContext.put(
 			"layoutData", JSONFactoryUtil.createJSONObject(_getLayoutData()));
 		soyContext.put("portletNamespace", _renderResponse.getNamespace());
+
+		if (classNameId == PortalUtil.getClassNameId(Layout.class)) {
+			soyContext.put(
+				"publishURL",
+				getFragmentEntryActionURL("/content_layout/publish_layout"));
+		}
+
 		soyContext.put(
 			"renderFragmentEntryURL",
 			getFragmentEntryActionURL("/content_layout/render_fragment_entry"));
