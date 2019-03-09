@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.servlet.DynamicServletRequest;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.search.spi.model.index.contributor.ModelDocumentContributor;
@@ -95,6 +96,12 @@ public class LayoutModelDocumentContributor
 
 		if (serviceContext != null) {
 			request = serviceContext.getRequest();
+
+			String queryString = "p_l_id=" + layout.getPlid();
+
+			request = DynamicServletRequest.addQueryString(
+				request, queryString, false);
+
 			response = serviceContext.getResponse();
 		}
 
