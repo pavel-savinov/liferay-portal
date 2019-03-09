@@ -131,7 +131,9 @@ public class LayoutModelDocumentContributor
 					groupId, classNameId, classPK, true);
 
 			if (segmentsExperience != null) {
-				return new long[] {segmentsExperience.getSegmentsEntryId()};
+				return new long[] {
+					segmentsExperience.getSegmentsExperienceId()
+				};
 			}
 
 			return new long[0];
