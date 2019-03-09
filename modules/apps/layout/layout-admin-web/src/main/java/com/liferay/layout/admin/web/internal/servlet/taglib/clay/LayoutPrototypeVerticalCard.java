@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.LayoutPrototype;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -144,7 +145,8 @@ public class LayoutPrototypeVerticalCard
 	@Override
 	public String getTitle() {
 		if (_layoutPrototype != null) {
-			return _layoutPrototype.getName(_themeDisplay.getLocale());
+			return HtmlUtil.escape(
+				_layoutPrototype.getName(_themeDisplay.getLocale()));
 		}
 
 		return null;
