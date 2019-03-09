@@ -705,6 +705,11 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 				"Name must not be null for group " + groupId);
 		}
 
+		if (!Validator.isAlphanumericName(name)) {
+			throw new LayoutPageTemplateEntryNameException(
+				"Name must alphanumeric");
+		}
+
 		int nameMaxLength = ModelHintsUtil.getMaxLength(
 			LayoutPageTemplateEntry.class.getName(), "name");
 
