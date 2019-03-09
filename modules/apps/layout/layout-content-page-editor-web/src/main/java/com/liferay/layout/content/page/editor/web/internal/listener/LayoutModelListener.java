@@ -21,6 +21,7 @@ import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
+import com.liferay.layout.util.LayoutCopyHelper;
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -36,6 +37,7 @@ import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchException;
+import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
@@ -163,13 +165,18 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 					layout.getUserId(), layout.getGroupId(),
 					_portal.getClassNameId(Layout.class), layout.getPlid(),
 					dataJSONObject.toString(), serviceContext);
+
+			Layout pagetTemplateLayout = _layoutLocalService.getLayout(
+				layoutPageTemplateEntry.getPlid());
+
+			_layoutCopyHelper.copyLayout(pagetTemplateLayout, layout);
 		}
-		catch (PortalException pe) {
+		catch (Exception e) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(e, e);
 			}
 
-			throw new ModelListenerException(pe);
+			throw new ModelListenerException(e);
 		}
 
 		_reindexLayout(layout);
@@ -287,6 +294,12 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 
 	@Reference
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
+
+	@Reference
+	private LayoutCopyHelper _layoutCopyHelper;
+
+	@Reference
+	private LayoutLocalService _layoutLocalService;
 
 	@Reference
 	private LayoutPageTemplateEntryLocalService
