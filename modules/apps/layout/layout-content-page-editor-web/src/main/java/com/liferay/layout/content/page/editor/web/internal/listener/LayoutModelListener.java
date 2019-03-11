@@ -39,10 +39,8 @@ import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
-import com.liferay.portal.kernel.util.UnicodeProperties;
 
 import java.util.List;
 import java.util.Objects;
@@ -246,15 +244,15 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 	}
 
 	private LayoutPageTemplateEntry _getLayoutPageTemplateEntry(Layout layout) {
-		UnicodeProperties typeSettingsProperties =
-			layout.getTypeSettingsProperties();
+		if (layout.getClassNameId() != _portal.getClassNameId(
+				LayoutPageTemplateEntry.class)) {
 
-		long layoutPageTemplateEntryId = GetterUtil.getLong(
-			typeSettingsProperties.get("layoutPageTemplateEntryId"));
+			return null;
+		}
 
 		LayoutPageTemplateEntry layoutPageTemplateEntry =
 			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
-				layoutPageTemplateEntryId);
+				layout.getClassPK());
 
 		return layoutPageTemplateEntry;
 	}
