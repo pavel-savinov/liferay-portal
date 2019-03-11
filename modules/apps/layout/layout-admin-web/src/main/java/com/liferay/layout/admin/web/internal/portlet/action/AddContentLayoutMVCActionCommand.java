@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropertiesParamUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -130,11 +131,13 @@ public class AddContentLayoutMVCActionCommand
 			}
 			else {
 				layout = _layoutService.addLayout(
-					groupId, privateLayout, parentLayoutId, nameMap,
+					groupId, privateLayout, parentLayoutId,
+					_portal.getClassNameId(LayoutPageTemplateEntry.class),
+					layoutPageTemplateEntryId, nameMap, new HashMap<>(),
 					new HashMap<>(), new HashMap<>(), new HashMap<>(),
-					new HashMap<>(), LayoutConstants.TYPE_CONTENT,
-					typeSettingsProperties.toString(), false, new HashMap<>(),
-					serviceContext);
+					LayoutConstants.TYPE_CONTENT,
+					typeSettingsProperties.toString(), false, false,
+					new HashMap<>(), serviceContext);
 			}
 
 			String redirectURL = getRedirectURL(
@@ -181,5 +184,8 @@ public class AddContentLayoutMVCActionCommand
 
 	@Reference
 	private LayoutService _layoutService;
+
+	@Reference
+	private Portal _portal;
 
 }
