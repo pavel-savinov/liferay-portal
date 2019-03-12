@@ -68,7 +68,6 @@ import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portlet.PortletPreferencesImpl;
 import com.liferay.site.exception.InitializationException;
@@ -493,8 +492,8 @@ public class WesterosBankSiteInitializer implements SiteInitializer {
 			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
 			_portal.getClassNameId(LayoutPageTemplateEntry.class),
 			layoutPageTemplateEntryId, nameMap, new HashMap<>(),
-			new HashMap<>(), new HashMap<>(), new HashMap<>(), "content",
-			null, false, false, new HashMap<>(), serviceContext);
+			new HashMap<>(), new HashMap<>(), new HashMap<>(), "content", null,
+			false, false, new HashMap<>(), serviceContext);
 	}
 
 	private void _configureFragmentEntryLink(

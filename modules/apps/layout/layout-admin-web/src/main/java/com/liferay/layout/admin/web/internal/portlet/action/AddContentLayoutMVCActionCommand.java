@@ -35,12 +35,9 @@ import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.PropertiesParamUtil;
-import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.sites.kernel.util.SitesUtil;
 
@@ -115,8 +112,8 @@ public class AddContentLayoutMVCActionCommand
 				layout = _layoutService.addLayout(
 					groupId, privateLayout, parentLayoutId, nameMap,
 					new HashMap<>(), new HashMap<>(), new HashMap<>(),
-					new HashMap<>(), LayoutConstants.TYPE_PORTLET,
-					null, false, new HashMap<>(), serviceContext);
+					new HashMap<>(), LayoutConstants.TYPE_PORTLET, null, false,
+					new HashMap<>(), serviceContext);
 
 				// Force propagation from page template to page. See LPS-48430.
 
