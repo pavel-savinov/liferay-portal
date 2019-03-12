@@ -168,7 +168,7 @@ public class LayoutsAdminDisplayContext {
 			_request, "layoutPageTemplateEntryId");
 
 		portletURL.setParameter(
-			"TypeSettingsProperties--layoutPageTemplateEntryId--",
+			"layoutPageTemplateEntryId",
 			String.valueOf(layoutPageTemplateEntryId));
 
 		if (layoutPageTemplateEntryId > 0) {

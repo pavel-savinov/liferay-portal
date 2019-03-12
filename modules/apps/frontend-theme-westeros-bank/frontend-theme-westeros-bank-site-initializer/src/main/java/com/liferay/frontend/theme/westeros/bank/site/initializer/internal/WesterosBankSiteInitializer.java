@@ -488,18 +488,13 @@ public class WesterosBankSiteInitializer implements SiteInitializer {
 
 		nameMap.put(LocaleUtil.getSiteDefault(), name);
 
-		UnicodeProperties typeSettingsProperties = new UnicodeProperties();
-
-		typeSettingsProperties.put(
-			"layoutPageTemplateEntryId",
-			String.valueOf(layoutPageTemplateEntryId));
-
 		return _layoutLocalService.addLayout(
 			serviceContext.getUserId(), serviceContext.getScopeGroupId(), false,
-			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID, nameMap, new HashMap<>(),
+			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+			_portal.getClassNameId(LayoutPageTemplateEntry.class),
+			layoutPageTemplateEntryId, nameMap, new HashMap<>(),
 			new HashMap<>(), new HashMap<>(), new HashMap<>(), "content",
-			typeSettingsProperties.toString(), false, new HashMap<>(),
-			serviceContext);
+			null, false, false, new HashMap<>(), serviceContext);
 	}
 
 	private void _configureFragmentEntryLink(

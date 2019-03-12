@@ -78,14 +78,8 @@ public class AddContentLayoutMVCActionCommand
 			WebKeys.THEME_DISPLAY);
 
 		long groupId = ParamUtil.getLong(actionRequest, "groupId");
-
-		UnicodeProperties typeSettingsProperties =
-			PropertiesParamUtil.getProperties(
-				actionRequest, "TypeSettingsProperties--");
-
-		long layoutPageTemplateEntryId = GetterUtil.getLong(
-			typeSettingsProperties.getProperty("layoutPageTemplateEntryId"));
-
+		long layoutPageTemplateEntryId = ParamUtil.getLong(
+			actionRequest, "layoutPageTemplateEntryId");
 		boolean privateLayout = ParamUtil.getBoolean(
 			actionRequest, "privateLayout");
 		long parentLayoutId = ParamUtil.getLong(
@@ -122,8 +116,7 @@ public class AddContentLayoutMVCActionCommand
 					groupId, privateLayout, parentLayoutId, nameMap,
 					new HashMap<>(), new HashMap<>(), new HashMap<>(),
 					new HashMap<>(), LayoutConstants.TYPE_PORTLET,
-					typeSettingsProperties.toString(), false, new HashMap<>(),
-					serviceContext);
+					null, false, new HashMap<>(), serviceContext);
 
 				// Force propagation from page template to page. See LPS-48430.
 
@@ -135,8 +128,7 @@ public class AddContentLayoutMVCActionCommand
 					_portal.getClassNameId(LayoutPageTemplateEntry.class),
 					layoutPageTemplateEntryId, nameMap, new HashMap<>(),
 					new HashMap<>(), new HashMap<>(), new HashMap<>(),
-					LayoutConstants.TYPE_CONTENT,
-					typeSettingsProperties.toString(), false, false,
+					LayoutConstants.TYPE_CONTENT, null, false, false,
 					new HashMap<>(), serviceContext);
 			}
 
