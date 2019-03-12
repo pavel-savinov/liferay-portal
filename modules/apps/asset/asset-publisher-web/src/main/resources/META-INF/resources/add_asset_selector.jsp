@@ -107,9 +107,6 @@
 		var title = selectedOption.attr('data-title');
 		var url = selectedOption.attr('data-url');
 
-		var dialog = Liferay.Util.getWindow();
-
-		dialog.iframe.set('uri', url);
-		dialog.titleNode.html(title);
+		Liferay.Util.navigate(url);
 	}
 </aui:script>
