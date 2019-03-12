@@ -244,17 +244,15 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 	}
 
 	private LayoutPageTemplateEntry _getLayoutPageTemplateEntry(Layout layout) {
-		if (layout.getClassNameId() != _portal.getClassNameId(
-				LayoutPageTemplateEntry.class)) {
+		long classNameId = _portal.getClassNameId(
+			LayoutPageTemplateEntry.class);
 
+		if (layout.getClassNameId() != classNameId) {
 			return null;
 		}
 
-		LayoutPageTemplateEntry layoutPageTemplateEntry =
-			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
-				layout.getClassPK());
-
-		return layoutPageTemplateEntry;
+		return _layoutPageTemplateEntryLocalService.
+			fetchLayoutPageTemplateEntry(layout.getClassPK());
 	}
 
 	private boolean _isContentLayout(Layout layout) {
