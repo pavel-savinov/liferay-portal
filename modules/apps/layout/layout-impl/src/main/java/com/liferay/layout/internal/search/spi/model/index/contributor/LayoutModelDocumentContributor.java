@@ -95,13 +95,9 @@ public class LayoutModelDocumentContributor
 			ServiceContextThreadLocal.getServiceContext();
 
 		if (serviceContext != null) {
-			request = serviceContext.getRequest();
-
-			String queryString = "p_l_id=" + layout.getPlid();
-
 			request = DynamicServletRequest.addQueryString(
-				request, queryString, false);
-
+				serviceContext.getRequest(), "p_l_id=" + layout.getPlid(),
+				false);
 			response = serviceContext.getResponse();
 		}
 
