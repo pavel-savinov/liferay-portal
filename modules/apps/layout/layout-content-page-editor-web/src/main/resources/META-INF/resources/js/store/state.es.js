@@ -164,6 +164,16 @@ const INITIAL_STATE = {
 		.value(''),
 
 	/**
+	 * URL to discard draft changes and return to the latest published version.
+	 * @default ''
+	 * @review
+	 * @type {!string}
+	 */
+	discardDraftURL: Config
+		.string()
+		.value(''),
+
+	/**
 	 * Available elements that can be dragged inside the existing Page Template,
 	 * organized by fragment categories.
 	 * @default []

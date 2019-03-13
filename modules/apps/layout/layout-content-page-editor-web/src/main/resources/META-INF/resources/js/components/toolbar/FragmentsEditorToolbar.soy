@@ -8,6 +8,7 @@
 	{@param? availableSegmentsEntries: ?}
 	{@param? _handleToggleContextualSidebarButtonClick: any}
 	{@param? classPK: ?}
+	{@param? discardDraftURL: string}
 	{@param? draft: bool}
 	{@param? fragmentsEditorSidebarVisible: bool}
 	{@param? lastSaveDate: string}
@@ -64,6 +65,28 @@
 				{if $status}
 					<li class="nav-item">
 						<span class="label label-secondary">{$status}</span>
+					</li>
+				{/if}
+
+				{if $discardDraftURL}
+					<li class="nav-item">
+						<form action="{$discardDraftURL}" method="POST">
+							<input
+								name="{$portletNamespace ?: ''}classPK"
+								type="hidden"
+								value="{$classPK ?: ''}"
+							/>
+
+							<input
+								name="{$portletNamespace}redirect"
+								type="hidden"
+								value="{$redirectURL}"
+							/>
+
+							<button class="btn btn-default nav-btn" type="submit">
+									{msg desc=""}discard-draft{/msg}
+							</button>
+						</form>
 					</li>
 				{/if}
 
