@@ -110,6 +110,10 @@ public class LayoutModelDocumentContributor
 			Locale locale = LocaleUtil.fromLanguageId(languageId);
 
 			try {
+				if ((request == null) || (response == null)) {
+					break;
+				}
+
 				String content =
 					LayoutPageTemplateStructureRenderUtil.renderLayoutContent(
 						request, response, layoutPageTemplateStructure,
