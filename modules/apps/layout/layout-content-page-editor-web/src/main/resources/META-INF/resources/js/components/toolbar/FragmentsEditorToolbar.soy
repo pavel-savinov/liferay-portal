@@ -46,6 +46,9 @@
 						{param store: $store /}
 					{/call}
 				</li>
+			</ul>
+
+			<ul class="navbar-nav">
 				<li class="nav-item">
 					<span class="navbar-text">
 						{if $savingChanges}
@@ -57,9 +60,7 @@
 						{/if}
 					</span>
 				</li>
-			</ul>
 
-			<ul class="navbar-nav">
 				{if $status}
 					<li class="nav-item">
 						<span class="label label-secondary">{$status}</span>
