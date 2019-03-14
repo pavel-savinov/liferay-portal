@@ -5057,6 +5057,13 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			throw new GroupFriendlyURLException(
 				GroupFriendlyURLException.ENDS_WITH_DASH);
 		}
+
+		if (StringUtil.equals(friendlyURL, "/.") ||
+			StringUtil.equals(friendlyURL, "/..")) {
+
+			throw new GroupFriendlyURLException(
+				GroupFriendlyURLException.INVALID_CHARACTERS);
+		}
 	}
 
 	protected void validateGroupKey(
