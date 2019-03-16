@@ -31,7 +31,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Set;
 
@@ -117,32 +116,11 @@ public abstract class BaseAssetDisplayContributor<T>
 			AssetEntry assetEntry, String fieldName, Locale locale)
 		throws PortalException {
 
-		AssetRendererFactory assetRendererFactory =
-			AssetRendererFactoryRegistryUtil.
-				getAssetRendererFactoryByClassNameId(
-					assetEntry.getClassNameId());
+		Map<String, Object> assetDisplayFieldsValues =
+			getAssetDisplayFieldsValues(assetEntry, locale);
 
-		AssetRenderer<T> assetRenderer = assetRendererFactory.getAssetRenderer(
-			assetEntry.getClassPK());
-
-		T assetObject = assetRenderer.getAssetObject();
-
-		List<AssetDisplayContributorField> assetDisplayContributorFields =
-			AssetDisplayContributorFieldHelperUtil.
-				getAssetDisplayContributorFields(assetEntry.getClassName());
-
-		for (AssetDisplayContributorField assetDisplayContributorField :
-				assetDisplayContributorFields) {
-
-			if (Objects.equals(
-					assetDisplayContributorField.getKey(), fieldName)) {
-
-				return assetDisplayContributorField.getValue(
-					assetObject, locale);
-			}
-		}
-
-		return getClassTypeFieldValue(assetObject, fieldName, locale);
+		return assetDisplayFieldsValues.getOrDefault(
+			fieldName, StringPool.BLANK);
 	}
 
 	@Override
