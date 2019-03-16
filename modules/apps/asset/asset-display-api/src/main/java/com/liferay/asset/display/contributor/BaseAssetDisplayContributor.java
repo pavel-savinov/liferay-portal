@@ -24,6 +24,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 
 import java.util.HashMap;
@@ -254,9 +255,16 @@ public abstract class BaseAssetDisplayContributor<T>
 		for (AssetDisplayContributorField assetDisplayContributorField :
 				_getAssetDisplayContributorFields(AssetEntry.class.getName())) {
 
+			Object assetDisplayFieldValue =
+				assetDisplayContributorField.getValue(assetEntry, locale);
+
+			if (assetDisplayFieldValue instanceof String) {
+				assetDisplayFieldValue = HtmlUtil.escape(
+					(String)assetDisplayFieldValue);
+			}
+
 			assetDisplayFieldsValues.putIfAbsent(
-				assetDisplayContributorField.getKey(),
-				assetDisplayContributorField.getValue(assetEntry, locale));
+				assetDisplayContributorField.getKey(), assetDisplayFieldValue);
 		}
 
 		return assetDisplayFieldsValues;
@@ -279,9 +287,16 @@ public abstract class BaseAssetDisplayContributor<T>
 		for (AssetDisplayContributorField assetDisplayContributorField :
 				assetDisplayContributorFields) {
 
+			Object assetDisplayFieldValue =
+				assetDisplayContributorField.getValue(assetObject, locale);
+
+			if (assetDisplayFieldValue instanceof String) {
+				assetDisplayFieldValue = HtmlUtil.escape(
+					(String)assetDisplayFieldValue);
+			}
+
 			parameterMap.putIfAbsent(
-				assetDisplayContributorField.getKey(),
-				assetDisplayContributorField.getValue(assetObject, locale));
+				assetDisplayContributorField.getKey(), assetDisplayFieldValue);
 		}
 
 		// Field values for the class type
