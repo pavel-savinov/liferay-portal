@@ -22,9 +22,11 @@ import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.sanitizer.Sanitizer;
+import com.liferay.portal.kernel.sanitizer.SanitizerUtil;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 
 import java.util.HashMap;
@@ -226,7 +228,8 @@ public abstract class BaseAssetDisplayContributor<T>
 	}
 
 	private Map<String, Object> _getAssetEntryAssetDisplayFieldsValues(
-		AssetEntry assetEntry, Locale locale) {
+			AssetEntry assetEntry, Locale locale)
+		throws PortalException {
 
 		Map<String, Object> assetDisplayFieldsValues = new HashMap<>();
 
@@ -237,8 +240,11 @@ public abstract class BaseAssetDisplayContributor<T>
 				assetDisplayContributorField.getValue(assetEntry, locale);
 
 			if (assetDisplayFieldValue instanceof String) {
-				assetDisplayFieldValue = HtmlUtil.escape(
-					(String)assetDisplayFieldValue);
+				assetDisplayFieldValue = SanitizerUtil.sanitize(
+					assetEntry.getCompanyId(), assetEntry.getGroupId(),
+					assetEntry.getUserId(), AssetEntry.class.getName(),
+					assetEntry.getEntryId(), ContentTypes.TEXT_HTML,
+					Sanitizer.MODE_ALL, (String)assetDisplayFieldValue, null);
 			}
 
 			assetDisplayFieldsValues.putIfAbsent(
@@ -249,7 +255,8 @@ public abstract class BaseAssetDisplayContributor<T>
 	}
 
 	private Map<String, Object> _getParameterMap(
-		AssetEntry assetEntry, T assetObject, Locale locale) {
+			AssetEntry assetEntry, T assetObject, Locale locale)
+		throws PortalException {
 
 		// Field values for asset entry
 
@@ -269,8 +276,11 @@ public abstract class BaseAssetDisplayContributor<T>
 				assetDisplayContributorField.getValue(assetObject, locale);
 
 			if (assetDisplayFieldValue instanceof String) {
-				assetDisplayFieldValue = HtmlUtil.escape(
-					(String)assetDisplayFieldValue);
+				assetDisplayFieldValue = SanitizerUtil.sanitize(
+					assetEntry.getCompanyId(), assetEntry.getGroupId(),
+					assetEntry.getUserId(), AssetEntry.class.getName(),
+					assetEntry.getEntryId(), ContentTypes.TEXT_HTML,
+					Sanitizer.MODE_ALL, (String)assetDisplayFieldValue, null);
 			}
 
 			parameterMap.putIfAbsent(
