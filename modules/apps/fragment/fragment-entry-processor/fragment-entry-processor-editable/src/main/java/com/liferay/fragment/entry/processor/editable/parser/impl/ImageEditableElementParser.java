@@ -19,6 +19,7 @@ import com.liferay.fragment.entry.processor.editable.parser.EditableElementParse
 import com.liferay.fragment.exception.FragmentEntryContentException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.Html;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -29,6 +30,7 @@ import java.util.ResourceBundle;
 import org.jsoup.nodes.Element;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Pavel Savinov
@@ -66,7 +68,7 @@ public class ImageEditableElementParser implements EditableElementParser {
 
 		Element replaceableElement = elements.get(0);
 
-		replaceableElement.attr("src", value);
+		replaceableElement.attr("src", _html.unescape(value));
 
 		if (configJSONObject == null) {
 			return;
@@ -109,5 +111,8 @@ public class ImageEditableElementParser implements EditableElementParser {
 		EditableFragmentEntryProcessor.class,
 		"/META-INF/resources/fragment/entry/processor/editable" +
 			"/image_field_template.tmpl");
+
+	@Reference
+	private Html _html;
 
 }
