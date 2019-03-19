@@ -176,6 +176,24 @@ class FragmentEditableField extends PortletBase {
 	}
 
 	/**
+	 * Handle editableValues changed
+	 * @inheritDoc
+	 * @review
+	 */
+	syncEditableValues() {
+		this._updateMappedFieldValue();
+	}
+
+	/**
+	 * Handle getAssetFieldValueURL changed
+	 * @inheritDoc
+	 * @review
+	 */
+	syncGetAssetFieldValueURL() {
+		this._updateMappedFieldValue();
+	}
+
+	/**
 	 * Creates a new instance of FloatingToolbar
 	 * @private
 	 * @review
