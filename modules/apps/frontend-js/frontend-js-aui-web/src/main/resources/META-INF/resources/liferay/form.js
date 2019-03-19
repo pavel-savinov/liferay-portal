@@ -241,7 +241,7 @@ AUI.add(
 
 						var field = formNode.one('.' + instance.formValidator.get('errorClass'));
 
-						if (field) {
+						if (field && field.ancestor('.lfr-nav')) {
 							var formTabs = formNode.one('.lfr-nav');
 
 							if (formTabs) {
