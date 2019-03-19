@@ -104,8 +104,8 @@ class FragmentEditableField extends PortletBase {
 			this.editableValues
 		);
 
-		const value = mapped ?
-			this.editableValues.defaultValue :
+		let value = mapped ?
+			(this._mappedFieldValue || this.editableValues.defaultValue) :
 			(translatedValue || this.editableValues.defaultValue);
 
 		const processor = FragmentProcessors[this.type] || FragmentProcessors.fallback;
@@ -538,6 +538,18 @@ FragmentEditableField.STATE = {
 		.internal()
 		.bool()
 		.value(false),
+
+	/**
+	 * Mapped asset field value
+	 * @instance
+	 * @memberOf FragmentEditableField
+	 * @private
+	 * @review
+	 * @type {string}
+	 */
+	_mappedFieldValue: Config
+		.internal()
+		.string(),
 
 	/**
 	 * Id of the timeout to save changes
