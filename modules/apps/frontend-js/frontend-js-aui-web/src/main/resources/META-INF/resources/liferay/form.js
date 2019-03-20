@@ -240,12 +240,13 @@ AUI.add(
 						var formNode = instance.formNode;
 
 						var field = formNode.one('.' + instance.formValidator.get('errorClass'));
-						var fieldWrapper = field.ancestor('form > div');
 
-						if (field && fieldWrapper) {
+						if (field) {
+							var fieldWrapper = field.ancestor('form > div');
+
 							var formTabs = formNode.one('.lfr-nav');
 
-							if (formTabs) {
+							if (fieldWrapper && formTabs) {
 								var tabs = formTabs.all('.tab');
 								var tabsNamespace = formTabs.getAttribute('data-tabs-namespace');
 
