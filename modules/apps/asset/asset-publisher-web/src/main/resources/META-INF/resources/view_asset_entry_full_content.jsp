@@ -326,16 +326,6 @@ String viewInContextURL = assetRenderer.getURLViewInContext(liferayPortletReques
 							printAssetURL.setParameter("type", assetRendererFactory.getType());
 							printAssetURL.setParameter("languageId", LanguageUtil.getLanguageId(request));
 
-							String urlTitle = assetRenderer.getUrlTitle(locale);
-
-							if (Validator.isNotNull(urlTitle)) {
-								if (assetRenderer.getGroupId() != scopeGroupId) {
-									printAssetURL.setParameter("groupId", String.valueOf(assetRenderer.getGroupId()));
-								}
-
-								printAssetURL.setParameter("urlTitle", urlTitle);
-							}
-
 							printAssetURL.setWindowState(LiferayWindowState.POP_UP);
 							%>
 
