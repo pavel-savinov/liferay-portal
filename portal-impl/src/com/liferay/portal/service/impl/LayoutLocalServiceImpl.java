@@ -260,7 +260,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		layout.setSystem(system);
 		layout.setFriendlyURL(friendlyURL);
 		layout.setPriority(priority);
-		layout.setPublishDate(now);
+		layout.setPublishDate(serviceContext.getModifiedDate(now));
 
 		boolean layoutUpdateable = ParamUtil.getBoolean(
 			serviceContext, Sites.LAYOUT_UPDATEABLE, true);
@@ -379,6 +379,8 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		if (!system &&
 			(Objects.equals(type, LayoutConstants.TYPE_CONTENT) ||
 			 Objects.equals(type, LayoutConstants.TYPE_ASSET_DISPLAY))) {
+
+			serviceContext.setModifiedDate(now);
 
 			addLayout(
 				userId, groupId, privateLayout, parentLayoutId,
