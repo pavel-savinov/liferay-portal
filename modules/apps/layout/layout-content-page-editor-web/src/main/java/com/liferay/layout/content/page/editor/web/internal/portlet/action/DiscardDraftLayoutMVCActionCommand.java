@@ -99,6 +99,10 @@ public class DiscardDraftLayoutMVCActionCommand extends BaseMVCActionCommand {
 
 			_layoutCopyHelper.copyLayout(layout, draftLayout);
 
+			draftLayout.setModifiedDate(layout.getPublishDate());
+
+			_layoutLocalService.updateLayout(draftLayout);
+
 			return null;
 		}
 
