@@ -38,7 +38,9 @@ import com.liferay.item.selector.criteria.image.criterion.ImageItemSelectorCrite
 import com.liferay.item.selector.criteria.url.criterion.URLItemSelectorCriterion;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorWebKeys;
+import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
+import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServiceUtil;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalServiceUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.editor.configuration.EditorConfiguration;
@@ -61,6 +63,7 @@ import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalServiceUtil;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
@@ -87,11 +90,13 @@ import com.liferay.portal.util.WebAppPool;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -234,8 +239,34 @@ public class ContentPageEditorDisplayContext {
 			"availableLanguages", _getAvailableLanguagesSoyContext());
 		soyContext.put("classPK", themeDisplay.getPlid());
 		soyContext.put("defaultLanguageId", themeDisplay.getLanguageId());
-		soyContext.put(
-			"draft", classNameId == PortalUtil.getClassNameId(Layout.class));
+
+		boolean draft = false;
+
+		if (classNameId == PortalUtil.getClassNameId(Layout.class)) {
+			Layout draftLayout = LayoutLocalServiceUtil.getLayout(classPK);
+
+			Layout layout = LayoutLocalServiceUtil.getLayout(
+				draftLayout.getClassPK());
+
+			Date modifiedDate = draftLayout.getModifiedDate();
+
+			if (!Objects.equals(
+					layout.getPublishDate(), draftLayout.getPublishDate())) {
+
+				draft = modifiedDate.after(layout.getPublishDate());
+			}
+		}
+		else {
+			LayoutPageTemplateEntry layoutPageTemplateEntry =
+				LayoutPageTemplateEntryLocalServiceUtil.
+					getLayoutPageTemplateEntry(classPK);
+
+			Date modifiedDate = layoutPageTemplateEntry.getModifiedDate();
+
+			draft = modifiedDate.after(layoutPageTemplateEntry.getCreateDate());
+		}
+
+		soyContext.put("draft", draft);
 		soyContext.put("lastSaveDate", StringPool.BLANK);
 		soyContext.put("portletNamespace", _renderResponse.getNamespace());
 		soyContext.put(

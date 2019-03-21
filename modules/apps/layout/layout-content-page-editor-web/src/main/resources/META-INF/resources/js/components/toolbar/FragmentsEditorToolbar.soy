@@ -17,7 +17,6 @@
 	{@param? redirectURL: string}
 	{@param? savingChanges: bool}
 	{@param? spritemap: string}
-	{@param? status: string}
 	{@param? store: ?}
 
 	{let $toolbarClasses kind="text"}
@@ -57,19 +56,11 @@
 					<span class="navbar-text">
 						{if $savingChanges}
 							{msg desc=""}saving-changes{/msg}
-						{elseif $lastSaveDate and not $draft}
-							{msg desc=""}changes-saved-at-{$lastSaveDate}{/msg}
-						{elseif $lastSaveDate and $draft}
+						{elseif $lastSaveDate}
 							{msg desc=""}draft-saved-at-{$lastSaveDate}{/msg}
 						{/if}
 					</span>
 				</li>
-
-				{if $status}
-					<li class="nav-item">
-						<span class="label label-secondary">{$status}</span>
-					</li>
-				{/if}
 
 				{if $discardDraftURL}
 					<li class="nav-item">
@@ -86,7 +77,7 @@
 								value="{$redirectURL}"
 							/>
 
-							<button class="btn btn-default nav-btn" type="submit">
+							<button class="btn btn-default nav-btn" type="submit"{if not $lastSaveDate and not $draft} disabled{/if}>
 								{msg desc=""}discard-draft{/msg}
 							</button>
 						</form>
@@ -108,12 +99,8 @@
 								value="{$redirectURL}"
 							/>
 
-							<button class="btn btn-primary nav-btn" type="submit">
-								{if $draft}
-									{msg desc=""}publish-page{/msg}
-								{else}
-									{msg desc=""}publish{/msg}
-								{/if}
+							<button class="btn btn-primary nav-btn" type="submit"{if not $lastSaveDate and not $draft} disabled{/if}>
+								{msg desc=""}publish{/msg}
 							</button>
 						</form>
 					</li>
