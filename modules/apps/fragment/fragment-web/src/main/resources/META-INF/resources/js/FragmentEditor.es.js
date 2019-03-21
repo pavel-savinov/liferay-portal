@@ -104,59 +104,64 @@ class FragmentEditor extends PortletBase {
 		const content = this.getContent();
 		const status = event.delegateTarget.value;
 
-		this._saving = true;
+		if (this.isHtmlValid()) {
+			this._saving = true;
 
-		this.fetch(
-			this.urls.edit,
-			{
-				cssContent: content.css,
-				fragmentCollectionId: this.fragmentCollectionId,
-				fragmentEntryId: this.fragmentEntryId,
-				htmlContent: content.html,
-				jsContent: content.js,
-				name: this.name,
-				status
-			}
-		)
-			.then(
-				response => response.json()
-			)
-			.then(
-				response => {
-					if (response.error) {
-						throw response.error;
-					}
-
-					return response;
+			this.fetch(
+				this.urls.edit,
+				{
+					cssContent: content.css,
+					fragmentCollectionId: this.fragmentCollectionId,
+					fragmentEntryId: this.fragmentEntryId,
+					htmlContent: content.html,
+					jsContent: content.js,
+					name: this.name,
+					status
 				}
 			)
-			.then(
-				response => {
-					const redirectURL = (
-						response.redirect ||
-						this.urls.redirect
-					);
-
-					Liferay.Util.navigate(redirectURL);
-				}
-			)
-			.catch(
-				error => {
-					this._saving = false;
-
-					const message = typeof error === 'string' ?
-						error :
-						Liferay.Language.get('error');
-
-					openToast(
-						{
-							message,
-							title: Liferay.Language.get('error'),
-							type: 'danger'
+				.then(
+					response => response.json()
+				)
+				.then(
+					response => {
+						if (response.error) {
+							throw response.error;
 						}
-					);
-				}
-			);
+
+						return response;
+					}
+				)
+				.then(
+					response => {
+						const redirectURL = (
+							response.redirect ||
+							this.urls.redirect
+						);
+
+						Liferay.Util.navigate(redirectURL);
+					}
+				)
+				.catch(
+					error => {
+						this._saving = false;
+
+						const message = typeof error === 'string' ?
+							error :
+							Liferay.Language.get('error');
+
+						openToast(
+							{
+								message,
+								title: Liferay.Language.get('error'),
+								type: 'danger'
+							}
+						);
+					}
+				);
+		}
+		else {
+			alert(Liferay.Language.get('fragment-html-is-invalid'));
+		}
 	}
 
 }
