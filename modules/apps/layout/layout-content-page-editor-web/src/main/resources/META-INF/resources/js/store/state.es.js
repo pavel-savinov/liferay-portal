@@ -324,6 +324,16 @@ const INITIAL_STATE = {
 		.value(''),
 
 	/**
+	 * URL for getting an asset field value
+	 * @default ''
+	 * @review
+	 * @type {string}
+	 */
+	getAssetFieldValueURL: Config
+		.string()
+		.value(''),
+
+	/**
 	 * Get asset mapping fields url
 	 * @default undefined
 	 * @review

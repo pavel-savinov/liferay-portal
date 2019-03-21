@@ -1,5 +1,5 @@
-import Component from 'metal-component';
 import {Config} from 'metal-state';
+import PortletBase from 'frontend-js-web/liferay/PortletBase.es';
 import Soy from 'metal-soy';
 
 import '../floating_toolbar/image_properties/FloatingToolbarImagePropertiesPanel.es';
@@ -30,7 +30,7 @@ const SAVE_CHANGES_DELAY = 1500;
 /**
  * FragmentEditableField
  */
-class FragmentEditableField extends Component {
+class FragmentEditableField extends PortletBase {
 
 	/**
 	 * Checks if the given editable is mapped
@@ -42,6 +42,23 @@ class FragmentEditableField extends Component {
 	static _isMapped(editableValues) {
 		return Boolean(
 			editableValues.mappedField ||
+			(
+				editableValues.classNameId &&
+				editableValues.classPK &&
+				editableValues.fieldId
+			)
+		);
+	}
+
+	/**
+	 * Checks if the given editable is mapped to an asset
+	 * @param {object} editableValues
+	 * @private
+	 * @return {boolean}
+	 * @review
+	 */
+	static _isMappedToAsset(editableValues) {
+		return Boolean(
 			(
 				editableValues.classNameId &&
 				editableValues.classPK &&
@@ -104,8 +121,8 @@ class FragmentEditableField extends Component {
 			this.editableValues
 		);
 
-		const value = mapped ?
-			this.editableValues.defaultValue :
+		let value = mapped ?
+			(this._mappedFieldValue || this.editableValues.defaultValue) :
 			(translatedValue || this.editableValues.defaultValue);
 
 		const processor = FragmentProcessors[this.type] || FragmentProcessors.fallback;
@@ -156,6 +173,24 @@ class FragmentEditableField extends Component {
 		return this._editing ?
 			shouldUpdateOnChangeProperties(changes, ['languageId', 'segmentsExperienceId']) :
 			shouldUpdatePureComponent(changes);
+	}
+
+	/**
+	 * Handle editableValues changed
+	 * @inheritDoc
+	 * @review
+	 */
+	syncEditableValues() {
+		this._updateMappedFieldValue();
+	}
+
+	/**
+	 * Handle getAssetFieldValueURL changed
+	 * @inheritDoc
+	 * @review
+	 */
+	syncGetAssetFieldValueURL() {
+		this._updateMappedFieldValue();
 	}
 
 	/**
@@ -433,6 +468,33 @@ class FragmentEditableField extends Component {
 			);
 	}
 
+	/**
+	 * Updates mapped field value
+	 * @private
+	 * @review
+	 */
+	_updateMappedFieldValue() {
+		if (this.getAssetFieldValueURL &&
+			FragmentEditableField._isMappedToAsset(this.editableValues)) {
+			this.fetch(
+				this.getAssetFieldValueURL,
+				{
+					classNameId: this.editableValues.classNameId,
+					classPK: this.editableValues.classPK,
+					fieldId: this.editableValues.fieldId
+				}
+			)
+				.then(
+					response => response.json()
+				)
+				.then(
+					response => {
+						this._mappedFieldValue = response.fieldValue;
+					}
+				);
+		}
+	}
+
 }
 
 /**
@@ -540,6 +602,18 @@ FragmentEditableField.STATE = {
 		.value(false),
 
 	/**
+	 * Mapped asset field value
+	 * @instance
+	 * @memberOf FragmentEditableField
+	 * @private
+	 * @review
+	 * @type {string}
+	 */
+	_mappedFieldValue: Config
+		.internal()
+		.string(),
+
+	/**
 	 * Id of the timeout to save changes
 	 * @default undefined
 	 * @instance
@@ -572,6 +646,7 @@ const ConnectedFragmentEditableField = getConnectedComponent(
 		'activeItemType',
 		'defaultLanguageId',
 		'defaultSegmentsExperienceId',
+		'getAssetFieldValueURL',
 		'hoveredItemId',
 		'hoveredItemType',
 		'languageId',
