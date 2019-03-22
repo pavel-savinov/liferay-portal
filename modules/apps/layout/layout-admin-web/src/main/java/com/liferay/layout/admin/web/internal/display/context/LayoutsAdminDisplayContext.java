@@ -573,7 +573,10 @@ public class LayoutsAdminDisplayContext {
 			if (Objects.equals(
 					layout.getType(), LayoutConstants.TYPE_CONTENT)) {
 
-				Date modifiedDate = layout.getModifiedDate();
+				Layout draftLayout = LayoutLocalServiceUtil.fetchLayout(
+					PortalUtil.getClassNameId(Layout.class), layout.getPlid());
+
+				Date modifiedDate = draftLayout.getModifiedDate();
 
 				layoutJSONObject.put(
 					"draft", modifiedDate.after(layout.getPublishDate()));

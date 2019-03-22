@@ -3232,6 +3232,10 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		layout.setModifiedDate(now);
 		layout.setTypeSettings(typeSettingsProperties.toString());
 
+		if (layout.isSystem() && (layout.getClassPK() > 0)) {
+			layout.setPublishDate(now);
+		}
+
 		return layoutLocalService.updateLayout(layout);
 	}
 
