@@ -124,6 +124,8 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 		validate(groupId, name);
 
+		Date now = new Date();
+
 		long layoutPageTemplateEntryId = counterLocalService.increment();
 
 		LayoutPageTemplateEntry layoutPageTemplateEntry =
@@ -136,9 +138,9 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 		layoutPageTemplateEntry.setUserId(user.getUserId());
 		layoutPageTemplateEntry.setUserName(user.getFullName());
 		layoutPageTemplateEntry.setCreateDate(
-			serviceContext.getCreateDate(new Date()));
+			serviceContext.getCreateDate(now));
 		layoutPageTemplateEntry.setModifiedDate(
-			serviceContext.getModifiedDate(new Date()));
+			serviceContext.getModifiedDate(now));
 		layoutPageTemplateEntry.setLayoutPageTemplateCollectionId(
 			layoutPageTemplateCollectionId);
 		layoutPageTemplateEntry.setClassNameId(classNameId);
@@ -160,6 +162,12 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 		}
 
 		layoutPageTemplateEntry.setPlid(plid);
+
+		// Draft layout page template version
+
+		layoutPageTemplateVersionLocalService.addLayoutPageTemplateVersion(
+			userId, groupId, layoutPageTemplateEntryId, 0.1, name, classNameId,
+			classTypeId, type, serviceContext);
 
 		layoutPageTemplateEntry.setStatus(status);
 		layoutPageTemplateEntry.setStatusByUserId(userId);
@@ -220,7 +228,7 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 		return addLayoutPageTemplateEntry(
 			userId, groupId, layoutPageTemplateCollectionId, name, type,
-			WorkflowConstants.STATUS_DRAFT, serviceContext);
+			WorkflowConstants.STATUS_APPROVED, serviceContext);
 	}
 
 	@Override
@@ -232,7 +240,7 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 		return addLayoutPageTemplateEntry(
 			userId, groupId, layoutPageTemplateCollectionId, name,
 			LayoutPageTemplateEntryTypeConstants.TYPE_BASIC,
-			WorkflowConstants.STATUS_DRAFT, serviceContext);
+			WorkflowConstants.STATUS_APPROVED, serviceContext);
 	}
 
 	@Override
