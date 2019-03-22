@@ -12,8 +12,6 @@
 		draft: bool,
 		dropdownItems: list<?>,
 		hasChild: bool,
-		homePage: bool,
-		homePageTitle: string,
 		parentable: bool,
 		plid: string,
 		title: string,
@@ -32,8 +30,6 @@
 		checked: bool,
 		description: string,
 		hasChild: bool,
-		homePage: bool,
-		homePageTitle: string,
 		plid: string,
 		title: string,
 		url: string
@@ -115,8 +111,6 @@
 		draft: bool,
 		dropdownItems: list<?>,
 		hasChild: bool,
-		homePage: bool,
-		homePageTitle: string,
 		parentable: bool,
 		plid: string,
 		title: string,
@@ -216,13 +210,6 @@
 				<h4 class="list-group-title">
 					<span class="text-truncate">
 						{$layoutColumnItem.title}
-
-						{if $layoutColumnItem.homePage}
-							&nbsp;
-							{call ClayBadge.render}
-								{param label: 'H' /}
-							{/call}
-						{/if}
 					</span>
 				</h4>
 
