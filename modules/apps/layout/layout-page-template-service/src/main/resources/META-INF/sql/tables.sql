@@ -50,3 +50,17 @@ create table LayoutPageTemplateStructure (
 	classPK LONG,
 	data_ STRING null
 );
+
+create table LayoutPageTemplateVersion (
+	uuid_ VARCHAR(75) null,
+	layoutPageTemplateVersionId LONG not null primary key,
+	groupId LONG,
+	companyId LONG,
+	userId LONG,
+	userName VARCHAR(75) null,
+	createDate DATE null,
+	modifiedDate DATE null,
+	layoutPageTemplateEntryId LONG,
+	plid LONG,
+	version DOUBLE
+);
