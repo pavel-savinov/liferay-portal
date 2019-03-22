@@ -18,14 +18,11 @@ import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
-import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
-import com.liferay.layout.util.LayoutCopyHelper;
+import com.liferay.layout.page.template.util.LayoutPageTemplateStructureHelperUtil;
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -37,12 +34,14 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.service.LayoutLocalService;
-import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.sites.kernel.util.Sites;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
@@ -120,93 +119,56 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 			LayoutPageTemplateEntry layoutPageTemplateEntry, Layout layout)
 		throws Exception {
 
-		LayoutPageTemplateStructure layoutPageTemplateStructure =
-			_layoutPageTemplateStructureLocalService.
-				fetchLayoutPageTemplateStructure(
-					layout.getGroupId(),
-					_portal.getClassNameId(
-						LayoutPageTemplateEntry.class.getName()),
-					layoutPageTemplateEntry.getLayoutPageTemplateEntryId(),
-					true);
-
-		JSONObject dataJSONObject = JSONFactoryUtil.createJSONObject(
-			layoutPageTemplateStructure.getData());
-
-		JSONArray structureJSONArray = dataJSONObject.getJSONArray("structure");
-
-		if (structureJSONArray == null) {
-			return null;
-		}
-
 		Layout draftLayout = _layoutLocalService.fetchLayout(
 			_portal.getClassNameId(Layout.class), layout.getPlid());
+
+		Layout pagetTemplateLayout = _layoutLocalService.getLayout(
+			layoutPageTemplateEntry.getPlid());
+
+		_sites.copyLookAndFeel(draftLayout, pagetTemplateLayout);
+		_sites.copyPortletSetups(pagetTemplateLayout, draftLayout);
+		_sites.copyPortletPermissions(draftLayout, pagetTemplateLayout);
 
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
-		for (int i = 0; i < structureJSONArray.length(); i++) {
-			JSONObject rowJSONObject = structureJSONArray.getJSONObject(i);
-
-			JSONArray columnsJSONArray = rowJSONObject.getJSONArray("columns");
-
-			for (int j = 0; j < columnsJSONArray.length(); j++) {
-				JSONObject columnJSONObject = columnsJSONArray.getJSONObject(j);
-
-				JSONArray fragmentEntryLinkIdsJSONArray =
-					columnJSONObject.getJSONArray("fragmentEntryLinkIds");
-
-				JSONArray newFragmentEntryLinkIdsJSONArray =
-					JSONFactoryUtil.createJSONArray();
-
-				for (int k = 0; k < fragmentEntryLinkIdsJSONArray.length();
-					 k++) {
-
-					long fragmentEntryLinkId =
-						fragmentEntryLinkIdsJSONArray.getLong(k);
-
-					if (fragmentEntryLinkId <= 0) {
-						continue;
-					}
-
-					FragmentEntryLink fragmentEntryLink =
-						_fragmentEntryLinkLocalService.fetchFragmentEntryLink(
-							fragmentEntryLinkId);
-
-					if (fragmentEntryLink == null) {
-						continue;
-					}
-
-					FragmentEntryLink newFragmentEntryLink =
-						_fragmentEntryLinkLocalService.addFragmentEntryLink(
-							fragmentEntryLink.getUserId(),
-							fragmentEntryLink.getGroupId(),
-							fragmentEntryLink.getFragmentEntryLinkId(),
-							fragmentEntryLink.getFragmentEntryId(),
-							_portal.getClassNameId(Layout.class.getName()),
-							draftLayout.getPlid(), fragmentEntryLink.getCss(),
-							fragmentEntryLink.getHtml(),
-							fragmentEntryLink.getJs(),
-							fragmentEntryLink.getEditableValues(),
-							fragmentEntryLink.getPosition(), serviceContext);
-
-					newFragmentEntryLinkIdsJSONArray.put(
-						newFragmentEntryLink.getFragmentEntryLinkId());
-				}
-
-				columnJSONObject.put(
-					"fragmentEntryLinkIds", newFragmentEntryLinkIdsJSONArray);
-			}
+		if (serviceContext == null) {
+			serviceContext = new ServiceContext();
 		}
+
+		List<FragmentEntryLink> existingFragmentEntryLinks =
+			_fragmentEntryLinkLocalService.getFragmentEntryLinks(
+				layout.getGroupId(),
+				_portal.getClassNameId(LayoutPageTemplateEntry.class),
+				layoutPageTemplateEntry.getLayoutPageTemplateEntryId());
+
+		List<FragmentEntryLink> fragmentEntryLinks = new ArrayList<>();
+
+		for (FragmentEntryLink existingFragmentEntryLink :
+				existingFragmentEntryLinks) {
+
+			FragmentEntryLink fragmentEntryLink =
+				_fragmentEntryLinkLocalService.addFragmentEntryLink(
+					draftLayout.getUserId(), draftLayout.getGroupId(), 0,
+					existingFragmentEntryLink.getFragmentEntryId(),
+					_portal.getClassNameId(Layout.class), draftLayout.getPlid(),
+					existingFragmentEntryLink.getCss(),
+					existingFragmentEntryLink.getHtml(),
+					existingFragmentEntryLink.getJs(),
+					existingFragmentEntryLink.getEditableValues(),
+					existingFragmentEntryLink.getPosition(), serviceContext);
+
+			fragmentEntryLinks.add(fragmentEntryLink);
+		}
+
+		JSONObject dataJSONObject =
+			LayoutPageTemplateStructureHelperUtil.
+				generateContentLayoutStructure(fragmentEntryLinks);
 
 		_layoutPageTemplateStructureLocalService.addLayoutPageTemplateStructure(
 			layout.getUserId(), layout.getGroupId(),
 			_portal.getClassNameId(Layout.class), draftLayout.getPlid(),
 			dataJSONObject.toString(), serviceContext);
-
-		Layout pagetTemplateLayout = _layoutLocalService.getLayout(
-			layoutPageTemplateEntry.getPlid());
-
-		_layoutCopyHelper.copyLayout(pagetTemplateLayout, draftLayout);
 
 		return null;
 	}
@@ -253,9 +215,6 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
 
 	@Reference
-	private LayoutCopyHelper _layoutCopyHelper;
-
-	@Reference
 	private LayoutLocalService _layoutLocalService;
 
 	@Reference
@@ -270,6 +229,6 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 	private Portal _portal;
 
 	@Reference
-	private PortletPreferencesLocalService _portletPreferencesLocalService;
+	private Sites _sites;
 
 }
