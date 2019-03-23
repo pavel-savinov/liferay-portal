@@ -100,7 +100,7 @@ List<AssetRendererFactory<?>> classTypesAssetRendererFactories = new ArrayList<>
 					mainFieldLabel: '<liferay-ui:message key="title" />',
 					mainFieldName: 'title',
 					mainFieldPlaceholder: '<liferay-ui:message key="title" />',
-					namespace: '<%= PortalUtil.getPortletNamespace(portletResource) %>',
+					namespace: '<%= PortalUtil.getPortletNamespace(HtmlUtil.escape(portletResource)) %>',
 					spritemap: '<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg'
 				}
 			);
