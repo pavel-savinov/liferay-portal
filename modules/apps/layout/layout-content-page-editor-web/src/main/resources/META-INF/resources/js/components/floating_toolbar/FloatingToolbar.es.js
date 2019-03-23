@@ -114,7 +114,7 @@ class FloatingToolbar extends Component {
 				this.element,
 				this.anchorElement,
 				Align.BottomRight,
-				false
+				true
 			);
 		}
 	}
