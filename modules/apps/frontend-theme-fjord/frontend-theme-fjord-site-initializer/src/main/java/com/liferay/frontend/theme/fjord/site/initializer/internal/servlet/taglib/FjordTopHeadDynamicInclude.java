@@ -16,7 +16,9 @@ package com.liferay.frontend.theme.fjord.site.initializer.internal.servlet.tagli
 
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.service.ThemeLocalService;
 import com.liferay.portal.kernel.servlet.PortalWebResourceConstants;
@@ -52,10 +54,14 @@ public class FjordTopHeadDynamicInclude implements DynamicInclude {
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		Theme theme = _themeLocalService.getTheme(
-			themeDisplay.getCompanyId(), _THEME_ID);
+		Group scopeGroup = themeDisplay.getScopeGroup();
 
-		if (!Objects.equals(theme.getThemeId(), _THEME_ID)) {
+		LayoutSet publicLayoutSet = scopeGroup.getPublicLayoutSet();
+		LayoutSet privateLayoutSet = scopeGroup.getPrivateLayoutSet();
+
+		if (!Objects.equals(publicLayoutSet.getThemeId(), _THEME_ID) &&
+			!Objects.equals(privateLayoutSet.getThemeId(), _THEME_ID)) {
+
 			return;
 		}
 
@@ -70,6 +76,9 @@ public class FjordTopHeadDynamicInclude implements DynamicInclude {
 
 			return;
 		}
+
+		Theme theme = _themeLocalService.getTheme(
+			themeDisplay.getCompanyId(), _THEME_ID);
 
 		PrintWriter printWriter = response.getWriter();
 
