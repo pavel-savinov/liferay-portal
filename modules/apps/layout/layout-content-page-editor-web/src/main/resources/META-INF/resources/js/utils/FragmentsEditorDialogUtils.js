@@ -2,6 +2,7 @@
  * Possible types that can be returned by the image selector
  */
 const IMAGE_SELECTOR_RETURN_TYPES = {
+	downloadUrl: 'com.liferay.item.selector.criteria.DownloadURLItemSelectorReturnType',
 	fileEntryItemSelector: 'com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType',
 	url: 'URL'
 };
@@ -94,7 +95,9 @@ function openImageSelector(imageSelectorURL, portletNamespace, callback, destroy
 			const {returnType, value} = selectedItem;
 			let selectedImageURL = '';
 
-			if (returnType === IMAGE_SELECTOR_RETURN_TYPES.url) {
+			if (returnType === IMAGE_SELECTOR_RETURN_TYPES.url ||
+				returnType === IMAGE_SELECTOR_RETURN_TYPES.downloadUrl) {
+
 				selectedImageURL = value;
 			}
 
