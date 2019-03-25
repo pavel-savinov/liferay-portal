@@ -116,7 +116,8 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 			return true;
 		}
 
-		Layout draftLayout = _layoutLocalService.getLayout(layout.getClassPK());
+		Layout draftLayout = _layoutLocalService.fetchLayout(
+			layout.getClassPK());
 
 		if (draftLayout != null) {
 			return false;
