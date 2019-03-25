@@ -20,6 +20,7 @@ import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
@@ -106,7 +107,10 @@ public class LayoutModelDocumentContributor
 			_classNameLocalService.getClassNameId(Layout.class.getName()),
 			layout.getPrimaryKey());
 
-		for (String languageId : layout.getAvailableLanguageIds()) {
+		String[] languageIds = LocaleUtil.toLanguageIds(
+			LanguageUtil.getAvailableLocales(layout.getGroupId()));
+
+		for (String languageId : languageIds) {
 			Locale locale = LocaleUtil.fromLanguageId(languageId);
 
 			try {
