@@ -36,6 +36,7 @@ import com.liferay.segments.service.SegmentsExperienceLocalService;
 
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -107,12 +108,10 @@ public class LayoutModelDocumentContributor
 			_classNameLocalService.getClassNameId(Layout.class.getName()),
 			layout.getPrimaryKey());
 
-		String[] languageIds = LocaleUtil.toLanguageIds(
-			LanguageUtil.getAvailableLocales(layout.getGroupId()));
+		Set<Locale> locales = LanguageUtil.getAvailableLocales(
+			layout.getGroupId());
 
-		for (String languageId : languageIds) {
-			Locale locale = LocaleUtil.fromLanguageId(languageId);
-
+		for (Locale locale : locales) {
 			try {
 				if ((request == null) || (response == null)) {
 					break;
