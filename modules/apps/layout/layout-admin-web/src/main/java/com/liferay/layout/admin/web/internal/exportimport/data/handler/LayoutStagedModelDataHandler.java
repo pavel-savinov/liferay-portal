@@ -609,6 +609,8 @@ public class LayoutStagedModelDataHandler
 			draftLayout.setClassPK(importedLayout.getPlid());
 
 			_layoutLocalService.updateLayout(draftLayout);
+
+			importedLayout.setPublishDate(draftLayout.getModifiedDate());
 		}
 
 		layoutPlids.put(layout.getPlid(), importedLayout.getPlid());
