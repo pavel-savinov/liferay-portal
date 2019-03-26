@@ -167,24 +167,25 @@ public class WesterosBankSiteInitializer implements SiteInitializer {
 				personalLayoutPageTemplate.getLayoutPageTemplateEntryId(),
 				serviceContext);
 
-			TransactionCommitCallbackUtil.registerCallback(
-				() -> {
-					_copyLayout(personalLayout);
-
-					return null;
-				});
-
 			FragmentEntry carouselFragmentEntry = fragmentEntriesMap.get(
 				"carousel");
 
 			JournalArticle carouselJournalArticle = _addCarouselJournalArticle(
 				serviceContext);
 
-			_configureFragmentEntryLink(
-				serviceContext.getCompanyId(), serviceContext.getScopeGroupId(),
-				personalLayout.getPlid(),
-				carouselFragmentEntry.getFragmentEntryId(),
-				carouselJournalArticle.getArticleId());
+			TransactionCommitCallbackUtil.registerCallback(
+				() -> {
+					_copyLayout(personalLayout);
+
+					_configureFragmentEntryLink(
+						serviceContext.getCompanyId(),
+						serviceContext.getScopeGroupId(),
+						personalLayout.getPlid(),
+						carouselFragmentEntry.getFragmentEntryId(),
+						carouselJournalArticle.getArticleId());
+
+					return null;
+				});
 
 			List<Layout> personalLayoutChildren = _addLayouts(
 				personalLayout, _LAYOUT_NAMES_CHILDREN_PERSONAL,
@@ -539,10 +540,21 @@ public class WesterosBankSiteInitializer implements SiteInitializer {
 				JournalContentPortletKeys.JOURNAL_CONTENT,
 				fragmentEntryLink.getNamespace());
 
-			_portletPreferencesLocalService.addPortletPreferences(
-				companyId, 0, PortletKeys.PREFS_OWNER_TYPE_LAYOUT,
-				_portal.getControlPanelPlid(companyId), portletId, null,
-				PortletPreferencesFactoryUtil.toXML(portletPreferences));
+			com.liferay.portal.kernel.model.PortletPreferences preferences =
+				_portletPreferencesLocalService.fetchPortletPreferences(
+					0, PortletKeys.PREFS_OWNER_TYPE_LAYOUT, plid, portletId);
+
+			if (preferences == null) {
+				_portletPreferencesLocalService.addPortletPreferences(
+					companyId, 0, PortletKeys.PREFS_OWNER_TYPE_LAYOUT, plid,
+					portletId, null,
+					PortletPreferencesFactoryUtil.toXML(portletPreferences));
+			}
+			else {
+				_portletPreferencesLocalService.updatePreferences(
+					0, PortletKeys.PREFS_OWNER_TYPE_LAYOUT, plid, portletId,
+					portletPreferences);
+			}
 		}
 	}
 
