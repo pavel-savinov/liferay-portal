@@ -259,7 +259,13 @@ public class ContentPageEditorDisplayContext {
 
 			Date modifiedDate = draftLayout.getModifiedDate();
 
-			draft = modifiedDate.after(layout.getPublishDate());
+			Date publishDate = layout.getPublishDate();
+
+			if (publishDate == null) {
+				publishDate = modifiedDate;
+			}
+
+			draft = modifiedDate.after(publishDate);
 		}
 		else {
 			LayoutPageTemplateEntry layoutPageTemplateEntry =

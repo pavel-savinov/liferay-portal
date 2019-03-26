@@ -579,8 +579,13 @@ public class LayoutsAdminDisplayContext {
 
 				Date modifiedDate = draftLayout.getModifiedDate();
 
-				layoutJSONObject.put(
-					"draft", modifiedDate.after(layout.getPublishDate()));
+				Date publishDate = layout.getPublishDate();
+
+				if (publishDate == null) {
+					publishDate = modifiedDate;
+				}
+
+				layoutJSONObject.put("draft", modifiedDate.after(publishDate));
 			}
 			else {
 				layoutJSONObject.put("draft", false);
