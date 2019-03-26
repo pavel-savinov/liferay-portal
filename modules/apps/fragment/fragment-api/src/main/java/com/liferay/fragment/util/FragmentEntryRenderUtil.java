@@ -14,6 +14,7 @@
 
 package com.liferay.fragment.util;
 
+import com.liferay.asset.display.contributor.util.ContentAccessorUtil;
 import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
@@ -207,6 +208,8 @@ public class FragmentEntryRenderUtil {
 		if (MapUtil.isNotEmpty(parameterMap)) {
 			template.putAll(parameterMap);
 		}
+
+		template.put("contentAccessorUtil", ContentAccessorUtil.getInstance());
 
 		template.prepare(request);
 
