@@ -170,8 +170,13 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 		// Resources
 
-		resourceLocalService.addModelResources(
-			layoutPageTemplateEntry, serviceContext);
+		resourceLocalService.addResources(
+			layoutPageTemplateEntry.getCompanyId(),
+			layoutPageTemplateEntry.getGroupId(),
+			layoutPageTemplateEntry.getUserId(),
+			LayoutPageTemplateEntry.class.getName(),
+			layoutPageTemplateEntry.getLayoutPageTemplateEntryId(), false, true,
+			true);
 
 		return layoutPageTemplateEntry;
 	}
