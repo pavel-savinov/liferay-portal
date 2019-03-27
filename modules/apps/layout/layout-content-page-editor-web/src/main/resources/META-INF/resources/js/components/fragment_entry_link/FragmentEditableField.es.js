@@ -140,11 +140,14 @@ class FragmentEditableField extends PortletBase {
 		const fragmentEntryLinkEditableId = `${this.fragmentEntryLinkId}-${this.editableId}`;
 		const translated = !mapped && Boolean(segmentedValue[this.languageId]);
 
+		this.languageDirection = Liferay.Language.direction[this.languageId];
+
 		nextState = setIn(nextState, ['_mapped'], mapped);
 		nextState = setIn(nextState, ['_translated'], translated);
 		nextState = setIn(nextState, ['content'], content);
 		nextState = setIn(nextState, ['fragmentEntryLinkEditableId'], fragmentEntryLinkEditableId);
 		nextState = setIn(nextState, ['itemTypes'], FRAGMENTS_EDITOR_ITEM_TYPES);
+		nextState = setIn(nextState, ['languageDirection'], this.languageDirection);
 
 		return nextState;
 	}
@@ -301,7 +304,8 @@ class FragmentEditableField extends PortletBase {
 			this.portletNamespace,
 			this.processorsOptions,
 			this._handleEditableChanged,
-			this._handleEditableDestroyed
+			this._handleEditableDestroyed,
+			this.languageId
 		);
 
 		this._editing = true;
@@ -664,6 +668,18 @@ FragmentEditableField.STATE = {
 	fragmentEntryLinkId: Config
 		.string()
 		.required(),
+
+	/**
+	 * Langauge direction
+	 * @default undefined
+	 * @instance
+	 * @memberOf FragmentEditableField
+	 * @review
+	 * @type {!string}
+	 */
+	languageDirection: Config
+		.string()
+		.value('ltr'),
 
 	/**
 	 * Set of options that are sent to the processors.

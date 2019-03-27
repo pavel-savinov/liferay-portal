@@ -22,6 +22,7 @@
 	{@param? hoveredItemId: string}
 	{@param? hoveredItemType: string}
 	{@param? itemTypes: ?}
+	{@param? languageDirection: string}
 	{@param? languageId: string}
 
 	{let $editableClasses kind="text"}
@@ -71,6 +72,7 @@
 		data-onblur="{$_handleEditableBlur}"
 		data-onclick="{$_handleEditableClick}"
 		data-onmouseover="{$_handleEditableHoverStart}"
+		dir="{$languageDirection}"
 		id="{$fragmentEntryLinkEditableId}"
 		ref="editable"
 		tabindex="0"
