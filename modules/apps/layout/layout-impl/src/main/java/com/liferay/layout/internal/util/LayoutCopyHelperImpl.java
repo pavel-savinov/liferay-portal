@@ -72,14 +72,27 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 			Layout sourceLayout, Layout targetLayout)
 		throws Exception {
 
+		long classNameId = _portal.getClassNameId(Layout.class);
+
 		LayoutPageTemplateStructure layoutPageTemplateStructure =
 			_layoutPageTemplateStructureLocalService.
 				fetchLayoutPageTemplateStructure(
-					sourceLayout.getGroupId(),
-					_portal.getClassNameId(Layout.class),
+					sourceLayout.getGroupId(), classNameId,
 					sourceLayout.getPlid());
 
 		if (layoutPageTemplateStructure == null) {
+			LayoutPageTemplateStructure targetLayoutPageTemplateStructure =
+				_layoutPageTemplateStructureLocalService.
+					fetchLayoutPageTemplateStructure(
+						targetLayout.getGroupId(), classNameId,
+						targetLayout.getPlid());
+
+			if (targetLayoutPageTemplateStructure != null) {
+				_layoutPageTemplateStructureLocalService.
+					deleteLayoutPageTemplateStructure(
+						targetLayoutPageTemplateStructure);
+			}
+
 			return;
 		}
 
@@ -96,8 +109,6 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 		if (structureJSONArray == null) {
 			return;
 		}
-
-		long classNameId = _portal.getClassNameId(Layout.class);
 
 		ServiceContext serviceContext = Optional.ofNullable(
 			ServiceContextThreadLocal.getServiceContext()
