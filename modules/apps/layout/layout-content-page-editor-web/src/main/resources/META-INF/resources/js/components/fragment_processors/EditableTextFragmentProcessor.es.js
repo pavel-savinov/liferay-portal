@@ -62,6 +62,7 @@ function getActiveEditableElement() {
  * @param {Object} options
  * @param {function} changedCallback
  * @param {function} destroyedCallback
+ * @param {string} languageId
  */
 function init(
 	editableElement,
@@ -69,7 +70,8 @@ function init(
 	portletNamespace,
 	options,
 	changedCallback,
-	destroyedCallback
+	destroyedCallback,
+	languageId
 ) {
 	destroy();
 
@@ -99,7 +101,8 @@ function init(
 			portletNamespace,
 			fragmentEntryLinkId,
 			defaultEditorConfiguration,
-			editorName
+			editorName,
+			languageId
 		)
 	);
 
@@ -161,6 +164,7 @@ function render(content, value) {
  * @param {string} fragmentEntryLinkId
  * @param {object} defaultEditorConfiguration
  * @param {string} editorName
+ * @param {string} languageId
  * @return {object}
  */
 function _getEditorConfiguration(
@@ -168,7 +172,8 @@ function _getEditorConfiguration(
 	portletNamespace,
 	fragmentEntryLinkId,
 	defaultEditorConfiguration,
-	editorName
+	editorName,
+	languageId
 ) {
 	return object.mixin(
 		{},
@@ -184,7 +189,8 @@ function _getEditorConfiguration(
 				.filebrowserImageBrowseUrl
 				.replace('_EDITOR_NAME_', editorName),
 
-			title: editorName
+			title: editorName,
+			contentsLangDirection: Liferay.Language.direction[languageId]
 		}
 	);
 }

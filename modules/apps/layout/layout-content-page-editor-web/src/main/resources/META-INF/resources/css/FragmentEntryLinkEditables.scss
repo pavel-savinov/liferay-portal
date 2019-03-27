@@ -62,4 +62,9 @@
 		background-color: fade_out($fragmentEditableFieldGridAccentColor, 0.9);
 		outline: 0;
 	}
+
+	&[dir="rtl"], .cke_contents_rtl {
+		direction: rtl;
+		text-align: right;
+	}
 }
