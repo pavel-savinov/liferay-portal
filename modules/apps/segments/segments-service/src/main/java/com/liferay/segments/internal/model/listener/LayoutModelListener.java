@@ -15,21 +15,35 @@
 package com.liferay.segments.internal.model.listener;
 
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.ModelListenerException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.ModelListener;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.util.ResourceBundleLoader;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.segments.constants.SegmentsConstants;
 import com.liferay.segments.exception.DefaultSegmentsExperienceException;
+import com.liferay.segments.model.SegmentsEntry;
+import com.liferay.segments.service.SegmentsEntryLocalService;
 import com.liferay.segments.service.SegmentsExperienceLocalService;
 
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author David Arques
@@ -93,6 +107,32 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 
 	private void _addDefaultSegmentsExperience(Layout layout) {
 		try {
+			SegmentsEntry defaultSegmentsEntry =
+				_segmentsEntryLocalService.fetchSegmentsEntry(
+					layout.getGroupId(), SegmentsConstants.KEY_DEFAULT, true);
+
+			if (defaultSegmentsEntry == null) {
+				ServiceContext serviceContext =
+					ServiceContextThreadLocal.getServiceContext();
+
+				if (serviceContext == null) {
+					serviceContext = new ServiceContext();
+				}
+
+				serviceContext.setAddGuestPermissions(true);
+				serviceContext.setAddGroupPermissions(true);
+
+				Map<Locale, String> nameMap =
+					ResourceBundleUtil.getLocalizationMap(
+						_resourceBundleLoader, "default-segment-name");
+
+				_segmentsEntryLocalService.addSegmentsEntry(
+					nameMap, Collections.emptyMap(), true, StringPool.BLANK,
+					SegmentsConstants.KEY_DEFAULT,
+					SegmentsConstants.SOURCE_DEFAULT, User.class.getName(),
+					serviceContext);
+			}
+
 			_segmentsExperienceLocalService.addDefaultSegmentsExperience(
 				layout.getGroupId(),
 				_classNameLocalService.getClassNameId(Layout.class),
@@ -131,6 +171,16 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;
+
+	@Reference(
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(bundle.symbolic.name=com.liferay.segments.lang)"
+	)
+	private volatile ResourceBundleLoader _resourceBundleLoader;
+
+	@Reference
+	private SegmentsEntryLocalService _segmentsEntryLocalService;
 
 	@Reference
 	private SegmentsExperienceLocalService _segmentsExperienceLocalService;
