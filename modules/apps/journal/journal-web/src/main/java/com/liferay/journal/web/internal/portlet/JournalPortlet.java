@@ -797,8 +797,6 @@ public class JournalPortlet extends MVCPortlet {
 			JournalArticle latestArticle = _journalArticleService.fetchArticle(
 				groupId, articleId);
 
-			layoutUuid = null;
-
 			if ((displayPageType == AssetDisplayPageConstants.TYPE_SPECIFIC) &&
 				(targetLayout == null) && (latestArticle != null) &&
 				Validator.isNotNull(latestArticle.getLayoutUuid())) {
