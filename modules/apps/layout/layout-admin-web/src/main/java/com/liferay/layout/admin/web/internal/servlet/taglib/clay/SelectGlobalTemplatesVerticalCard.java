@@ -85,7 +85,8 @@ public class SelectGlobalTemplatesVerticalCard implements VerticalCard {
 
 	@Override
 	public String getElementClasses() {
-		return "add-layout-action-option";
+		return "add-layout-action-option card-interactive " +
+			"card-interactive-primary";
 	}
 
 	@Override
