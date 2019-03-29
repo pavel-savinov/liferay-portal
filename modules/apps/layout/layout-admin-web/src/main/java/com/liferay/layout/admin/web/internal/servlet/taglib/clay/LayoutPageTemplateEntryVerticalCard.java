@@ -118,8 +118,11 @@ public class LayoutPageTemplateEntryVerticalCard extends BaseVerticalCard {
 			Layout layout = LayoutLocalServiceUtil.getLayout(
 				_layoutPageTemplateEntry.getPlid());
 
+			Layout draftLayout = LayoutLocalServiceUtil.fetchLayout(
+				PortalUtil.getClassNameId(Layout.class), layout.getPlid());
+
 			String layoutFullURL = PortalUtil.getLayoutFullURL(
-				layout, themeDisplay);
+				draftLayout, themeDisplay);
 
 			layoutFullURL = HttpUtil.setParameter(
 				layoutFullURL, "p_l_mode", Constants.EDIT);

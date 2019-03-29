@@ -126,8 +126,11 @@ public class DisplayPageVerticalCard
 			Layout layout = LayoutLocalServiceUtil.fetchLayout(
 				_layoutPageTemplateEntry.getPlid());
 
+			Layout draftLayout = LayoutLocalServiceUtil.fetchLayout(
+				PortalUtil.getClassNameId(Layout.class), layout.getPlid());
+
 			String layoutFullURL = PortalUtil.getLayoutFullURL(
-				layout, _themeDisplay);
+				draftLayout, _themeDisplay);
 
 			layoutFullURL = HttpUtil.setParameter(
 				layoutFullURL, "p_l_mode", Constants.EDIT);

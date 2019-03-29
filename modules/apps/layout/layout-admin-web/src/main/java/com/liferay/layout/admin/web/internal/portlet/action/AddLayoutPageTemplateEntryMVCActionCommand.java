@@ -128,10 +128,14 @@ public class AddLayoutPageTemplateEntryMVCActionCommand
 		Layout layout = _layoutLocalService.getLayout(
 			layoutPageTemplateEntry.getPlid());
 
+		Layout draftLayout = _layoutLocalService.fetchLayout(
+			_portal.getClassNameId(Layout.class), layout.getPlid());
+
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		String layoutFullURL = _portal.getLayoutFullURL(layout, themeDisplay);
+		String layoutFullURL = _portal.getLayoutFullURL(
+			draftLayout, themeDisplay);
 
 		layoutFullURL = _http.setParameter(
 			layoutFullURL, "p_l_mode", Constants.EDIT);
