@@ -1083,7 +1083,8 @@ public class PortletURLImpl
 		AssetEntry assetEntry = (AssetEntry)_request.getAttribute(
 			WebKeys.LAYOUT_ASSET_ENTRY);
 
-		if (Objects.equals(
+		if ((_layout != null) &&
+			Objects.equals(
 				_layout.getType(), LayoutConstants.TYPE_ASSET_DISPLAY) &&
 			(assetEntry != null)) {
 
