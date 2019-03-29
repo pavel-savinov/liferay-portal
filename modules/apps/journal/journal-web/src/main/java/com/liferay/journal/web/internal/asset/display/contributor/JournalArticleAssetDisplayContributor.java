@@ -92,7 +92,7 @@ public class JournalArticleAssetDisplayContributor
 		assetDisplayFields.addAll(
 			stream.map(
 				ddmTemplate -> new AssetDisplayField(
-					_DDM_TEMPLATE + ddmTemplate.getTemplateKey(),
+					_getTemplateKey(ddmTemplate),
 					ddmTemplate.getName(locale) + StringPool.SPACE +
 						StringPool.STAR,
 					"text")
@@ -156,7 +156,7 @@ public class JournalArticleAssetDisplayContributor
 
 			ddmTemplates.forEach(
 				ddmTemplate -> classTypeValues.put(
-					_DDM_TEMPLATE + ddmTemplate.getTemplateKey(),
+					_getTemplateKey(ddmTemplate),
 					new DDMTemplateContentAccessor(
 						article, ddmTemplate,
 						LocaleUtil.toLanguageId(locale))));
@@ -168,6 +168,12 @@ public class JournalArticleAssetDisplayContributor
 		}
 
 		return classTypeValues;
+	}
+
+	private String _getTemplateKey(DDMTemplate ddmTemplate) {
+		String templateKey = ddmTemplate.getTemplateKey();
+
+		return _DDM_TEMPLATE + templateKey.replaceAll("\\W]", "_");
 	}
 
 	private String _transformFileEntryURL(String data) {
