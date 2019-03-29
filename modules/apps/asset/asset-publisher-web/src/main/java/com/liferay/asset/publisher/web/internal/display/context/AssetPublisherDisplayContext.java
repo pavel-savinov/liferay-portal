@@ -1235,10 +1235,7 @@ public class AssetPublisherDisplayContext {
 		String rootPortletId = PortletIdCodec.decodePortletName(
 			getPortletResource());
 
-		if (!layout.isTypeControlPanel() ||
-			!Objects.equals(layout.getType(), LayoutConstants.TYPE_CONTENT) ||
-			!Objects.equals(
-				layout.getType(), LayoutConstants.TYPE_ASSET_DISPLAY) ||
+		if (Objects.equals(layout.getType(), LayoutConstants.TYPE_PORTLET) &&
 			rootPortletId.equals(AssetPublisherPortletKeys.ASSET_PUBLISHER)) {
 
 			return true;

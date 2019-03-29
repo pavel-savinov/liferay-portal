@@ -242,11 +242,8 @@ public class AssetPublisherConfigurationAction
 				Layout layout = (Layout)actionRequest.getAttribute(
 					WebKeys.LAYOUT);
 
-				if (!layout.isTypeControlPanel() ||
-					!Objects.equals(
-						layout.getType(), LayoutConstants.TYPE_CONTENT) ||
-					!Objects.equals(
-						layout.getType(), LayoutConstants.TYPE_ASSET_DISPLAY)) {
+				if (Objects.equals(
+						layout.getType(), LayoutConstants.TYPE_PORTLET)) {
 
 					updateDefaultAssetPublisher(actionRequest);
 				}
