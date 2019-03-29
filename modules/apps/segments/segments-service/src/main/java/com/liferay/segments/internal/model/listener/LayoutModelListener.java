@@ -40,7 +40,10 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 	@Override
 	public void onAfterCreate(Layout layout) throws ModelListenerException {
 		try {
-			if (!_isPublishedContentLayout(layout)) {
+			if (!_isPublishedContentLayout(layout) ||
+				ExportImportThreadLocal.isImportInProcess() ||
+				ExportImportThreadLocal.isStagingInProcess()) {
+
 				return;
 			}
 
