@@ -22,8 +22,10 @@ import com.liferay.portal.kernel.events.LifecycleAction;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
@@ -38,6 +40,7 @@ import com.liferay.segments.model.SegmentsExperienceModel;
 import com.liferay.segments.provider.SegmentsEntryProvider;
 import com.liferay.segments.service.SegmentsEntryLocalService;
 import com.liferay.segments.service.SegmentsExperienceLocalService;
+import com.liferay.staging.StagingGroupHelper;
 
 import java.util.List;
 import java.util.Map;
@@ -121,6 +124,19 @@ public class SegmentsServicePreAction extends Action {
 		request.setAttribute(
 			SegmentsWebKeys.SEGMENTS_ENTRY_IDS, segmentsEntryIds);
 
+		Group group = layout.getGroup();
+
+		if (group.isStaged() &&
+			_stagingGroupHelper.isLocalLiveGroup(group.getGroupId())) {
+
+			Group stagingGroup = _stagingGroupHelper.fetchLocalStagingGroup(
+				group.getGroupId());
+
+			layout = _layoutLocalService.fetchLayoutByUuidAndGroupId(
+				layout.getUuid(), stagingGroup.getGroupId(),
+				layout.isPrivateLayout());
+		}
+
 		long[] segmentsExperienceIds = _getSegmentsExperienceIds(
 			layout.getGroupId(), segmentsEntryIds,
 			_portal.getClassNameId(Layout.class.getName()), layout.getPlid());
@@ -150,6 +166,9 @@ public class SegmentsServicePreAction extends Action {
 		SegmentsServicePreAction.class);
 
 	@Reference
+	private GroupLocalService _groupLocalService;
+
+	@Reference
 	private LayoutLocalService _layoutLocalService;
 
 	@Reference
@@ -168,5 +187,8 @@ public class SegmentsServicePreAction extends Action {
 	private SegmentsExperienceLocalService _segmentsExperienceLocalService;
 
 	private SegmentsServiceConfiguration _segmentsServiceConfiguration;
+
+	@Reference
+	private StagingGroupHelper _stagingGroupHelper;
 
 }
