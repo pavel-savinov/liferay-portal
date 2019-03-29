@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.template.soy.util.SoyContext;
 import com.liferay.portal.template.soy.util.SoyContextFactoryUtil;
@@ -136,7 +135,7 @@ public class ContentPageEditorLayoutPageTemplateDisplayContext
 		Layout draftLayout = LayoutLocalServiceUtil.getLayout(classPK);
 
 		Layout layout = LayoutLocalServiceUtil.fetchLayout(
-			PortalUtil.getClassNameId(Layout.class), draftLayout.getPlid());
+			draftLayout.getClassPK());
 
 		if (layout == null) {
 			return null;
