@@ -16,8 +16,9 @@ package com.liferay.layout.admin.web.internal.portlet.action;
 
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
 import com.liferay.layout.admin.web.internal.handler.LayoutExceptionRequestHandler;
+import com.liferay.layout.admin.web.internal.security.permission.resource.LayoutPageTemplateEntryPermission;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
-import com.liferay.layout.page.template.service.LayoutPageTemplateEntryService;
+import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -28,14 +29,17 @@ import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutPrototype;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.LayoutPrototypeService;
 import com.liferay.portal.kernel.service.LayoutService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.sites.kernel.util.SitesUtil;
 
 import java.util.HashMap;
@@ -90,8 +94,8 @@ public class AddContentLayoutMVCActionCommand
 
 		try {
 			LayoutPageTemplateEntry layoutPageTemplateEntry =
-				_layoutPageTemplateEntryService.fetchLayoutPageTemplateEntry(
-					layoutPageTemplateEntryId);
+				_layoutPageTemplateEntryLocalService.
+					fetchLayoutPageTemplateEntry(layoutPageTemplateEntryId);
 
 			if ((layoutPageTemplateEntry != null) &&
 				(layoutPageTemplateEntry.getLayoutPrototypeId() > 0)) {
@@ -114,6 +118,16 @@ public class AddContentLayoutMVCActionCommand
 				SitesUtil.mergeLayoutPrototypeLayout(layout.getGroup(), layout);
 			}
 			else {
+				ThemeDisplay themeDisplay =
+					(ThemeDisplay)actionRequest.getAttribute(
+						WebKeys.THEME_DISPLAY);
+
+				if (layoutPageTemplateEntryId > 0) {
+					LayoutPageTemplateEntryPermission.check(
+						themeDisplay.getPermissionChecker(),
+						layoutPageTemplateEntryId, ActionKeys.VIEW);
+				}
+
 				layout = _layoutService.addLayout(
 					groupId, privateLayout, parentLayoutId,
 					portal.getClassNameId(LayoutPageTemplateEntry.class),
@@ -160,7 +174,8 @@ public class AddContentLayoutMVCActionCommand
 	private LayoutExceptionRequestHandler _layoutExceptionRequestHandler;
 
 	@Reference
-	private LayoutPageTemplateEntryService _layoutPageTemplateEntryService;
+	private LayoutPageTemplateEntryLocalService
+		_layoutPageTemplateEntryLocalService;
 
 	@Reference
 	private LayoutPrototypeService _layoutPrototypeService;
