@@ -1662,11 +1662,6 @@ public class LayoutStagedModelDataHandler
 			importedLayout.setColorSchemeId(layout.getColorSchemeId());
 			importedLayout.setCss(layout.getCss());
 		}
-		else {
-			importedLayout.setThemeId(StringPool.BLANK);
-			importedLayout.setColorSchemeId(StringPool.BLANK);
-			importedLayout.setCss(StringPool.BLANK);
-		}
 	}
 
 	protected void initNewLayoutPermissions(
