@@ -68,7 +68,8 @@ public class LayoutPageTemplateServiceUpgrade
 		registry.register(
 			"2.0.0", "2.1.0",
 			new UpgradeLayout(
-				_layoutLocalService, _layoutPrototypeLocalService),
+				_fragmentEntryLinkLocalService, _layoutLocalService,
+				_layoutPrototypeLocalService),
 			new UpgradeSchema());
 	}
 
