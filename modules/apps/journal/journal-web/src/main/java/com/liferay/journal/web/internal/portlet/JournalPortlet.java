@@ -102,6 +102,7 @@ import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
+import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -999,6 +1000,11 @@ public class JournalPortlet extends MVCPortlet {
 		_updateAssetDisplayPage(
 			themeDisplay.getUserId(), groupId, article, assetDisplayPageId,
 			displayPageType, serviceContext);
+
+		if (Validator.isNotNull(portletResource)) {
+			MultiSessionMessages.add(
+				actionRequest, portletResource + "requestProcessed");
+		}
 
 		sendEditArticleRedirect(
 			actionRequest, actionResponse, article, oldUrlTitle);

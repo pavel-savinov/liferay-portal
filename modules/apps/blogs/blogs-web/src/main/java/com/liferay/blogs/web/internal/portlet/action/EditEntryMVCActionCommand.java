@@ -53,6 +53,7 @@ import com.liferay.portal.kernel.sanitizer.SanitizerException;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
+import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -580,6 +581,14 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 
 			_assetDisplayPageEntryLocalService.updateAssetDisplayPageEntry(
 				assetDisplayPageEntry);
+		}
+
+		String portletResource = ParamUtil.getString(
+			actionRequest, "portletResource");
+
+		if (Validator.isNotNull(portletResource)) {
+			MultiSessionMessages.add(
+				actionRequest, portletResource + "requestProcessed");
 		}
 
 		return entry;
