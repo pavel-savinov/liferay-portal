@@ -50,7 +50,7 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 
 	@Override
 	public void onAfterCreate(Layout layout) throws ModelListenerException {
-		if (ExportImportThreadLocal.isStagingInProcess()) {
+		if (ExportImportThreadLocal.isStagingInProcess() && !layout.isHead()) {
 			return;
 		}
 
@@ -76,7 +76,7 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 
 	@Override
 	public void onAfterRemove(Layout layout) throws ModelListenerException {
-		if (layout == null) {
+		if ((layout == null) || !layout.isHead()) {
 			return;
 		}
 
