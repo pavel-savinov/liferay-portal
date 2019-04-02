@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.sanitizer.Sanitizer;
+import com.liferay.portal.kernel.sanitizer.SanitizerException;
 import com.liferay.portal.kernel.sanitizer.SanitizerUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
@@ -129,22 +130,45 @@ public class JournalArticleAssetDisplayContributor
 
 				List<DDMFormFieldValue> ddmFormFieldValues = entry.getValue();
 
-				DDMFormFieldValue ddmFormFieldValue0 = ddmFormFieldValues.get(
-					0);
+				Object fieldValue = null;
 
-				Value value = ddmFormFieldValue0.getValue();
+				if (ddmFormFieldValues.size() == 1) {
+					DDMFormFieldValue ddmFormFieldValue0 =
+						ddmFormFieldValues.get(0);
 
-				String fieldValue = value.getString(locale);
+					Value value = ddmFormFieldValue0.getValue();
 
-				if (Objects.equals(ddmFormFieldValue0.getType(), "ddm-image")) {
-					fieldValue = _transformFileEntryURL(fieldValue);
+					fieldValue = _sanitizeFieldValue(
+						article, ddmFormFieldValue0.getType(),
+						value.getString(locale));
 				}
 				else {
-					fieldValue = SanitizerUtil.sanitize(
-						article.getCompanyId(), article.getGroupId(),
-						article.getUserId(), JournalArticle.class.getName(),
-						article.getResourcePrimKey(), ContentTypes.TEXT_HTML,
-						Sanitizer.MODE_ALL, fieldValue, null);
+					Stream<DDMFormFieldValue> stream =
+						ddmFormFieldValues.stream();
+
+					fieldValue = stream.map(
+						ddmFormFieldValue -> {
+							Value value = ddmFormFieldValue.getValue();
+
+							try {
+								return _sanitizeFieldValue(
+									article, ddmFormFieldValue.getType(),
+									value.getString(locale));
+							}
+							catch (SanitizerException se) {
+								_log.error(
+									"Unable to sanitize field " +
+										ddmFormFieldValue.getName(),
+									se);
+
+								return null;
+							}
+						}
+					).filter(
+						value -> value != null
+					).collect(
+						Collectors.toList()
+					);
 				}
 
 				classTypeValues.put(entry.getKey(), fieldValue);
@@ -174,6 +198,20 @@ public class JournalArticleAssetDisplayContributor
 		String templateKey = ddmTemplate.getTemplateKey();
 
 		return _DDM_TEMPLATE + templateKey.replaceAll("\\W]", "_");
+	}
+
+	private Object _sanitizeFieldValue(
+			JournalArticle article, String type, String value)
+		throws SanitizerException {
+
+		if (Objects.equals(type, "ddm-image")) {
+			return _transformFileEntryURL(value);
+		}
+
+		return SanitizerUtil.sanitize(
+			article.getCompanyId(), article.getGroupId(), article.getUserId(),
+			JournalArticle.class.getName(), article.getResourcePrimKey(),
+			ContentTypes.TEXT_HTML, Sanitizer.MODE_ALL, value, null);
 	}
 
 	private String _transformFileEntryURL(String data) {
