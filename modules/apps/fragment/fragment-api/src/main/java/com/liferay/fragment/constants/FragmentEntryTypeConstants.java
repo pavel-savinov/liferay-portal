@@ -23,9 +23,15 @@ public class FragmentEntryTypeConstants {
 
 	public static final int TYPE_COMPONENT = 1;
 
+	public static final String TYPE_COMPONENT_KEY =
+		"fragments-editor-component-row";
+
 	public static final String TYPE_COMPONENT_LABEL = "component";
 
 	public static final int TYPE_SECTION = 0;
+
+	public static final String TYPE_SECTION_KEY =
+		"fragments-editor-section-row";
 
 	public static final String TYPE_SECTION_LABEL = "section";
 
