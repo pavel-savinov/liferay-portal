@@ -151,8 +151,7 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 		if (plid == 0) {
 			Layout layout = _addLayout(
-				userId, groupId, classNameId, classTypeId, name, type,
-				serviceContext);
+				userId, groupId, name, type, serviceContext);
 
 			if (layout != null) {
 				plid = layout.getPlid();
@@ -559,7 +558,7 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 		if (layoutPageTemplateEntry.getPlid() == 0) {
 			layout = _addLayout(
 				layoutPageTemplateEntry.getUserId(),
-				layoutPageTemplateEntry.getGroupId(), classNameId, classTypeId,
+				layoutPageTemplateEntry.getGroupId(),
 				layoutPageTemplateEntry.getName(),
 				layoutPageTemplateEntry.getType(), serviceContext);
 		}
@@ -769,23 +768,12 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 	}
 
 	private Layout _addLayout(
-			long userId, long groupId, long classNameId, long classTypeId,
-			String name, int type, ServiceContext serviceContext)
+			long userId, long groupId, String name, int type,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		Map<Locale, String> titleMap = Collections.singletonMap(
 			LocaleUtil.getSiteDefault(), name);
-
-		if (classNameId > 0) {
-			AssetRendererFactory assetRendererFactory =
-				AssetRendererFactoryRegistryUtil.
-					getAssetRendererFactoryByClassNameId(classNameId);
-
-			titleMap = Collections.singletonMap(
-				LocaleUtil.getSiteDefault(),
-				assetRendererFactory.getTypeName(
-					LocaleUtil.getSiteDefault(), classTypeId));
-		}
 
 		String layoutType = LayoutConstants.TYPE_ASSET_DISPLAY;
 
