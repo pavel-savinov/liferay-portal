@@ -108,15 +108,26 @@ public class UpgradeLayout extends UpgradeProcess {
 							LayoutPageTemplateEntry.class),
 						layoutPageTemplateEntryId);
 
-				fragmentEntryLinks.forEach(
-					fragmentEntryLink -> {
-						fragmentEntryLink.setClassNameId(
-							PortalUtil.getClassNameId(Layout.class));
-						fragmentEntryLink.setClassPK(plid);
+				Layout draftLayout = _layoutLocalService.fetchLayout(
+					PortalUtil.getClassNameId(Layout.class), plid);
 
-						_fragmentEntryLinkLocalService.updateFragmentEntryLink(
-							fragmentEntryLink);
-					});
+				for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
+					fragmentEntryLink.setClassNameId(
+						PortalUtil.getClassNameId(Layout.class));
+					fragmentEntryLink.setClassPK(plid);
+
+					_fragmentEntryLinkLocalService.updateFragmentEntryLink(
+						fragmentEntryLink);
+
+					_fragmentEntryLinkLocalService.addFragmentEntryLink(
+						draftLayout.getUserId(), draftLayout.getGroupId(),
+						fragmentEntryLink.getFragmentEntryId(),
+						PortalUtil.getClassNameId(Layout.class),
+						draftLayout.getPlid(), fragmentEntryLink.getCss(),
+						fragmentEntryLink.getHtml(), fragmentEntryLink.getJs(),
+						fragmentEntryLink.getEditableValues(),
+						fragmentEntryLink.getPosition(), serviceContext);
+				}
 			}
 
 			ps.executeBatch();
@@ -162,6 +173,14 @@ public class UpgradeLayout extends UpgradeProcess {
 			userId, groupId, false, 0, titleMap, titleMap, null, null, null,
 			layoutType, StringPool.BLANK, true, true, new HashMap<>(),
 			serviceContext);
+
+		_layoutLocalService.addLayout(
+			layout.getUserId(), layout.getGroupId(), layout.isPrivateLayout(),
+			layout.getParentLayoutId(), PortalUtil.getClassNameId(Layout.class),
+			layout.getPlid(), layout.getNameMap(), layout.getTitleMap(),
+			layout.getDescriptionMap(), layout.getKeywordsMap(),
+			layout.getRobotsMap(), layout.getType(), StringPool.BLANK, true,
+			true, Collections.emptyMap(), serviceContext);
 
 		return layout.getPlid();
 	}
