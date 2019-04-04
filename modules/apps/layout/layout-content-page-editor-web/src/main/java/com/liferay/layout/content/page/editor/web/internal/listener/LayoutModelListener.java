@@ -17,6 +17,7 @@ package com.liferay.layout.content.page.editor.web.internal.listener;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
+import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.layout.util.LayoutCopyHelper;
@@ -118,6 +119,21 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 
 		Layout pagetTemplateLayout = _layoutLocalService.getLayout(
 			layoutPageTemplateEntry.getPlid());
+
+		LayoutPageTemplateStructure layoutPageTemplateStructure =
+			_layoutPageTemplateStructureLocalService.
+				fetchLayoutPageTemplateStructure(
+					pagetTemplateLayout.getGroupId(),
+					_portal.getClassNameId(Layout.class),
+					pagetTemplateLayout.getPlid());
+
+		if (layoutPageTemplateStructure == null) {
+			_layoutPageTemplateStructureLocalService.
+				rebuildLayoutPageTemplateStructure(
+					pagetTemplateLayout.getGroupId(),
+					_portal.getClassNameId(Layout.class),
+					pagetTemplateLayout.getPlid());
+		}
 
 		_layoutCopyHelper.copyLayout(pagetTemplateLayout, draftLayout);
 
