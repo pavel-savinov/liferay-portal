@@ -38,6 +38,8 @@ if (assetEntry != null) {
 		structureJSONArray = dataJSONObject.getJSONArray("structure");
 	}
 }
+
+int errorsCount = 0;
 %>
 
 <liferay-ui:success key="displayPagePublished" message="the-display-page-template-was-published-succesfully" />
@@ -120,11 +122,17 @@ if (assetEntry != null) {
 											defaultFragmentRendererContext.setLocale(locale);
 											defaultFragmentRendererContext.setMode(FragmentEntryLinkConstants.ASSET_DISPLAY_PAGE);
 											defaultFragmentRendererContext.setSegmentsExperienceIds(segmentsExperienceIds);
+
+											try {
 										%>
 
-											<%= fragmentRendererController.render(defaultFragmentRendererContext, request, response) %>
+												<%= fragmentRendererController.render(defaultFragmentRendererContext, request, response) %>
 
 										<%
+											}
+											catch (IOException e) {
+												errorsCount++;
+											}
 										}
 										%>
 
@@ -221,5 +229,25 @@ if (assetEntry != null) {
 
 	</c:otherwise>
 </c:choose>
+
+<c:if test="<%= (errorsCount > 0) && LayoutPermissionUtil.contains(permissionChecker, layout, ActionKeys.UPDATE) %>">
+	<liferay-util:buffer
+		var="alertBuffer"
+	>
+		<clay:stripe
+			destroyOnHide="<%= true %>"
+			elementClasses="mb-0"
+			message='<%= LanguageUtil.get(resourceBundle, "there-are-parts-of-the-page-which-are-not-being-displayed") %>'
+			style="warning"
+			title='<%= LanguageUtil.get(resourceBundle, "warning") + ":" %>'
+		/>
+	</liferay-util:buffer>
+
+	<script>
+		var alertsContainer = document.getElementById('controlMenuAlertsContainer');
+
+		alertsContainer.innerHTML = '<%= alertBuffer %>';
+	</script>
+</c:if>
 
 <liferay-ui:layout-common />

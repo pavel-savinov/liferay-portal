@@ -18,6 +18,8 @@
 
 <%
 String ppid = ParamUtil.getString(request, "p_p_id");
+
+int errorsCount = 0;
 %>
 
 <liferay-ui:success key="layoutPublished" message="the-page-was-published-succesfully" />
@@ -136,11 +138,17 @@ String ppid = ParamUtil.getString(request, "p_p_id");
 													defaultFragmentRendererContext.setLocale(locale);
 													defaultFragmentRendererContext.setMode(FragmentEntryLinkConstants.VIEW);
 													defaultFragmentRendererContext.setSegmentsExperienceIds(segmentsExperienceIds);
+
+													try {
 												%>
 
-													<%= fragmentRendererController.render(defaultFragmentRendererContext, request, response) %>
+														<%= fragmentRendererController.render(defaultFragmentRendererContext, request, response) %>
 
 												<%
+													}
+													catch (IOException fece) {
+														errorsCount++;
+													}
 												}
 												%>
 
@@ -167,5 +175,25 @@ String ppid = ParamUtil.getString(request, "p_p_id");
 		</c:if>
 	</c:otherwise>
 </c:choose>
+
+<c:if test="<%= (errorsCount > 0) && LayoutPermissionUtil.contains(permissionChecker, layout, ActionKeys.UPDATE) %>">
+	<liferay-util:buffer
+		var="alertBuffer"
+	>
+		<clay:stripe
+			destroyOnHide="<%= true %>"
+			elementClasses="mb-0"
+			message='<%= LanguageUtil.get(resourceBundle, "there-are-parts-of-the-page-which-are-not-being-displayed") %>'
+			style="warning"
+			title='<%= LanguageUtil.get(resourceBundle, "warning") + ":" %>'
+		/>
+	</liferay-util:buffer>
+
+	<script>
+		var alertsContainer = document.getElementById('controlMenuAlertsContainer');
+
+		alertsContainer.innerHTML = '<%= alertBuffer %>';
+	</script>
+</c:if>
 
 <liferay-ui:layout-common />
