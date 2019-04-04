@@ -137,13 +137,13 @@ List<AssetEntryUsage> assetEntryUsages = AssetEntryUsageLocalServiceUtil.getAsse
 				);
 			}
 		);
+
+		function removeListener() {
+			previewAssetEntryUsagesList.removeListener();
+
+			Liferay.detach('destroyPortlet', removeListener);
+		}
+
+		Liferay.on('destroyPortlet', removeListener);
 	}
-
-	function removeListener() {
-		previewAssetEntryUsagesList.removeListener();
-
-		Liferay.detach('destroyPortlet', removeListener);
-	}
-
-	Liferay.on('destroyPortlet', removeListener);
 </aui:script>
