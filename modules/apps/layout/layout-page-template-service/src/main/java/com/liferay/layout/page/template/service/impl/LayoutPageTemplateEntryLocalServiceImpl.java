@@ -14,8 +14,6 @@
 
 package com.liferay.layout.page.template.service.impl;
 
-import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
-import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.dynamic.data.mapping.model.DDMStructureLink;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLinkLocalService;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
@@ -565,35 +563,6 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 		if (layout != null) {
 			layoutPageTemplateEntry.setPlid(layout.getPlid());
-		}
-
-		if (layoutPageTemplateEntry.getType() ==
-				LayoutPageTemplateEntryTypeConstants.TYPE_DISPLAY_PAGE) {
-
-			if (layout == null) {
-				layout = layoutLocalService.fetchLayout(
-					layoutPageTemplateEntry.getPlid());
-			}
-
-			AssetRendererFactory assetRendererFactory =
-				AssetRendererFactoryRegistryUtil.
-					getAssetRendererFactoryByClassNameId(classNameId);
-
-			Map<Locale, String> titleMap = Collections.singletonMap(
-				LocaleUtil.getSiteDefault(),
-				assetRendererFactory.getTypeName(
-					LocaleUtil.getSiteDefault(), classTypeId));
-
-			serviceContext.setAttribute(
-				"layout.instanceable.allowed", Boolean.TRUE);
-
-			layoutLocalService.updateLayout(
-				layout.getGroupId(), layout.isPrivateLayout(),
-				layout.getLayoutId(), layout.getParentLayoutId(), titleMap,
-				titleMap, layout.getDescriptionMap(), layout.getKeywordsMap(),
-				layout.getRobotsMap(), layout.getType(), layout.isHidden(),
-				layout.getFriendlyURLMap(), layout.getIconImage(), null,
-				serviceContext);
 		}
 
 		layoutPageTemplateEntryPersistence.update(layoutPageTemplateEntry);
