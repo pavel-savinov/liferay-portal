@@ -182,7 +182,7 @@ public class FragmentEntryLinkLocalServiceImpl
 		long groupId, long classNameId, long classPK) {
 
 		return fragmentEntryLinkPersistence.countByG_C_C(
-			groupId, classNameId, classNameId);
+			groupId, classNameId, classPK);
 	}
 
 	@Override
