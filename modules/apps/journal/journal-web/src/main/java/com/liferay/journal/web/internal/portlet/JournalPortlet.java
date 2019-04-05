@@ -985,7 +985,12 @@ public class JournalPortlet extends MVCPortlet {
 			JournalArticle.class.getName(), article.getResourcePrimKey(),
 			actionRequest);
 
-		if (Validator.isNotNull(portletResource)) {
+		int workflowAction = ParamUtil.getInteger(
+			actionRequest, "workflowAction", WorkflowConstants.ACTION_PUBLISH);
+
+		if (Validator.isNotNull(portletResource) &&
+			(workflowAction != WorkflowConstants.ACTION_SAVE_DRAFT)) {
+
 			MultiSessionMessages.add(
 				actionRequest, portletResource + "requestProcessed");
 		}
@@ -1333,6 +1338,9 @@ public class JournalPortlet extends MVCPortlet {
 			String redirect)
 		throws Exception {
 
+		String portletResource = ParamUtil.getString(
+			actionRequest, "portletResource");
+
 		String referringPortletResource = ParamUtil.getString(
 			actionRequest, "referringPortletResource");
 
@@ -1342,6 +1350,7 @@ public class JournalPortlet extends MVCPortlet {
 
 		portletURL.setParameter("mvcPath", "/edit_article.jsp");
 		portletURL.setParameter("redirect", redirect);
+		portletURL.setParameter("portletResource", portletResource);
 		portletURL.setParameter(
 			"referringPortletResource", referringPortletResource);
 		portletURL.setParameter(
