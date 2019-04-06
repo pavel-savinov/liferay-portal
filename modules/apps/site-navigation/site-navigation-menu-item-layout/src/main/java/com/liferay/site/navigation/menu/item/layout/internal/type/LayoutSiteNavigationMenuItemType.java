@@ -288,13 +288,12 @@ public class LayoutSiteNavigationMenuItemType
 			SiteNavigationMenuItem importedSiteNavigationMenuItem)
 		throws PortalException {
 
-		Layout layout = null;
+		Layout layout = _getLayout(importedSiteNavigationMenuItem);
 
-		try {
-			layout = _getLayout(importedSiteNavigationMenuItem);
-		}
-		catch (NoSuchLayoutException nsle) {
+		if (layout == null) {
 			if (ExportImportThreadLocal.isPortletImportInProcess()) {
+				NoSuchLayoutException nsle = new NoSuchLayoutException();
+
 				throw nsle;
 			}
 
@@ -428,9 +427,7 @@ public class LayoutSiteNavigationMenuItemType
 			layoutUuid, siteNavigationMenuItem.getGroupId(), privateLayout);
 	}
 
-	private Layout _getLayout(SiteNavigationMenuItem siteNavigationMenuItem)
-		throws PortalException {
-
+	private Layout _getLayout(SiteNavigationMenuItem siteNavigationMenuItem) {
 		UnicodeProperties typeSettingsProperties = new UnicodeProperties();
 
 		typeSettingsProperties.fastLoad(
