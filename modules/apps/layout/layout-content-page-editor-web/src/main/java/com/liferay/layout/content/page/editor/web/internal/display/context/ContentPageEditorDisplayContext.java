@@ -566,12 +566,35 @@ public class ContentPageEditorDisplayContext {
 			return soyContext;
 		}
 
-		soyContext.put(
-			"name",
-			PortalUtil.getPortletTitle(portletId, themeDisplay.getLocale())
-		).put(
-			"portletId", portletId
-		);
+		PortletConfig portletConfig = PortletConfigFactoryUtil.get(portletId);
+
+		soyContext.put("portletId", portletId);
+
+		if (portletConfig == null) {
+			Element element = new Element("div");
+
+			element.attr("class", "alert alert-danger m-2");
+
+			element.text(
+				LanguageUtil.get(
+					request,
+					"this-portlet-has-been-undeployed.-please-redeploy-it-or-" +
+						"remove-it-from-the-page"));
+
+			soyContext.put(
+				"content", element.outerHtml()
+			).put(
+				"error", true
+			).put(
+				"name", portletId
+			);
+		}
+		else {
+			soyContext.put(
+				"name",
+				PortalUtil.getPortletTitle(
+					portletId, themeDisplay.getLocale()));
+		}
 
 		return soyContext;
 	}
