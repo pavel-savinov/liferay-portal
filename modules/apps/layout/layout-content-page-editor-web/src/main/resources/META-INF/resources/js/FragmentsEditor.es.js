@@ -140,6 +140,10 @@ class FragmentsEditor extends Component {
 			}
 		}
 
+		if(dom.parent(event.target, '.fragment-entry-link-list')) {
+			event.preventDefault();
+		}
+
 		this._activeElement = document.activeElement;
 	}
 }
