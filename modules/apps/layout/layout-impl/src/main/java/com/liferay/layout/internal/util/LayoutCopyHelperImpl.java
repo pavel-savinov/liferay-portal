@@ -283,19 +283,32 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 			Image image = _imageLocalService.getImage(
 				_sourceLayout.getIconImageId());
 
+			byte[] imageBytes = null;
+
 			if (image != null) {
-				_layoutLocalService.updateIconImage(
-					_targetLayout.getPlid(), image.getTextObj());
+				imageBytes = image.getTextObj();
 			}
 
-			_targetLayout.setNameMap(_sourceLayout.getNameMap());
-			_targetLayout.setTitleMap(_sourceLayout.getTitleMap());
-			_targetLayout.setDescriptionMap(_sourceLayout.getDescriptionMap());
-			_targetLayout.setKeywordsMap(_sourceLayout.getKeywordsMap());
-			_targetLayout.setRobotsMap(_sourceLayout.getRobotsMap());
-			_targetLayout.setTypeSettings(_sourceLayout.getTypeSettings());
+			ServiceContext serviceContext =
+				ServiceContextThreadLocal.getServiceContext();
 
-			return _layoutLocalService.updateLayout(_targetLayout);
+			if (serviceContext == null) {
+				serviceContext = new ServiceContext();
+			}
+
+			_layoutLocalService.updateLayout(
+				_targetLayout.getGroupId(), _targetLayout.isPrivateLayout(),
+				_targetLayout.getLayoutId(), _sourceLayout.getTypeSettings());
+
+			return _layoutLocalService.updateLayout(
+				_targetLayout.getGroupId(), _targetLayout.isPrivateLayout(),
+				_targetLayout.getLayoutId(), _targetLayout.getParentLayoutId(),
+				_sourceLayout.getNameMap(), _sourceLayout.getTitleMap(),
+				_sourceLayout.getDescriptionMap(),
+				_sourceLayout.getKeywordsMap(), _sourceLayout.getRobotsMap(),
+				_targetLayout.getType(), _targetLayout.isHidden(),
+				_targetLayout.getFriendlyURLMap(), imageBytes != null,
+				imageBytes, serviceContext);
 		}
 
 		private CopyLayoutCallable(Layout sourceLayout, Layout targetLayout) {
