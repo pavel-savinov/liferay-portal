@@ -41,6 +41,7 @@ import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutRevision;
 import com.liferay.portal.kernel.model.LayoutSetBranch;
 import com.liferay.portal.kernel.model.LayoutTypePortletConstants;
@@ -238,7 +239,14 @@ public class AssetPublisherConfigurationAction
 					updateQueryLogic(actionRequest, preferences);
 				}
 
-				updateDefaultAssetPublisher(actionRequest);
+				Layout layout = (Layout)actionRequest.getAttribute(
+					WebKeys.LAYOUT);
+
+				if (Objects.equals(
+						layout.getType(), LayoutConstants.TYPE_PORTLET)) {
+
+					updateDefaultAssetPublisher(actionRequest);
+				}
 
 				super.processAction(
 					portletConfig, actionRequest, actionResponse);

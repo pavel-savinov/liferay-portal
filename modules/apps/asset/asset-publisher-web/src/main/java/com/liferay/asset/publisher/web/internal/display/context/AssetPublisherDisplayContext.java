@@ -53,6 +53,8 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -1228,10 +1230,14 @@ public class AssetPublisherDisplayContext {
 	}
 
 	public boolean isEnableSetAsDefaultAssetPublisher() {
+		Layout layout = _themeDisplay.getLayout();
+
 		String rootPortletId = PortletIdCodec.decodePortletName(
 			getPortletResource());
 
-		if (rootPortletId.equals(AssetPublisherPortletKeys.ASSET_PUBLISHER)) {
+		if (Objects.equals(layout.getType(), LayoutConstants.TYPE_PORTLET) &&
+			rootPortletId.equals(AssetPublisherPortletKeys.ASSET_PUBLISHER)) {
+
 			return true;
 		}
 
