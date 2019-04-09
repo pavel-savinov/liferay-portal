@@ -18,6 +18,8 @@ import java.io.Serializable;
 
 import java.util.Locale;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * @author Jürgen Kappler
  */
@@ -36,5 +38,7 @@ public interface InfoDisplayTemplate<T> extends Serializable {
 	public T getModel();
 
 	public String getTitle(Locale locale);
+
+	public void prepareTemplate(HttpServletRequest request);
 
 }
