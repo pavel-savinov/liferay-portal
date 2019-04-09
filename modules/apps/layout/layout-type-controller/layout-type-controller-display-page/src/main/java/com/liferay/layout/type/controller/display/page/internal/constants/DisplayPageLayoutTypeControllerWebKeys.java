@@ -19,6 +19,6 @@ package com.liferay.layout.type.controller.display.page.internal.constants;
  */
 public class DisplayPageLayoutTypeControllerWebKeys {
 
-	public static final String INFO_DISPLAY_OBJECT = "INFO_DISPLAY_OBJECT";
+	public static final String INFO_DISPLAY_TEMPLATE = "INFO_DISPLAY_TEMPLATE";
 
 }

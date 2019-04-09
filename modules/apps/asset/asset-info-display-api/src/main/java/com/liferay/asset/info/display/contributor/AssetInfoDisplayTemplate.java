@@ -15,16 +15,17 @@
 package com.liferay.asset.info.display.contributor;
 
 import com.liferay.asset.kernel.model.AssetEntry;
-import com.liferay.info.display.contributor.InfoDisplayObject;
+import com.liferay.info.display.contributor.InfoDisplayTemplate;
 
 import java.util.Locale;
 
 /**
  * @author Jürgen Kappler
  */
-public class AssetInfoDisplayObject implements InfoDisplayObject<AssetEntry> {
+public class AssetInfoDisplayTemplate
+	implements InfoDisplayTemplate<AssetEntry> {
 
-	public AssetInfoDisplayObject(AssetEntry assetEntry) {
+	public AssetInfoDisplayTemplate(AssetEntry assetEntry) {
 		_assetEntry = assetEntry;
 	}
 
@@ -54,7 +55,7 @@ public class AssetInfoDisplayObject implements InfoDisplayObject<AssetEntry> {
 	}
 
 	@Override
-	public AssetEntry getModelEntry() {
+	public AssetEntry getModel() {
 		return _assetEntry;
 	}
 

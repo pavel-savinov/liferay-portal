@@ -21,7 +21,7 @@ import java.util.Locale;
 /**
  * @author Jürgen Kappler
  */
-public interface InfoDisplayObject<T> extends Serializable {
+public interface InfoDisplayTemplate<T> extends Serializable {
 
 	public long getClassNameId();
 
@@ -33,7 +33,7 @@ public interface InfoDisplayObject<T> extends Serializable {
 
 	public long getGroupId();
 
-	public T getModelEntry();
+	public T getModel();
 
 	public String getTitle(Locale locale);
 

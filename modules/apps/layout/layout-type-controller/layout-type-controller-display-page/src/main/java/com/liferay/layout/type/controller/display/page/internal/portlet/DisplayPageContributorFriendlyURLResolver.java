@@ -17,12 +17,11 @@ package com.liferay.layout.type.controller.display.page.internal.portlet;
 import com.liferay.asset.display.page.constants.AssetDisplayPageConstants;
 import com.liferay.asset.display.page.model.AssetDisplayPageEntry;
 import com.liferay.asset.display.page.service.AssetDisplayPageEntryLocalService;
-import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.util.AssetHelper;
 import com.liferay.info.constants.InfoDisplayWebKeys;
 import com.liferay.info.display.contributor.InfoDisplayContributor;
 import com.liferay.info.display.contributor.InfoDisplayContributorTracker;
-import com.liferay.info.display.contributor.InfoDisplayObject;
+import com.liferay.info.display.contributor.InfoDisplayTemplate;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryService;
 import com.liferay.layout.type.controller.display.page.internal.constants.DisplayPageLayoutTypeControllerWebKeys;
@@ -40,7 +39,6 @@ import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -77,34 +75,17 @@ public class DisplayPageContributorFriendlyURLResolver
 			InfoDisplayWebKeys.VERSION_CLASS_PK,
 			_getVersionClassPK(friendlyURL));
 
-		InfoDisplayObject infoDisplayObject = _getInfoDisplayObject(
+		InfoDisplayTemplate infoDisplayTemplate = _getInfoDisplayTemplate(
 			infoDisplayContributor, groupId, friendlyURL);
 
-		Object modelEntry = infoDisplayObject.getModelEntry();
-
-		if (modelEntry instanceof AssetEntry) {
-			AssetEntry assetEntry = (AssetEntry)modelEntry;
-
-			Locale locale = _portal.getLocale(request);
-
-			_portal.setPageDescription(
-				assetEntry.getDescription(locale), request);
-
-			_portal.setPageKeywords(
-				_assetHelper.getAssetKeywords(
-					assetEntry.getClassName(), assetEntry.getClassPK()),
-				request);
-
-			_portal.setPageTitle(assetEntry.getTitle(locale), request);
-
-			request.setAttribute(WebKeys.LAYOUT_ASSET_ENTRY, assetEntry);
-		}
+		request.setAttribute(
+			WebKeys.LAYOUT_ASSET_ENTRY, infoDisplayTemplate.getModel());
 
 		request.setAttribute(
-			DisplayPageLayoutTypeControllerWebKeys.INFO_DISPLAY_OBJECT,
-			infoDisplayObject);
+			DisplayPageLayoutTypeControllerWebKeys.INFO_DISPLAY_TEMPLATE,
+			infoDisplayTemplate);
 
-		Layout layout = _getInfoDisplayObjectLayout(infoDisplayObject);
+		Layout layout = _getInfoDisplayTemplateLayout(infoDisplayTemplate);
 
 		return _portal.getLayoutActualURL(layout, mainPath);
 	}
@@ -119,8 +100,8 @@ public class DisplayPageContributorFriendlyURLResolver
 		InfoDisplayContributor infoDisplayContributor =
 			_getInfoDisplayContributor(friendlyURL);
 
-		Layout layout = _getInfoDisplayObjectLayout(
-			_getInfoDisplayObject(
+		Layout layout = _getInfoDisplayTemplateLayout(
+			_getInfoDisplayTemplate(
 				infoDisplayContributor, groupId, friendlyURL));
 
 		return new LayoutFriendlyURLComposite(layout, friendlyURL);
@@ -166,23 +147,23 @@ public class DisplayPageContributorFriendlyURLResolver
 		return infoDisplayContributor;
 	}
 
-	private InfoDisplayObject _getInfoDisplayObject(
+	private InfoDisplayTemplate _getInfoDisplayTemplate(
 			InfoDisplayContributor infoDisplayContributor, long groupId,
 			String friendlyURL)
 		throws PortalException {
 
-		return infoDisplayContributor.getInfoDisplayObject(
+		return infoDisplayContributor.getInfoDisplayTemplate(
 			groupId, _getUrlTitle(friendlyURL));
 	}
 
-	private Layout _getInfoDisplayObjectLayout(
-		InfoDisplayObject infoDisplayObject) {
+	private Layout _getInfoDisplayTemplateLayout(
+		InfoDisplayTemplate infoDisplayTemplate) {
 
 		AssetDisplayPageEntry assetDisplayPageEntry =
 			_assetDisplayPageEntryLocalService.fetchAssetDisplayPageEntry(
-				infoDisplayObject.getGroupId(),
-				infoDisplayObject.getClassNameId(),
-				infoDisplayObject.getClassPK());
+				infoDisplayTemplate.getGroupId(),
+				infoDisplayTemplate.getClassNameId(),
+				infoDisplayTemplate.getClassPK());
 
 		if (assetDisplayPageEntry == null) {
 			return null;
@@ -197,9 +178,9 @@ public class DisplayPageContributorFriendlyURLResolver
 
 		LayoutPageTemplateEntry layoutPageTemplateEntry =
 			_layoutPageTemplateEntryService.fetchDefaultLayoutPageTemplateEntry(
-				infoDisplayObject.getGroupId(),
-				infoDisplayObject.getClassNameId(),
-				infoDisplayObject.getClassTypeId());
+				infoDisplayTemplate.getGroupId(),
+				infoDisplayTemplate.getClassNameId(),
+				infoDisplayTemplate.getClassTypeId());
 
 		if (layoutPageTemplateEntry != null) {
 			return _layoutLocalService.fetchLayout(
