@@ -35,7 +35,6 @@ import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.HashSet;
 import java.util.List;
@@ -78,8 +77,7 @@ public class DisplayPageContributorFriendlyURLResolver
 		InfoDisplayTemplate infoDisplayTemplate = _getInfoDisplayTemplate(
 			infoDisplayContributor, groupId, friendlyURL);
 
-		request.setAttribute(
-			WebKeys.LAYOUT_ASSET_ENTRY, infoDisplayTemplate.getModel());
+		infoDisplayTemplate.prepareTemplate(request);
 
 		request.setAttribute(
 			DisplayPageLayoutTypeControllerWebKeys.INFO_DISPLAY_TEMPLATE,
