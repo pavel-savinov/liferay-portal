@@ -148,7 +148,18 @@ public class LayoutsAdminDisplayContext {
 		};
 	}
 
-	public String getAddLayoutURL() {
+	public String getAddLayoutURL() throws PortalException {
+		String cmd = ParamUtil.getString(
+			_request, Constants.CMD, Constants.ADD);
+
+		if (Objects.equals(cmd, Constants.COPY)) {
+			long copyPlid = ParamUtil.getLong(_request, "copyPlid");
+
+			Layout copyLayout = LayoutLocalServiceUtil.getLayout(copyPlid);
+
+			return getCopyLayoutURL(copyLayout);
+		}
+
 		PortletURL portletURL = _liferayPortletResponse.createActionURL();
 
 		portletURL.setParameter(
@@ -300,6 +311,22 @@ public class LayoutsAdminDisplayContext {
 			"privateLayout", String.valueOf(layout.isPrivateLayout()));
 
 		return configureLayoutURL.toString();
+	}
+
+	public String getCopyLayoutRenderURL(Layout layout) throws Exception {
+		PortletURL copyLayoutRenderURL =
+			_liferayPortletResponse.createActionURL();
+
+		copyLayoutRenderURL.setParameter(
+			"mvcRenderCommandName", "/layout/add_layout");
+
+		copyLayoutRenderURL.setParameter(Constants.CMD, Constants.COPY);
+		copyLayoutRenderURL.setParameter(
+			"copyPlid", String.valueOf(layout.getPlid()));
+
+		copyLayoutRenderURL.setWindowState(LiferayWindowState.POP_UP);
+
+		return copyLayoutRenderURL.toString();
 	}
 
 	public String getCopyLayoutURL(Layout layout) {
@@ -1385,7 +1412,7 @@ public class LayoutsAdminDisplayContext {
 		}
 
 		if (isShowCopyLayoutAction(layout)) {
-			jsonObject.put("copyLayoutURL", getCopyLayoutURL(layout));
+			jsonObject.put("copyLayoutURL", getCopyLayoutRenderURL(layout));
 		}
 
 		if (isShowDeleteAction(layout)) {
