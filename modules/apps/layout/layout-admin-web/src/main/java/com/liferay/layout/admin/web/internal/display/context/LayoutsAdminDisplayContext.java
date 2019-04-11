@@ -1146,6 +1146,19 @@ public class LayoutsAdminDisplayContext {
 		return false;
 	}
 
+	public boolean isDraft() {
+		Layout layout = getSelLayout();
+
+		if (layout.isSystem() && (layout.getClassPK() > 0) &&
+			(layout.getClassNameId() == PortalUtil.getClassNameId(
+				Layout.class))) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	public boolean isFirstColumn() {
 		if (_firstColumn != null) {
 			return _firstColumn;
