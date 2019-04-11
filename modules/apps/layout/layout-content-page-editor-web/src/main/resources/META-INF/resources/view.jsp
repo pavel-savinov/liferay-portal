@@ -84,8 +84,6 @@ JSONSerializer jsonSerializer = JSONFactoryUtil.createJSONSerializer();
 	function handleDestroyPortlet() {
 		Object.keys(editModeComponents).forEach(
 			function(key) {
-				editModeComponents[key].dispose();
-
 				Liferay.destroyComponent(key);
 			}
 		);
