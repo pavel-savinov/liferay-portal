@@ -98,7 +98,7 @@ public class FragmentEntryLinkRichTextEditorConfigContributor
 	}
 
 	protected String getAllowedContentLists() {
-		return "li ol ul;";
+		return "li ol ul [*](*){*};";
 	}
 
 	protected String getAllowedContentTable() {
