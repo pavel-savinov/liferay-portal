@@ -254,9 +254,8 @@ public class LayoutPageTemplateEntryServiceTest {
 		List<FragmentEntryLink> actualLayoutPageTemplateEntriesCount =
 			FragmentEntryLinkLocalServiceUtil.getFragmentEntryLinks(
 				_group.getGroupId(),
-				PortalUtil.getClassNameId(
-					LayoutPageTemplateEntry.class.getName()),
-				layoutPageTemplateEntry.getLayoutPageTemplateEntryId());
+				PortalUtil.getClassNameId(Layout.class.getName()),
+				layoutPageTemplateEntry.getPlid());
 
 		Assert.assertEquals(
 			actualLayoutPageTemplateEntriesCount.toString(), 2,
