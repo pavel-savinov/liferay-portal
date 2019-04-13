@@ -17,6 +17,7 @@ package com.liferay.portal.kernel.theme;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutType;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
@@ -36,6 +37,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -109,7 +111,8 @@ public class NavItem implements Serializable {
 			while (iterator.hasNext()) {
 				Layout childLayout = iterator.next();
 
-				if (childLayout.isHidden() ||
+				if (_isContentPageDraft(childLayout) ||
+					childLayout.isHidden() ||
 					!LayoutPermissionUtil.contains(
 						themeDisplay.getPermissionChecker(), childLayout,
 						ActionKeys.VIEW)) {
@@ -124,6 +127,10 @@ public class NavItem implements Serializable {
 		for (Layout parentLayout : parentLayouts) {
 			List<Layout> childLayouts = layoutChildLayouts.get(
 				parentLayout.getPlid());
+
+			if (_isContentPageDraft(parentLayout)) {
+				continue;
+			}
 
 			navItems.add(
 				new NavItem(
@@ -420,6 +427,18 @@ public class NavItem implements Serializable {
 		}
 
 		return navItems;
+	}
+
+	private static boolean _isContentPageDraft(Layout layout) {
+		if (!Objects.equals(layout.getType(), LayoutConstants.TYPE_CONTENT)) {
+			return false;
+		}
+
+		if (Objects.equals(layout.getCreateDate(), layout.getPublishDate())) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private NavItem(
