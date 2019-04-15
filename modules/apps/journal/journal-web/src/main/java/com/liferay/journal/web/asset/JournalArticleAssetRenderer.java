@@ -219,7 +219,7 @@ public class JournalArticleAssetRenderer
 		String summary = _article.getDescription(locale);
 
 		if (Validator.isNotNull(summary)) {
-			return HtmlUtil.stripHtml(summary);
+			return HtmlUtil.render(HtmlUtil.stripHtml(summary));
 		}
 
 		try {
@@ -242,7 +242,7 @@ public class JournalArticleAssetRenderer
 					LanguageUtil.getLanguageId(locale), 1, portletRequestModel,
 					themeDisplay);
 
-			summary = HtmlUtil.unescape(
+			summary = HtmlUtil.render(
 				HtmlUtil.stripHtml(articleDisplay.getContent()));
 		}
 		catch (Exception e) {
