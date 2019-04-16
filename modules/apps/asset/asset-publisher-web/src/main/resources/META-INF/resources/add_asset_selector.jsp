@@ -114,7 +114,6 @@ String redirect = PortalUtil.getLayoutFullURL(layout, themeDisplay);
 
 		var selectedOption = assetEntryTypeSelector.get('options').item(index);
 
-		var title = selectedOption.attr('data-title');
 		var url = selectedOption.attr('data-url');
 
 		Liferay.Util.navigate(url);
