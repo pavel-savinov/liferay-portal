@@ -17,13 +17,7 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String redirect = ParamUtil.getString(request, "redirect");
-
-if (Validator.isNull(redirect)) {
-	PortletURL portletURL = renderResponse.createRenderURL();
-
-	redirect = portletURL.toString();
-}
+String redirect = PortalUtil.getLayoutFullURL(layout, themeDisplay);
 %>
 
 <div class="container-fluid-1280">
@@ -71,10 +65,14 @@ if (Validator.isNull(redirect)) {
 								curGroupId = group.getLiveGroupId();
 							}
 
+							PortletURL portletURL = assetPublisherAddItemHolder.getPortletURL();
+
+							portletURL.setParameter("redirect", redirect);
+
 							Map<String, Object> data = new HashMap<String, Object>();
 
 							data.put("title", LanguageUtil.format((HttpServletRequest)pageContext.getRequest(), "new-x", HtmlUtil.escape(message), false));
-							data.put("url", assetHelper.getAddURLPopUp(curGroupId, plid, assetPublisherAddItemHolder.getPortletURL(), false, null));
+							data.put("url", assetHelper.getAddURLPopUp(curGroupId, plid, portletURL, false, null));
 						%>
 
 							<aui:option data="<%= data %>" label="<%= HtmlUtil.escape(message) %>" />
