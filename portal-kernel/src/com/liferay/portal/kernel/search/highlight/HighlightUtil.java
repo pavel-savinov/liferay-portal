@@ -78,8 +78,10 @@ public class HighlightUtil {
 			return s;
 		}
 
-		Arrays.sort(
-			queryTerms, Comparator.comparingInt(String::length).reversed());
+		Comparator<? super String> comparator = Comparator.comparingInt(
+			String::length);
+
+		Arrays.sort(queryTerms, comparator.reversed());
 
 		StringBundler sb = new StringBundler(3 * queryTerms.length - 1);
 
@@ -118,8 +120,6 @@ public class HighlightUtil {
 
 		return sb.toString();
 	}
-
-	private static final String _REGEXP_WORD_BOUNDARY = "\\b";
 
 	private static final Pattern _pattern = Pattern.compile(
 		HIGHLIGHT_TAG_OPEN + "(.*?)" + HIGHLIGHT_TAG_CLOSE);
