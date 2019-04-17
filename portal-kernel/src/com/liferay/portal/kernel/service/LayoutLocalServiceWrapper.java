@@ -658,6 +658,15 @@ public class LayoutLocalServiceWrapper
 	}
 
 	@Override
+	public com.liferay.portal.kernel.model.Layout fetchFirstLayout(
+		long groupId, boolean privateLayout, long parentLayoutId,
+		boolean hidden) {
+
+		return _layoutLocalService.fetchFirstLayout(
+			groupId, privateLayout, parentLayoutId, hidden);
+	}
+
+	@Override
 	public com.liferay.portal.kernel.model.LayoutVersion fetchLatestVersion(
 		com.liferay.portal.kernel.model.Layout layout) {
 

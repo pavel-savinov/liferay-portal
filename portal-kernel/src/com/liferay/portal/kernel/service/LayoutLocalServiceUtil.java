@@ -639,6 +639,14 @@ public class LayoutLocalServiceUtil {
 			groupId, privateLayout, parentLayoutId);
 	}
 
+	public static com.liferay.portal.kernel.model.Layout fetchFirstLayout(
+		long groupId, boolean privateLayout, long parentLayoutId,
+		boolean hidden) {
+
+		return getService().fetchFirstLayout(
+			groupId, privateLayout, parentLayoutId, hidden);
+	}
+
 	public static com.liferay.portal.kernel.model.LayoutVersion
 		fetchLatestVersion(com.liferay.portal.kernel.model.Layout layout) {
 

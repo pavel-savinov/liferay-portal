@@ -577,6 +577,11 @@ public interface LayoutLocalService
 	public Layout fetchFirstLayout(
 		long groupId, boolean privateLayout, long parentLayoutId);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public Layout fetchFirstLayout(
+		long groupId, boolean privateLayout, long parentLayoutId,
+		boolean hidden);
+
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public LayoutVersion fetchLatestVersion(Layout layout);
