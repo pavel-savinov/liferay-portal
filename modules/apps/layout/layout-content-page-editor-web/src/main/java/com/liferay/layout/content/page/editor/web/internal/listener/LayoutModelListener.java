@@ -37,7 +37,6 @@ import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.Portal;
 
-import java.util.Date;
 import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
@@ -131,11 +130,12 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 					pagetTemplateLayout.getPlid());
 		}
 
-		_layoutCopyHelper.copyLayout(pagetTemplateLayout, draftLayout);
+		draftLayout = _layoutCopyHelper.copyLayout(
+			pagetTemplateLayout, draftLayout);
 
-		draftLayout.setModifiedDate(new Date());
-
-		_layoutLocalService.updateLayout(draftLayout);
+		_layoutLocalService.updateLayout(
+			draftLayout.getGroupId(), draftLayout.isPrivateLayout(),
+			draftLayout.getLayoutId(), draftLayout.getTypeSettings());
 
 		return null;
 	}
