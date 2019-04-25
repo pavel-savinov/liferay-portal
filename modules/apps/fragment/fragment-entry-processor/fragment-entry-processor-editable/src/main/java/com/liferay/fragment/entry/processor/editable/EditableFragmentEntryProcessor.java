@@ -695,7 +695,7 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 	private static final String[] _REQUIRED_ATTRIBUTE_NAMES = {"id", "type"};
 
 	private static final Pattern _cssPropertyPattern = Pattern.compile(
-		"([^:]+)\\s*:([^;]+);");
+		"([^:]+)\\s*:\\s*((url\\([^\\)]+\\))|([^;]+));");
 	private static final Pattern _cssSelectorPattern = Pattern.compile(
 		"([^\\{]+)\\s*\\{([^\\}]+)\\}");
 
