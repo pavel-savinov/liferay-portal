@@ -320,7 +320,7 @@ public class AssetListEntryImpl extends AssetListEntryBaseImpl {
 	private long[] _getClassTypeIds(
 		UnicodeProperties properties, String className) {
 
-		long[] availableClassTypeIds = null;
+		long[] availableClassTypeIds = {};
 
 		AssetRendererFactory assetRendererFactory =
 			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
