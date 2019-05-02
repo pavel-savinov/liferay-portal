@@ -97,12 +97,10 @@ public class UpgradeContentImages extends UpgradeProcess {
 				dynamicContentElement.clearContent();
 
 				if (fileEntry == null) {
-					String message = StringBundler.concat(
-						"Unable to get file entry with group ID ",
-						String.valueOf(groupId), ", and file name ", id,
-						" for resourcePrimKey ", String.valueOf(resourcePrimKey), " clear dynamic content");
-
-					_log.warn(message);
+					_log.warn(
+						StringBundler.concat(
+							"DynamicContent of fileEntryId ",
+							String.valueOf(fileEntryId), " was deleted"));
 
 					continue;
 				}
