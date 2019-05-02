@@ -94,9 +94,9 @@ public class UpgradeContentImages extends UpgradeProcess {
 							data);
 				}
 
-				if (fileEntry == null) {
-					dynamicContentElement.clearContent();
+				dynamicContentElement.clearContent();
 
+				if (fileEntry == null) {
 					String message = StringBundler.concat(
 						"Unable to get file entry with group ID ",
 						String.valueOf(groupId), ", and file name ", id,
@@ -106,8 +106,6 @@ public class UpgradeContentImages extends UpgradeProcess {
 
 					continue;
 				}
-
-				dynamicContentElement.clearContent();
 
 				dynamicContentElement.addCDATA(
 					JSONUtil.put(
