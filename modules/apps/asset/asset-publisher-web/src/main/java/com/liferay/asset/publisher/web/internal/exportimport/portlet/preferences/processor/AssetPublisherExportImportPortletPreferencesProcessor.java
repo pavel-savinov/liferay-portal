@@ -23,6 +23,7 @@ import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.asset.kernel.service.persistence.AssetEntryQuery;
+import com.liferay.asset.list.constants.AssetListEntryTypeConstants;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.AssetListEntryLocalService;
 import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
@@ -203,7 +204,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 			PortletPreferences portletPreferences)
 		throws Exception {
 
-		List<AssetEntry> assetEntries = null;
+		List<AssetEntry> assetEntries = new ArrayList<>();
 
 		Layout layout = layoutLocalService.getLayout(
 			portletDataContext.getPlid());
@@ -211,7 +212,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 		String selectionStyle = portletPreferences.getValue(
 			"selectionStyle", "dynamic");
 
-		if (selectionStyle.equals("dynamic")) {
+		if (Objects.equals(selectionStyle, "dynamic")) {
 			if (!_assetPublisherWebConfiguration.dynamicExportEnabled()) {
 				return;
 			}
@@ -244,7 +245,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 
 			assetEntries = baseModelSearchResult.getBaseModels();
 		}
-		else {
+		else if (Objects.equals(selectionStyle, "manual")) {
 			if (!_assetPublisherWebConfiguration.manualExportEnabled()) {
 				return;
 			}
@@ -257,6 +258,21 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 				null, portletPreferences,
 				PermissionThreadLocal.getPermissionChecker(), groupIds, false,
 				false);
+		}
+		else if (Objects.equals(selectionStyle, "asset-list")) {
+			long assetListEntryId = GetterUtil.getLong(
+				portletPreferences.getValue("assetListEntryId", null));
+
+			AssetListEntry assetListEntry =
+				assetListEntryLocalService.fetchAssetListEntry(
+					assetListEntryId);
+
+			if ((assetListEntry != null) &&
+				(assetListEntry.getType() ==
+					AssetListEntryTypeConstants.TYPE_DYNAMIC)) {
+
+				assetEntries = assetListEntry.getAssetEntries(new long[0]);
+			}
 		}
 
 		for (AssetEntry assetEntry : assetEntries) {
