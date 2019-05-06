@@ -273,6 +273,10 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 				PortletKeys.PREFS_OWNER_ID_DEFAULT,
 				PortletKeys.PREFS_OWNER_TYPE_LAYOUT, sourceLayout.getPlid());
 
+		_portletPreferencesLocalService.deletePortletPreferences(
+			PortletKeys.PREFS_OWNER_ID_DEFAULT,
+			PortletKeys.PREFS_OWNER_TYPE_LAYOUT, targetLayout.getPlid());
+
 		for (PortletPreferences portletPreferences : portletPreferencesList) {
 			Portlet portlet = _portletLocalService.getPortletById(
 				portletPreferences.getPortletId());
