@@ -114,6 +114,10 @@ public class LayoutStagingImpl implements LayoutStaging {
 
 	@Override
 	public boolean isBranchingLayout(Layout layout) {
+		if (layout.isSystem()) {
+			return false;
+		}
+
 		return isBranchingLayoutSet(
 			layout.getGroup(), layout.isPrivateLayout());
 	}
