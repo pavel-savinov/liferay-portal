@@ -54,6 +54,10 @@ public class FragmentEntryLinkLocalServiceUtil {
 		return getService().addFragmentEntryLink(fragmentEntryLink);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link #addFragmentEntryLink(long, long, long, long, long, long, String, String, String, String, String, int, String, ServiceContext)}
+	 */
+	@Deprecated
 	public static com.liferay.fragment.model.FragmentEntryLink
 			addFragmentEntryLink(
 				long userId, long groupId, long originalFragmentEntryLinkId,
@@ -67,6 +71,10 @@ public class FragmentEntryLinkLocalServiceUtil {
 			classNameId, classPK, rendererKey, serviceContext);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link #addFragmentEntryLink(long, long, long, long, long, long, String, String, String, String, String, int, String, ServiceContext)}
+	 */
+	@Deprecated
 	public static com.liferay.fragment.model.FragmentEntryLink
 			addFragmentEntryLink(
 				long userId, long groupId, long originalFragmentEntryLinkId,
@@ -82,6 +90,10 @@ public class FragmentEntryLinkLocalServiceUtil {
 			serviceContext);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link #addFragmentEntryLink(long, long, long, long, long, long, String, String, String, String, String, int, String, ServiceContext)}
+	 */
+	@Deprecated
 	public static com.liferay.fragment.model.FragmentEntryLink
 			addFragmentEntryLink(
 				long userId, long groupId, long originalFragmentEntryLinkId,
@@ -112,6 +124,10 @@ public class FragmentEntryLinkLocalServiceUtil {
 			position, rendererKey, serviceContext);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link #addFragmentEntryLink(long, long, long, long, long, long, String, String, String, String, String, int, String, ServiceContext)}
+	 */
+	@Deprecated
 	public static com.liferay.fragment.model.FragmentEntryLink
 			addFragmentEntryLink(
 				long userId, long groupId, long fragmentEntryId,

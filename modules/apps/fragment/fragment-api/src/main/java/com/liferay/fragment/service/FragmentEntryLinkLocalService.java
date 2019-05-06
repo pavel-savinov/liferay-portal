@@ -76,12 +76,20 @@ public interface FragmentEntryLinkLocalService
 	public FragmentEntryLink addFragmentEntryLink(
 		FragmentEntryLink fragmentEntryLink);
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link #addFragmentEntryLink(long, long, long, long, long, long, String, String, String, String, String, int, String, ServiceContext)}
+	 */
+	@Deprecated
 	public FragmentEntryLink addFragmentEntryLink(
 			long userId, long groupId, long originalFragmentEntryLinkId,
 			long fragmentEntryId, long classNameId, long classPK,
 			String rendererKey, ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link #addFragmentEntryLink(long, long, long, long, long, long, String, String, String, String, String, int, String, ServiceContext)}
+	 */
+	@Deprecated
 	public FragmentEntryLink addFragmentEntryLink(
 			long userId, long groupId, long originalFragmentEntryLinkId,
 			long fragmentEntryId, long classNameId, long classPK, String css,
@@ -89,6 +97,10 @@ public interface FragmentEntryLinkLocalService
 			ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link #addFragmentEntryLink(long, long, long, long, long, long, String, String, String, String, String, int, String, ServiceContext)}
+	 */
+	@Deprecated
 	public FragmentEntryLink addFragmentEntryLink(
 			long userId, long groupId, long originalFragmentEntryLinkId,
 			long fragmentEntryId, long classNameId, long classPK, String css,
@@ -103,6 +115,10 @@ public interface FragmentEntryLinkLocalService
 			int position, String rendererKey, ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link #addFragmentEntryLink(long, long, long, long, long, long, String, String, String, String, String, int, String, ServiceContext)}
+	 */
+	@Deprecated
 	public FragmentEntryLink addFragmentEntryLink(
 			long userId, long groupId, long fragmentEntryId, long classNameId,
 			long classPK, String css, String html, String js,
