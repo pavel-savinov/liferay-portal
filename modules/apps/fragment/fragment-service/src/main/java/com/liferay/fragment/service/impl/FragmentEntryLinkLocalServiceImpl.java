@@ -53,6 +53,10 @@ import java.util.regex.Pattern;
 public class FragmentEntryLinkLocalServiceImpl
 	extends FragmentEntryLinkLocalServiceBaseImpl {
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link #addFragmentEntryLink(long, long, long, long, long, long, String, String, String, String, String, int, String, ServiceContext)}
+	 */
+	@Deprecated
 	@Override
 	public FragmentEntryLink addFragmentEntryLink(
 			long userId, long groupId, long originalFragmentEntryLinkId,
@@ -63,9 +67,14 @@ public class FragmentEntryLinkLocalServiceImpl
 		return addFragmentEntryLink(
 			userId, groupId, originalFragmentEntryLinkId, fragmentEntryId,
 			classNameId, classPK, StringPool.BLANK, StringPool.BLANK,
-			StringPool.BLANK, StringPool.BLANK, 0, rendererKey, serviceContext);
+			StringPool.BLANK, StringPool.BLANK, StringPool.BLANK, 0,
+			rendererKey, serviceContext);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link #addFragmentEntryLink(long, long, long, long, long, long, String, String, String, String, String, int, String, ServiceContext)}
+	 */
+	@Deprecated
 	@Override
 	public FragmentEntryLink addFragmentEntryLink(
 			long userId, long groupId, long originalFragmentEntryLinkId,
@@ -76,10 +85,14 @@ public class FragmentEntryLinkLocalServiceImpl
 
 		return addFragmentEntryLink(
 			userId, groupId, originalFragmentEntryLinkId, fragmentEntryId,
-			classNameId, classPK, css, html, js, editableValues, position, null,
-			serviceContext);
+			classNameId, classPK, css, html, js, editableValues,
+			StringPool.BLANK, position, null, serviceContext);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link #addFragmentEntryLink(long, long, long, long, long, long, String, String, String, String, String, int, String, ServiceContext)}
+	 */
+	@Deprecated
 	@Override
 	public FragmentEntryLink addFragmentEntryLink(
 			long userId, long groupId, long originalFragmentEntryLinkId,
@@ -157,6 +170,10 @@ public class FragmentEntryLinkLocalServiceImpl
 		return fragmentEntryLink;
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link #addFragmentEntryLink(long, long, long, long, long, long, String, String, String, String, String, int, String, ServiceContext)}
+	 */
+	@Deprecated
 	@Override
 	public FragmentEntryLink addFragmentEntryLink(
 			long userId, long groupId, long fragmentEntryId, long classNameId,
@@ -166,7 +183,8 @@ public class FragmentEntryLinkLocalServiceImpl
 
 		return addFragmentEntryLink(
 			userId, groupId, 0, fragmentEntryId, classNameId, classPK, css,
-			html, js, editableValues, position, serviceContext);
+			html, js, editableValues, StringPool.BLANK, position, null,
+			serviceContext);
 	}
 
 	@Override
@@ -438,11 +456,11 @@ public class FragmentEntryLinkLocalServiceImpl
 				fragmentEntryLocalService.fetchFragmentEntry(fragmentId);
 
 			addFragmentEntryLink(
-				userId, groupId, fragmentEntry.getFragmentEntryId(),
+				userId, groupId, 0, fragmentEntry.getFragmentEntryId(),
 				classNameId, classPK, fragmentEntry.getCss(),
 				fragmentEntry.getHtml(), fragmentEntry.getJs(),
-				jsonObject.getString(String.valueOf(position)), position++,
-				serviceContext);
+				jsonObject.getString(String.valueOf(position)),
+				StringPool.BLANK, position++, null, serviceContext);
 		}
 	}
 
