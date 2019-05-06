@@ -164,12 +164,12 @@ public class FragmentEntryProcessorEditableTest {
 
 		FragmentEntryLink fragmentEntryLink =
 			_fragmentEntryLinkLocalService.addFragmentEntryLink(
-				TestPropsValues.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUserId(), _group.getGroupId(), 0,
 				fragmentEntry.getFragmentEntryId(),
 				_portal.getClassNameId(Layout.class), TestPropsValues.getPlid(),
 				fragmentEntry.getCss(), fragmentEntry.getHtml(),
-				fragmentEntry.getJs(), StringPool.BLANK, 0,
-				ServiceContextTestUtil.getServiceContext());
+				fragmentEntry.getJs(), StringPool.BLANK, StringPool.BLANK, 0,
+				null, ServiceContextTestUtil.getServiceContext());
 
 		AssetEntry assetEntry = AssetTestUtil.addAssetEntry(
 			_group.getGroupId());
