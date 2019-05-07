@@ -109,7 +109,6 @@ public class ManageLayoutProductNavigationControlMenuEntry
 
 		String currentURL = _portal.getCurrentURL(httpServletRequest);
 
-		editPageURL.setParameter("redirect", currentURL);
 		editPageURL.setParameter("backURL", currentURL);
 
 		editPageURL.setParameter(
