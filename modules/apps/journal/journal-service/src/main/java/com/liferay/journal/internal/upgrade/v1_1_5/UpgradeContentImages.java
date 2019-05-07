@@ -97,10 +97,12 @@ public class UpgradeContentImages extends UpgradeProcess {
 				dynamicContentElement.clearContent();
 
 				if (fileEntry == null) {
-					_log.warn(
-						StringBundler.concat(
-							"DynamicContent of fileEntryId ",
-							String.valueOf(fileEntryId), " was deleted"));
+					if (_log.isWarnEnabled()) {
+						_log.warn(
+							StringBundler.concat(
+								"DynamicContent of fileEntryId ",
+								String.valueOf(fileEntryId), " was deleted"));
+					}
 
 					continue;
 				}
