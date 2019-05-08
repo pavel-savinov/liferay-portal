@@ -85,6 +85,8 @@ List<SiteNavigationMenu> autoSiteNavigationMenus = layoutsAdminDisplayContext.ge
 	form.addEventListener(
 		'submit',
 		function(event) {
+			event.stopPropagation();
+
 			var formData = new FormData();
 
 			Array.prototype.slice.call(
