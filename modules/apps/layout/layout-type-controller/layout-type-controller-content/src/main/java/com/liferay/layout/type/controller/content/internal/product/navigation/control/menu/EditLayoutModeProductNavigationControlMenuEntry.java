@@ -17,6 +17,7 @@ package com.liferay.layout.type.controller.content.internal.product.navigation.c
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorWebKeys;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.type.controller.content.internal.controller.ContentLayoutTypeController;
+import com.liferay.layout.util.LayoutCopyHelper;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -25,6 +26,8 @@ import com.liferay.portal.kernel.model.LayoutTypeController;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
@@ -36,6 +39,7 @@ import com.liferay.product.navigation.control.menu.BaseProductNavigationControlM
 import com.liferay.product.navigation.control.menu.ProductNavigationControlMenuEntry;
 import com.liferay.product.navigation.control.menu.constants.ProductNavigationControlMenuCategoryKeys;
 
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -97,10 +101,24 @@ public class EditLayoutModeProductNavigationControlMenuEntry
 				Layout draftLayout = _layoutLocalService.fetchLayout(
 					_portal.getClassNameId(Layout.class), layout.getPlid());
 
-				if (draftLayout != null) {
-					redirect = _portal.getLayoutFullURL(
-						draftLayout, themeDisplay);
+				if (draftLayout == null) {
+					ServiceContext serviceContext =
+						ServiceContextFactory.getInstance(httpServletRequest);
+
+					draftLayout = _layoutLocalService.addLayout(
+						layout.getUserId(), layout.getGroupId(),
+						layout.isPrivateLayout(), layout.getParentLayoutId(),
+						_portal.getClassNameId(Layout.class), layout.getPlid(),
+						layout.getNameMap(), layout.getTitleMap(),
+						layout.getDescriptionMap(), layout.getKeywordsMap(),
+						layout.getRobotsMap(), layout.getType(),
+						layout.getTypeSettings(), true, true,
+						Collections.emptyMap(), serviceContext);
+
+					_layoutCopyHelper.copyLayout(layout, draftLayout);
 				}
+
+				redirect = _portal.getLayoutFullURL(draftLayout, themeDisplay);
 			}
 
 			redirect = _http.setParameter(
@@ -159,6 +177,9 @@ public class EditLayoutModeProductNavigationControlMenuEntry
 
 	@Reference
 	private Http _http;
+
+	@Reference
+	private LayoutCopyHelper _layoutCopyHelper;
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;
