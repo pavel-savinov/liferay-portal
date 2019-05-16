@@ -1710,6 +1710,12 @@ public class AssetPublisherDisplayContext {
 	public void setLayoutAssetEntry(AssetEntry assetEntry)
 		throws PortalException {
 
+		if (_httpServletRequest.getAttribute(WebKeys.LAYOUT_ASSET_ENTRY) !=
+				null) {
+
+			return;
+		}
+
 		String defaultAssetPublisherPortletId =
 			_assetPublisherWebUtil.getDefaultAssetPublisherId(
 				_themeDisplay.getLayout());
