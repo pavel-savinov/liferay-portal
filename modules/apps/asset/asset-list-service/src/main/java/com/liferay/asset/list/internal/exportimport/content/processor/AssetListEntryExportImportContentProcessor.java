@@ -16,6 +16,8 @@ package com.liferay.asset.list.internal.exportimport.content.processor;
 
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
+import com.liferay.document.library.kernel.model.DLFileEntryType;
+import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalService;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
@@ -117,6 +119,18 @@ public class AssetListEntryExportImportContentProcessor
 					StagedModelDataHandlerUtil.exportReferenceStagedModel(
 						portletDataContext, stagedModel, ddmStructure,
 						PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
+
+					continue;
+				}
+
+				DLFileEntryType dlFileEntryType =
+					_dlFileEntryTypeLocalService.fetchFileEntryType(
+						classTypeId);
+
+				if (dlFileEntryType != null) {
+					StagedModelDataHandlerUtil.exportReferenceStagedModel(
+						portletDataContext, stagedModel, dlFileEntryType,
+						PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
 				}
 			}
 		}
@@ -193,13 +207,29 @@ public class AssetListEntryExportImportContentProcessor
 
 			LongStream classTypeIdsStream = Arrays.stream(classTypeIds);
 
-			Map<Long, Long> structureIds =
+			Map<Long, Long> ddmStructureIds =
 				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 					DDMStructure.class);
+			Map<Long, Long> dlFileEntryTypeIds =
+				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+					DLFileEntryType.class);
 
 			long[] newClassTypeIds = classTypeIdsStream.map(
-				classTypeId -> MapUtil.getLong(
-					structureIds, classTypeId, classTypeId)
+				classTypeId -> {
+					long newClassTypeId = classTypeId;
+
+					newClassTypeId = MapUtil.getLong(
+						ddmStructureIds, classTypeId, classTypeId);
+
+					if (newClassTypeId != classTypeId) {
+						return newClassTypeId;
+					}
+
+					newClassTypeId = MapUtil.getLong(
+						dlFileEntryTypeIds, classTypeId, classTypeId);
+
+					return newClassTypeId;
+				}
 			).toArray();
 
 			unicodeProperties.setProperty(
@@ -216,6 +246,9 @@ public class AssetListEntryExportImportContentProcessor
 
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
+
+	@Reference
+	private DLFileEntryTypeLocalService _dlFileEntryTypeLocalService;
 
 	@Reference(unbind = "-")
 	private GroupLocalService _groupLocalService;
