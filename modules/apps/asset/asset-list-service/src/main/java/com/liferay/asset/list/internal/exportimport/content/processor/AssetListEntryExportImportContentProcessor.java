@@ -20,11 +20,8 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
-import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -196,34 +193,13 @@ public class AssetListEntryExportImportContentProcessor
 
 			LongStream classTypeIdsStream = Arrays.stream(classTypeIds);
 
+			Map<Long, Long> structureIds =
+				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+					DDMStructure.class);
+
 			long[] newClassTypeIds = classTypeIdsStream.map(
-				classTypeId -> {
-					if (classTypeId == 0) {
-						return 0;
-					}
-
-					try {
-						StagedModelDataHandlerUtil.importReferenceStagedModel(
-							portletDataContext, stagedModel, DDMStructure.class,
-							Long.valueOf(classTypeId));
-
-						Map<Long, Long> structureIds =
-							(Map<Long, Long>)
-								portletDataContext.getNewPrimaryKeysMap(
-									DDMStructure.class);
-
-						classTypeId = MapUtil.getLong(
-							structureIds, classTypeId, classTypeId);
-					}
-					catch (PortletDataException pde) {
-						_log.error(
-							"Unable to import DDMStructure for classTypeId " +
-								classTypeId,
-							pde);
-					}
-
-					return classTypeId;
-				}
+				classTypeId -> MapUtil.getLong(
+					structureIds, classTypeId, classTypeId)
 			).toArray();
 
 			unicodeProperties.setProperty(
@@ -237,9 +213,6 @@ public class AssetListEntryExportImportContentProcessor
 	public void validateContentReferences(long groupId, String content)
 		throws PortalException {
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		AssetListEntryExportImportContentProcessor.class);
 
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
