@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.StagedModel;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -147,6 +148,8 @@ public class AssetListEntryExportImportContentProcessor
 
 		long[] newGroupIds = oldGroupIdsStream.map(
 			oldGroupId -> MapUtil.getLong(groupIds, oldGroupId, oldGroupId)
+		).filter(
+			oldGroupId -> _groupLocalService.fetchGroup(oldGroupId) != null
 		).toArray();
 
 		unicodeProperties.put("groupIds", StringUtil.merge(newGroupIds));
@@ -240,6 +243,9 @@ public class AssetListEntryExportImportContentProcessor
 
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
+
+	@Reference(unbind = "-")
+	private GroupLocalService _groupLocalService;
 
 	@Reference
 	private Portal _portal;
