@@ -34,7 +34,7 @@ public interface FreeMarkerFragmentEntryProcessorConfiguration {
 
 	@Meta.AD(
 		deflt = "true", description = "enable-freemarker-help",
-		name = "enable-freemarker", required = false
+		id = "enable.freemarker", name = "enable-freemarker", required = false
 	)
 	public boolean enable();
 
