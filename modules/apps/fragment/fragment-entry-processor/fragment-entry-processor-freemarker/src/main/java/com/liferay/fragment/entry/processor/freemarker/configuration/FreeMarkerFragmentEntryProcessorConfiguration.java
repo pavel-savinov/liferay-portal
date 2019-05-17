@@ -33,7 +33,7 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 public interface FreeMarkerFragmentEntryProcessorConfiguration {
 
 	@Meta.AD(
-		deflt = "false", description = "enable-freemarker-help",
+		deflt = "true", description = "enable-freemarker-help",
 		name = "enable-freemarker", required = false
 	)
 	public boolean enable();
