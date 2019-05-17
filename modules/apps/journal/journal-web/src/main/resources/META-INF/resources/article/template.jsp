@@ -132,9 +132,11 @@ DDMTemplate ddmTemplate = journalEditArticleDisplayContext.getDDMTemplate();
 
 		if (oldDDMTemplateId != newDDMTemplateId) {
 			if (confirm('<%= UnicodeLanguageUtil.get(request, "editing-the-current-template-deletes-all-unsaved-content") %>')) {
-				document.<portlet:namespace />fm1.<portlet:namespace />ddmTemplateId.value = newDDMTemplateId;
+				var uri = '<%= themeDisplay.getURLCurrent() %>';
 
-				submitForm(document.<portlet:namespace />fm1, null, false, false);
+				uri = Liferay.Util.addParams('<portlet:namespace />ddmTemplateId=' + newDDMTemplateId, uri);
+
+				Liferay.Util.navigate(uri);
 			}
 		}
 	}
