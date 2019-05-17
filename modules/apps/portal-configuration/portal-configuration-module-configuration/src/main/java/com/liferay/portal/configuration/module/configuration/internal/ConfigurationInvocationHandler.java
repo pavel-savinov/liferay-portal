@@ -72,14 +72,15 @@ public class ConfigurationInvocationHandler<S> implements InvocationHandler {
 		}
 	}
 
-	private Object _getValue(Class<?> returnType, String key)
+	private Object _getValue(
+			Class<?> returnType, String key, String defaultValue)
 		throws ReflectiveOperationException {
 
 		if (returnType.equals(boolean.class) ||
 			returnType.equals(double.class) || returnType.equals(float.class) ||
 			returnType.equals(int.class) || returnType.equals(long.class)) {
 
-			String value = _typedSettings.getValue(key, null);
+			String value = _typedSettings.getValue(key, defaultValue);
 
 			if (value == null) {
 				return value;
@@ -111,7 +112,7 @@ public class ConfigurationInvocationHandler<S> implements InvocationHandler {
 			return localizedValuesMap;
 		}
 		else if (returnType.equals(String.class)) {
-			return _typedSettings.getValue(key, null);
+			return _typedSettings.getValue(key, defaultValue);
 		}
 		else if (returnType.equals(String[].class)) {
 			return _typedSettings.getValues(key, null);
@@ -142,7 +143,8 @@ public class ConfigurationInvocationHandler<S> implements InvocationHandler {
 		Meta.AD annotation = method.getAnnotation(Meta.AD.class);
 
 		if ((annotation != null) && !Meta.NULL.equals(annotation.id())) {
-			Object value = _getValue(returnType, annotation.id());
+			Object value = _getValue(
+				returnType, annotation.id(), annotation.deflt());
 
 			if (value != null) {
 				return value;
