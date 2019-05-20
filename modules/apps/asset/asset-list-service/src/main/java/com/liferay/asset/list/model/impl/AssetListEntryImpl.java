@@ -350,23 +350,32 @@ public class AssetListEntryImpl extends AssetListEntryBaseImpl {
 			}
 		}
 
+		Class<?> clazz = assetRendererFactory.getClass();
+
+		String assetRendererFactoryClassName = clazz.getSimpleName();
+
 		boolean anyAssetType = GetterUtil.getBoolean(
 			properties.getProperty(
-				"anyClassType" + className, Boolean.TRUE.toString()));
+				"anyClassType" + assetRendererFactoryClassName,
+				Boolean.TRUE.toString()));
 
 		if (anyAssetType) {
 			return availableClassTypeIds;
 		}
 
 		long anyClassTypeId = GetterUtil.getLong(
-			properties.getProperty("anyClassType" + className, null), -1);
+			properties.getProperty(
+				"anyClassType" + assetRendererFactoryClassName, null),
+			-1);
 
 		if (anyClassTypeId > -1) {
 			return new long[] {anyClassTypeId};
 		}
 
 		long[] classTypeIds = StringUtil.split(
-			properties.getProperty("classTypeIds" + className, null), 0L);
+			properties.getProperty(
+				"classTypeIds" + assetRendererFactoryClassName, null),
+			0L);
 
 		if (classTypeIds != null) {
 			return classTypeIds;
