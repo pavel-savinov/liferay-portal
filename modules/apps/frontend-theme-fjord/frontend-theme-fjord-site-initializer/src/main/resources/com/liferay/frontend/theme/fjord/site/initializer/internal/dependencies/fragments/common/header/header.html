@@ -27,6 +27,15 @@
 						<div aria-expanded="false" class="collapse justify-content-md-end navbar-collapse text-center" id="navigationCollapse">
 							<lfr-widget-nav></lfr-widget-nav>
 						</div>
+
+						<div class="ea-test">
+							[#if (user?? && user.isSetupComplete()) || (themeDisplay?? && !themeDisplay.isSignedIn())]
+								[@liferay_portlet.runtime
+									portletProviderAction=portletProviderAction.VIEW
+									portletProviderClassName="com.liferay.admin.kernel.util.PortalUserPersonalBarApplicationType$UserPersonalBar"
+								/]
+							[/#if]
+						</div>
 					</nav>
 				</div>
 			</div>
