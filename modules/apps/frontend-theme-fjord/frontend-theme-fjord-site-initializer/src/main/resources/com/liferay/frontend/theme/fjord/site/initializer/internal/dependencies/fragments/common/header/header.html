@@ -29,11 +29,26 @@
 						</div>
 
 						<div class="ea-test">
-							[#if (user?? && user.isSetupComplete()) || (themeDisplay?? && !themeDisplay.isSignedIn())]
-								[@liferay_portlet.runtime
-									portletProviderAction=portletProviderAction.VIEW
-									portletProviderClassName="com.liferay.admin.kernel.util.PortalUserPersonalBarApplicationType$UserPersonalBar"
-								/]
+							[#assign
+								isSetupComplete = false
+								isSignedIn = false
+							/]
+
+							[#if user??]
+								[#assign isSetupComplete = user.isSetupComplete() /]
+							[/#if]
+
+							[#if themeDisplay??]
+								[#assign isSignedIn = themeDisplay.isSignedIn() /]
+							[/#if]
+
+							[#if isSetupComplete || !isSignedIn]
+								[#if liferay_portlet??]
+									[@liferay_portlet.runtime
+										portletProviderAction=portletProviderAction.VIEW
+										portletProviderClassName="com.liferay.admin.kernel.util.PortalUserPersonalBarApplicationType$UserPersonalBar"
+									/]
+								[/#if]
 							[/#if]
 						</div>
 					</nav>
