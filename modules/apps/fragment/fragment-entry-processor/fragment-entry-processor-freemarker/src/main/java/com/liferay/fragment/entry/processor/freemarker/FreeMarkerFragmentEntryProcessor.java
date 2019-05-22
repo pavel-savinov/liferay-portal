@@ -25,6 +25,8 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.template.StringTemplateResource;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateConstants;
@@ -35,6 +37,9 @@ import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -137,6 +142,28 @@ public class FreeMarkerFragmentEntryProcessor
 			false);
 
 		try {
+			HttpServletRequest httpServletRequest = null;
+			HttpServletResponse httpServletResponse = null;
+
+			ServiceContext serviceContext =
+				ServiceContextThreadLocal.getServiceContext();
+
+			if (serviceContext != null) {
+				httpServletRequest = serviceContext.getRequest();
+				httpServletResponse = serviceContext.getResponse();
+			}
+
+			if ((httpServletRequest != null) && (httpServletResponse != null)) {
+				TemplateManager templateManager =
+					TemplateManagerUtil.getTemplateManager(
+						TemplateConstants.LANG_TYPE_FTL);
+
+				templateManager.addTaglibSupport(
+					template, httpServletRequest, httpServletResponse);
+
+				template.prepare(httpServletRequest);
+			}
+
 			template.processTemplate(new UnsyncStringWriter());
 		}
 		catch (TemplateException te) {
