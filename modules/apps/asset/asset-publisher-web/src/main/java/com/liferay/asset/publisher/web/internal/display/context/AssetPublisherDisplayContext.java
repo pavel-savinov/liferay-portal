@@ -1091,7 +1091,8 @@ public class AssetPublisherDisplayContext {
 
 	public List<Long> getVocabularyIds() {
 		List<AssetVocabulary> vocabularies =
-			AssetVocabularyServiceUtil.getGroupsVocabularies(getGroupIds());
+			AssetVocabularyServiceUtil.getGroupsVocabularies(
+				getReferencedModelsGroupIds());
 
 		return ListUtil.toList(
 			vocabularies, AssetVocabulary.VOCABULARY_ID_ACCESSOR);
