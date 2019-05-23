@@ -159,6 +159,10 @@ public class DiscardDraftLayoutMVCActionCommand extends BaseMVCActionCommand {
 						classNameId, classTypeId);
 			}
 
+			LayoutPermissionUtil.check(
+				themeDisplay.getPermissionChecker(), layout.getPlid(),
+				ActionKeys.VIEW);
+
 			draftLayout = _layoutCopyHelper.copyLayout(layout, draftLayout);
 
 			draftLayout.setModifiedDate(layout.getPublishDate());
