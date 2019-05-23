@@ -149,6 +149,15 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 			fragmentEntryLink.getEditableValues());
 
+		if (jsonObject.length() == 0) {
+			Class<?> clazz = getClass();
+
+			jsonObject.put(
+				clazz.getName(),
+				getDefaultEditableValuesJSONObject(
+					fragmentEntryLink.getHtml()));
+		}
+
 		Document document = _getDocument(html);
 
 		Map<Long, Map<String, Object>> infoDisplaysFieldValues =
