@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
@@ -38,6 +39,7 @@ import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -85,14 +87,17 @@ public class AddPortletMVCActionCommand extends BaseMVCActionCommand {
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 		long classNameId = ParamUtil.getLong(actionRequest, "classNameId");
+
 		long classPK = ParamUtil.getLong(actionRequest, "classPK");
+
+		Layout layout = _layoutLocalService.getLayout(classPK);
 
 		String portletId = PortletIdCodec.decodePortletName(
 			ParamUtil.getString(actionRequest, "portletId"));
 
 		PortletPermissionUtil.check(
-			themeDisplay.getPermissionChecker(), themeDisplay.getScopeGroupId(),
-			themeDisplay.getPlid(), portletId, ActionKeys.ADD_TO_PAGE);
+			themeDisplay.getPermissionChecker(), layout.getGroupId(), layout,
+			portletId, ActionKeys.ADD_TO_PAGE);
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			actionRequest);
@@ -106,8 +111,8 @@ public class AddPortletMVCActionCommand extends BaseMVCActionCommand {
 				instanceId = PortletIdCodec.generateInstanceId();
 			}
 			else if (_portletPreferencesLocalService.getPortletPreferencesCount(
-						PortletKeys.PREFS_OWNER_TYPE_LAYOUT,
-						themeDisplay.getPlid(), portletId) > 0) {
+						PortletKeys.PREFS_OWNER_TYPE_LAYOUT, layout.getPlid(),
+						portletId) > 0) {
 
 				throw new PortletIdException(
 					"Cannot add non-instanceable portlet more than once");
@@ -216,6 +221,9 @@ public class AddPortletMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private FragmentRendererController _fragmentRendererController;
+
+	@Reference
+	private LayoutLocalService _layoutLocalService;
 
 	@Reference
 	private Portal _portal;
