@@ -82,7 +82,8 @@ public class AddPortletMVCActionCommand extends BaseMVCActionCommand {
 		long classNameId = ParamUtil.getLong(actionRequest, "classNameId");
 		long classPK = ParamUtil.getLong(actionRequest, "classPK");
 
-		String portletId = ParamUtil.getString(actionRequest, "portletId");
+		String portletId = PortletIdCodec.decodePortletName(
+			ParamUtil.getString(actionRequest, "portletId"));
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			actionRequest);
