@@ -14,6 +14,7 @@
 
 package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
+import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
@@ -136,8 +137,21 @@ public class UpdateLayoutPageTemplateDataMVCActionCommand
 			long[] toFragmentEntryLinkIds = JSONUtil.toLongArray(
 				JSONFactoryUtil.createJSONArray(fragmentEntryLinkIdsString));
 
-			_fragmentEntryLinkLocalService.deleteFragmentEntryLinks(
-				toFragmentEntryLinkIds);
+			for (long fragmentEntryLinkId : toFragmentEntryLinkIds) {
+				FragmentEntryLink fragmentEntryLink =
+					_fragmentEntryLinkLocalService.getFragmentEntryLink(
+						fragmentEntryLinkId);
+
+				if ((fragmentEntryLink.getClassNameId() != classNameId) ||
+					(fragmentEntryLink.getClassPK() != classPK)) {
+
+					throw new PrincipalException(
+						"User sent invalid classNameId or classPK");
+				}
+
+				_fragmentEntryLinkLocalService.deleteFragmentEntryLink(
+					fragmentEntryLinkId);
+			}
 		}
 	}
 

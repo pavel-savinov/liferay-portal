@@ -80,7 +80,7 @@ public class DeleteFragmentEntryLinkMVCActionCommand
 			actionRequest, "fragmentEntryLinkId");
 
 		FragmentEntryLink fragmentEntryLink =
-			_fragmentEntryLinkLocalService.deleteFragmentEntryLink(
+			_fragmentEntryLinkLocalService.getFragmentEntryLink(
 				fragmentEntryLinkId);
 
 		long classNameId = ParamUtil.getLong(actionRequest, "classNameId");
@@ -89,6 +89,13 @@ public class DeleteFragmentEntryLinkMVCActionCommand
 			actionRequest, "segmentsExperienceId",
 			SegmentsConstants.SEGMENTS_EXPERIENCE_ID_DEFAULT);
 		String data = ParamUtil.getString(actionRequest, "data");
+
+		if ((fragmentEntryLink.getClassNameId() != classNameId) ||
+			(fragmentEntryLink.getClassPK() != classPK)) {
+
+			throw new PrincipalException(
+				"User sent invalid classNameId or classPK");
+		}
 
 		Boolean containsModelPermission =
 			BaseModelPermissionCheckerUtil.containsBaseModelPermission(
@@ -103,6 +110,10 @@ public class DeleteFragmentEntryLinkMVCActionCommand
 				fragmentEntryLink.getClassName(),
 				fragmentEntryLink.getClassPK(), ActionKeys.UPDATE);
 		}
+
+		fragmentEntryLink =
+			_fragmentEntryLinkLocalService.deleteFragmentEntryLink(
+				fragmentEntryLinkId);
 
 		_layoutPageTemplateStructureLocalService.
 			updateLayoutPageTemplateStructure(
