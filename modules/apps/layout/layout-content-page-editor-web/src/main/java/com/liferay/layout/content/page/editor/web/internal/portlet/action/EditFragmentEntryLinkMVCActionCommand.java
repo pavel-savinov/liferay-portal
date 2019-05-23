@@ -14,6 +14,7 @@
 
 package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
+import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -21,7 +22,12 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.BaseModelPermissionCheckerUtil;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -55,6 +61,27 @@ public class EditFragmentEntryLinkMVCActionCommand
 
 		String editableValues = ParamUtil.getString(
 			actionRequest, "editableValues");
+
+		FragmentEntryLink fragmentEntryLink =
+			_fragmentEntryLinkLocalService.getFragmentEntryLink(
+				fragmentEntryLinkId);
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		Boolean containsModelPermission =
+			BaseModelPermissionCheckerUtil.containsBaseModelPermission(
+				themeDisplay.getPermissionChecker(),
+				themeDisplay.getScopeGroupId(),
+				fragmentEntryLink.getClassName(),
+				fragmentEntryLink.getClassPK(), ActionKeys.UPDATE);
+
+		if ((containsModelPermission == null) || !containsModelPermission) {
+			throw new PrincipalException.MustHavePermission(
+				themeDisplay.getPermissionChecker(),
+				fragmentEntryLink.getClassName(),
+				fragmentEntryLink.getClassPK(), ActionKeys.UPDATE);
+		}
 
 		_fragmentEntryLinkLocalService.updateFragmentEntryLink(
 			fragmentEntryLinkId, editableValues);

@@ -34,6 +34,9 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.BaseModelPermissionCheckerUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionMessages;
@@ -42,6 +45,7 @@ import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.segments.constants.SegmentsConstants;
 import com.liferay.segments.service.SegmentsExperienceLocalService;
@@ -92,6 +96,21 @@ public class AddFragmentEntryLinkMVCActionCommand extends BaseMVCActionCommand {
 		long classPK = ParamUtil.getLong(actionRequest, "classPK");
 
 		FragmentEntryLink fragmentEntryLink = null;
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		Boolean containsModelPermission =
+			BaseModelPermissionCheckerUtil.containsBaseModelPermission(
+				themeDisplay.getPermissionChecker(),
+				themeDisplay.getScopeGroupId(),
+				_portal.getClassName(classNameId), classPK, ActionKeys.UPDATE);
+
+		if ((containsModelPermission == null) || !containsModelPermission) {
+			throw new PrincipalException.MustHavePermission(
+				themeDisplay.getPermissionChecker(),
+				_portal.getClassName(classNameId), classPK, ActionKeys.UPDATE);
+		}
 
 		if (fragmentEntry != null) {
 			String contributedRendererKey = null;
@@ -226,6 +245,9 @@ public class AddFragmentEntryLinkMVCActionCommand extends BaseMVCActionCommand {
 	@Reference
 	private LayoutPageTemplateStructureLocalService
 		_layoutPageTemplateStructureLocalService;
+
+	@Reference
+	private Portal _portal;
 
 	@Reference
 	private SegmentsExperienceLocalService _segmentsExperienceLocalService;

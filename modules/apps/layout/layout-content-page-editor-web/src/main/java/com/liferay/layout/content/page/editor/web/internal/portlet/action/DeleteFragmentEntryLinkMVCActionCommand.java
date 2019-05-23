@@ -32,6 +32,9 @@ import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.BaseModelPermissionCheckerUtil;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -86,6 +89,20 @@ public class DeleteFragmentEntryLinkMVCActionCommand
 			actionRequest, "segmentsExperienceId",
 			SegmentsConstants.SEGMENTS_EXPERIENCE_ID_DEFAULT);
 		String data = ParamUtil.getString(actionRequest, "data");
+
+		Boolean containsModelPermission =
+			BaseModelPermissionCheckerUtil.containsBaseModelPermission(
+				themeDisplay.getPermissionChecker(),
+				themeDisplay.getScopeGroupId(),
+				fragmentEntryLink.getClassName(),
+				fragmentEntryLink.getClassPK(), ActionKeys.UPDATE);
+
+		if ((containsModelPermission == null) || !containsModelPermission) {
+			throw new PrincipalException.MustHavePermission(
+				themeDisplay.getPermissionChecker(),
+				fragmentEntryLink.getClassName(),
+				fragmentEntryLink.getClassPK(), ActionKeys.UPDATE);
+		}
 
 		_layoutPageTemplateStructureLocalService.
 			updateLayoutPageTemplateStructure(
