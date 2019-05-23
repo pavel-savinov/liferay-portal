@@ -61,6 +61,8 @@ public class DeleteSegmentsExperienceMVCActionCommand
 	protected void deleteSegmentsExperience(ActionRequest actionRequest)
 		throws PortalException {
 
+		// WE SHOULD CHECK SOMETHING HERE AS WELL!
+
 		long segmentsExperienceId = ParamUtil.getLong(
 			actionRequest, "segmentsExperienceId",
 			SegmentsConstants.SEGMENTS_EXPERIENCE_ID_DEFAULT);

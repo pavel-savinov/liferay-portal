@@ -41,6 +41,8 @@ import org.osgi.service.component.annotations.Reference;
 public class FragmentEntryLinkStagedModelRepository
 	implements StagedModelRepository<FragmentEntryLink> {
 
+	// we should use remote services to check it from here too
+
 	@Override
 	public FragmentEntryLink addStagedModel(
 			PortletDataContext portletDataContext,

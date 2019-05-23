@@ -67,6 +67,8 @@ import org.osgi.service.component.annotations.Reference;
 @Component(immediate = true, service = LayoutCopyHelper.class)
 public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 
+	// what about here? It's a separate service, hard to say if part of frontend or backend, where to check permissions
+
 	@Override
 	public Layout copyLayout(Layout sourceLayout, Layout targetLayout)
 		throws Exception {
