@@ -153,6 +153,10 @@ public class DiscardDraftLayoutMVCActionCommand extends BaseMVCActionCommand {
 				long classTypeId = GetterUtil.getLong(
 					typeSettingsProperties.getProperty("assetClassTypeId"));
 
+				LayoutPermissionUtil.check(
+					themeDisplay.getPermissionChecker(), layout.getPlid(),
+					ActionKeys.UPDATE);
+
 				_layoutPageTemplateEntryLocalService.
 					updateLayoutPageTemplateEntry(
 						layoutPageTemplateEntry.getLayoutPageTemplateEntryId(),
