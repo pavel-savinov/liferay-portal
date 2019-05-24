@@ -14,6 +14,7 @@
 
 package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
+import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -26,6 +27,8 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
@@ -79,8 +82,21 @@ public class DeleteSegmentsExperienceMVCActionCommand
 			long[] toFragmentEntryLinkIds = JSONUtil.toLongArray(
 				JSONFactoryUtil.createJSONArray(fragmentEntryLinkIdsString));
 
-			_fragmentEntryLinkLocalService.deleteFragmentEntryLinks(
-				toFragmentEntryLinkIds);
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+			for (long fragmentEntryLinkId : toFragmentEntryLinkIds) {
+				FragmentEntryLink fragmentEntryLink =
+					_fragmentEntryLinkLocalService.getFragmentEntryLink(
+						fragmentEntryLinkId);
+
+				LayoutPermissionUtil.check(
+					themeDisplay.getPermissionChecker(),
+					fragmentEntryLink.getClassPK(), ActionKeys.UPDATE);
+
+				_fragmentEntryLinkLocalService.deleteFragmentEntryLink(
+					fragmentEntryLink);
+			}
 		}
 	}
 
