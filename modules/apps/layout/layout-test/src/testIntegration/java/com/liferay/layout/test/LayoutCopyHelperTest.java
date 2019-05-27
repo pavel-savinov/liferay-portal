@@ -296,7 +296,7 @@ public class LayoutCopyHelperTest {
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
 
 	@DeleteAfterTestRun
-	private Group _group;
+	private Group _group;;
 
 	@Inject
 	private ImageLocalService _imageLocalService;

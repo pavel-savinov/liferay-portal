@@ -47,7 +47,7 @@ public class LayoutTypeControllerTrackerTest {
 
 	@Test
 	public void testGetLayoutTypeController1() {
-		Layout layout = new TestLayoutImpl();
+		Layout layout = new TestLayoutImpl();;
 
 		LayoutTypeController layoutTypeController =
 			LayoutTypeControllerTracker.getLayoutTypeController(layout);
