@@ -218,9 +218,13 @@ public class AssetPublisherPortletToolbarContributor
 				themeDisplay.getLayout(), portletDisplay.getId(),
 				assetPublisherDisplayContext.getPortletResource());
 
+		PortletURL portletURL = assetPublisherAddItemHolder.getPortletURL();
+
+		portletURL.setParameter(
+			"portletResource", AssetPublisherPortletKeys.ASSET_PUBLISHER);
+
 		String url = _assetHelper.getAddURLPopUp(
-			curGroupId, themeDisplay.getPlid(),
-			assetPublisherAddItemHolder.getPortletURL(),
+			curGroupId, themeDisplay.getPlid(), portletURL,
 			addDisplayPageParameter, themeDisplay.getLayout());
 
 		urlMenuItem.setURL(url);
