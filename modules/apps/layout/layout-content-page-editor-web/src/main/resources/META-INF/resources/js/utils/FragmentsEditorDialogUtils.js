@@ -131,12 +131,17 @@ function startListeningWidgetConfigurationChange(store) {
 			submitFormHandler = null;
 		}
 
-		submitFormHandler = event.win.Liferay.on('submitForm', () => {
-			store.dispatch({
-				lastSaveDate: new Date(),
-				type: UPDATE_LAST_SAVE_DATE
+		const configurationForm = event.win.document.querySelector(
+			'.portlet-configuration-setup');
+
+		if (configurationForm) {
+			submitFormHandler = event.win.Liferay.on('submitForm', () => {
+				store.dispatch({
+					lastSaveDate: new Date(),
+					type: UPDATE_LAST_SAVE_DATE
+				});
 			});
-		});
+		}
 	});
 }
 
