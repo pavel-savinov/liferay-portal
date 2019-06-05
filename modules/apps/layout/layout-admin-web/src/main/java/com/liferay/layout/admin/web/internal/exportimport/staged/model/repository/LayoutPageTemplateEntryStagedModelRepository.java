@@ -57,6 +57,12 @@ public class LayoutPageTemplateEntryStagedModelRepository
 			serviceContext.setUuid(layoutPageTemplateEntry.getUuid());
 		}
 
+		long plid = layoutPageTemplateEntry.getPlid();
+
+		if (layoutPageTemplateEntry.getLayoutPrototypeId() > 0) {
+			plid = 0;
+		}
+
 		return _layoutPageTemplateEntryLocalService.addLayoutPageTemplateEntry(
 			userId, layoutPageTemplateEntry.getGroupId(),
 			layoutPageTemplateEntry.getLayoutPageTemplateCollectionId(),
@@ -66,8 +72,7 @@ public class LayoutPageTemplateEntryStagedModelRepository
 			layoutPageTemplateEntry.getType(),
 			layoutPageTemplateEntry.isDefaultTemplate(),
 			layoutPageTemplateEntry.getLayoutPrototypeId(),
-			layoutPageTemplateEntry.getPreviewFileEntryId(),
-			layoutPageTemplateEntry.getPlid(),
+			layoutPageTemplateEntry.getPreviewFileEntryId(), plid,
 			layoutPageTemplateEntry.getStatus(), serviceContext);
 	}
 
