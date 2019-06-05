@@ -125,17 +125,17 @@ function startListeningWidgetConfigurationChange(store) {
 	let submitFormHandler = null;
 
 	_widgetConfigurationChangeHandler = Liferay.after('popupReady', event => {
-		if (submitFormHandler) {
-			submitFormHandler.detach();
-
-			submitFormHandler = null;
-		}
-
 		const configurationForm = event.win.document.querySelector(
 			'.portlet-configuration-setup'
 		);
 
 		if (configurationForm) {
+			if (submitFormHandler) {
+				submitFormHandler.detach();
+
+				submitFormHandler = null;
+			}
+
 			submitFormHandler = event.win.Liferay.on('submitForm', () => {
 				store.dispatch({
 					lastSaveDate: new Date(),
