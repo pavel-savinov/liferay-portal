@@ -298,6 +298,13 @@ public class FragmentEntryServiceUtil {
 			fragmentEntryId, fragmentCollectionId);
 	}
 
+	public static String renderFragmentEntryPreview(
+			long groupId, String css, String html, String js)
+		throws Exception {
+
+		return getService().renderFragmentEntryPreview(groupId, css, html, js);
+	}
+
 	public static com.liferay.fragment.model.FragmentEntry updateFragmentEntry(
 			long fragmentEntryId, long previewFileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {

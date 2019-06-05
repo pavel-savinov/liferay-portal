@@ -186,6 +186,10 @@ public interface FragmentEntryService extends BaseService {
 			long fragmentEntryId, long fragmentCollectionId)
 		throws PortalException;
 
+	public String renderFragmentEntryPreview(
+			long groupId, String css, String html, String js)
+		throws Exception;
+
 	public FragmentEntry updateFragmentEntry(
 			long fragmentEntryId, long previewFileEntryId)
 		throws PortalException;
