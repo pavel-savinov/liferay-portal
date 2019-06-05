@@ -324,6 +324,15 @@ public class FragmentEntryServiceWrapper
 	}
 
 	@Override
+	public String renderFragmentEntryPreview(
+			long groupId, String css, String html, String js)
+		throws Exception {
+
+		return _fragmentEntryService.renderFragmentEntryPreview(
+			groupId, css, html, js);
+	}
+
+	@Override
 	public com.liferay.fragment.model.FragmentEntry updateFragmentEntry(
 			long fragmentEntryId, long previewFileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {

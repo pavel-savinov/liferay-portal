@@ -1083,6 +1083,42 @@ public class FragmentEntryServiceHttp {
 		}
 	}
 
+	public static String renderFragmentEntryPreview(
+			HttpPrincipal httpPrincipal, long groupId, String css, String html,
+			String js)
+		throws Exception {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				FragmentEntryServiceUtil.class, "renderFragmentEntryPreview",
+				_renderFragmentEntryPreviewParameterTypes28);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, groupId, css, html, js);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception e) {
+				if (e instanceof Exception) {
+					throw (Exception)e;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
+			}
+
+			return (String)returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException se) {
+			_log.error(se, se);
+
+			throw se;
+		}
+	}
+
 	public static com.liferay.fragment.model.FragmentEntry updateFragmentEntry(
 			HttpPrincipal httpPrincipal, long fragmentEntryId,
 			long previewFileEntryId)
@@ -1091,7 +1127,7 @@ public class FragmentEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				FragmentEntryServiceUtil.class, "updateFragmentEntry",
-				_updateFragmentEntryParameterTypes28);
+				_updateFragmentEntryParameterTypes29);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, fragmentEntryId, previewFileEntryId);
@@ -1129,7 +1165,7 @@ public class FragmentEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				FragmentEntryServiceUtil.class, "updateFragmentEntry",
-				_updateFragmentEntryParameterTypes29);
+				_updateFragmentEntryParameterTypes30);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, fragmentEntryId, name);
@@ -1168,7 +1204,7 @@ public class FragmentEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				FragmentEntryServiceUtil.class, "updateFragmentEntry",
-				_updateFragmentEntryParameterTypes30);
+				_updateFragmentEntryParameterTypes31);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, fragmentEntryId, name, css, html, js, status);
@@ -1208,7 +1244,7 @@ public class FragmentEntryServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				FragmentEntryServiceUtil.class, "updateFragmentEntry",
-				_updateFragmentEntryParameterTypes31);
+				_updateFragmentEntryParameterTypes32);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, fragmentEntryId, name, css, html, js,
@@ -1355,16 +1391,20 @@ public class FragmentEntryServiceHttp {
 		new Class[] {long.class, String.class};
 	private static final Class<?>[] _moveFragmentEntryParameterTypes27 =
 		new Class[] {long.class, long.class};
-	private static final Class<?>[] _updateFragmentEntryParameterTypes28 =
-		new Class[] {long.class, long.class};
+	private static final Class<?>[]
+		_renderFragmentEntryPreviewParameterTypes28 = new Class[] {
+			long.class, String.class, String.class, String.class
+		};
 	private static final Class<?>[] _updateFragmentEntryParameterTypes29 =
-		new Class[] {long.class, String.class};
+		new Class[] {long.class, long.class};
 	private static final Class<?>[] _updateFragmentEntryParameterTypes30 =
+		new Class[] {long.class, String.class};
+	private static final Class<?>[] _updateFragmentEntryParameterTypes31 =
 		new Class[] {
 			long.class, String.class, String.class, String.class, String.class,
 			int.class
 		};
-	private static final Class<?>[] _updateFragmentEntryParameterTypes31 =
+	private static final Class<?>[] _updateFragmentEntryParameterTypes32 =
 		new Class[] {
 			long.class, String.class, String.class, String.class, String.class,
 			long.class, int.class

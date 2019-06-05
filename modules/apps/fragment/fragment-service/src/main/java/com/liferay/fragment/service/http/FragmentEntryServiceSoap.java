@@ -639,6 +639,24 @@ public class FragmentEntryServiceSoap {
 		}
 	}
 
+	public static String renderFragmentEntryPreview(
+			long groupId, String css, String html, String js)
+		throws RemoteException {
+
+		try {
+			String returnValue =
+				FragmentEntryServiceUtil.renderFragmentEntryPreview(
+					groupId, css, html, js);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static com.liferay.fragment.model.FragmentEntrySoap
 			updateFragmentEntry(long fragmentEntryId, long previewFileEntryId)
 		throws RemoteException {
