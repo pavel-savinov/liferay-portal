@@ -115,7 +115,7 @@ if ((publicLayoutSet.isLayoutSetPrototypeLinkEnabled() || privateLayoutSet.isLay
 			for (Locale siteAvailableLocale : siteAvailableLocales) {
 			%>
 
-				<aui:option data-value="<%= LocaleUtil.toLanguageId(siteAvailableLocale) %>" label="<%= siteAvailableLocale.getDisplayName(locale) %>" lang="<%= LocaleUtil.toW3cLanguageId(siteAvailableLocale) %>" selected="<%= siteDefaultLocale.getLanguage().equals(siteAvailableLocale.getLanguage()) && siteDefaultLocale.getCountry().equals(siteAvailableLocale.getCountry()) %>" value="<%= LocaleUtil.toLanguageId(siteAvailableLocale) %>" />
+				<aui:option label="<%= siteAvailableLocale.getDisplayName(locale) %>" lang="<%= LocaleUtil.toW3cLanguageId(siteAvailableLocale) %>" selected="<%= siteDefaultLocale.getLanguage().equals(siteAvailableLocale.getLanguage()) && siteDefaultLocale.getCountry().equals(siteAvailableLocale.getCountry()) %>" value="<%= LocaleUtil.toLanguageId(siteAvailableLocale) %>" />
 
 			<%
 			}
@@ -206,14 +206,10 @@ if ((publicLayoutSet.isLayoutSetPrototypeLinkEnabled() || privateLayoutSet.isLay
 		languageSelectInput.on(
 			'change',
 			function(event) {
-				const select = event.currentTarget.getDOMNode();
-
-				const selectedOption = select.options[select.selectedIndex];
-
 				Liferay.fire(
 					'inputLocalized:defaultLocaleChanged',
 					{
-						item: selectedOption
+						item: event.target.val()
 					}
 				);
 
