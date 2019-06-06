@@ -42,6 +42,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.spring.extender.service.ServiceReference;
+import com.liferay.staging.StagingGroupHelper;
 
 import java.util.Collections;
 import java.util.Date;
@@ -268,16 +269,21 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 		// Layout prototype
 
-		long layoutPrototypeId = layoutPageTemplateEntry.getLayoutPrototypeId();
+		if (!_stagingGroupHelper.isLocalStagingGroup(
+				layoutPageTemplateEntry.getGroupId())) {
 
-		if (layoutPrototypeId > 0) {
-			LayoutPrototype layoutPrototype =
-				_layoutPrototypeLocalService.fetchLayoutPrototype(
-					layoutPrototypeId);
+			long layoutPrototypeId =
+				layoutPageTemplateEntry.getLayoutPrototypeId();
 
-			if (layoutPrototype != null) {
-				_layoutPrototypeLocalService.deleteLayoutPrototype(
-					layoutPrototypeId);
+			if (layoutPrototypeId > 0) {
+				LayoutPrototype layoutPrototype =
+					_layoutPrototypeLocalService.fetchLayoutPrototype(
+						layoutPrototypeId);
+
+				if (layoutPrototype != null) {
+					_layoutPrototypeLocalService.deleteLayoutPrototype(
+						layoutPrototypeId);
+				}
 			}
 		}
 
@@ -821,5 +827,8 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 	@ServiceReference(type = LayoutPrototypeLocalService.class)
 	private LayoutPrototypeLocalService _layoutPrototypeLocalService;
+
+	@ServiceReference(type = StagingGroupHelper.class)
+	private StagingGroupHelper _stagingGroupHelper;
 
 }
