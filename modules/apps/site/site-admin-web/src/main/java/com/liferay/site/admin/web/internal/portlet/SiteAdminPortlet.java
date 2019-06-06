@@ -742,12 +742,8 @@ public class SiteAdminPortlet extends MVCPortlet {
 			active = ParamUtil.getBoolean(
 				actionRequest, "active", liveGroup.isActive());
 
-			UnicodeProperties unicodeProperties =
-				PropertiesParamUtil.getProperties(
-					actionRequest, "TypeSettingsProperties--");
-
 			Locale defaultLocale = LocaleUtil.fromLanguageId(
-				unicodeProperties.getProperty("languageId"));
+				liveGroup.getDefaultLanguageId());
 
 			validateDefaultLocaleGroupName(nameMap, defaultLocale);
 
