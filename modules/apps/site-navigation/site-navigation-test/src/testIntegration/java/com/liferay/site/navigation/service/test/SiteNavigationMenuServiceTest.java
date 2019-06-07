@@ -23,8 +23,8 @@ import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.service.ResourcePermissionLocalServiceUtil;
-import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -78,36 +78,28 @@ public class SiteNavigationMenuServiceTest {
 		_group = GroupTestUtil.addGroup();
 
 		_groupUser = UserTestUtil.addGroupUser(
-			_group, RoleConstants.POWER_USER);
+			_group, RoleConstants.SITE_MEMBER);
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		Role siteMemberRole = RoleLocalServiceUtil.getRole(
-			TestPropsValues.getCompanyId(), RoleConstants.SITE_MEMBER);
+		Role guestRole = _roleLocalService.getRole(
+			TestPropsValues.getCompanyId(), RoleConstants.GUEST);
 
-		ResourcePermissionLocalServiceUtil.removeResourcePermissions(
-			TestPropsValues.getCompanyId(), "com.liferay.site.navigation",
-			ResourceConstants.SCOPE_GROUP, siteMemberRole.getRoleId(),
-			SiteNavigationActionKeys.ADD_SITE_NAVIGATION_MENU);
-
-		ResourcePermissionLocalServiceUtil.removeResourcePermissions(
+		_resourcePermissionLocalService.deleteResourcePermissions(
 			TestPropsValues.getCompanyId(),
-			"com.liferay.site.navigation.model.SiteNavigationMenu",
-			ResourceConstants.SCOPE_GROUP, siteMemberRole.getRoleId(),
-			ActionKeys.DELETE);
+			SiteNavigationConstants.RESOURCE_NAME,
+			ResourceConstants.SCOPE_GROUP, _group.getGroupId());
 
-		ResourcePermissionLocalServiceUtil.removeResourcePermissions(
-			TestPropsValues.getCompanyId(),
-			"com.liferay.site.navigation.model.SiteNavigationMenu",
-			ResourceConstants.SCOPE_GROUP, siteMemberRole.getRoleId(),
-			ActionKeys.VIEW);
+		_resourcePermissionLocalService.deleteResourcePermissions(
+			TestPropsValues.getCompanyId(), SiteNavigationMenu.class.getName(),
+			ResourceConstants.SCOPE_GROUP, _group.getGroupId());
 
-		ResourcePermissionLocalServiceUtil.removeResourcePermissions(
-			TestPropsValues.getCompanyId(),
-			"com.liferay.site.navigation.model.SiteNavigationMenu",
-			ResourceConstants.SCOPE_GROUP, siteMemberRole.getRoleId(),
-			ActionKeys.UPDATE);
+		_resourcePermissionLocalService.setResourcePermissions(
+			TestPropsValues.getCompanyId(), SiteNavigationMenu.class.getName(),
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			SiteNavigationMenu.class.getName(), guestRole.getRoleId(),
+			new String[] {ActionKeys.VIEW});
 	}
 
 	@Test(expected = PrincipalException.MustHavePermission.class)
@@ -145,9 +137,10 @@ public class SiteNavigationMenuServiceTest {
 			ServiceContextTestUtil.getServiceContext(
 				_group, _groupUser.getUserId());
 
-		_addSiteMemberRoleResourcePermission(
-			"com.liferay.site.navigation",
-			SiteNavigationActionKeys.ADD_SITE_NAVIGATION_MENU);
+		_addRoleResourcePermission(
+			SiteNavigationConstants.RESOURCE_NAME,
+			SiteNavigationActionKeys.ADD_SITE_NAVIGATION_MENU,
+			RoleConstants.SITE_MEMBER);
 
 		ServiceTestUtil.setUser(_groupUser);
 
@@ -162,9 +155,10 @@ public class SiteNavigationMenuServiceTest {
 			ServiceContextTestUtil.getServiceContext(
 				_group, _groupUser.getUserId());
 
-		_addSiteMemberRoleResourcePermission(
-			"com.liferay.site.navigation",
-			SiteNavigationActionKeys.ADD_SITE_NAVIGATION_MENU);
+		_addRoleResourcePermission(
+			SiteNavigationConstants.RESOURCE_NAME,
+			SiteNavigationActionKeys.ADD_SITE_NAVIGATION_MENU,
+			RoleConstants.SITE_MEMBER);
 
 		ServiceTestUtil.setUser(_groupUser);
 
@@ -177,8 +171,7 @@ public class SiteNavigationMenuServiceTest {
 		throws Exception {
 
 		SiteNavigationMenu siteNavigationMenu =
-			SiteNavigationMenuTestUtil.addSiteNavigationMenu(
-				_group, _groupUser.getUserId());
+			SiteNavigationMenuTestUtil.addSiteNavigationMenu(_group);
 
 		ServiceTestUtil.setUser(_groupUser);
 
@@ -189,12 +182,11 @@ public class SiteNavigationMenuServiceTest {
 	@Test
 	public void testDeleteSiteNavigationMenuWithPermissions() throws Exception {
 		SiteNavigationMenu siteNavigationMenu =
-			SiteNavigationMenuTestUtil.addSiteNavigationMenu(
-				_group, _groupUser.getUserId());
+			SiteNavigationMenuTestUtil.addSiteNavigationMenu(_group);
 
-		_addSiteMemberRoleResourcePermission(
-			"com.liferay.site.navigation.model.SiteNavigationMenu",
-			ActionKeys.DELETE);
+		_addRoleResourcePermission(
+			SiteNavigationMenu.class.getName(), ActionKeys.DELETE,
+			RoleConstants.SITE_MEMBER);
 
 		ServiceTestUtil.setUser(_groupUser);
 
@@ -206,9 +198,32 @@ public class SiteNavigationMenuServiceTest {
 	public void testFetchSiteNavigationMenuWithoutPermissions()
 		throws Exception {
 
+		Role guestRole = _roleLocalService.getRole(
+			TestPropsValues.getCompanyId(), RoleConstants.GUEST);
+
+		Role siteMemberRole = _roleLocalService.getRole(
+			TestPropsValues.getCompanyId(), RoleConstants.SITE_MEMBER);
+
 		SiteNavigationMenu siteNavigationMenu =
-			SiteNavigationMenuTestUtil.addSiteNavigationMenu(
-				_group, _groupUser.getUserId());
+			SiteNavigationMenuTestUtil.addSiteNavigationMenu(_group);
+
+		_resourcePermissionLocalService.removeResourcePermission(
+			TestPropsValues.getCompanyId(), SiteNavigationMenu.class.getName(),
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			SiteNavigationMenu.class.getName(), guestRole.getRoleId(),
+			ActionKeys.VIEW);
+
+		_resourcePermissionLocalService.removeResourcePermission(
+			TestPropsValues.getCompanyId(), SiteNavigationMenu.class.getName(),
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			String.valueOf(siteNavigationMenu.getSiteNavigationMenuId()),
+			guestRole.getRoleId(), ActionKeys.VIEW);
+
+		_resourcePermissionLocalService.removeResourcePermission(
+			TestPropsValues.getCompanyId(), SiteNavigationMenu.class.getName(),
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			String.valueOf(siteNavigationMenu.getSiteNavigationMenuId()),
+			siteMemberRole.getRoleId(), ActionKeys.VIEW);
 
 		ServiceTestUtil.setUser(_groupUser);
 
@@ -219,12 +234,7 @@ public class SiteNavigationMenuServiceTest {
 	@Test
 	public void testFetchSiteNavigationMenuWithPermissions() throws Exception {
 		SiteNavigationMenu siteNavigationMenu =
-			SiteNavigationMenuTestUtil.addSiteNavigationMenu(
-				_group, _groupUser.getUserId());
-
-		_addSiteMemberRoleResourcePermission(
-			"com.liferay.site.navigation.model.SiteNavigationMenu",
-			ActionKeys.VIEW);
+			SiteNavigationMenuTestUtil.addSiteNavigationMenu(_group);
 
 		ServiceTestUtil.setUser(_groupUser);
 
@@ -525,12 +535,11 @@ public class SiteNavigationMenuServiceTest {
 	public void testUpdateSiteNavigationMenuWithoutUpdatePermissions1()
 		throws Exception {
 
+		SiteNavigationMenu siteNavigationMenu =
+			SiteNavigationMenuTestUtil.addSiteNavigationMenu(_group);
+
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group, _groupUser.getUserId());
-
-		SiteNavigationMenu siteNavigationMenu =
-			SiteNavigationMenuTestUtil.addSiteNavigationMenu(
 				_group, _groupUser.getUserId());
 
 		ServiceTestUtil.setUser(_groupUser);
@@ -545,12 +554,11 @@ public class SiteNavigationMenuServiceTest {
 	public void testUpdateSiteNavigationMenuWithoutUpdatePermissions2()
 		throws Exception {
 
+		SiteNavigationMenu siteNavigationMenu =
+			SiteNavigationMenuTestUtil.addSiteNavigationMenu(_group);
+
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
-				_group, _groupUser.getUserId());
-
-		SiteNavigationMenu siteNavigationMenu =
-			SiteNavigationMenuTestUtil.addSiteNavigationMenu(
 				_group, _groupUser.getUserId());
 
 		ServiceTestUtil.setUser(_groupUser);
@@ -569,12 +577,11 @@ public class SiteNavigationMenuServiceTest {
 				_group, _groupUser.getUserId());
 
 		SiteNavigationMenu siteNavigationMenu =
-			SiteNavigationMenuTestUtil.addSiteNavigationMenu(
-				_group, _groupUser.getUserId());
+			SiteNavigationMenuTestUtil.addSiteNavigationMenu(_group);
 
-		_addSiteMemberRoleResourcePermission(
-			"com.liferay.site.navigation.model.SiteNavigationMenu",
-			ActionKeys.UPDATE);
+		_addRoleResourcePermission(
+			SiteNavigationMenu.class.getName(), ActionKeys.UPDATE,
+			RoleConstants.SITE_MEMBER);
 
 		ServiceTestUtil.setUser(_groupUser);
 
@@ -588,17 +595,16 @@ public class SiteNavigationMenuServiceTest {
 	public void testUpdateSiteNavigationMenuWithUpdatePermissions2()
 		throws Exception {
 
+		SiteNavigationMenu siteNavigationMenu =
+			SiteNavigationMenuTestUtil.addSiteNavigationMenu(_group);
+
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
 				_group, _groupUser.getUserId());
 
-		SiteNavigationMenu siteNavigationMenu =
-			SiteNavigationMenuTestUtil.addSiteNavigationMenu(
-				_group, _groupUser.getUserId());
-
-		_addSiteMemberRoleResourcePermission(
-			"com.liferay.site.navigation.model.SiteNavigationMenu",
-			ActionKeys.UPDATE);
+		_addRoleResourcePermission(
+			SiteNavigationMenu.class.getName(), ActionKeys.UPDATE,
+			RoleConstants.SITE_MEMBER);
 
 		ServiceTestUtil.setUser(_groupUser);
 
@@ -607,17 +613,16 @@ public class SiteNavigationMenuServiceTest {
 			RandomTestUtil.randomString(), serviceContext);
 	}
 
-	private void _addSiteMemberRoleResourcePermission(
-			String name, String permission)
+	private void _addRoleResourcePermission(
+			String name, String permission, String roleName)
 		throws Exception {
 
-		Role siteMemberRole = RoleLocalServiceUtil.getRole(
-			TestPropsValues.getCompanyId(), RoleConstants.SITE_MEMBER);
+		Role role = _roleLocalService.getRole(
+			TestPropsValues.getCompanyId(), roleName);
 
-		ResourcePermissionLocalServiceUtil.addResourcePermission(
+		_resourcePermissionLocalService.addResourcePermission(
 			TestPropsValues.getCompanyId(), name, ResourceConstants.SCOPE_GROUP,
-			String.valueOf(_group.getGroupId()), siteMemberRole.getRoleId(),
-			permission);
+			String.valueOf(_group.getGroupId()), role.getRoleId(), permission);
 	}
 
 	@DeleteAfterTestRun
@@ -625,6 +630,12 @@ public class SiteNavigationMenuServiceTest {
 
 	@DeleteAfterTestRun
 	private User _groupUser;
+
+	@Inject
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
+
+	@Inject
+	private RoleLocalService _roleLocalService;
 
 	@Inject
 	private SiteNavigationMenuService _siteNavigationMenuService;
