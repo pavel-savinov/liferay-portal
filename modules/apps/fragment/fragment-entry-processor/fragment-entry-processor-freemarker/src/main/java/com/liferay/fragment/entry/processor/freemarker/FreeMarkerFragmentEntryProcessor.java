@@ -184,9 +184,9 @@ public class FreeMarkerFragmentEntryProcessor
 					template, httpServletRequest, httpServletResponse);
 
 				template.prepare(httpServletRequest);
-			}
 
-			template.processTemplate(new UnsyncStringWriter());
+				template.processTemplate(new UnsyncStringWriter());
+			}
 		}
 		catch (TemplateException te) {
 			ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
