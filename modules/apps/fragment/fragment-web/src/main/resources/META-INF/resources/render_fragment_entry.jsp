@@ -17,20 +17,32 @@
 <%@ include file="/init.jsp" %>
 
 <%
-long fragmentEntryId = ParamUtil.getLong(renderRequest, "fragmentEntryId");
-
-FragmentEntry fragmentEntry = FragmentEntryLocalServiceUtil.fetchFragmentEntry(fragmentEntryId);
-
-String css = BeanParamUtil.getString(fragmentEntry, renderRequest, "css");
-String html = BeanParamUtil.getString(fragmentEntry, renderRequest, "html");
-String js = BeanParamUtil.getString(fragmentEntry, renderRequest, "js");
-
 FragmentEntryLink fragmentEntryLink = FragmentEntryLinkLocalServiceUtil.createFragmentEntryLink(0);
+
+String css = StringPool.BLANK;
+String html = StringPool.BLANK;
+String js = StringPool.BLANK;
+
+if (renderRequest != null) {
+	long fragmentEntryId = ParamUtil.getLong(renderRequest, "fragmentEntryId");
+
+	FragmentEntry fragmentEntry = FragmentEntryLocalServiceUtil.fetchFragmentEntry(fragmentEntryId);
+
+	fragmentEntryLink.setFragmentEntryId(fragmentEntryId);
+
+	css = BeanParamUtil.getString(fragmentEntry, renderRequest, "css");
+	html = BeanParamUtil.getString(fragmentEntry, renderRequest, "html");
+	js = BeanParamUtil.getString(fragmentEntry, renderRequest, "js");
+}
+else {
+	css = ParamUtil.getString(request, "css");
+	html = ParamUtil.getString(request, "html");
+	js = ParamUtil.getString(request, "js");
+}
 
 fragmentEntryLink.setCss(css);
 fragmentEntryLink.setHtml(html);
 fragmentEntryLink.setJs(js);
-fragmentEntryLink.setFragmentEntryId(fragmentEntryId);
 
 DefaultFragmentRendererContext defaultFragmentRendererContext = new DefaultFragmentRendererContext(fragmentEntryLink);
 
