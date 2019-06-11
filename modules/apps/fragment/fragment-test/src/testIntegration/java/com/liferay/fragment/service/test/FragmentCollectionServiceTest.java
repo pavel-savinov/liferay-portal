@@ -16,6 +16,7 @@ package com.liferay.fragment.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.fragment.constants.FragmentActionKeys;
+import com.liferay.fragment.constants.FragmentConstants;
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.service.FragmentCollectionService;
 import com.liferay.fragment.util.FragmentTestUtil;
@@ -23,21 +24,18 @@ import com.liferay.fragment.util.comparator.FragmentCollectionCreateDateComparat
 import com.liferay.fragment.util.comparator.FragmentCollectionNameComparator;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.service.ResourcePermissionLocalServiceUtil;
-import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
-import com.liferay.portal.kernel.test.util.CompanyTestUtil;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
@@ -86,10 +84,25 @@ public class FragmentCollectionServiceTest {
 
 	@After
 	public void tearDown() throws Exception {
-		_addRoleResourcePermission(ActionKeys.VIEW);
+		Role guestRole = _roleLocalService.getRole(
+			TestPropsValues.getCompanyId(), RoleConstants.GUEST);
 
-		_removeRoleResourcePermission(
-			FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES);
+		Role siteMemberRole = _roleLocalService.getRole(
+			TestPropsValues.getCompanyId(), RoleConstants.SITE_MEMBER);
+
+		_resourcePermissionLocalService.setResourcePermissions(
+			TestPropsValues.getCompanyId(), FragmentConstants.RESOURCE_NAME,
+			ResourceConstants.SCOPE_INDIVIDUAL, FragmentConstants.RESOURCE_NAME,
+			guestRole.getRoleId(), new String[] {ActionKeys.VIEW});
+
+		_resourcePermissionLocalService.setResourcePermissions(
+			TestPropsValues.getCompanyId(), FragmentConstants.RESOURCE_NAME,
+			ResourceConstants.SCOPE_INDIVIDUAL, FragmentConstants.RESOURCE_NAME,
+			siteMemberRole.getRoleId(), new String[] {ActionKeys.VIEW});
+
+		_resourcePermissionLocalService.deleteResourcePermissions(
+			TestPropsValues.getCompanyId(), FragmentConstants.RESOURCE_NAME,
+			ResourceConstants.SCOPE_GROUP, _group.getGroupId());
 	}
 
 	@Test(expected = PrincipalException.MustHavePermission.class)
@@ -128,7 +141,8 @@ public class FragmentCollectionServiceTest {
 			ServiceContextTestUtil.getServiceContext(
 				_group, _groupUser.getUserId());
 
-		_addRoleResourcePermission(FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES);
+		_addSiteMemberResourcePermission(
+			FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES);
 
 		ServiceTestUtil.setUser(_groupUser);
 
@@ -143,7 +157,8 @@ public class FragmentCollectionServiceTest {
 			ServiceContextTestUtil.getServiceContext(
 				_group, _groupUser.getUserId());
 
-		_addRoleResourcePermission(FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES);
+		_addSiteMemberResourcePermission(
+			FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES);
 
 		ServiceTestUtil.setUser(_groupUser);
 
@@ -188,7 +203,8 @@ public class FragmentCollectionServiceTest {
 			fragmentCollection2.getFragmentCollectionId()
 		};
 
-		_addRoleResourcePermission(FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES);
+		_addSiteMemberResourcePermission(
+			FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES);
 
 		ServiceTestUtil.setUser(_groupUser);
 
@@ -214,7 +230,8 @@ public class FragmentCollectionServiceTest {
 		FragmentCollection fragmentCollection =
 			FragmentTestUtil.addFragmentCollection(_group.getGroupId());
 
-		_addRoleResourcePermission(FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES);
+		_addSiteMemberResourcePermission(
+			FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES);
 
 		ServiceTestUtil.setUser(_groupUser);
 
@@ -226,8 +243,24 @@ public class FragmentCollectionServiceTest {
 	public void testFetchFragmentCollectionWithoutPermissions()
 		throws Exception {
 
+		Role guestRole = _roleLocalService.getRole(
+			TestPropsValues.getCompanyId(), RoleConstants.GUEST);
+
+		Role siteMemberRole = _roleLocalService.getRole(
+			TestPropsValues.getCompanyId(), RoleConstants.SITE_MEMBER);
+
 		FragmentCollection fragmentCollection =
 			FragmentTestUtil.addFragmentCollection(_group.getGroupId());
+
+		_resourcePermissionLocalService.removeResourcePermission(
+			TestPropsValues.getCompanyId(), FragmentConstants.RESOURCE_NAME,
+			ResourceConstants.SCOPE_INDIVIDUAL, FragmentConstants.RESOURCE_NAME,
+			guestRole.getRoleId(), ActionKeys.VIEW);
+
+		_resourcePermissionLocalService.removeResourcePermission(
+			TestPropsValues.getCompanyId(), FragmentConstants.RESOURCE_NAME,
+			ResourceConstants.SCOPE_INDIVIDUAL, FragmentConstants.RESOURCE_NAME,
+			siteMemberRole.getRoleId(), ActionKeys.VIEW);
 
 		ServiceTestUtil.setUser(_groupUser);
 
@@ -520,7 +553,8 @@ public class FragmentCollectionServiceTest {
 
 	@Test
 	public void testGetTempFileNamesWithPermissions() throws Exception {
-		_addRoleResourcePermission(FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES);
+		_addSiteMemberResourcePermission(
+			FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES);
 
 		ServiceTestUtil.setUser(_groupUser);
 
@@ -547,7 +581,8 @@ public class FragmentCollectionServiceTest {
 		FragmentCollection fragmentCollection =
 			FragmentTestUtil.addFragmentCollection(_group.getGroupId());
 
-		_addRoleResourcePermission(FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES);
+		_addSiteMemberResourcePermission(
+			FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES);
 
 		ServiceTestUtil.setUser(_groupUser);
 
@@ -556,26 +591,14 @@ public class FragmentCollectionServiceTest {
 			RandomTestUtil.randomString(), RandomTestUtil.randomString());
 	}
 
-	private void _addRoleResourcePermission(String permissionType)
+	private void _addSiteMemberResourcePermission(String permissionType)
 		throws Exception {
 
-		Role siteMemberRole = RoleLocalServiceUtil.getRole(
+		Role siteMemberRole = _roleLocalService.getRole(
 			TestPropsValues.getCompanyId(), RoleConstants.SITE_MEMBER);
 
-		ResourcePermissionLocalServiceUtil.addResourcePermission(
-			TestPropsValues.getCompanyId(), "com.liferay.fragment",
-			ResourceConstants.SCOPE_GROUP, String.valueOf(_group.getGroupId()),
-			siteMemberRole.getRoleId(), permissionType);
-	}
-
-	private void _removeRoleResourcePermission(String permissionType)
-		throws Exception {
-		
-		Role siteMemberRole = RoleLocalServiceUtil.getRole(
-			TestPropsValues.getCompanyId(), RoleConstants.SITE_MEMBER);
-
-		ResourcePermissionLocalServiceUtil.addResourcePermission(
-			TestPropsValues.getCompanyId(), "com.liferay.fragment",
+		_resourcePermissionLocalService.addResourcePermission(
+			TestPropsValues.getCompanyId(), FragmentConstants.RESOURCE_NAME,
 			ResourceConstants.SCOPE_GROUP, String.valueOf(_group.getGroupId()),
 			siteMemberRole.getRoleId(), permissionType);
 	}
@@ -583,9 +606,16 @@ public class FragmentCollectionServiceTest {
 	@Inject
 	private FragmentCollectionService _fragmentCollectionService;
 
+	@DeleteAfterTestRun
 	private Group _group;
 
 	@DeleteAfterTestRun
 	private User _groupUser;
+
+	@Inject
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
+
+	@Inject
+	private RoleLocalService _roleLocalService;
 
 }
