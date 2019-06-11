@@ -82,6 +82,7 @@ import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -490,6 +491,10 @@ public class WesterosBankSiteInitializer implements SiteInitializer {
 				new long[] {fragmentEntry.getFragmentEntryId()},
 				StringPool.BLANK, serviceContext);
 
+			_layoutLocalService.updateLayout(
+				layout.getGroupId(), layout.isPrivateLayout(),
+				layout.getLayoutId(), new Date());
+
 			layouts.add(layout);
 		}
 
@@ -566,6 +571,10 @@ public class WesterosBankSiteInitializer implements SiteInitializer {
 		if (draftLayout != null) {
 			_layoutCopyHelper.copyLayout(draftLayout, layout);
 		}
+
+		_layoutLocalService.updateLayout(
+			layout.getGroupId(), layout.isPrivateLayout(), layout.getLayoutId(),
+			new Date());
 	}
 
 	private ServiceContext _createServiceContext(long groupId)
