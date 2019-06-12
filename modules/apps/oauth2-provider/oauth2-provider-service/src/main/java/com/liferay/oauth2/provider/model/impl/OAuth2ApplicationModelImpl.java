@@ -136,7 +136,9 @@ public class OAuth2ApplicationModelImpl
 
 	public static final long COMPANYID_COLUMN_BITMASK = 2L;
 
-	public static final long OAUTH2APPLICATIONID_COLUMN_BITMASK = 4L;
+	public static final long NAME_COLUMN_BITMASK = 4L;
+
+	public static final long OAUTH2APPLICATIONID_COLUMN_BITMASK = 8L;
 
 	public static void setEntityCacheEnabled(boolean entityCacheEnabled) {
 		_entityCacheEnabled = entityCacheEnabled;
@@ -765,7 +767,17 @@ public class OAuth2ApplicationModelImpl
 
 	@Override
 	public void setName(String name) {
+		_columnBitmask |= NAME_COLUMN_BITMASK;
+
+		if (_originalName == null) {
+			_originalName = _name;
+		}
+
 		_name = name;
+	}
+
+	public String getOriginalName() {
+		return GetterUtil.getString(_originalName);
 	}
 
 	@JSON
@@ -926,6 +938,9 @@ public class OAuth2ApplicationModelImpl
 
 		oAuth2ApplicationModelImpl._originalClientId =
 			oAuth2ApplicationModelImpl._clientId;
+
+		oAuth2ApplicationModelImpl._originalName =
+			oAuth2ApplicationModelImpl._name;
 
 		oAuth2ApplicationModelImpl._columnBitmask = 0;
 	}
@@ -1156,6 +1171,7 @@ public class OAuth2ApplicationModelImpl
 	private String _homePageURL;
 	private long _iconFileEntryId;
 	private String _name;
+	private String _originalName;
 	private String _privacyPolicyURL;
 	private String _redirectURIs;
 	private long _columnBitmask;

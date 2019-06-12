@@ -256,6 +256,9 @@ public interface OAuth2ApplicationLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getOAuth2ApplicationsCount();
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getOAuth2ApplicationsCount(long companyId, String name);
+
 	/**
 	 * Returns the OSGi service identifier.
 	 *
