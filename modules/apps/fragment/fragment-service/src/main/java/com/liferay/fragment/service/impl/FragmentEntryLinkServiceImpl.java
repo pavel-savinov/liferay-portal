@@ -97,7 +97,7 @@ public class FragmentEntryLinkServiceImpl
 		_checkPermission(groupId, _portal.getClassName(classNameId), classPK);
 
 		fragmentEntryLinkLocalService.updateFragmentEntryLinks(
-			getUserId(), groupId, classNameId, classNameId, fragmentEntryIds,
+			getUserId(), groupId, classNameId, classPK, fragmentEntryIds,
 			editableValues, serviceContext);
 	}
 
