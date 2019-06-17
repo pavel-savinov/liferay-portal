@@ -323,10 +323,6 @@ public class OAuth2ApplicationLocalServiceUtil {
 		return getService().getOAuth2ApplicationsCount();
 	}
 
-	public static int getOAuth2ApplicationsCount(long companyId, String name) {
-		return getService().getOAuth2ApplicationsCount(companyId, name);
-	}
-
 	/**
 	 * Returns the OSGi service identifier.
 	 *

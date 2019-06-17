@@ -349,12 +349,6 @@ public class OAuth2ApplicationLocalServiceWrapper
 		return _oAuth2ApplicationLocalService.getOAuth2ApplicationsCount();
 	}
 
-	@Override
-	public int getOAuth2ApplicationsCount(long companyId, String name) {
-		return _oAuth2ApplicationLocalService.getOAuth2ApplicationsCount(
-			companyId, name);
-	}
-
 	/**
 	 * Returns the OSGi service identifier.
 	 *
