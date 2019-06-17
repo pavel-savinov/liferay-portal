@@ -16,8 +16,9 @@ package com.liferay.fragment.internal.instance.lifecycle;
 
 import com.liferay.oauth2.provider.constants.ClientProfile;
 import com.liferay.oauth2.provider.constants.GrantType;
+import com.liferay.oauth2.provider.model.OAuth2Application;
+import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
-import com.liferay.oauth2.provider.util.OAuth2SecureRandomGenerator;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
 import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
@@ -25,26 +26,38 @@ import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.GetterUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Map;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Pavel Savinov
  */
-@Component(immediate = true, service = PortalInstanceLifecycleListener.class)
+@Component(
+	immediate = true,
+	property = {
+		"applicationName=Fragment Renderer", "clientId=FragmentRenderer"
+	},
+	service = PortalInstanceLifecycleListener.class
+)
 public class OAuth2ProviderShortcutPortalInstanceLifecycleListener
 	extends BasePortalInstanceLifecycleListener {
 
 	@Override
 	public void portalInstanceRegistered(Company company) throws Exception {
-		int count = _oAuth2ApplicationLocalService.getOAuth2ApplicationsCount(
-			company.getCompanyId(), _APPLICATION_NAME);
+		long companyId = company.getCompanyId();
 
-		if (count > 0) {
+		OAuth2Application oAuth2Application =
+			_oAuth2ApplicationLocalService.fetchOAuth2Application(
+				companyId, _clientId);
+
+		if (oAuth2Application != null) {
 			return;
 		}
 
@@ -58,17 +71,30 @@ public class OAuth2ProviderShortcutPortalInstanceLifecycleListener
 					add(GrantType.RESOURCE_OWNER_PASSWORD);
 				}
 			},
-			user.getUserId(), OAuth2SecureRandomGenerator.generateClientId(),
-			ClientProfile.NATIVE_APPLICATION.id(), StringPool.BLANK, null, null,
-			null, 0, _APPLICATION_NAME, null, Collections.emptyList(),
-			Collections.singletonList("liferay-json-web-services.everything"),
+			user.getUserId(), _clientId, ClientProfile.NATIVE_APPLICATION.id(),
+			StringPool.BLANK, null, null, null, 0, _applicationName, null,
+			Collections.emptyList(),
+			new ArrayList(
+				_scopeLocator.getScopeAliases(
+					companyId, "liferay-json-web-services")),
 			new ServiceContext());
 	}
 
-	private static final String _APPLICATION_NAME = "Fragment Renderer";
+	@Activate
+	protected void activate(Map<String, Object> properties) {
+		_clientId = GetterUtil.getString(properties.get("clientId"));
+		_applicationName = GetterUtil.getString(
+			properties.get("applicationName"));
+	}
+
+	private String _applicationName = "Fragment Renderer";
+	private String _clientId = "FragmentRenderer";
 
 	@Reference
 	private OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;
+
+	@Reference
+	private ScopeLocator _scopeLocator;
 
 	@Reference
 	private UserLocalService _userLocalService;
