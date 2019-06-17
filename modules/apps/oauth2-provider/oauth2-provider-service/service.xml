@@ -43,10 +43,6 @@
 			<finder-column name="companyId" />
 			<finder-column name="clientId" />
 		</finder>
-		<finder name="C_N" return-type="Collection">
-			<finder-column name="companyId" />
-			<finder-column name="name" />
-		</finder>
 
 		<!-- References -->
 
