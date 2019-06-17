@@ -276,11 +276,6 @@ public class OAuth2ApplicationLocalServiceImpl
 	}
 
 	@Override
-	public int getOAuth2ApplicationsCount(long companyId, String name) {
-		return oAuth2ApplicationPersistence.countByC_N(companyId, name);
-	}
-
-	@Override
 	public OAuth2Application updateIcon(
 			long oAuth2ApplicationId, InputStream inputStream)
 		throws PortalException {
