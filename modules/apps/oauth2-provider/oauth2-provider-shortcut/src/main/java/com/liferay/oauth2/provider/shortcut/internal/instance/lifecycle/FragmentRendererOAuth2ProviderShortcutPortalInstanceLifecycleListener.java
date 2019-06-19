@@ -12,13 +12,12 @@
  * details.
  */
 
-package com.liferay.fragment.internal.instance.lifecycle;
+package com.liferay.oauth2.provider.shortcut.internal.instance.lifecycle;
 
 import com.liferay.oauth2.provider.constants.ClientProfile;
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
-import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
@@ -49,8 +48,9 @@ import org.osgi.service.component.annotations.Reference;
 	},
 	service = PortalInstanceLifecycleListener.class
 )
-public class OAuth2ProviderShortcutPortalInstanceLifecycleListener
-	extends BasePortalInstanceLifecycleListener {
+public class
+	FragmentRendererOAuth2ProviderShortcutPortalInstanceLifecycleListener
+		extends BasePortalInstanceLifecycleListener {
 
 	@Override
 	public void portalInstanceRegistered(Company company) throws Exception {
@@ -122,9 +122,6 @@ public class OAuth2ProviderShortcutPortalInstanceLifecycleListener
 
 	@Reference
 	private OAuth2ScopeGrantLocalService _oAuth2ScopeGrantLocalService;
-
-	@Reference
-	private ScopeLocator _scopeLocator;
 
 	@Reference
 	private UserLocalService _userLocalService;
