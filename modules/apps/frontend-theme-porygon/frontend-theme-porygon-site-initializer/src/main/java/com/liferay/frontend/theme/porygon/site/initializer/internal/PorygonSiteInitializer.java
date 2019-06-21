@@ -163,8 +163,9 @@ public class PorygonSiteInitializer implements SiteInitializer {
 			_addJournalArticleDDMTemplates(ddmStructure, serviceContext);
 
 			_addDisplayPageEntry(
-				"Porgon Entry", entryFragmentEntries, _PATH + "/page_templates",
-				"porygon_entry.jpg", ddmStructure, fileEntries, serviceContext);
+				"Porygon Entry", entryFragmentEntries,
+				_PATH + "/page_templates", "porygon_entry.jpg", ddmStructure,
+				fileEntries, serviceContext);
 
 			_addJournalArticles(fileEntries, serviceContext);
 
