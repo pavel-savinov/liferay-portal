@@ -37,7 +37,7 @@ import org.osgi.service.component.annotations.Component;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + JournalPortletKeys.JOURNAL,
-		"mvc.command.name=/journal/update_folder"
+		"mvc.command.name=/journal/expire_entries"
 	},
 	service = MVCActionCommand.class
 )
