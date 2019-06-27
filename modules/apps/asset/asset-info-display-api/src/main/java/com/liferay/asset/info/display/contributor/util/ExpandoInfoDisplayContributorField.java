@@ -34,6 +34,9 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
+import java.text.DateFormat;
+
+import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
@@ -142,6 +145,12 @@ public class ExpandoInfoDisplayContributorField
 			return StringUtil.merge(
 				ArrayUtil.toStringArray((Object[])attributeValue),
 				StringPool.COMMA_AND_SPACE);
+		}
+		else if (attributeType == ExpandoColumnConstants.DATE) {
+			DateFormat dateFormat = DateFormat.getDateInstance(
+				DateFormat.FULL, locale);
+
+			return dateFormat.format((Date)attributeValue);
 		}
 
 		return ExpandoConverterUtil.getStringFromAttribute(
