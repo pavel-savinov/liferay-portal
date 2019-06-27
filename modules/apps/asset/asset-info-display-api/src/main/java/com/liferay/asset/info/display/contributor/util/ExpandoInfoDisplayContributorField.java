@@ -27,7 +27,9 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ClassedModel;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
@@ -123,6 +125,23 @@ public class ExpandoInfoDisplayContributorField
 
 			attributeValue = values.getOrDefault(
 				locale, defaultValues.get(locale));
+
+			return StringUtil.merge(
+				ArrayUtil.toStringArray((Object[])attributeValue),
+				StringPool.COMMA_AND_SPACE);
+		}
+		else if ((attributeType == ExpandoColumnConstants.BOOLEAN_ARRAY) ||
+				 (attributeType == ExpandoColumnConstants.DOUBLE_ARRAY) ||
+				 (attributeType == ExpandoColumnConstants.FLOAT_ARRAY) ||
+				 (attributeType == ExpandoColumnConstants.INTEGER_ARRAY) ||
+				 (attributeType == ExpandoColumnConstants.LONG_ARRAY) ||
+				 (attributeType == ExpandoColumnConstants.NUMBER_ARRAY) ||
+				 (attributeType == ExpandoColumnConstants.SHORT_ARRAY) ||
+				 (attributeType == ExpandoColumnConstants.STRING_ARRAY)) {
+
+			return StringUtil.merge(
+				ArrayUtil.toStringArray((Object[])attributeValue),
+				StringPool.COMMA_AND_SPACE);
 		}
 
 		return ExpandoConverterUtil.getStringFromAttribute(
