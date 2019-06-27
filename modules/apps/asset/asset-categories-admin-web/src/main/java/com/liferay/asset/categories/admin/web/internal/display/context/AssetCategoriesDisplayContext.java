@@ -409,7 +409,9 @@ public class AssetCategoriesDisplayContext {
 		return _orderByType;
 	}
 
-	public String getSelectCategoryURL() throws Exception {
+	public String getSelectCategoryURL(AssetCategory category)
+		throws Exception {
+
 		if (_selectCategoryURL != null) {
 			return _selectCategoryURL;
 		}
@@ -429,7 +431,11 @@ public class AssetCategoriesDisplayContext {
 		selectCategoryURL.setParameter(
 			"allowedSelectVocabularies", Boolean.TRUE.toString());
 		selectCategoryURL.setParameter(
+			"disableSelectedCategories", Boolean.TRUE.toString());
+		selectCategoryURL.setParameter(
 			"eventName", _renderResponse.getNamespace() + "selectCategory");
+		selectCategoryURL.setParameter(
+			"selectedCategories", "{" + category.getCategoryId() + "}");
 		selectCategoryURL.setParameter("singleSelect", Boolean.TRUE.toString());
 		selectCategoryURL.setParameter(
 			"vocabularyIds",

@@ -56,7 +56,15 @@ AssetCategory category = (AssetCategory)row.getObject();
 	</c:if>
 
 	<c:if test="<%= assetCategoriesDisplayContext.hasPermission(category, ActionKeys.UPDATE) %>">
+
+		<%
+		Map<String, Object> data = new HashMap<>();
+
+		data.put("href", assetCategoriesDisplayContext.getSelectCategoryURL(category));
+		%>
+
 		<liferay-ui:icon
+			data="<%= data %>"
 			id='<%= row.getRowId() + "moveCategory" %>'
 			message="move"
 			url="javascript:;"
@@ -100,6 +108,7 @@ AssetCategory category = (AssetCategory)row.getObject();
 			moveCategoryIcon.addEventListener(
 				'click',
 				function(event) {
+					debugger;
 					var itemSelectorDialog = new A.LiferayItemSelectorDialog(
 						{
 							eventName: '<portlet:namespace />selectCategory',
@@ -134,7 +143,7 @@ AssetCategory category = (AssetCategory)row.getObject();
 							},
 							'strings.add': '<liferay-ui:message key="done" />',
 							title: '<liferay-ui:message arguments="<%= category.getTitle(locale) %>" key="move-x" />',
-							url: '<%= assetCategoriesDisplayContext.getSelectCategoryURL() %>'
+							url: event.currentTarget.getAttribute('data-href')
 						}
 					);
 
