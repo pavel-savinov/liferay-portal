@@ -230,7 +230,7 @@ class SidebarPageStructurePanel extends Component {
 	 * @review
 	 */
 	_handleElementClick(event) {
-		const {nodeKey} = event.delegateTarget.dataset;
+		const {elementId, nodeKey} = event.delegateTarget.dataset;
 
 		if (nodeKey) {
 			const nodeKeyIndex = this._expandedNodes.indexOf(nodeKey);
@@ -242,6 +242,16 @@ class SidebarPageStructurePanel extends Component {
 			}
 
 			this._expandedNodes = this._expandedNodes;
+		}
+
+		if (elementId) {
+			const element = document.querySelector(
+				`[data-fragments-editor-item-id="${elementId}"][data-fragment-entry-link-id]`
+			);
+
+			if (element) {
+				element.scrollIntoView(true);
+			}
 		}
 	}
 
