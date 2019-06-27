@@ -208,6 +208,17 @@ public class AssetCategoriesSelectorDisplayContext {
 		return _singleSelect;
 	}
 
+	private boolean _disableSelectedCategories() {
+		if (_disableSelectedCategories != null) {
+			return _disableSelectedCategories;
+		}
+
+		_disableSelectedCategories = ParamUtil.getBoolean(
+			_httpServletRequest, "disableSelectedCategories");
+
+		return _disableSelectedCategories;
+	}
+
 	private JSONArray _getCategoriesJSONArray(
 			long vocabularyId, long categoryId)
 		throws Exception {
@@ -245,6 +256,10 @@ public class AssetCategoriesSelectorDisplayContext {
 					String.valueOf(category.getCategoryId()))) {
 
 				jsonObject.put("selected", true);
+
+				if (_disableSelectedCategories()) {
+					jsonObject.put("disabled", true);
+				}
 			}
 
 			jsonArray.put(jsonObject);
@@ -282,6 +297,7 @@ public class AssetCategoriesSelectorDisplayContext {
 
 	private Boolean _allowedSelectVocabularies;
 	private long _categoryId;
+	private Boolean _disableSelectedCategories;
 	private String _eventName;
 	private final HttpServletRequest _httpServletRequest;
 	private final RenderRequest _renderRequest;
