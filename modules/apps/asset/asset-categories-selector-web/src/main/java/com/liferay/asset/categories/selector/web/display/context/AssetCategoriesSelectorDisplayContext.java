@@ -245,6 +245,13 @@ public class AssetCategoriesSelectorDisplayContext {
 					String.valueOf(category.getCategoryId()))) {
 
 				jsonObject.put("selected", true);
+
+				boolean disableSelectedCategories = ParamUtil.getBoolean(
+					_httpServletRequest, "disableSelectedCategories");
+
+				if (disableSelectedCategories) {
+					jsonObject.put("disabled", true);
+				}
 			}
 
 			jsonArray.put(jsonObject);
