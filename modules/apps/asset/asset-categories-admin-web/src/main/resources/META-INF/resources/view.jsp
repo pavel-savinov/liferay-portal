@@ -38,6 +38,15 @@ AssetVocabulariesManagementToolbarDisplayContext assetVocabulariesManagementTool
 		breadcrumbEntries="<%= AssetCategoryUtil.getAssetVocabulariesBreadcrumbEntries(request) %>"
 	/>
 
+	<liferay-ui:error exception="<%= InvalidCategoryException.class %>">
+
+		<%
+		InvalidCategoryException ice = (InvalidCategoryException)errorException;
+		%>
+
+		<liferay-ui:message arguments="<%= ice.getMessageArgument(locale) %>" key="<%= ice.getMessageKey() %>" />
+	</liferay-ui:error>
+
 	<liferay-ui:search-container
 		id="assetVocabularies"
 		searchContainer="<%= assetCategoriesDisplayContext.getVocabulariesSearchContainer() %>"
