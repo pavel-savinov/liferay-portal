@@ -19,8 +19,15 @@ import com.liferay.exportimport.data.handler.base.BaseStagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
+import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
+import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
+import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.xml.Element;
+
+import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -54,6 +61,15 @@ public class AssetDisplayPageStagedModelDataHandler
 			assetDisplayPageElement,
 			ExportImportPathUtil.getModelPath(assetDisplayPageEntry),
 			assetDisplayPageEntry);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
+				assetDisplayPageEntry.getLayoutPageTemplateEntryId());
+
+		if (layoutPageTemplateEntry != null) {
+			StagedModelDataHandlerUtil.exportStagedModel(
+				portletDataContext, layoutPageTemplateEntry);
+		}
 	}
 
 	@Override
@@ -93,6 +109,10 @@ public class AssetDisplayPageStagedModelDataHandler
 					portletDataContext, importedAssetDisplayPageEntry);
 		}
 
+		_importLayoutPageTemplateEnty(
+			portletDataContext, existingAssetDisplayPageEntry,
+			importedAssetDisplayPageEntry);
+
 		portletDataContext.importClassedModel(
 			assetDisplayPageEntry, importedAssetDisplayPageEntry);
 	}
@@ -103,6 +123,61 @@ public class AssetDisplayPageStagedModelDataHandler
 
 		return _stagedModelRepository;
 	}
+
+	private void _importLayoutPageTemplateEnty(
+			PortletDataContext portletDataContext,
+			AssetDisplayPageEntry existingAssetDisplayPageEntry,
+			AssetDisplayPageEntry importedAssetDisplayPageEntry)
+		throws PortalException {
+
+		LayoutPageTemplateEntry existingLayoutPageTemplateEntry =
+			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
+				existingAssetDisplayPageEntry.getLayoutPageTemplateEntryId());
+
+		if ((existingLayoutPageTemplateEntry == null) ||
+			(existingLayoutPageTemplateEntry.getGroupId() !=
+				existingAssetDisplayPageEntry.getGroupId())) {
+
+			String path = ExportImportPathUtil.getModelPath(
+				portletDataContext, LayoutPageTemplateEntry.class.getName(),
+				Long.valueOf(
+					existingAssetDisplayPageEntry.
+						getLayoutPageTemplateEntryId()));
+
+			LayoutPageTemplateEntry layoutPageTemplateEntry =
+				(LayoutPageTemplateEntry)portletDataContext.getZipEntryAsObject(
+					path);
+
+			StagedModelDataHandlerUtil.importStagedModel(
+				portletDataContext, layoutPageTemplateEntry);
+
+			Map<Long, Long> layoutPageTemplateEntryIds =
+				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+					LayoutPageTemplateEntry.class);
+
+			long layoutPageTemplateEntryId = MapUtil.getLong(
+				layoutPageTemplateEntryIds,
+				layoutPageTemplateEntry.getLayoutPageTemplateEntryId(),
+				layoutPageTemplateEntry.getLayoutPageTemplateEntryId());
+
+			LayoutPageTemplateEntry importedLayoutPageTemplateEntry =
+				_layoutPageTemplateEntryLocalService.
+					fetchLayoutPageTemplateEntry(layoutPageTemplateEntryId);
+
+			importedAssetDisplayPageEntry.setLayoutPageTemplateEntryId(
+				layoutPageTemplateEntryId);
+
+			importedAssetDisplayPageEntry.setPlid(
+				importedLayoutPageTemplateEntry.getPlid());
+
+			_stagedModelRepository.updateStagedModel(
+				portletDataContext, importedAssetDisplayPageEntry);
+		}
+	}
+
+	@Reference
+	private LayoutPageTemplateEntryLocalService
+		_layoutPageTemplateEntryLocalService;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.asset.display.page.model.AssetDisplayPageEntry)"
