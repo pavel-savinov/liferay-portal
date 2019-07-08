@@ -12,6 +12,8 @@
  * details.
  */
 
+/* eslint no-for-of-loops/no-for-of-loops: "warn" */
+
 import {CLEAR_DROP_TARGET, MOVE_ROW} from '../actions/actions.es';
 import {
 	DEFAULT_COMPONENT_ROW_CONFIG,
@@ -321,6 +323,37 @@ function updateRow(store, updateAction, payload) {
 }
 
 /**
+ * Sets used widgets based on the portletIds array
+ * @param {!Array} widgets
+ * @param {{!Array} portletIds
+ * @return {Array}
+ * @review
+ */
+function updateUsedWidgets(widgets, portletIds) {
+	const filteredWidgets = [...widgets];
+
+	for (const widgetCategory of filteredWidgets) {
+		const {categories = [], portlets = []} = widgetCategory;
+
+		widgetCategory.categories = updateUsedWidgets(categories, portletIds);
+		widgetCategory.portlets = portlets.map(portlet => {
+			if (
+				portletIds.indexOf(portlet.portletId) !== -1 &&
+				!portlet.instanceable
+			) {
+				portlet.used = true;
+			} else {
+				portlet.used = false;
+			}
+
+			return portlet;
+		});
+	}
+
+	return filteredWidgets;
+}
+
+/**
  * @param {Object} state
  * @param {Object[]} state.fragmentEntryLinks
  * @param {Object[]} state.widgets
@@ -359,5 +392,6 @@ export {
 	setIn,
 	updateIn,
 	updateRow,
+	updateUsedWidgets,
 	updateWidgets
 };

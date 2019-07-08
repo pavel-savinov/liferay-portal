@@ -47,6 +47,12 @@ function _fetch(url, body = {}) {
 	});
 }
 
+function getExperienceUsedPortletIds(segmentsExperienceId) {
+	return _fetch(_store.getState().getExperienceUsedPortletsURL, {
+		segmentsExperienceId
+	}).then(response => response.json());
+}
+
 /**
  * @param {string} segmentsExperienceId
  * @param {Array<string>} [fragmentEntryLinkIds=[]]
@@ -136,6 +142,7 @@ function updatePageEditorLayoutData(layoutData, segmentsExperienceId) {
 }
 
 export {
+	getExperienceUsedPortletIds,
 	removeExperience,
 	removeFragmentEntryLinks,
 	setStore,

@@ -25,15 +25,17 @@ import {
 	deepClone,
 	getFragmentRowIndex
 } from '../utils/FragmentsEditorGetUtils.es';
-import {setIn} from '../utils/FragmentsEditorUpdateUtils.es';
+import {setIn, updateUsedWidgets} from '../utils/FragmentsEditorUpdateUtils.es';
 import {
+	getExperienceUsedPortletIds,
 	removeExperience,
 	updatePageEditorLayoutData
 } from '../utils/FragmentsEditorFetchUtils.es';
 import {getRowFragmentEntryLinkIds} from '../utils/FragmentsEditorGetUtils.es';
 import {
 	containsFragmentEntryLinkId,
-	getEmptyLayoutData
+	getEmptyLayoutData,
+	getLayoutDataFragmentEntryLinkIds
 } from '../utils/LayoutDataList.es';
 import {prefixSegmentsExperienceId} from '../utils/prefixSegmentsExperienceId.es';
 import {EDITABLE_FRAGMENT_ENTRY_PROCESSOR} from '../utils/constants';
@@ -220,8 +222,28 @@ function _removeLayoutDataItem(state, segmentsExperienceId) {
  * @param {string} segmentsExperienceId
  * @returns {object}
  */
+function _setUsedWidgets(state, segmentsExperienceId) {
+	return getExperienceUsedPortletIds(segmentsExperienceId).then(
+		portletIds => {
+			const widgets = updateUsedWidgets(state.widgets, portletIds);
+
+			state = setIn(state, ['widgets'], widgets);
+
+			return state;
+		}
+	);
+}
+
+/**
+ *
+ * @param {object} state
+ * @param {string} segmentsExperienceId
+ * @returns {object}
+ */
 function _updateFragmentEntryLinks(state, segmentsExperienceId) {
-	const fragmentEntryLinkIds = Object.keys(state.fragmentEntryLinks);
+	const fragmentEntryLinkIds = getLayoutDataFragmentEntryLinkIds(
+		state.layoutData
+	);
 
 	const promises = fragmentEntryLinkIds.map(fragmentEntryLinkId => {
 		let fragmentEntryLink = state.fragmentEntryLinks[fragmentEntryLinkId];
@@ -330,6 +352,12 @@ function createSegmentsExperienceReducer(state, action) {
 									_updateFragmentEntryLinks(
 										nextNewState,
 										segmentsExperienceId
+									)
+								)
+								.then(nextNewState =>
+									_setUsedWidgets(
+										nextNewState,
+										action.segmentsExperienceId
 									)
 								)
 								.then(nextNewState => resolve(nextNewState))
@@ -562,6 +590,9 @@ function selectSegmentsExperienceReducer(state, action) {
 						nextNewState,
 						action.segmentsExperienceId
 					)
+				)
+				.then(nextNewState =>
+					_setUsedWidgets(nextNewState, action.segmentsExperienceId)
 				)
 				.then(nextNewState => resolve(nextNewState))
 				.catch(e => {
