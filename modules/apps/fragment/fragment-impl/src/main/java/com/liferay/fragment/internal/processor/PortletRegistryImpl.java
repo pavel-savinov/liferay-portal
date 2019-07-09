@@ -132,6 +132,10 @@ public class PortletRegistryImpl implements PortletRegistry {
 			plid = layoutPageTemplateEntry.getPlid();
 		}
 
+		if (plid == 0) {
+			return;
+		}
+
 		List<PortletPreferences> portletPreferencesList =
 			_portletPreferencesLocalService.getPortletPreferences(
 				PortletKeys.PREFS_OWNER_ID_DEFAULT,
