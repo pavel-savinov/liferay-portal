@@ -365,6 +365,8 @@ public class FragmentEntryLocalServiceImpl
 			fragmentEntryKey = generateFragmentEntryKey(groupId, name);
 		}
 
+		fragmentEntryKey = _getFragmentEntryKey(fragmentEntryKey);
+
 		validate(name);
 		validateFragmentEntryKey(groupId, fragmentEntryKey);
 
