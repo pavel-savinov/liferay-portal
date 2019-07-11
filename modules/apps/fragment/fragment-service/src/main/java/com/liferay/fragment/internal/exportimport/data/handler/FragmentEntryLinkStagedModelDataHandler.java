@@ -25,6 +25,7 @@ import com.liferay.exportimport.staged.model.repository.StagedModelRepositoryReg
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
+import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -139,9 +140,28 @@ public class FragmentEntryLinkStagedModelDataHandler
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				FragmentEntry.class);
 
+		long fragmentEntryLinkFragmentEntryId =
+			fragmentEntryLink.getFragmentEntryId();
+
 		long fragmentEntryId = MapUtil.getLong(
-			fragmentEntryIds, fragmentEntryLink.getFragmentEntryId(),
-			fragmentEntryLink.getFragmentEntryId());
+			fragmentEntryIds, fragmentEntryLinkFragmentEntryId);
+
+		if (fragmentEntryId == 0) {
+			FragmentEntry fragmentEntry =
+				_fragmentEntryLocalService.fetchFragmentEntry(
+					fragmentEntryLinkFragmentEntryId);
+
+			FragmentEntry targetFragmentEntry =
+				_fragmentEntryLocalService.fetchFragmentEntryByUuidAndGroupId(
+					fragmentEntry.getUuid(), portletDataContext.getGroupId());
+
+			if (targetFragmentEntry != null) {
+				fragmentEntryId = targetFragmentEntry.getFragmentEntryId();
+			}
+			else {
+				fragmentEntryId = fragmentEntryLinkFragmentEntryId;
+			}
+		}
 
 		Map<Long, Long> referenceClassPKs =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
@@ -210,6 +230,9 @@ public class FragmentEntryLinkStagedModelDataHandler
 
 	@Reference
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
+
+	@Reference
+	private FragmentEntryLocalService _fragmentEntryLocalService;
 
 	@Reference
 	private Portal _portal;
