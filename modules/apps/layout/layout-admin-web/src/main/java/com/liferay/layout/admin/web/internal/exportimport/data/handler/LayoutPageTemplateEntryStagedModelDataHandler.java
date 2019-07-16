@@ -29,6 +29,7 @@ import com.liferay.layout.page.template.model.LayoutPageTemplateCollection;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateCollectionLocalService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutPrototype;
@@ -311,9 +312,8 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 					layoutPageTemplateEntry.getName(), plid, preloaded);
 
 			if (existingLayoutPageTemplateEntry == null) {
-				importedLayoutPageTemplateEntry =
-					_stagedModelRepository.addStagedModel(
-						portletDataContext, importedLayoutPageTemplateEntry);
+				importedLayoutPageTemplateEntry = _addStagedModel(
+					portletDataContext, importedLayoutPageTemplateEntry);
 			}
 			else {
 				importedLayoutPageTemplateEntry.setLayoutPageTemplateEntryId(
@@ -326,9 +326,8 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 			}
 		}
 		else {
-			importedLayoutPageTemplateEntry =
-				_stagedModelRepository.addStagedModel(
-					portletDataContext, importedLayoutPageTemplateEntry);
+			importedLayoutPageTemplateEntry = _addStagedModel(
+				portletDataContext, importedLayoutPageTemplateEntry);
 		}
 
 		_importAssetDisplayPages(
@@ -374,6 +373,28 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 	@Reference(unbind = "-")
 	protected void setUserLocalService(UserLocalService userLocalService) {
 		_userLocalService = userLocalService;
+	}
+
+	private LayoutPageTemplateEntry _addStagedModel(
+			PortletDataContext portletDataContext,
+			LayoutPageTemplateEntry layoutPageTemplateEntry)
+		throws PortalException {
+
+		if (layoutPageTemplateEntry.isDefaultTemplate()) {
+			LayoutPageTemplateEntry defaultLayoutPageTemplateEntry =
+				_layoutPageTemplateEntryLocalService.
+					fetchDefaultLayoutPageTemplateEntry(
+						layoutPageTemplateEntry.getGroupId(),
+						layoutPageTemplateEntry.getClassNameId(),
+						layoutPageTemplateEntry.getClassTypeId());
+
+			if (defaultLayoutPageTemplateEntry != null) {
+				layoutPageTemplateEntry.setDefaultTemplate(false);
+			}
+		}
+
+		return _stagedModelRepository.addStagedModel(
+			portletDataContext, layoutPageTemplateEntry);
 	}
 
 	private void _exportAssetDisplayPages(
