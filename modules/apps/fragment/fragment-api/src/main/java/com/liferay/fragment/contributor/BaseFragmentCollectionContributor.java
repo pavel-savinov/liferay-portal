@@ -113,6 +113,7 @@ public abstract class BaseFragmentCollectionContributor
 		return getName();
 	}
 
+	@Override
 	public ResourceBundleLoader getResourceBundleLoader() {
 		ServletContext servletContext = getServletContext();
 
