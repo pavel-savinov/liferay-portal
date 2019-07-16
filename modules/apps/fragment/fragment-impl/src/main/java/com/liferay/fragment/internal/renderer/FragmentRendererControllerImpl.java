@@ -14,6 +14,7 @@
 
 package com.liferay.fragment.internal.renderer;
 
+import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.exception.FragmentEntryContentException;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.renderer.FragmentRenderer;
@@ -22,15 +23,29 @@ import com.liferay.fragment.renderer.FragmentRendererController;
 import com.liferay.fragment.renderer.FragmentRendererTracker;
 import com.liferay.fragment.renderer.constants.FragmentRendererConstants;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.AggregateResourceBundleLoader;
+import com.liferay.portal.kernel.util.ResourceBundleLoader;
+import com.liferay.portal.kernel.util.ResourceBundleLoaderUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.taglib.servlet.PipingServletResponse;
 
 import java.io.IOException;
+
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -52,7 +67,19 @@ public class FragmentRendererControllerImpl
 		FragmentRenderer fragmentRenderer = _getFragmentRenderer(
 			fragmentRendererContext.getFragmentEntryLink());
 
-		return fragmentRenderer.getConfiguration(fragmentRendererContext);
+		try {
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+				fragmentRenderer.getConfiguration(fragmentRendererContext));
+
+			return _translateConfigurationFields(
+				jsonObject, fragmentRendererContext.getLocale());
+		}
+		catch (JSONException jsone) {
+			_log.error(
+				"Unable to parse fragment entry link configuration", jsone);
+		}
+
+		return StringPool.BLANK;
 	}
 
 	@Override
@@ -122,6 +149,62 @@ public class FragmentRendererControllerImpl
 
 		return fragmentRenderer;
 	}
+
+	private String _translateConfigurationFields(
+		JSONObject jsonObject, Locale locale) {
+
+		JSONArray fieldSetsJSONArray = jsonObject.getJSONArray("fieldSets");
+
+		if (fieldSetsJSONArray == null) {
+			return StringPool.BLANK;
+		}
+
+		ResourceBundleLoader resourceBundleLoader =
+			new AggregateResourceBundleLoader(
+				ResourceBundleLoaderUtil.getPortalResourceBundleLoader(),
+				_fragmentCollectionContributorTracker.
+					getResourceBundleLoader());
+
+		ResourceBundle resourceBundle = resourceBundleLoader.loadResourceBundle(
+			locale);
+
+		Iterator<JSONObject> iterator = fieldSetsJSONArray.iterator();
+
+		iterator.forEachRemaining(
+			fieldSetJSONObject -> {
+				String fieldSetLabel = fieldSetJSONObject.getString("label");
+
+				fieldSetJSONObject.put(
+					"label",
+					LanguageUtil.get(
+						resourceBundle, fieldSetLabel, fieldSetLabel));
+
+				JSONArray fieldsJSONArray = fieldSetJSONObject.getJSONArray(
+					"fields");
+
+				Iterator<JSONObject> fieldsIterator =
+					fieldsJSONArray.iterator();
+
+				fieldsIterator.forEachRemaining(
+					fieldJSONObject -> {
+						String fieldLabel = fieldJSONObject.getString("label");
+
+						fieldJSONObject.put(
+							"label",
+							LanguageUtil.get(
+								resourceBundle, fieldLabel, fieldLabel));
+					});
+			});
+
+		return jsonObject.toString();
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		FragmentRendererControllerImpl.class);
+
+	@Reference
+	private FragmentCollectionContributorTracker
+		_fragmentCollectionContributorTracker;
 
 	@Reference
 	private FragmentRendererTracker _fragmentRendererTracker;
