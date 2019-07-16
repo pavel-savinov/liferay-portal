@@ -15,6 +15,7 @@
 package com.liferay.fragment.contributor;
 
 import com.liferay.fragment.model.FragmentEntry;
+import com.liferay.portal.kernel.util.ResourceBundleLoader;
 
 import java.util.List;
 import java.util.Locale;
@@ -44,5 +45,7 @@ public interface FragmentCollectionContributorTracker {
 
 		return getFragmentEntries();
 	}
+
+	public ResourceBundleLoader getResourceBundleLoader();
 
 }

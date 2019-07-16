@@ -17,6 +17,8 @@ package com.liferay.fragment.contributor;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.fragment.model.FragmentEntry;
+import com.liferay.portal.kernel.util.ResourceBundleLoader;
+import com.liferay.portal.kernel.util.ResourceBundleLoaderUtil;
 
 import java.util.List;
 import java.util.Locale;
@@ -41,6 +43,10 @@ public interface FragmentCollectionContributor {
 
 	public default String getName(Locale locale) {
 		return getName();
+	}
+
+	public default ResourceBundleLoader getResourceBundleLoader() {
+		return ResourceBundleLoaderUtil.getPortalResourceBundleLoader();
 	}
 
 }
