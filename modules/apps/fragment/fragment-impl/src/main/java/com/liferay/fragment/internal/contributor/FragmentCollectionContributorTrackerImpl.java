@@ -18,6 +18,8 @@ import com.liferay.fragment.constants.FragmentConstants;
 import com.liferay.fragment.contributor.FragmentCollectionContributor;
 import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.model.FragmentEntry;
+import com.liferay.portal.kernel.util.AggregateResourceBundleLoader;
+import com.liferay.portal.kernel.util.ResourceBundleLoader;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -100,6 +102,21 @@ public class FragmentCollectionContributorTrackerImpl
 				FragmentEntry::getFragmentEntryKey,
 				fragmentEntry -> fragmentEntry)
 		);
+	}
+
+	public ResourceBundleLoader getResourceBundleLoader() {
+		Stream<FragmentCollectionContributor> stream =
+			_fragmentCollectionContributors.stream();
+
+		return new AggregateResourceBundleLoader(
+			stream.map(
+				fragmentCollectionContributor ->
+					fragmentCollectionContributor.getResourceBundleLoader()
+			).filter(
+				resourceBundleLoader -> resourceBundleLoader != null
+			).toArray(
+				ResourceBundleLoader[]::new
+			));
 	}
 
 	@Reference(
