@@ -20,14 +20,6 @@ import {
 	UPDATE_SEGMENTS_EXPERIENCE_PRIORITY
 } from '../actions/actions.es';
 import {
-	deepClone
-} from '../utils/FragmentsEditorGetUtils.es';
-import {
-	setIn,
-	updateUsedWidgets,
-	updateWidgets
-} from '../utils/FragmentsEditorUpdateUtils.es';
-import {
 	getExperienceUsedPortletIds,
 	removeExperience,
 	updatePageEditorLayoutData
@@ -36,7 +28,10 @@ import {
 	deepClone,
 	getRowFragmentEntryLinkIds
 } from '../utils/FragmentsEditorGetUtils.es';
-import {setIn} from '../utils/FragmentsEditorUpdateUtils.es';
+import {
+	setIn,
+	updateUsedWidgets
+} from '../utils/FragmentsEditorUpdateUtils.es';
 import {
 	containsFragmentEntryLinkId,
 	getEmptyLayoutData,
