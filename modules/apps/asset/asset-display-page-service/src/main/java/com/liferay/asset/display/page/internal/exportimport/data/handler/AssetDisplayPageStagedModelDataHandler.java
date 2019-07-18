@@ -85,11 +85,6 @@ public class AssetDisplayPageStagedModelDataHandler
 		long layoutPageTemplateEntryId = 0;
 
 		if (importedAssetDisplayPageEntry.getLayoutPageTemplateEntryId() > 0) {
-			StagedModelDataHandlerUtil.importReferenceStagedModel(
-				portletDataContext, assetDisplayPageEntry,
-				LayoutPageTemplateEntry.class,
-				assetDisplayPageEntry.getLayoutPageTemplateEntryId());
-
 			Map<Long, Long> layoutPageTemplateEntryIds =
 				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 					LayoutPageTemplateEntry.class);
