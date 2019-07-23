@@ -468,6 +468,17 @@ public class FragmentEntryServiceImpl extends FragmentEntryServiceBaseImpl {
 	}
 
 	@Override
+	public List<FragmentEntry> getFragmentEntriesByTypeAndStatus(
+		long groupId, long fragmentCollectionId, int type, int status,
+		int start, int end,
+		OrderByComparator<FragmentEntry> orderByComparator) {
+
+		return fragmentEntryPersistence.findByG_FCI_T_S(
+			groupId, fragmentCollectionId, type, status, start, end,
+			orderByComparator);
+	}
+
+	@Override
 	public int getFragmentEntriesCount(
 		long groupId, long fragmentCollectionId) {
 
@@ -507,6 +518,14 @@ public class FragmentEntryServiceImpl extends FragmentEntryServiceBaseImpl {
 
 		return fragmentEntryPersistence.countByG_FCI_T(
 			groupId, fragmentCollectionId, type);
+	}
+
+	@Override
+	public int getFragmentEntriesCountByTypeAndStatus(
+		long groupId, long fragmentCollectionId, int type, int status) {
+
+		return fragmentEntryPersistence.countByG_FCI_T_S(
+			groupId, fragmentCollectionId, type, status);
 	}
 
 	@Override
