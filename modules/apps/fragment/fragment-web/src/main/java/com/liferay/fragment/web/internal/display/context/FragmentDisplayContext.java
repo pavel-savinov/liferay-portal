@@ -344,18 +344,18 @@ public class FragmentDisplayContext {
 				fragmentEntriesSearchContainer.getEnd(), orderByComparator);
 
 			fragmentEntriesCount =
-				FragmentEntryServiceUtil.getFragmentCollectionsCountByType(
+				FragmentEntryServiceUtil.getFragmentEntriesCountByType(
 					_themeDisplay.getScopeGroupId(), getFragmentCollectionId(),
 					type);
 		}
 		else if (isSearch()) {
-			fragmentEntries = FragmentEntryServiceUtil.getFragmentEntries(
+			fragmentEntries = FragmentEntryServiceUtil.getFragmentEntriesByName(
 				_themeDisplay.getScopeGroupId(), getFragmentCollectionId(),
 				_getKeywords(), fragmentEntriesSearchContainer.getStart(),
 				fragmentEntriesSearchContainer.getEnd(), orderByComparator);
 
 			fragmentEntriesCount =
-				FragmentEntryServiceUtil.getFragmentCollectionsCount(
+				FragmentEntryServiceUtil.getFragmentEntriesCountByName(
 					_themeDisplay.getScopeGroupId(), getFragmentCollectionId(),
 					_getKeywords());
 		}
@@ -366,7 +366,7 @@ public class FragmentDisplayContext {
 				fragmentEntriesSearchContainer.getEnd(), orderByComparator);
 
 			fragmentEntriesCount =
-				FragmentEntryServiceUtil.getFragmentCollectionsCount(
+				FragmentEntryServiceUtil.getFragmentEntriesCount(
 					_themeDisplay.getScopeGroupId(), getFragmentCollectionId());
 		}
 

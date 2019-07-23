@@ -770,7 +770,7 @@ public class ContentPageEditorDisplayContext {
 
 		for (FragmentCollection fragmentCollection : fragmentCollections) {
 			List<FragmentEntry> fragmentEntries =
-				FragmentEntryServiceUtil.getFragmentEntriesByType(
+				FragmentEntryServiceUtil.getFragmentEntriesByTypeAndStatus(
 					getGroupId(), fragmentCollection.getFragmentCollectionId(),
 					type, WorkflowConstants.STATUS_APPROVED);
 
