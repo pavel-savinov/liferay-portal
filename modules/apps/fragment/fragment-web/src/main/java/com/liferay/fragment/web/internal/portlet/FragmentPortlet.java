@@ -16,22 +16,22 @@ package com.liferay.fragment.web.internal.portlet;
 
 import com.liferay.fragment.constants.FragmentActionKeys;
 import com.liferay.fragment.constants.FragmentPortletKeys;
-import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.processor.FragmentEntryProcessorRegistry;
 import com.liferay.fragment.renderer.FragmentRendererController;
 import com.liferay.fragment.service.FragmentCollectionService;
 import com.liferay.fragment.web.internal.configuration.FragmentPortletConfiguration;
+import com.liferay.fragment.web.internal.configuration.FragmentSharedScopeConfiguration;
 import com.liferay.fragment.web.internal.constants.FragmentWebKeys;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
-
-import java.util.List;
 
 import javax.portlet.Portlet;
 import javax.portlet.PortletException;
@@ -78,22 +78,36 @@ public class FragmentPortlet extends MVCPortlet {
 
 		FragmentPortletConfiguration fragmentPortletConfiguration = null;
 
+		FragmentSharedScopeConfiguration fragmentSharedScopeConfiguration =
+			null;
+
 		try {
 			fragmentPortletConfiguration =
 				_configurationProvider.getCompanyConfiguration(
 					FragmentPortletConfiguration.class,
+					themeDisplay.getCompanyId());
+
+			fragmentSharedScopeConfiguration =
+				_configurationProvider.getCompanyConfiguration(
+					FragmentSharedScopeConfiguration.class,
 					themeDisplay.getCompanyId());
 		}
 		catch (ConfigurationException ce) {
 			throw new PortletException(ce);
 		}
 
-		List<FragmentCollection> fragmentCollections =
-			_fragmentCollectionService.getFragmentCollections(
-				themeDisplay.getScopeGroupId());
+		long[] groupIds = {themeDisplay.getScopeGroupId()};
+
+		if (fragmentSharedScopeConfiguration.enabled()) {
+			groupIds = ArrayUtil.append(
+				groupIds,
+				_portal.getAncestorSiteGroupIds(
+					themeDisplay.getScopeGroupId()));
+		}
 
 		renderRequest.setAttribute(
-			FragmentWebKeys.FRAGMENT_COLLECTIONS, fragmentCollections);
+			FragmentWebKeys.FRAGMENT_COLLECTIONS,
+			_fragmentCollectionService.getFragmentCollections(groupIds));
 
 		renderRequest.setAttribute(
 			FragmentPortletConfiguration.class.getName(),
@@ -125,5 +139,8 @@ public class FragmentPortlet extends MVCPortlet {
 
 	@Reference
 	private ItemSelector _itemSelector;
+
+	@Reference
+	private Portal _portal;
 
 }
