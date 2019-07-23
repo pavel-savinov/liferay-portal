@@ -246,45 +246,69 @@ public class FragmentEntryServiceImpl extends FragmentEntryServiceBaseImpl {
 		return fragmentEntry;
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #getFragmentEntriesCount(Long, Long)}
+	 */
+	@Deprecated
 	@Override
 	public int getFragmentCollectionsCount(
 		long groupId, long fragmentCollectionId) {
 
-		return fragmentEntryPersistence.countByG_FCI(
-			groupId, fragmentCollectionId);
+		return getFragmentEntriesCount(groupId, fragmentCollectionId);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #getFragmentEntriesCount(Long, Long, Integer)}
+	 */
+	@Deprecated
 	@Override
 	public int getFragmentCollectionsCount(
 		long groupId, long fragmentCollectionId, int status) {
 
-		return fragmentEntryPersistence.countByG_FCI_S(
+		return getFragmentEntriesCountByStatus(
 			groupId, fragmentCollectionId, status);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #getFragmentEntriesCount(Long, Long, String)}
+	 */
+	@Deprecated
 	@Override
 	public int getFragmentCollectionsCount(
 		long groupId, long fragmentCollectionId, String name) {
 
-		return fragmentEntryPersistence.countByG_FCI_LikeN(
+		return getFragmentEntriesCountByName(
 			groupId, fragmentCollectionId,
 			_customSQL.keywords(name, false, WildcardMode.SURROUND)[0]);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #getFragmentEntriesCount(Long, Long, String, Integer)}
+	 */
+	@Deprecated
 	@Override
 	public int getFragmentCollectionsCount(
 		long groupId, long fragmentCollectionId, String name, int status) {
 
-		return fragmentEntryPersistence.countByG_FCI_LikeN_S(
+		return getFragmentEntriesCountByNameAndStatus(
 			groupId, fragmentCollectionId,
 			_customSQL.keywords(name, false, WildcardMode.SURROUND)[0], status);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #getFragmentEntriesCount(Long, Long, Integer)}
+	 */
+	@Deprecated
 	@Override
 	public int getFragmentCollectionsCountByType(
 		long groupId, long fragmentCollectionId, int type) {
 
-		return fragmentEntryPersistence.countByG_FCI_T(
+		return getFragmentEntriesCountByType(
 			groupId, fragmentCollectionId, type);
 	}
 
@@ -294,11 +318,16 @@ public class FragmentEntryServiceImpl extends FragmentEntryServiceBaseImpl {
 			fragmentCollectionId);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #getFragmentEntriesByStatus(Long, Long, Integer)}
+	 */
+	@Deprecated
 	@Override
 	public List<FragmentEntry> getFragmentEntries(
 		long groupId, long fragmentCollectionId, int status) {
 
-		return fragmentEntryLocalService.getFragmentEntries(
+		return getFragmentEntriesByStatus(
 			groupId, fragmentCollectionId, status);
 	}
 
@@ -310,12 +339,17 @@ public class FragmentEntryServiceImpl extends FragmentEntryServiceBaseImpl {
 			groupId, fragmentCollectionId, start, end);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #getFragmentEntriesByStatus(Long, Long, Integer, Integer, Integer, OrderByComparator)}
+	 */
+	@Deprecated
 	@Override
 	public List<FragmentEntry> getFragmentEntries(
 		long groupId, long fragmentCollectionId, int status, int start, int end,
 		OrderByComparator<FragmentEntry> orderByComparator) {
 
-		return fragmentEntryPersistence.findByG_FCI_S(
+		return getFragmentEntriesByStatus(
 			groupId, fragmentCollectionId, status, start, end,
 			orderByComparator);
 	}
@@ -329,8 +363,52 @@ public class FragmentEntryServiceImpl extends FragmentEntryServiceBaseImpl {
 			groupId, fragmentCollectionId, start, end, orderByComparator);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #getFragmentEntriesByNameAndStatus(Long, Long, String, Integer, Integer, Integer, OrderByComparator)}
+	 */
+	@Deprecated
 	@Override
 	public List<FragmentEntry> getFragmentEntries(
+		long groupId, long fragmentCollectionId, String name, int status,
+		int start, int end,
+		OrderByComparator<FragmentEntry> orderByComparator) {
+
+		return getFragmentEntriesByNameAndStatus(
+			groupId, fragmentCollectionId,
+			_customSQL.keywords(name, false, WildcardMode.SURROUND)[0], status,
+			start, end, orderByComparator);
+	}
+
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #getFragmentEntriesByName(Long, Long, String, Integer, Integer, OrderByComparator)}
+	 */
+	@Deprecated
+	@Override
+	public List<FragmentEntry> getFragmentEntries(
+		long groupId, long fragmentCollectionId, String name, int start,
+		int end, OrderByComparator<FragmentEntry> orderByComparator) {
+
+		return getFragmentEntriesByName(
+			groupId, fragmentCollectionId,
+			_customSQL.keywords(name, false, WildcardMode.SURROUND)[0], start,
+			end, orderByComparator);
+	}
+
+	@Override
+	public List<FragmentEntry> getFragmentEntriesByName(
+		long groupId, long fragmentCollectionId, String name, int start,
+		int end, OrderByComparator<FragmentEntry> orderByComparator) {
+
+		return fragmentEntryPersistence.findByG_FCI_LikeN(
+			groupId, fragmentCollectionId,
+			_customSQL.keywords(name, false, WildcardMode.SURROUND)[0], start,
+			end, orderByComparator);
+	}
+
+	@Override
+	public List<FragmentEntry> getFragmentEntriesByNameAndStatus(
 		long groupId, long fragmentCollectionId, String name, int status,
 		int start, int end,
 		OrderByComparator<FragmentEntry> orderByComparator) {
@@ -342,21 +420,33 @@ public class FragmentEntryServiceImpl extends FragmentEntryServiceBaseImpl {
 	}
 
 	@Override
-	public List<FragmentEntry> getFragmentEntries(
-		long groupId, long fragmentCollectionId, String name, int start,
-		int end, OrderByComparator<FragmentEntry> orderByComparator) {
+	public List<FragmentEntry> getFragmentEntriesByStatus(
+		long groupId, long fragmentCollectionId, int status) {
 
-		return fragmentEntryPersistence.findByG_FCI_LikeN(
-			groupId, fragmentCollectionId,
-			_customSQL.keywords(name, false, WildcardMode.SURROUND)[0], start,
-			end, orderByComparator);
+		return fragmentEntryLocalService.getFragmentEntries(
+			groupId, fragmentCollectionId, status);
 	}
 
+	@Override
+	public List<FragmentEntry> getFragmentEntriesByStatus(
+		long groupId, long fragmentCollectionId, int status, int start, int end,
+		OrderByComparator<FragmentEntry> orderByComparator) {
+
+		return fragmentEntryPersistence.findByG_FCI_S(
+			groupId, fragmentCollectionId, status, start, end,
+			orderByComparator);
+	}
+
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #getFragmentEntriesByTypeAndStatus(Long, Long, Integer, Integer)}
+	 */
+	@Deprecated
 	@Override
 	public List<FragmentEntry> getFragmentEntriesByType(
 		long groupId, long fragmentCollectionId, int type, int status) {
 
-		return fragmentEntryPersistence.findByG_FCI_T_S(
+		return getFragmentEntriesByTypeAndStatus(
 			groupId, fragmentCollectionId, type, status);
 	}
 
@@ -367,6 +457,56 @@ public class FragmentEntryServiceImpl extends FragmentEntryServiceBaseImpl {
 
 		return fragmentEntryPersistence.findByG_FCI_T(
 			groupId, fragmentCollectionId, type, start, end, orderByComparator);
+	}
+
+	@Override
+	public List<FragmentEntry> getFragmentEntriesByTypeAndStatus(
+		long groupId, long fragmentCollectionId, int type, int status) {
+
+		return fragmentEntryPersistence.findByG_FCI_T_S(
+			groupId, fragmentCollectionId, type, status);
+	}
+
+	@Override
+	public int getFragmentEntriesCount(
+		long groupId, long fragmentCollectionId) {
+
+		return fragmentEntryPersistence.countByG_FCI(
+			groupId, fragmentCollectionId);
+	}
+
+	@Override
+	public int getFragmentEntriesCountByName(
+		long groupId, long fragmentCollectionId, String name) {
+
+		return fragmentEntryPersistence.countByG_FCI_LikeN(
+			groupId, fragmentCollectionId,
+			_customSQL.keywords(name, false, WildcardMode.SURROUND)[0]);
+	}
+
+	@Override
+	public int getFragmentEntriesCountByNameAndStatus(
+		long groupId, long fragmentCollectionId, String name, int status) {
+
+		return fragmentEntryPersistence.countByG_FCI_LikeN_S(
+			groupId, fragmentCollectionId,
+			_customSQL.keywords(name, false, WildcardMode.SURROUND)[0], status);
+	}
+
+	@Override
+	public int getFragmentEntriesCountByStatus(
+		long groupId, long fragmentCollectionId, int status) {
+
+		return fragmentEntryPersistence.countByG_FCI_S(
+			groupId, fragmentCollectionId, status);
+	}
+
+	@Override
+	public int getFragmentEntriesCountByType(
+		long groupId, long fragmentCollectionId, int type) {
+
+		return fragmentEntryPersistence.countByG_FCI_T(
+			groupId, fragmentCollectionId, type);
 	}
 
 	@Override
