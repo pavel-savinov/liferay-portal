@@ -332,6 +332,12 @@ function getFragmentEntryLinkContent(
 				response.content
 			);
 
+			fragmentEntryLink = setIn(
+				fragmentEntryLink,
+				['editableValues'],
+				response.editableValues
+			);
+
 			return setIn(fragmentEntryLink, ['error'], response.error);
 		});
 }
