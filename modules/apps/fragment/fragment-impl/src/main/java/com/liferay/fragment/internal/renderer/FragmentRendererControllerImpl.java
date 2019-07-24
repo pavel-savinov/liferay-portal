@@ -215,20 +215,14 @@ public class FragmentRendererControllerImpl
 
 									String key = value;
 
-									if (validValueJSONObject.has("label") &&
-										!validValueJSONObject.isNull("label")) {
-
-										String label =
-											validValueJSONObject.getString(
-												"label");
-
-										key = label;
-									}
+									String label =
+										validValueJSONObject.getString(
+											"label", key);
 
 									validValueJSONObject.put(
 										"label",
 										LanguageUtil.get(
-											resourceBundle, key, key));
+											resourceBundle, label, key));
 								});
 						}
 					});
