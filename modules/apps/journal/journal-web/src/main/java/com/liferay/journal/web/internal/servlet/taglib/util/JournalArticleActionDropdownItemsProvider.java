@@ -405,7 +405,7 @@ public class JournalArticleActionDropdownItemsProvider {
 			_liferayPortletResponse.createActionURL();
 
 		deleteArticleTranslationsURL.setParameter(
-			ActionRequest.ACTION_NAME, "/journal/select_article_translations");
+			ActionRequest.ACTION_NAME, "/journal/delete_article_translations");
 		deleteArticleTranslationsURL.setParameter(
 			"articleId", _article.getArticleId());
 
