@@ -164,7 +164,7 @@ class ElementsDefaultEventHandler extends DefaultEventHandler {
 	) {
 		const itemSelectorDialog = new ItemSelectorDialog({
 			buttonAddLabel: dialogButtonLabel,
-			eventName: this.ns('selectArticleTranslations'),
+			eventName: this.ns('selectTranslations'),
 			title: dialogTitle,
 			url: selectArticleTranslationsURL
 		});
