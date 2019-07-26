@@ -17,7 +17,9 @@
 <%@ include file="/init.jsp" %>
 
 <%
-FragmentManagementToolbarDisplayContext fragmentManagementToolbarDisplayContext = new FragmentManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, fragmentDisplayContext);
+FragmentManagementToolbarDisplayContextFactory fragmentManagementToolbarDisplayContextFactory = new FragmentManagementToolbarDisplayContextFactory(liferayPortletRequest, liferayPortletResponse, request, fragmentDisplayContext);
+
+FragmentManagementToolbarDisplayContext fragmentManagementToolbarDisplayContext = fragmentManagementToolbarDisplayContextFactory.getFragmentManagementToolbarDisplayContext(fragmentDisplayContext.getFragmentType());
 %>
 
 <liferay-ui:error exception="<%= RequiredFragmentEntryException.class %>" message="the-fragment-entry-cannot-be-deleted-because-it-is-required-by-one-or-more-page-templates" />
@@ -37,12 +39,14 @@ FragmentManagementToolbarDisplayContext fragmentManagementToolbarDisplayContext 
 		>
 
 			<%
+			FragmentEntryVerticalCardFactory fragmentEntryVerticalCardFactory = new FragmentEntryVerticalCardFactory(fragmentEntry, renderRequest, renderResponse, searchContainer.getRowChecker());
+
 			row.setCssClass("card-page-item-asset " + row.getCssClass());
 			%>
 
 			<liferay-ui:search-container-column-text>
 				<clay:vertical-card
-					verticalCard="<%= new FragmentEntryVerticalCard(fragmentEntry, renderRequest, renderResponse, searchContainer.getRowChecker()) %>"
+					verticalCard="<%= fragmentEntryVerticalCardFactory.getVerticalCard(fragmentDisplayContext.getFragmentType()) %>"
 				/>
 			</liferay-ui:search-container-column-text>
 		</liferay-ui:search-container-row>

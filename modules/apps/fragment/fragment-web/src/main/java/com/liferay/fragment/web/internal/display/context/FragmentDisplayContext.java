@@ -24,6 +24,7 @@ import com.liferay.fragment.processor.FragmentEntryProcessorRegistry;
 import com.liferay.fragment.service.FragmentCollectionLocalServiceUtil;
 import com.liferay.fragment.service.FragmentEntryLocalServiceUtil;
 import com.liferay.fragment.service.FragmentEntryServiceUtil;
+import com.liferay.fragment.web.internal.constants.FragmentTypeConstants;
 import com.liferay.fragment.web.internal.constants.FragmentWebKeys;
 import com.liferay.fragment.web.internal.security.permission.resource.FragmentPermission;
 import com.liferay.fragment.web.internal.util.FragmentPortletUtil;
@@ -408,6 +409,18 @@ public class FragmentDisplayContext {
 		}
 
 		return fragmentEntry.getName();
+	}
+
+	public String getFragmentType() {
+		FragmentCollection fragmentCollection = getFragmentCollection();
+
+		if (fragmentCollection.getGroupId() ==
+				_themeDisplay.getScopeGroupId()) {
+
+			return FragmentTypeConstants.BASIC_FRAGMENT_TYPE;
+		}
+
+		return FragmentTypeConstants.SHARED_FRAGMENT_TYPE;
 	}
 
 	public String getHtmlContent() {
