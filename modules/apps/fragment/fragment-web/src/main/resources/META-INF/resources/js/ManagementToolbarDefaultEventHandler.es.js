@@ -40,6 +40,10 @@ class ManagementToolbarDefaultEventHandler extends DefaultEventHandler {
 		submitForm(this.one('#fragmentEntryFm'), this.copyFragmentEntryURL);
 	}
 
+	copyToSelectedFragmentEntries() {
+		this._selectFragmentCollection(this.copyFragmentEntryURL);
+	}
+
 	deleteSelectedFragmentEntries() {
 		if (
 			confirm(
@@ -55,6 +59,10 @@ class ManagementToolbarDefaultEventHandler extends DefaultEventHandler {
 	}
 
 	moveSelectedFragmentEntries() {
+		this._selectFragmentCollection(this.moveFragmentEntryURL);
+	}
+
+	_selectFragmentCollection(targetFragmentEntryURL) {
 		const fragmentEntryIds = Liferay.Util.listCheckedExcept(
 			this.one('#fm'),
 			this.ns('allRowIds')
@@ -79,7 +87,7 @@ class ManagementToolbarDefaultEventHandler extends DefaultEventHandler {
 
 					submitForm(
 						this.one('#fragmentEntryFm'),
-						this.moveFragmentEntryURL
+						targetFragmentEntryURL
 					);
 				}
 			}.bind(this)
