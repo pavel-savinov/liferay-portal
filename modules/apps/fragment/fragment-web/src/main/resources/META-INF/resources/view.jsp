@@ -79,6 +79,13 @@ List<FragmentCollection> fragmentCollections = (List<FragmentCollection>)request
 
 											<a class="nav-link truncate-text <%= (fragmentCollection.getFragmentCollectionId() == fragmentDisplayContext.getFragmentCollectionId()) ? "active" : StringPool.BLANK %>" href="<%= fragmentCollectionURL.toString() %>">
 												<%= HtmlUtil.escape(fragmentCollection.getName()) %>
+
+												<c:if test="<%= fragmentCollection.getGroupId() != scopeGroupId %>">
+													<liferay-ui:icon
+														icon="lock"
+														markupView="lexicon"
+													/>
+												</c:if>
 											</a>
 										</li>
 
@@ -133,7 +140,7 @@ List<FragmentCollection> fragmentCollections = (List<FragmentCollection>)request
 						/>
 
 						<c:choose>
-							<c:when test="<%= fragmentDisplayContext.isViewResources() %>">
+							<c:when test="<%= fragmentDisplayContext.isViewResources() && (fragmentCollection.getGroupId() == scopeGroupId) %>">
 								<liferay-util:include page="/view_resources.jsp" servletContext="<%= application %>" />
 							</c:when>
 							<c:otherwise>
