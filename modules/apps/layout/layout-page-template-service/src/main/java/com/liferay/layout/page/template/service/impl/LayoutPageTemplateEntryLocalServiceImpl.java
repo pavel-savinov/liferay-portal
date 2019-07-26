@@ -294,14 +294,10 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 				LayoutPageTemplateEntryTypeConstants.TYPE_DISPLAY_PAGE) &&
 			(layoutPageTemplateEntry.getClassTypeId() > 0)) {
 
-			DDMStructureLink ddmStructureLink =
-				_ddmStructureLinkLocalService.getUniqueStructureLink(
-					classNameLocalService.getClassNameId(
-						LayoutPageTemplateEntry.class),
-					layoutPageTemplateEntry.getLayoutPageTemplateEntryId());
-
-			_ddmStructureLinkLocalService.deleteDDMStructureLink(
-				ddmStructureLink);
+			_ddmStructureLinkLocalService.deleteStructureLinks(
+				classNameLocalService.getClassNameId(
+					LayoutPageTemplateEntry.class),
+				layoutPageTemplateEntry.getLayoutPageTemplateEntryId());
 		}
 
 		// Fragment entry instance links
