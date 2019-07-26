@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.List;
 
@@ -413,6 +414,13 @@ public class FragmentEntryServiceImpl extends FragmentEntryServiceBaseImpl {
 		int start, int end,
 		OrderByComparator<FragmentEntry> orderByComparator) {
 
+		if (status == WorkflowConstants.STATUS_ANY) {
+			return fragmentEntryPersistence.findByG_FCI_LikeN(
+				groupId, fragmentCollectionId,
+				_customSQL.keywords(name, false, WildcardMode.SURROUND)[0],
+				start, end, orderByComparator);
+		}
+
 		return fragmentEntryPersistence.findByG_FCI_LikeN_S(
 			groupId, fragmentCollectionId,
 			_customSQL.keywords(name, false, WildcardMode.SURROUND)[0], status,
@@ -423,6 +431,11 @@ public class FragmentEntryServiceImpl extends FragmentEntryServiceBaseImpl {
 	public List<FragmentEntry> getFragmentEntriesByStatus(
 		long groupId, long fragmentCollectionId, int status) {
 
+		if (status == WorkflowConstants.STATUS_ANY) {
+			return fragmentEntryPersistence.findByG_FCI(
+				groupId, fragmentCollectionId);
+		}
+
 		return fragmentEntryLocalService.getFragmentEntries(
 			groupId, fragmentCollectionId, status);
 	}
@@ -431,6 +444,11 @@ public class FragmentEntryServiceImpl extends FragmentEntryServiceBaseImpl {
 	public List<FragmentEntry> getFragmentEntriesByStatus(
 		long groupId, long fragmentCollectionId, int status, int start, int end,
 		OrderByComparator<FragmentEntry> orderByComparator) {
+
+		if (status == WorkflowConstants.STATUS_ANY) {
+			return fragmentEntryPersistence.findByG_FCI(
+				groupId, fragmentCollectionId, start, end, orderByComparator);
+		}
 
 		return fragmentEntryPersistence.findByG_FCI_S(
 			groupId, fragmentCollectionId, status, start, end,
@@ -473,6 +491,12 @@ public class FragmentEntryServiceImpl extends FragmentEntryServiceBaseImpl {
 		int start, int end,
 		OrderByComparator<FragmentEntry> orderByComparator) {
 
+		if (status == WorkflowConstants.STATUS_ANY) {
+			return fragmentEntryPersistence.findByG_FCI_T(
+				groupId, fragmentCollectionId, type, start, end,
+				orderByComparator);
+		}
+
 		return fragmentEntryPersistence.findByG_FCI_T_S(
 			groupId, fragmentCollectionId, type, status, start, end,
 			orderByComparator);
@@ -499,6 +523,12 @@ public class FragmentEntryServiceImpl extends FragmentEntryServiceBaseImpl {
 	public int getFragmentEntriesCountByNameAndStatus(
 		long groupId, long fragmentCollectionId, String name, int status) {
 
+		if (status == WorkflowConstants.STATUS_ANY) {
+			return fragmentEntryPersistence.countByG_FCI_LikeN(
+				groupId, fragmentCollectionId,
+				_customSQL.keywords(name, false, WildcardMode.SURROUND)[0]);
+		}
+
 		return fragmentEntryPersistence.countByG_FCI_LikeN_S(
 			groupId, fragmentCollectionId,
 			_customSQL.keywords(name, false, WildcardMode.SURROUND)[0], status);
@@ -507,6 +537,11 @@ public class FragmentEntryServiceImpl extends FragmentEntryServiceBaseImpl {
 	@Override
 	public int getFragmentEntriesCountByStatus(
 		long groupId, long fragmentCollectionId, int status) {
+
+		if (status == WorkflowConstants.STATUS_ANY) {
+			return fragmentEntryPersistence.countByG_FCI(
+				groupId, fragmentCollectionId);
+		}
 
 		return fragmentEntryPersistence.countByG_FCI_S(
 			groupId, fragmentCollectionId, status);
@@ -523,6 +558,11 @@ public class FragmentEntryServiceImpl extends FragmentEntryServiceBaseImpl {
 	@Override
 	public int getFragmentEntriesCountByTypeAndStatus(
 		long groupId, long fragmentCollectionId, int type, int status) {
+
+		if (status == WorkflowConstants.STATUS_ANY) {
+			return fragmentEntryPersistence.countByG_FCI_T(
+				groupId, fragmentCollectionId, type);
+		}
 
 		return fragmentEntryPersistence.countByG_FCI_T_S(
 			groupId, fragmentCollectionId, type, status);
