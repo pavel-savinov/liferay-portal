@@ -505,15 +505,22 @@ public class FragmentDisplayContext {
 							LanguageUtil.get(_httpServletRequest, "fragments"));
 					});
 
-				add(
-					navigationItem -> {
-						navigationItem.setActive(
-							Objects.equals(_getTabs1(), "resources"));
-						navigationItem.setHref(
-							_getPortletURL(), "tabs1", "resources");
-						navigationItem.setLabel(
-							LanguageUtil.get(_httpServletRequest, "resources"));
-					});
+				FragmentCollection fragmentCollection = getFragmentCollection();
+
+				if (fragmentCollection.getGroupId() ==
+						_themeDisplay.getScopeGroupId()) {
+
+					add(
+						navigationItem -> {
+							navigationItem.setActive(
+								Objects.equals(_getTabs1(), "resources"));
+							navigationItem.setHref(
+								_getPortletURL(), "tabs1", "resources");
+							navigationItem.setLabel(
+								LanguageUtil.get(
+									_httpServletRequest, "resources"));
+						});
+				}
 			}
 		};
 	}
