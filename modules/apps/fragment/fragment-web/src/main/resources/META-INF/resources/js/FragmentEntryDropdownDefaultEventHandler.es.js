@@ -23,6 +23,14 @@ class FragmentEntryDropdownDefaultEventHandler extends DefaultEventHandler {
 		submitForm(this.one('#fragmentEntryFm'), itemData.copyFragmentEntryURL);
 	}
 
+	copyToFragmentEntry(itemData) {
+		this._selectFragmentCollection(
+			itemData.fragmentEntryId,
+			itemData.selectFragmentCollectionURL,
+			itemData.copyFragmentEntryURL
+		);
+	}
+
 	deleteFragmentEntry(itemData) {
 		if (
 			confirm(
@@ -38,30 +46,10 @@ class FragmentEntryDropdownDefaultEventHandler extends DefaultEventHandler {
 	}
 
 	moveFragmentEntry(itemData) {
-		Liferay.Util.selectEntity(
-			{
-				dialog: {
-					constrain: true,
-					destroyOnHide: true,
-					modal: true
-				},
-				eventName: this.ns('selectFragmentCollection'),
-				id: this.ns('selectFragmentCollection'),
-				title: Liferay.Language.get('select-collection'),
-				uri: itemData.selectFragmentCollectionURL
-			},
-			function(selectedItem) {
-				if (selectedItem) {
-					this.one('#fragmentCollectionId').value = selectedItem.id;
-					this.one('#fragmentEntryIds').value =
-						itemData.fragmentEntryId;
-
-					submitForm(
-						this.one('#fragmentEntryFm'),
-						itemData.moveFragmentEntryURL
-					);
-				}
-			}.bind(this)
+		this._selectFragmentCollection(
+			itemData.fragmentEntryId,
+			itemData.selectFragmentCollectionURL,
+			itemData.moveFragmentEntryURL
 		);
 	}
 
@@ -107,6 +95,37 @@ class FragmentEntryDropdownDefaultEventHandler extends DefaultEventHandler {
 
 			itemSelectorDialog.open();
 		});
+	}
+
+	_selectFragmentCollection(
+		fragmentEntryId,
+		selectFragmentCollectionURL,
+		targetFragmentEntryURL
+	) {
+		Liferay.Util.selectEntity(
+			{
+				dialog: {
+					constrain: true,
+					destroyOnHide: true,
+					modal: true
+				},
+				eventName: this.ns('selectFragmentCollection'),
+				id: this.ns('selectFragmentCollection'),
+				title: Liferay.Language.get('select-collection'),
+				uri: selectFragmentCollectionURL
+			},
+			function(selectedItem) {
+				if (selectedItem) {
+					this.one('#fragmentCollectionId').value = selectedItem.id;
+					this.one('#fragmentEntryIds').value = fragmentEntryId;
+
+					submitForm(
+						this.one('#fragmentEntryFm'),
+						targetFragmentEntryURL
+					);
+				}
+			}.bind(this)
+		);
 	}
 
 	_send(url) {
