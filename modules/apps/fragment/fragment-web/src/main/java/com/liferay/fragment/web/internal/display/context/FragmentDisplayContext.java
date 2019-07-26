@@ -332,6 +332,16 @@ public class FragmentDisplayContext {
 		List<FragmentEntry> fragmentEntries = null;
 		int fragmentEntriesCount = 0;
 
+		FragmentCollection fragmentCollection = getFragmentCollection();
+
+		int status = WorkflowConstants.STATUS_ANY;
+
+		if (fragmentCollection.getGroupId() !=
+				_themeDisplay.getScopeGroupId()) {
+
+			status = WorkflowConstants.STATUS_APPROVED;
+		}
+
 		if (isNavigationComponents() || isNavigationSections()) {
 			int type = FragmentConstants.TYPE_SECTION;
 
@@ -339,36 +349,45 @@ public class FragmentDisplayContext {
 				type = FragmentConstants.TYPE_COMPONENT;
 			}
 
-			fragmentEntries = FragmentEntryServiceUtil.getFragmentEntriesByType(
-				_themeDisplay.getScopeGroupId(), getFragmentCollectionId(),
-				type, fragmentEntriesSearchContainer.getStart(),
-				fragmentEntriesSearchContainer.getEnd(), orderByComparator);
+			fragmentEntries =
+				FragmentEntryServiceUtil.getFragmentEntriesByTypeAndStatus(
+					fragmentCollection.getGroupId(),
+					fragmentCollection.getFragmentCollectionId(), type, status,
+					fragmentEntriesSearchContainer.getStart(),
+					fragmentEntriesSearchContainer.getEnd(), orderByComparator);
 
 			fragmentEntriesCount =
-				FragmentEntryServiceUtil.getFragmentEntriesCountByType(
-					_themeDisplay.getScopeGroupId(), getFragmentCollectionId(),
-					type);
+				FragmentEntryServiceUtil.getFragmentEntriesCountByTypeAndStatus(
+					fragmentCollection.getGroupId(),
+					fragmentCollection.getFragmentCollectionId(), type, status);
 		}
 		else if (isSearch()) {
-			fragmentEntries = FragmentEntryServiceUtil.getFragmentEntriesByName(
-				_themeDisplay.getScopeGroupId(), getFragmentCollectionId(),
-				_getKeywords(), fragmentEntriesSearchContainer.getStart(),
-				fragmentEntriesSearchContainer.getEnd(), orderByComparator);
+			fragmentEntries =
+				FragmentEntryServiceUtil.getFragmentEntriesByNameAndStatus(
+					fragmentCollection.getGroupId(),
+					fragmentCollection.getFragmentCollectionId(),
+					_getKeywords(), status,
+					fragmentEntriesSearchContainer.getStart(),
+					fragmentEntriesSearchContainer.getEnd(), orderByComparator);
 
 			fragmentEntriesCount =
-				FragmentEntryServiceUtil.getFragmentEntriesCountByName(
-					_themeDisplay.getScopeGroupId(), getFragmentCollectionId(),
-					_getKeywords());
+				FragmentEntryServiceUtil.getFragmentEntriesCountByNameAndStatus(
+					fragmentCollection.getGroupId(),
+					fragmentCollection.getFragmentCollectionId(),
+					_getKeywords(), status);
 		}
 		else {
-			fragmentEntries = FragmentEntryServiceUtil.getFragmentEntries(
-				_themeDisplay.getScopeGroupId(), getFragmentCollectionId(),
-				fragmentEntriesSearchContainer.getStart(),
-				fragmentEntriesSearchContainer.getEnd(), orderByComparator);
+			fragmentEntries =
+				FragmentEntryServiceUtil.getFragmentEntriesByStatus(
+					fragmentCollection.getGroupId(),
+					fragmentCollection.getFragmentCollectionId(), status,
+					fragmentEntriesSearchContainer.getStart(),
+					fragmentEntriesSearchContainer.getEnd(), orderByComparator);
 
 			fragmentEntriesCount =
-				FragmentEntryServiceUtil.getFragmentEntriesCount(
-					_themeDisplay.getScopeGroupId(), getFragmentCollectionId());
+				FragmentEntryServiceUtil.getFragmentEntriesCountByStatus(
+					fragmentCollection.getGroupId(),
+					fragmentCollection.getFragmentCollectionId(), status);
 		}
 
 		fragmentEntriesSearchContainer.setResults(fragmentEntries);
