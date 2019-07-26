@@ -14,12 +14,12 @@
 
 package com.liferay.fragment.web.internal.servlet.taglib.clay;
 
-import com.liferay.fragment.web.internal.constants.FragmentTypeConstants;
-import com.liferay.frontend.taglib.clay.servlet.taglib.soy.VerticalCard;
+import com.liferay.fragment.web.internal.servlet.taglib.util.SharedFragmentEntryActionDropdownItemsProvider;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.model.BaseModel;
 
-import java.util.Objects;
+import java.util.List;
 
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -27,35 +27,36 @@ import javax.portlet.RenderResponse;
 /**
  * @author Jürgen Kappler
  */
-public class FragmentEntryVerticalCardFactory {
+public class SharedFragmentEntryVerticalCard extends FragmentEntryVerticalCard {
 
-	public FragmentEntryVerticalCardFactory(
+	public SharedFragmentEntryVerticalCard(
 		BaseModel<?> baseModel, RenderRequest renderRequest,
 		RenderResponse renderResponse, RowChecker rowChecker) {
 
-		_baseModel = baseModel;
+		super(baseModel, renderRequest, rowChecker);
+
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
-		_rowChecker = rowChecker;
 	}
 
-	public VerticalCard getVerticalCard(String type) {
-		if (Objects.equals(type, FragmentTypeConstants.BASIC_FRAGMENT_TYPE)) {
-			return new BasicFragmentEntryVerticalCard(
-				_baseModel, _renderRequest, _renderResponse, _rowChecker);
-		}
+	@Override
+	public List<DropdownItem> getActionDropdownItems() {
+		SharedFragmentEntryActionDropdownItemsProvider
+			sharedFragmentEntryActionDropdownItemsProvider =
+				new SharedFragmentEntryActionDropdownItemsProvider(
+					fragmentEntry, _renderRequest, _renderResponse);
 
-		if (Objects.equals(type, FragmentTypeConstants.SHARED_FRAGMENT_TYPE)) {
-			return new SharedFragmentEntryVerticalCard(
-				_baseModel, _renderRequest, _renderResponse, _rowChecker);
+		try {
+			return sharedFragmentEntryActionDropdownItemsProvider.
+				getActionDropdownItems();
+		}
+		catch (Exception e) {
 		}
 
 		return null;
 	}
 
-	private final BaseModel _baseModel;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
-	private final RowChecker _rowChecker;
 
 }
