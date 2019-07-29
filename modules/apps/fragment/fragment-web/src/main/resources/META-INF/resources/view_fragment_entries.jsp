@@ -39,14 +39,14 @@ FragmentManagementToolbarDisplayContext fragmentManagementToolbarDisplayContext 
 		>
 
 			<%
-			FragmentEntryVerticalCardFactory fragmentEntryVerticalCardFactory = new FragmentEntryVerticalCardFactory(fragmentEntry, renderRequest, renderResponse, searchContainer.getRowChecker());
+			FragmentEntryVerticalCardFactory fragmentEntryVerticalCardFactory = FragmentEntryVerticalCardFactory.getInstance();
 
 			row.setCssClass("card-page-item-asset " + row.getCssClass());
 			%>
 
 			<liferay-ui:search-container-column-text>
 				<clay:vertical-card
-					verticalCard="<%= fragmentEntryVerticalCardFactory.getVerticalCard(fragmentDisplayContext.getFragmentType()) %>"
+					verticalCard="<%= fragmentEntryVerticalCardFactory.getVerticalCard(fragmentEntry, renderRequest, renderResponse, searchContainer.getRowChecker(), fragmentDisplayContext.getFragmentType()) %>"
 				/>
 			</liferay-ui:search-container-column-text>
 		</liferay-ui:search-container-row>

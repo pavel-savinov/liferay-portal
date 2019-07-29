@@ -14,10 +14,10 @@
 
 package com.liferay.fragment.web.internal.servlet.taglib.clay;
 
+import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.web.internal.constants.FragmentTypeConstants;
 import com.liferay.frontend.taglib.clay.servlet.taglib.soy.VerticalCard;
 import com.liferay.portal.kernel.dao.search.RowChecker;
-import com.liferay.portal.kernel.model.BaseModel;
 
 import java.util.Objects;
 
@@ -29,33 +29,31 @@ import javax.portlet.RenderResponse;
  */
 public class FragmentEntryVerticalCardFactory {
 
-	public FragmentEntryVerticalCardFactory(
-		BaseModel<?> baseModel, RenderRequest renderRequest,
-		RenderResponse renderResponse, RowChecker rowChecker) {
-
-		_baseModel = baseModel;
-		_renderRequest = renderRequest;
-		_renderResponse = renderResponse;
-		_rowChecker = rowChecker;
+	public static FragmentEntryVerticalCardFactory getInstance() {
+		return _instance;
 	}
 
-	public VerticalCard getVerticalCard(String type) {
+	public VerticalCard getVerticalCard(
+		FragmentEntry fragmentEntry, RenderRequest renderRequest,
+		RenderResponse renderResponse, RowChecker rowChecker, String type) {
+
 		if (Objects.equals(type, FragmentTypeConstants.BASIC_FRAGMENT_TYPE)) {
 			return new BasicFragmentEntryVerticalCard(
-				_baseModel, _renderRequest, _renderResponse, _rowChecker);
+				fragmentEntry, renderRequest, renderResponse, rowChecker);
 		}
 
 		if (Objects.equals(type, FragmentTypeConstants.SHARED_FRAGMENT_TYPE)) {
 			return new SharedFragmentEntryVerticalCard(
-				_baseModel, _renderRequest, _renderResponse, _rowChecker);
+				fragmentEntry, renderRequest, renderResponse, rowChecker);
 		}
 
 		return null;
 	}
 
-	private final BaseModel _baseModel;
-	private final RenderRequest _renderRequest;
-	private final RenderResponse _renderResponse;
-	private final RowChecker _rowChecker;
+	private FragmentEntryVerticalCardFactory() {
+	}
+
+	private static final FragmentEntryVerticalCardFactory _instance =
+		new FragmentEntryVerticalCardFactory();
 
 }
