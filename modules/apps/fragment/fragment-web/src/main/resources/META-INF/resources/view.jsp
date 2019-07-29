@@ -125,7 +125,7 @@ List<FragmentCollection> fragmentCollections = (List<FragmentCollection>)request
 					<h2 class="sheet-title">
 						<div class="autofit-row autofit-row-center">
 							<div class="autofit-col">
-								<%= HtmlUtil.escape(fragmentCollection.getName()) %>
+								<%= fragmentDisplayContext.getFragmentCollectionName() %>
 							</div>
 
 							<div class="autofit-col autofit-col-end inline-item-after">

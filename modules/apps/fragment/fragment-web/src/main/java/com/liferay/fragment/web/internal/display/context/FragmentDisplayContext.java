@@ -33,16 +33,22 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemList;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -225,6 +231,29 @@ public class FragmentDisplayContext {
 			defaultFragmentCollectionId);
 
 		return _fragmentCollectionId;
+	}
+
+	public String getFragmentCollectionName() throws PortalException {
+		FragmentCollection fragmentCollection = getFragmentCollection();
+
+		if (fragmentCollection == null) {
+			return StringPool.BLANK;
+		}
+
+		String fragmentCollectionName = fragmentCollection.getName();
+
+		if (fragmentCollection.getGroupId() !=
+				_themeDisplay.getScopeGroupId()) {
+
+			Group group = GroupLocalServiceUtil.getGroup(
+				fragmentCollection.getGroupId());
+
+			fragmentCollectionName = StringUtil.appendParentheticalSuffix(
+				fragmentCollectionName,
+				group.getDescriptiveName(_themeDisplay.getLocale()));
+		}
+
+		return HtmlUtil.escape(fragmentCollectionName);
 	}
 
 	public SoyContext getFragmentEditorDisplayContext() throws Exception {
