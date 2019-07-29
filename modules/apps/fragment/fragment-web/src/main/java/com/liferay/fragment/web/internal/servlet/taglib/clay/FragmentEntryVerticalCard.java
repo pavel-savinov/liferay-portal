@@ -20,7 +20,6 @@ import com.liferay.fragment.web.internal.constants.FragmentWebKeys;
 import com.liferay.frontend.taglib.clay.servlet.taglib.soy.BaseBaseClayCard;
 import com.liferay.frontend.taglib.clay.servlet.taglib.soy.VerticalCard;
 import com.liferay.portal.kernel.dao.search.RowChecker;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -33,12 +32,12 @@ public abstract class FragmentEntryVerticalCard
 	extends BaseBaseClayCard implements VerticalCard {
 
 	public FragmentEntryVerticalCard(
-		BaseModel<?> baseModel, RenderRequest renderRequest,
+		FragmentEntry fragmentEntry, RenderRequest renderRequest,
 		RowChecker rowChecker) {
 
-		super(baseModel, rowChecker);
+		super(fragmentEntry, rowChecker);
 
-		fragmentEntry = (FragmentEntry)baseModel;
+		this.fragmentEntry = fragmentEntry;
 		themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}

@@ -15,6 +15,7 @@
 package com.liferay.fragment.web.internal.servlet.taglib.clay;
 
 import com.liferay.fragment.constants.FragmentActionKeys;
+import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.web.internal.constants.FragmentWebKeys;
 import com.liferay.fragment.web.internal.security.permission.resource.FragmentPermission;
 import com.liferay.fragment.web.internal.servlet.taglib.util.BasicFragmentEntryActionDropdownItemsProvider;
@@ -23,7 +24,6 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemList;
 import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.util.PortalUtil;
 
 import java.util.Date;
@@ -41,10 +41,10 @@ import javax.servlet.http.HttpServletRequest;
 public class BasicFragmentEntryVerticalCard extends FragmentEntryVerticalCard {
 
 	public BasicFragmentEntryVerticalCard(
-		BaseModel<?> baseModel, RenderRequest renderRequest,
+		FragmentEntry fragmentEntry, RenderRequest renderRequest,
 		RenderResponse renderResponse, RowChecker rowChecker) {
 
-		super(baseModel, renderRequest, rowChecker);
+		super(fragmentEntry, renderRequest, rowChecker);
 
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;

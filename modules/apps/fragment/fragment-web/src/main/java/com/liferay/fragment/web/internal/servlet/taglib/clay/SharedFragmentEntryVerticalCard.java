@@ -14,10 +14,10 @@
 
 package com.liferay.fragment.web.internal.servlet.taglib.clay;
 
+import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.web.internal.servlet.taglib.util.SharedFragmentEntryActionDropdownItemsProvider;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.portal.kernel.dao.search.RowChecker;
-import com.liferay.portal.kernel.model.BaseModel;
 
 import java.util.List;
 
@@ -30,10 +30,10 @@ import javax.portlet.RenderResponse;
 public class SharedFragmentEntryVerticalCard extends FragmentEntryVerticalCard {
 
 	public SharedFragmentEntryVerticalCard(
-		BaseModel<?> baseModel, RenderRequest renderRequest,
+		FragmentEntry fragmentEntry, RenderRequest renderRequest,
 		RenderResponse renderResponse, RowChecker rowChecker) {
 
-		super(baseModel, renderRequest, rowChecker);
+		super(fragmentEntry, renderRequest, rowChecker);
 
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
