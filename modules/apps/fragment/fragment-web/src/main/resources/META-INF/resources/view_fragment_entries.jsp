@@ -17,9 +17,9 @@
 <%@ include file="/init.jsp" %>
 
 <%
-FragmentManagementToolbarDisplayContextFactory fragmentManagementToolbarDisplayContextFactory = new FragmentManagementToolbarDisplayContextFactory(liferayPortletRequest, liferayPortletResponse, request, fragmentDisplayContext);
+FragmentManagementToolbarDisplayContextFactory fragmentManagementToolbarDisplayContextFactory = FragmentManagementToolbarDisplayContextFactory.getInstance();
 
-FragmentManagementToolbarDisplayContext fragmentManagementToolbarDisplayContext = fragmentManagementToolbarDisplayContextFactory.getFragmentManagementToolbarDisplayContext(fragmentDisplayContext.getFragmentType());
+FragmentManagementToolbarDisplayContext fragmentManagementToolbarDisplayContext = fragmentManagementToolbarDisplayContextFactory.getFragmentManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, fragmentDisplayContext);
 %>
 
 <liferay-ui:error exception="<%= RequiredFragmentEntryException.class %>" message="the-fragment-entry-cannot-be-deleted-because-it-is-required-by-one-or-more-page-templates" />

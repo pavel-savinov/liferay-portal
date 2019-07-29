@@ -27,39 +27,38 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class FragmentManagementToolbarDisplayContextFactory {
 
-	public FragmentManagementToolbarDisplayContextFactory(
-		LiferayPortletRequest liferayPortletRequest,
-		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest httpServletRequest,
-		FragmentDisplayContext fragmentDisplayContext) {
-
-		_liferayPortletRequest = liferayPortletRequest;
-		_liferayPortletResponse = liferayPortletResponse;
-		_httpServletRequest = httpServletRequest;
-		_fragmentDisplayContext = fragmentDisplayContext;
+	public static FragmentManagementToolbarDisplayContextFactory getInstance() {
+		return _instance;
 	}
 
 	public FragmentManagementToolbarDisplayContext
-		getFragmentManagementToolbarDisplayContext(String type) {
+		getFragmentManagementToolbarDisplayContext(
+			LiferayPortletRequest liferayPortletRequest,
+			LiferayPortletResponse liferayPortletResponse,
+			HttpServletRequest httpServletRequest,
+			FragmentDisplayContext fragmentDisplayContext) {
+
+		String type = fragmentDisplayContext.getFragmentType();
 
 		if (Objects.equals(type, FragmentTypeConstants.BASIC_FRAGMENT_TYPE)) {
 			return new BasicFragmentManagementToolbarDisplayContext(
-				_liferayPortletRequest, _liferayPortletResponse,
-				_httpServletRequest, _fragmentDisplayContext);
+				liferayPortletRequest, liferayPortletResponse,
+				httpServletRequest, fragmentDisplayContext);
 		}
 
 		if (Objects.equals(type, FragmentTypeConstants.SHARED_FRAGMENT_TYPE)) {
 			return new SharedFragmentManagementToolbarDisplayContext(
-				_liferayPortletRequest, _liferayPortletResponse,
-				_httpServletRequest, _fragmentDisplayContext);
+				liferayPortletRequest, liferayPortletResponse,
+				httpServletRequest, fragmentDisplayContext);
 		}
 
 		return null;
 	}
 
-	private final FragmentDisplayContext _fragmentDisplayContext;
-	private final HttpServletRequest _httpServletRequest;
-	private final LiferayPortletRequest _liferayPortletRequest;
-	private final LiferayPortletResponse _liferayPortletResponse;
+	private FragmentManagementToolbarDisplayContextFactory() {
+	}
+
+	private static final FragmentManagementToolbarDisplayContextFactory
+		_instance = new FragmentManagementToolbarDisplayContextFactory();
 
 }
