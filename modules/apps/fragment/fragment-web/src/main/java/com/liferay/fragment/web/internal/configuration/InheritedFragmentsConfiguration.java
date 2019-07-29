@@ -26,10 +26,10 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 	scope = ExtendedObjectClassDefinition.Scope.COMPANY
 )
 @Meta.OCD(
-	id = "com.liferay.fragment.web.internal.configuration.FragmentSharedScopeConfiguration",
+	id = "com.liferay.fragment.web.internal.configuration.InheritedFragmentsConfiguration",
 	name = "fragment-thumbnail-configuration-name"
 )
-public interface FragmentSharedScopeConfiguration {
+public interface InheritedFragmentsConfiguration {
 
 	/**
 	 * Enables child sites to use fragments from ancestor sites

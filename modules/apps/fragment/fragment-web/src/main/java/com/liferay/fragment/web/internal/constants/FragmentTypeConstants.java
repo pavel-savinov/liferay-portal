@@ -21,6 +21,7 @@ public class FragmentTypeConstants {
 
 	public static final String BASIC_FRAGMENT_TYPE = "BASIC_FRAGMENT_TYPE";
 
-	public static final String SHARED_FRAGMENT_TYPE = "SHARED_FRAGMENT_TYPE";
+	public static final String INHERITED_FRAGMENT_TYPE =
+		"INHERITED_FRAGMENT_TYPE";
 
 }

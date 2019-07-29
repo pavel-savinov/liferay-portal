@@ -46,8 +46,10 @@ public class FragmentManagementToolbarDisplayContextFactory {
 				httpServletRequest, fragmentDisplayContext);
 		}
 
-		if (Objects.equals(type, FragmentTypeConstants.SHARED_FRAGMENT_TYPE)) {
-			return new SharedFragmentManagementToolbarDisplayContext(
+		if (Objects.equals(
+				type, FragmentTypeConstants.INHERITED_FRAGMENT_TYPE)) {
+
+			return new InheritedFragmentManagementToolbarDisplayContext(
 				liferayPortletRequest, liferayPortletResponse,
 				httpServletRequest, fragmentDisplayContext);
 		}

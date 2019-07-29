@@ -39,9 +39,9 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author Jürgen Kappler
  */
-public class SharedFragmentEntryActionDropdownItemsProvider {
+public class InheritedFragmentEntryActionDropdownItemsProvider {
 
-	public SharedFragmentEntryActionDropdownItemsProvider(
+	public InheritedFragmentEntryActionDropdownItemsProvider(
 		FragmentEntry fragmentEntry, RenderRequest renderRequest,
 		RenderResponse renderResponse) {
 

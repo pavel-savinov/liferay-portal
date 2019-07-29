@@ -15,7 +15,7 @@
 package com.liferay.fragment.web.internal.servlet.taglib.clay;
 
 import com.liferay.fragment.model.FragmentEntry;
-import com.liferay.fragment.web.internal.servlet.taglib.util.SharedFragmentEntryActionDropdownItemsProvider;
+import com.liferay.fragment.web.internal.servlet.taglib.util.InheritedFragmentEntryActionDropdownItemsProvider;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.portal.kernel.dao.search.RowChecker;
 
@@ -27,9 +27,10 @@ import javax.portlet.RenderResponse;
 /**
  * @author Jürgen Kappler
  */
-public class SharedFragmentEntryVerticalCard extends FragmentEntryVerticalCard {
+public class InheritedFragmentEntryVerticalCard
+	extends FragmentEntryVerticalCard {
 
-	public SharedFragmentEntryVerticalCard(
+	public InheritedFragmentEntryVerticalCard(
 		FragmentEntry fragmentEntry, RenderRequest renderRequest,
 		RenderResponse renderResponse, RowChecker rowChecker) {
 
@@ -41,13 +42,13 @@ public class SharedFragmentEntryVerticalCard extends FragmentEntryVerticalCard {
 
 	@Override
 	public List<DropdownItem> getActionDropdownItems() {
-		SharedFragmentEntryActionDropdownItemsProvider
-			sharedFragmentEntryActionDropdownItemsProvider =
-				new SharedFragmentEntryActionDropdownItemsProvider(
+		InheritedFragmentEntryActionDropdownItemsProvider
+			inheritedFragmentEntryActionDropdownItemsProvider =
+				new InheritedFragmentEntryActionDropdownItemsProvider(
 					fragmentEntry, _renderRequest, _renderResponse);
 
 		try {
-			return sharedFragmentEntryActionDropdownItemsProvider.
+			return inheritedFragmentEntryActionDropdownItemsProvider.
 				getActionDropdownItems();
 		}
 		catch (Exception e) {

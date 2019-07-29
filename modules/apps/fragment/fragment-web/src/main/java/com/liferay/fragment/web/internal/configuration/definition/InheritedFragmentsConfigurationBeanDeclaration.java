@@ -14,7 +14,7 @@
 
 package com.liferay.fragment.web.internal.configuration.definition;
 
-import com.liferay.fragment.web.internal.configuration.FragmentSharedScopeConfiguration;
+import com.liferay.fragment.web.internal.configuration.InheritedFragmentsConfiguration;
 import com.liferay.portal.kernel.settings.definition.ConfigurationBeanDeclaration;
 
 import org.osgi.service.component.annotations.Component;
@@ -23,12 +23,12 @@ import org.osgi.service.component.annotations.Component;
  * @author Jürgen Kappler
  */
 @Component(service = ConfigurationBeanDeclaration.class)
-public class FragmentSharedScopeConfigurationBeanDeclaration
+public class InheritedFragmentsConfigurationBeanDeclaration
 	implements ConfigurationBeanDeclaration {
 
 	@Override
 	public Class<?> getConfigurationBeanClass() {
-		return FragmentSharedScopeConfiguration.class;
+		return InheritedFragmentsConfiguration.class;
 	}
 
 }

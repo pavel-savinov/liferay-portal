@@ -39,10 +39,10 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author Jürgen Kappler
  */
-public class SharedFragmentManagementToolbarDisplayContext
+public class InheritedFragmentManagementToolbarDisplayContext
 	extends FragmentManagementToolbarDisplayContext {
 
-	public SharedFragmentManagementToolbarDisplayContext(
+	public InheritedFragmentManagementToolbarDisplayContext(
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
 		HttpServletRequest httpServletRequest,

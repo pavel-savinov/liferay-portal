@@ -20,7 +20,7 @@ import com.liferay.fragment.processor.FragmentEntryProcessorRegistry;
 import com.liferay.fragment.renderer.FragmentRendererController;
 import com.liferay.fragment.service.FragmentCollectionService;
 import com.liferay.fragment.web.internal.configuration.FragmentPortletConfiguration;
-import com.liferay.fragment.web.internal.configuration.FragmentSharedScopeConfiguration;
+import com.liferay.fragment.web.internal.configuration.InheritedFragmentsConfiguration;
 import com.liferay.fragment.web.internal.constants.FragmentWebKeys;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
@@ -78,8 +78,7 @@ public class FragmentPortlet extends MVCPortlet {
 
 		FragmentPortletConfiguration fragmentPortletConfiguration = null;
 
-		FragmentSharedScopeConfiguration fragmentSharedScopeConfiguration =
-			null;
+		InheritedFragmentsConfiguration inheritedFragmentsConfiguration = null;
 
 		try {
 			fragmentPortletConfiguration =
@@ -87,9 +86,9 @@ public class FragmentPortlet extends MVCPortlet {
 					FragmentPortletConfiguration.class,
 					themeDisplay.getCompanyId());
 
-			fragmentSharedScopeConfiguration =
+			inheritedFragmentsConfiguration =
 				_configurationProvider.getCompanyConfiguration(
-					FragmentSharedScopeConfiguration.class,
+					InheritedFragmentsConfiguration.class,
 					themeDisplay.getCompanyId());
 		}
 		catch (ConfigurationException ce) {
@@ -98,7 +97,7 @@ public class FragmentPortlet extends MVCPortlet {
 
 		long[] groupIds = {themeDisplay.getScopeGroupId()};
 
-		if (fragmentSharedScopeConfiguration.enabled()) {
+		if (inheritedFragmentsConfiguration.enabled()) {
 			groupIds = ArrayUtil.append(
 				groupIds,
 				_portal.getAncestorSiteGroupIds(

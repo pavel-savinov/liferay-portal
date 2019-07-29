@@ -42,8 +42,10 @@ public class FragmentEntryVerticalCardFactory {
 				fragmentEntry, renderRequest, renderResponse, rowChecker);
 		}
 
-		if (Objects.equals(type, FragmentTypeConstants.SHARED_FRAGMENT_TYPE)) {
-			return new SharedFragmentEntryVerticalCard(
+		if (Objects.equals(
+				type, FragmentTypeConstants.INHERITED_FRAGMENT_TYPE)) {
+
+			return new InheritedFragmentEntryVerticalCard(
 				fragmentEntry, renderRequest, renderResponse, rowChecker);
 		}
 

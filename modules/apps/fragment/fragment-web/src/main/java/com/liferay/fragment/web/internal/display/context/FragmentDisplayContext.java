@@ -468,7 +468,7 @@ public class FragmentDisplayContext {
 			return FragmentTypeConstants.BASIC_FRAGMENT_TYPE;
 		}
 
-		return FragmentTypeConstants.SHARED_FRAGMENT_TYPE;
+		return FragmentTypeConstants.INHERITED_FRAGMENT_TYPE;
 	}
 
 	public String getHtmlContent() {
