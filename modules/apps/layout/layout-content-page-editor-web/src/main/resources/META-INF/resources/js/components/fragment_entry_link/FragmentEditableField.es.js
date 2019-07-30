@@ -200,6 +200,16 @@ class FragmentEditableField extends PortletBase {
 
 		nextState = setIn(nextState, ['_highlighted'], highlighted);
 		nextState = setIn(nextState, ['_mapped'], mapped);
+		nextState = setIn(
+			nextState,
+			['_selected'],
+			state.selectedItems.filter(
+				selectedItem =>
+					selectedItem.itemId === itemId &&
+					selectedItem.itemType ===
+						FRAGMENTS_EDITOR_ITEM_TYPES.editable
+			).length === 1
+		);
 		nextState = setIn(nextState, ['_translated'], translated);
 		nextState = setIn(nextState, ['content'], content);
 		nextState = setIn(nextState, ['itemId'], itemId);
@@ -700,7 +710,8 @@ const ConnectedFragmentEditableField = getConnectedComponent(
 		'mappingFieldsURL',
 		'portletNamespace',
 		'segmentsExperienceId',
-		'selectedMappingTypes'
+		'selectedMappingTypes',
+		'selectedItems'
 	]
 );
 
