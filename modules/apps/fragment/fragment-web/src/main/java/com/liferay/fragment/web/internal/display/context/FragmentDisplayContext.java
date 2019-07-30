@@ -604,6 +604,26 @@ public class FragmentDisplayContext {
 		return redirect;
 	}
 
+	public boolean hasUpdatePermission(FragmentCollection fragmentCollection) {
+		if (_updatePermission != null) {
+			return _updatePermission;
+		}
+
+		_updatePermission = false;
+
+		if (FragmentPermission.contains(
+				_themeDisplay.getPermissionChecker(),
+				_themeDisplay.getScopeGroupId(),
+				FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES) &&
+			(fragmentCollection.getGroupId() ==
+				_themeDisplay.getScopeGroupId())) {
+
+			_updatePermission = true;
+		}
+
+		return _updatePermission;
+	}
+
 	public boolean isNavigationComponents() {
 		if (Objects.equals(getNavigation(), "components")) {
 			return true;
@@ -628,8 +648,11 @@ public class FragmentDisplayContext {
 		return false;
 	}
 
-	public boolean isViewResources() {
-		if (Objects.equals(_getTabs1(), "resources")) {
+	public boolean isViewResources(FragmentCollection fragmentCollection) {
+		if (Objects.equals(_getTabs1(), "resources") &&
+			(fragmentCollection.getGroupId() ==
+				_themeDisplay.getScopeGroupId())) {
+
 			return true;
 		}
 
@@ -734,5 +757,6 @@ public class FragmentDisplayContext {
 	private final RenderResponse _renderResponse;
 	private String _tabs1;
 	private final ThemeDisplay _themeDisplay;
+	private Boolean _updatePermission;
 
 }

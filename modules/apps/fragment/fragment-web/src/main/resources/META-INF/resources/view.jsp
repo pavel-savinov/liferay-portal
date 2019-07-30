@@ -140,7 +140,7 @@ List<FragmentCollection> fragmentCollections = (List<FragmentCollection>)request
 						/>
 
 						<c:choose>
-							<c:when test="<%= fragmentDisplayContext.isViewResources() && (fragmentCollection.getGroupId() == scopeGroupId) %>">
+							<c:when test="<%= fragmentDisplayContext.isViewResources(fragmentCollection) %>">
 								<liferay-util:include page="/view_resources.jsp" servletContext="<%= application %>" />
 							</c:when>
 							<c:otherwise>
