@@ -13,9 +13,11 @@
  */
 
 import {
+	HIDE_CREATE_CONTENT_DIALOG,
 	HIDE_MAPPING_DIALOG,
 	HIDE_MAPPING_TYPE_DIALOG,
 	OPEN_ASSET_TYPE_DIALOG,
+	OPEN_CREATE_CONTENT_DIALOG,
 	OPEN_MAPPING_FIELDS_DIALOG,
 	SELECT_MAPPEABLE_TYPE
 } from '../actions/actions.es';
@@ -33,6 +35,23 @@ function openAssetTypeDialogReducer(state, action) {
 
 	if (action.type === OPEN_ASSET_TYPE_DIALOG) {
 		nextState = setIn(nextState, ['selectMappingTypeDialogVisible'], true);
+	}
+
+	return nextState;
+}
+
+/**
+ * @param {object} state
+ * @param {object} action
+ * @param {string} action.type
+ * @return {object}
+ * @review
+ */
+function openCreateContentDialogReducer(state, action) {
+	let nextState = state;
+
+	if (action.type === OPEN_CREATE_CONTENT_DIALOG) {
+		nextState = setIn(nextState, ['createContentDialogVisible'], true);
 	}
 
 	return nextState;
@@ -152,6 +171,23 @@ function selectMappeableTypeReducer(state, action) {
  * @return {object}
  * @review
  */
+function hideCreateContentDialogReducer(state, action) {
+	let nextState = state;
+
+	if (action.type === HIDE_CREATE_CONTENT_DIALOG) {
+		nextState = setIn(nextState, ['createContentDialogVisible'], false);
+	}
+
+	return nextState;
+}
+
+/**
+ * @param {object} state
+ * @param {object} action
+ * @param {string} action.type
+ * @return {object}
+ * @review
+ */
 function hideMappingDialogReducer(state, action) {
 	let nextState = state;
 
@@ -209,9 +245,11 @@ function _selectMappingType(
 }
 
 export {
+	hideCreateContentDialogReducer,
 	hideMappingDialogReducer,
 	hideMappingTypeDialogReducer,
 	openAssetTypeDialogReducer,
+	openCreateContentDialogReducer,
 	openMappingFieldsDialogReducer,
 	selectMappeableTypeReducer
 };

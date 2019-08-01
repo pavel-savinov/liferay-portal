@@ -44,9 +44,11 @@ import {
 } from './segmentsExperiences.es';
 import {updateSelectedSidebarPanelId} from './sidebar.es';
 import {
+	hideCreateContentDialogReducer,
 	hideMappingDialogReducer,
 	hideMappingTypeDialogReducer,
 	openAssetTypeDialogReducer,
+	openCreateContentDialogReducer,
 	openMappingFieldsDialogReducer,
 	selectMappeableTypeReducer
 } from './dialogs.es';
@@ -71,12 +73,14 @@ const reducers = [
 	deleteFragmentEntryLinkCommentReducer,
 	disableFragmentEditorReducer,
 	enableFragmentEditorReducer,
+	hideCreateContentDialogReducer,
 	hideMappingDialogReducer,
 	hideMappingTypeDialogReducer,
 	languageIdReducer,
 	moveFragmentEntryLinkReducer,
 	moveRowReducer,
 	openAssetTypeDialogReducer,
+	openCreateContentDialogReducer,
 	openMappingFieldsDialogReducer,
 	removeFragmentEntryLinkReducer,
 	removeRowReducer,
