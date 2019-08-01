@@ -26,6 +26,7 @@ import './components/toolbar/FragmentsEditorToolbar.es';
 import {
 	CLEAR_ACTIVE_ITEM,
 	CLEAR_HOVERED_ITEM,
+	OPEN_CREATE_CONTENT_DIALOG,
 	UPDATE_ACTIVE_ITEM,
 	UPDATE_HOVERED_ITEM
 } from './actions/actions.es';
@@ -152,6 +153,12 @@ class FragmentsEditor extends Component {
 				type: CLEAR_HOVERED_ITEM
 			});
 		}
+	}
+
+	_opencreatecontent() {
+		this.store.dispatch({
+			type: OPEN_CREATE_CONTENT_DIALOG
+		});
 	}
 
 	/**

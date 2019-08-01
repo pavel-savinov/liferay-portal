@@ -4,6 +4,7 @@
  * FragmentsEditor
  */
 {template .render}
+	{@param _opencreatecontent: any}
 	{@param defaultEditorConfigurations: ?}
 	{@param defaultLanguageId: string}
 	{@param fragmentEntryLinks: ?}
@@ -74,6 +75,16 @@
 				{param store: $store /}
 			{/call}
 		{/if}
+
+		<div class="btn-group-item">
+			<button
+					class="btn btn-secondary"
+					data-onclick="{$_opencreatecontent}"
+					type="button"
+			>
+				{msg desc=""}create content{/msg}
+			</button>
+		</div>
 
 		{call com.liferay.layout.content.page.editor.web.SelectMappingTypeDialog.render}
 			{param store: $store /}
