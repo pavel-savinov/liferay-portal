@@ -242,6 +242,7 @@ function addFragmentEntryLinkReducer(state, action) {
 				nextState.addFragmentEntryLinkURL,
 				action.fragmentEntryKey,
 				action.fragmentName,
+				action.groupId,
 				nextState.classNameId,
 				nextState.classPK,
 				nextState.portletNamespace,
@@ -718,6 +719,7 @@ function _addFragmentEntryLink(
 	addFragmentEntryLinkURL,
 	fragmentEntryKey,
 	fragmentName,
+	groupId,
 	classNameId,
 	classPK,
 	portletNamespace,
@@ -728,6 +730,7 @@ function _addFragmentEntryLink(
 	formData.append(`${portletNamespace}fragmentKey`, fragmentEntryKey);
 	formData.append(`${portletNamespace}classNameId`, classNameId);
 	formData.append(`${portletNamespace}classPK`, classPK);
+	formData.append(`${portletNamespace}groupId`, groupId);
 	formData.append(
 		`${portletNamespace}segmentsExperienceId`,
 		segmentsExperienceId

@@ -318,6 +318,7 @@ const INITIAL_STATE = {
 	 *   fragmentEntries: Array<{
 	 *     fragmentEntryKey: !string,
 	 *     imagePreviewURL: string,
+	 *     groupId: string,
 	 *     name: !string
 	 *   }>,
 	 *   name: !string
@@ -330,6 +331,7 @@ const INITIAL_STATE = {
 				Config.shapeOf({
 					fragmentEntryKey: Config.string().required(),
 					imagePreviewURL: Config.string(),
+					groupId: Config.string().value(''),
 					name: Config.string().required()
 				})
 			).required(),
@@ -564,6 +566,7 @@ const INITIAL_STATE = {
 	 *   fragmentEntries: Array<{
 	 *     fragmentEntryKey: !string,
 	 *     imagePreviewURL: string,
+	 *     groupId: string,
 	 *     name: !string
 	 *   }>,
 	 *   name: !string
@@ -576,6 +579,7 @@ const INITIAL_STATE = {
 				Config.shapeOf({
 					fragmentEntryKey: Config.string().required(),
 					imagePreviewURL: Config.string(),
+					groupId: Config.string().value(''),
 					name: Config.string().required()
 				}).required()
 			).required(),
