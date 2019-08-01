@@ -448,8 +448,9 @@ public class FragmentEntryLocalServiceImpl
 
 		// Fragment entry
 
-		long fragmentEntryLinkCount = fragmentEntryLinkPersistence.countByG_F(
-			fragmentEntry.getGroupId(), fragmentEntry.getFragmentEntryId());
+		long fragmentEntryLinkCount =
+			fragmentEntryLinkPersistence.countByFragmentEntryId(
+				fragmentEntry.getFragmentEntryId());
 
 		if (fragmentEntryLinkCount > 0) {
 			throw new RequiredFragmentEntryException();
