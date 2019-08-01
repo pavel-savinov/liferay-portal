@@ -143,7 +143,7 @@ class SidebarAvailableSections extends Component {
 		event.preventDefault();
 
 		if (data.target) {
-			const {itemId, itemName} = data.source.dataset;
+			const {itemGroupId, itemId, itemName} = data.source.dataset;
 
 			requestAnimationFrame(() => {
 				this._initializeDragAndDrop();
@@ -156,6 +156,7 @@ class SidebarAvailableSections extends Component {
 					fragmentEntryLinkRowType:
 						FRAGMENTS_EDITOR_ROW_TYPES.sectionRow,
 					fragmentName: itemName,
+					groupId: itemGroupId,
 					type: ADD_FRAGMENT_ENTRY_LINK
 				})
 				.dispatch(updateLastSaveDateAction())

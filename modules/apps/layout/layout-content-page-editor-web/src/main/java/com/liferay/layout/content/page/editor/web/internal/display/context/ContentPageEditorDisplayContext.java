@@ -800,14 +800,17 @@ public class ContentPageEditorDisplayContext {
 		List<SoyContext> soyContexts =
 			_getFragmentCollectionContributorSoyContexts(type);
 
+		long[] groupIds = {getGroupId(), themeDisplay.getCompanyGroupId()};
+
 		List<FragmentCollection> fragmentCollections =
-			FragmentCollectionServiceUtil.getFragmentCollections(getGroupId());
+			FragmentCollectionServiceUtil.getFragmentCollections(groupIds);
 
 		for (FragmentCollection fragmentCollection : fragmentCollections) {
 			List<FragmentEntry> fragmentEntries =
 				FragmentEntryServiceUtil.getFragmentEntriesByTypeAndStatus(
-					getGroupId(), fragmentCollection.getFragmentCollectionId(),
-					type, WorkflowConstants.STATUS_APPROVED);
+					fragmentCollection.getGroupId(),
+					fragmentCollection.getFragmentCollectionId(), type,
+					WorkflowConstants.STATUS_APPROVED);
 
 			if (ListUtil.isEmpty(fragmentEntries)) {
 				continue;
@@ -846,6 +849,8 @@ public class ContentPageEditorDisplayContext {
 			).put(
 				"imagePreviewURL",
 				fragmentEntry.getImagePreviewURL(themeDisplay)
+			).put(
+				"groupId", fragmentEntry.getGroupId()
 			).put(
 				"name", fragmentEntry.getName()
 			);
