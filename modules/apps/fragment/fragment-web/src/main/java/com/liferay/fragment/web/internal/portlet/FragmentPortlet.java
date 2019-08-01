@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
@@ -97,11 +96,12 @@ public class FragmentPortlet extends MVCPortlet {
 
 		long[] groupIds = {themeDisplay.getScopeGroupId()};
 
-		if (inheritedFragmentsConfiguration.enabled()) {
+		if (inheritedFragmentsConfiguration.enabled() &&
+			(themeDisplay.getScopeGroupId() !=
+				themeDisplay.getCompanyGroupId())) {
+
 			groupIds = ArrayUtil.append(
-				groupIds,
-				_portal.getAncestorSiteGroupIds(
-					themeDisplay.getScopeGroupId()));
+				groupIds, themeDisplay.getCompanyGroupId());
 		}
 
 		renderRequest.setAttribute(
@@ -138,8 +138,5 @@ public class FragmentPortlet extends MVCPortlet {
 
 	@Reference
 	private ItemSelector _itemSelector;
-
-	@Reference
-	private Portal _portal;
 
 }
