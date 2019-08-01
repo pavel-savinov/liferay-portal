@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.segments.constants.SegmentsConstants;
 
@@ -76,6 +77,8 @@ public class AddFragmentEntryLinkMVCActionCommand extends BaseMVCActionCommand {
 			ActionRequest actionRequest)
 		throws PortalException {
 
+		long groupId = ParamUtil.getLong(actionRequest, "groupId");
+
 		String fragmentEntryKey = ParamUtil.getString(
 			actionRequest, "fragmentKey");
 
@@ -83,7 +86,7 @@ public class AddFragmentEntryLinkMVCActionCommand extends BaseMVCActionCommand {
 			actionRequest);
 
 		FragmentEntry fragmentEntry = _getFragmentEntry(
-			serviceContext, fragmentEntryKey);
+			serviceContext, groupId, fragmentEntryKey);
 
 		FragmentRenderer fragmentRenderer =
 			_fragmentRendererTracker.getFragmentRenderer(fragmentEntryKey);
@@ -208,11 +211,11 @@ public class AddFragmentEntryLinkMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	private FragmentEntry _getFragmentEntry(
-		ServiceContext serviceContext, String fragmentEntryKey) {
+		ServiceContext serviceContext, long groupId, String fragmentEntryKey) {
 
 		FragmentEntry fragmentEntry =
 			_fragmentEntryLocalService.fetchFragmentEntry(
-				serviceContext.getScopeGroupId(), fragmentEntryKey);
+				groupId, fragmentEntryKey);
 
 		if (fragmentEntry != null) {
 			return fragmentEntry;
@@ -248,6 +251,9 @@ public class AddFragmentEntryLinkMVCActionCommand extends BaseMVCActionCommand {
 	@Reference
 	private LayoutPageTemplateStructureLocalService
 		_layoutPageTemplateStructureLocalService;
+
+	@Reference
+	private Portal _portal;
 
 	private class AddFragmentEntryLinkCallable
 		implements Callable<FragmentEntryLink> {
