@@ -182,6 +182,7 @@ class SidebarAvailableSections extends Component {
 				fragmentEntryKey: event.itemId,
 				fragmentEntryLinkRowType: FRAGMENTS_EDITOR_ROW_TYPES.sectionRow,
 				fragmentName: event.itemName,
+				groupId: event.itemGroupId,
 				type: ADD_FRAGMENT_ENTRY_LINK
 			})
 			.dispatch(updateLastSaveDateAction())

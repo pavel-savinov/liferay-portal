@@ -180,6 +180,7 @@ class SidebarAvailableElements extends Component {
 			.dispatch({
 				fragmentEntryKey: event.itemId,
 				fragmentName: event.itemName,
+				groupId: event.itemGroupId,
 				type: ADD_FRAGMENT_ENTRY_LINK
 			})
 			.dispatch(updateLastSaveDateAction())
