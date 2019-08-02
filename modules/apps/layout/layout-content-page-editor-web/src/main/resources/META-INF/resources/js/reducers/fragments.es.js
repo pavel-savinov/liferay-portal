@@ -227,6 +227,7 @@ function deleteFragmentEntryLinkCommentReducer(state, action) {
  * @param {string} action.fragmentEntryKey
  * @param {string} action.fragmentEntryLinkType
  * @param {string} action.fragmentName
+ * @param {string} action.groupId
  * @return {object}
  * @review
  */
