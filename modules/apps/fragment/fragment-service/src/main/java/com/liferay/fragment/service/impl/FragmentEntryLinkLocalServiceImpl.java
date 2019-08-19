@@ -640,7 +640,7 @@ public class FragmentEntryLinkLocalServiceImpl
 			String fileEntryURL = StringPool.BLANK;
 
 			if (fileEntry != null) {
-				fileEntryURL = _dlURLHelper.getPreviewURL(
+				fileEntryURL = _dlURLHelper.getDownloadURL(
 					fileEntry, fileEntry.getFileVersion(), null,
 					StringPool.BLANK, false, false);
 			}
