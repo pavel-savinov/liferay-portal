@@ -55,6 +55,13 @@ public class BackgroundImageFragmentEntryProcessor
 	implements FragmentEntryProcessor {
 
 	@Override
+	public JSONObject getDefaultEditableValuesJSONObject(
+		String html, String configuration) {
+
+		return JSONFactoryUtil.createJSONObject();
+	}
+
+	@Override
 	public String processFragmentEntryLinkHTML(
 			FragmentEntryLink fragmentEntryLink, String html,
 			FragmentEntryProcessorContext fragmentEntryProcessorContext)
