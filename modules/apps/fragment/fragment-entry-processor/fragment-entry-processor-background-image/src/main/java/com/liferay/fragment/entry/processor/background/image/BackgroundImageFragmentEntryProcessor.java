@@ -58,7 +58,21 @@ public class BackgroundImageFragmentEntryProcessor
 	public JSONObject getDefaultEditableValuesJSONObject(
 		String html, String configuration) {
 
-		return JSONFactoryUtil.createJSONObject();
+		JSONObject defaultEditableValuesJSONObject =
+			JSONFactoryUtil.createJSONObject();
+
+		Document document = _getDocument(html);
+
+		for (Element element :
+				document.select("[data-lfr-background-image-id]")) {
+
+			String id = element.attr("data-lfr-background-image-id");
+
+			defaultEditableValuesJSONObject.put(
+				id, JSONFactoryUtil.createJSONObject());
+		}
+
+		return defaultEditableValuesJSONObject;
 	}
 
 	@Override
