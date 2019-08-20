@@ -73,29 +73,38 @@ class CreateContentDialog extends Component {
 		if (this._step === 1) {
 			this._step = 2;
 		} else {
-			const ddmFormValuesElement = document.createElement("input");
+			const ddmFormValuesElement = document.createElement('input');
 
-			ddmFormValuesElement.setAttribute("name", `${this.portletNamespace}ddmFormValues`);
-			ddmFormValuesElement.setAttribute("type", "hidden");
-			ddmFormValuesElement.setAttribute("value", this.refs.modal.refs.mapContentForm.getSerializedFields());
+			ddmFormValuesElement.setAttribute(
+				'name',
+				`${this.portletNamespace}ddmFormValues`
+			);
+			ddmFormValuesElement.setAttribute('type', 'hidden');
+			ddmFormValuesElement.setAttribute(
+				'value',
+				this.refs.modal.refs.mapContentForm.getSerializedFields()
+			);
 
-			const ddmStructureIdElement = document.createElement("input");
+			const ddmStructureIdElement = document.createElement('input');
 
-			ddmStructureIdElement.setAttribute("name", `${this.portletNamespace}ddmStructureId`);
-			ddmStructureIdElement.setAttribute("type", "hidden");
-			ddmStructureIdElement.setAttribute("value", this._ddmStructure.id);
+			ddmStructureIdElement.setAttribute(
+				'name',
+				`${this.portletNamespace}ddmStructureId`
+			);
+			ddmStructureIdElement.setAttribute('type', 'hidden');
+			ddmStructureIdElement.setAttribute('value', this._ddmStructure.id);
 
-			const titleElement = document.createElement("input");
+			const titleElement = document.createElement('input');
 
-			titleElement.setAttribute("name", `${this.portletNamespace}title`);
-			titleElement.setAttribute("type", "hidden");
-			titleElement.setAttribute("value", this._title);
+			titleElement.setAttribute('name', `${this.portletNamespace}title`);
+			titleElement.setAttribute('type', 'hidden');
+			titleElement.setAttribute('value', this._title);
 
 			document.hrefFm.appendChild(ddmFormValuesElement);
 			document.hrefFm.appendChild(ddmStructureIdElement);
 			document.hrefFm.appendChild(titleElement);
 
-			submitForm(document.hrefFm, this.saveStucturedContentURL);
+			submitForm(document.hrefFm, this.addStucturedContentURL);
 		}
 
 		this.onSubmitButtonClick();
@@ -219,7 +228,7 @@ CreateContentDialog.STATE = {
 
 const ConnectedCreateContentDialog = getConnectedComponent(
 	CreateContentDialog,
-	['portletNamespace', 'saveStucturedContentURL', 'savingChanges', 'spritemap']
+	['portletNamespace', 'addStucturedContentURL', 'savingChanges', 'spritemap']
 );
 
 Soy.register(ConnectedCreateContentDialog, templates);

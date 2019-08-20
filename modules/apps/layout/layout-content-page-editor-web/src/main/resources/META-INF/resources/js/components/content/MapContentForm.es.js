@@ -168,29 +168,22 @@ class MapContentForm extends PortletBase {
 
 	getSerializedFields() {
 		const ddmForm = {
-			availableLanguagesIds: [
-				this.languageId
-			],
+			availableLanguagesIds: [this.languageId],
 			defaultLanguageId: this.languageId,
-			fieldValues: this._fields.map(
-				field => {
+			fieldValues: this._fields.map(field => {
+				let itemValue = '';
 
-					let itemValue = '';
-
-					this.selectedItems.forEach(
-						selectedItem => {
-							if (selectedItem.editableId === field.editableId) {
-								itemValue = selectedItem.itemValue;
-							}
-						}
-					);
-
-					return {
-						name: field.key,
-						value: itemValue
+				this.selectedItems.forEach(selectedItem => {
+					if (selectedItem.editableId === field.editableId) {
+						itemValue = selectedItem.itemValue;
 					}
-				}
-			)
+				});
+
+				return {
+					name: field.key,
+					value: itemValue
+				};
+			})
 		};
 
 		return JSON.stringify(ddmForm);

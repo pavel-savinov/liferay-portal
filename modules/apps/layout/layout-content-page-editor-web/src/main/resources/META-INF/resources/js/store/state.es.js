@@ -90,6 +90,14 @@ const INITIAL_STATE = {
 	addPortletURL: Config.string().value(''),
 
 	/**
+	 * URL for adding structured content
+	 * @default ''
+	 * @review
+	 * @type {string}
+	 */
+	addStucturedContentURL: Config.string().value(''),
+
+	/**
 	 * List of asset browser links that can be used
 	 * for selecting an asset
 	 * @default []
@@ -587,14 +595,6 @@ const INITIAL_STATE = {
 	 * @type {string}
 	 */
 	renderFragmentEntryURL: Config.string().value(''),
-
-	/**
-	 * URL for saving structured content
-	 * @default ''
-	 * @review
-	 * @type {string}
-	 */
-	saveStucturedContentURL: Config.string().value(''),
 
 	/**
 	 * When true, it indicates that are changes pending to save.
