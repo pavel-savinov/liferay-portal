@@ -21,7 +21,8 @@ import {removeItem, setIn} from '../../../utils/FragmentsEditorUpdateUtils.es';
 import {
 	EDITABLE_FRAGMENT_ENTRY_PROCESSOR,
 	FRAGMENTS_EDITOR_ITEM_TYPES,
-	FRAGMENTS_EDITOR_ROW_TYPES
+	FRAGMENTS_EDITOR_ROW_TYPES,
+	BACKGROUND_IMAGE_FRAGMENT_ENTRY_PROCESSOR
 } from '../../../utils/constants';
 import {getConnectedComponent} from '../../../store/ConnectedComponent.es';
 import {
@@ -93,18 +94,33 @@ class SidebarPageStructurePanel extends Component {
 	 */
 	static _getFragmentEntryLinkTree(state, fragmentEntryLink) {
 		return SidebarPageStructurePanel._getTreeNode(state, {
-			children: Object.keys(
-				fragmentEntryLink.editableValues[
-					EDITABLE_FRAGMENT_ENTRY_PROCESSOR
-				] || {}
-			).map(editableValueKey =>
-				SidebarPageStructurePanel._getTreeNode(state, {
-					elementId: `${fragmentEntryLink.fragmentEntryLinkId}-${editableValueKey}`,
-					elementType: FRAGMENTS_EDITOR_ITEM_TYPES.editable,
-					key: `${FRAGMENTS_EDITOR_ITEM_TYPES.editable}-${fragmentEntryLink.fragmentEntryLinkId}-${editableValueKey}`,
-					label: editableValueKey
-				})
-			),
+			children: [
+				...Object.keys(
+					fragmentEntryLink.editableValues[
+						EDITABLE_FRAGMENT_ENTRY_PROCESSOR
+					] || {}
+				).map(editableValueKey =>
+					SidebarPageStructurePanel._getTreeNode(state, {
+						elementId: `${fragmentEntryLink.fragmentEntryLinkId}-${editableValueKey}`,
+						elementType: FRAGMENTS_EDITOR_ITEM_TYPES.editable,
+						key: `${FRAGMENTS_EDITOR_ITEM_TYPES.editable}-${fragmentEntryLink.fragmentEntryLinkId}-${editableValueKey}`,
+						label: editableValueKey
+					})
+				),
+				...Object.keys(
+					fragmentEntryLink.editableValues[
+						BACKGROUND_IMAGE_FRAGMENT_ENTRY_PROCESSOR
+					] || {}
+				).map(editableValueKey =>
+					SidebarPageStructurePanel._getTreeNode(state, {
+						elementId: `${fragmentEntryLink.fragmentEntryLinkId}-${editableValueKey}`,
+						elementType:
+							FRAGMENTS_EDITOR_ITEM_TYPES.backgroundImageEditable,
+						key: `${FRAGMENTS_EDITOR_ITEM_TYPES.backgroundImageEditable}-${fragmentEntryLink.fragmentEntryLinkId}-${editableValueKey}`,
+						label: editableValueKey
+					})
+				)
+			],
 			elementId: fragmentEntryLink.fragmentEntryLinkId,
 			elementType: FRAGMENTS_EDITOR_ITEM_TYPES.fragment,
 			key: `${FRAGMENTS_EDITOR_ITEM_TYPES.fragment}-${fragmentEntryLink.fragmentEntryLinkId}`,
