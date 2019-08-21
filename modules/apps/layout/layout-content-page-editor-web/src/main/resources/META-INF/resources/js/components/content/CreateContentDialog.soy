@@ -12,6 +12,7 @@
 	{@param? _handleFormValidated: any}
 	{@param? _handleStructureChange: any }
 	{@param? _handleSubmitButtonClick: any}
+	{@param? _handleTitleChange: any}
 	{@param? _handleVisibleChanged: any}
 	{@param? _step: number}
 	{@param? _stepLabel: string}
@@ -27,7 +28,8 @@
 				{call com.liferay.layout.content.page.editor.web.CreateContentForm.render}
 					{param events: [
 							'formValidated': $_handleFormValidated,
-							'structureChanged': $_handleStructureChange
+							'structureChanged': $_handleStructureChange,
+							'titleChanged': $_handleTitleChange,
 					] /}
 					{param spritemap: $spritemap /}
 					{param store: $store /}
@@ -35,6 +37,7 @@
 			{else}
 				{call com.liferay.layout.content.page.editor.web.MapContentForm.render}
 					{param ddmStructure: $_ddmStructure /}
+					{param ref: 'mapContentForm' /}
 					{param spritemap: $spritemap /}
 					{param store: $store /}
 				{/call}
@@ -96,6 +99,8 @@
 				</div>
 			</div>
 		{/param}
+
+		{param ref: 'modal' /}
 
 		{param spritemap: $spritemap ?: '' /}
 	{/call}

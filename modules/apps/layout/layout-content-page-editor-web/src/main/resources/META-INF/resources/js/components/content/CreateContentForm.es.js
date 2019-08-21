@@ -51,6 +51,10 @@ class CreateContentForm extends PortletBase {
 
 	_handleContentNameChange() {
 		this._validateForm();
+
+		this.emit('titleChanged', {
+			title: this.refs.contentName.value
+		});
 	}
 
 	_handleStructureChange(event) {
