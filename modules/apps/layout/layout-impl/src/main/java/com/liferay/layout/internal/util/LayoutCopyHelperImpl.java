@@ -23,6 +23,8 @@ import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.layout.util.LayoutCopyHelper;
+import com.liferay.message.boards.service.MBMessageLocalService;
+import com.liferay.portal.kernel.comment.CommentManager;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -213,6 +215,11 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 				JSONArray newFragmentEntryLinkIdsJSONArray =
 					JSONFactoryUtil.createJSONArray();
 
+				DuplicateDiscussionHelper duplicateDiscussionHelper =
+					new DuplicateDiscussionHelper(
+						_commentManager, _mbMessageLocalService, targetLayout,
+						serviceContext);
+
 				for (int k = 0; k < fragmentEntryLinkIdsJSONArray.length();
 					 k++) {
 
@@ -248,6 +255,10 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 							newFragmentEntryLink);
 
 					newFragmentEntryLinkIdsJSONArray.put(
+						newFragmentEntryLink.getFragmentEntryLinkId());
+
+					duplicateDiscussionHelper.duplicateDisscussion(
+						fragmentEntryLink.getFragmentEntryLinkId(),
 						newFragmentEntryLink.getFragmentEntryLinkId());
 				}
 
@@ -332,6 +343,9 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 	private AssetEntryUsageLocalService _assetEntryUsageLocalService;
 
 	@Reference
+	private CommentManager _commentManager;
+
+	@Reference
 	private CounterLocalService _counterLocalService;
 
 	@Reference
@@ -350,6 +364,9 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 	@Reference
 	private LayoutPageTemplateStructureLocalService
 		_layoutPageTemplateStructureLocalService;
+
+	@Reference
+	private MBMessageLocalService _mbMessageLocalService;
 
 	@Reference
 	private Portal _portal;
