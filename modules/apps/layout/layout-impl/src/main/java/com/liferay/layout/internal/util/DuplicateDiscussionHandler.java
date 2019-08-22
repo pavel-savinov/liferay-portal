@@ -85,43 +85,48 @@ public class DuplicateDiscussionHandler {
 			rootDiscussionComment.getDescendantComments();
 
 		for (DiscussionComment parentComment : parentComments) {
-			MBMessage parent = _mbMessageLocalService.getMBMessage(
+			MBMessage parentMBMessage = _mbMessageLocalService.getMBMessage(
 				parentComment.getCommentId());
 
-			MBMessage parentMessage =
+			MBMessage discussionMBMessage =
 				_mbMessageLocalService.addDiscussionMessage(
-					parent.getUserId(), parent.getUserName(),
-					parent.getGroupId(), parent.getClassName(),
-					newFragmentEntryLinkId, rootMBMessage.getThreadId(),
-					rootMBMessage.getMessageId(), String.valueOf(Math.random()),
-					parent.getBody(), _serviceContext);
+					parentMBMessage.getUserId(), parentMBMessage.getUserName(),
+					parentMBMessage.getGroupId(),
+					parentMBMessage.getClassName(), newFragmentEntryLinkId,
+					rootMBMessage.getThreadId(), rootMBMessage.getMessageId(),
+					String.valueOf(Math.random()), parentMBMessage.getBody(),
+					_serviceContext);
 
 			if (parentComment.getDescendantCommentsCount() > 0) {
 				List<DiscussionComment> childComments =
 					parentComment.getDescendantComments();
 
-				for (DiscussionComment child : childComments) {
-					MBMessage mbChildMessage =
+				for (DiscussionComment childComment : childComments) {
+					MBMessage childMBMessage =
 						_mbMessageLocalService.addDiscussionMessage(
-							child.getUserId(), child.getUserName(),
-							child.getGroupId(), child.getClassName(),
-							newFragmentEntryLinkId, parentMessage.getThreadId(),
-							parentMessage.getMessageId(),
-							String.valueOf(Math.random()), child.getBody(),
-							_serviceContext);
+							childComment.getUserId(),
+							childComment.getUserName(),
+							childComment.getGroupId(),
+							childComment.getClassName(), newFragmentEntryLinkId,
+							discussionMBMessage.getThreadId(),
+							discussionMBMessage.getMessageId(),
+							String.valueOf(Math.random()),
+							childComment.getBody(), _serviceContext);
 
-					mbChildMessage.setCreateDate(child.getCreateDate());
-					mbChildMessage.setModifiedDate(child.getModifiedDate());
+					childMBMessage.setCreateDate(childComment.getCreateDate());
+					childMBMessage.setModifiedDate(
+						childComment.getModifiedDate());
 
-					_mbMessageLocalService.updateMBMessage(mbChildMessage);
+					_mbMessageLocalService.updateMBMessage(childMBMessage);
 				}
 			}
 
-			parentMessage.setCreateDate(parent.getCreateDate());
-			parentMessage.setModifiedDate(parent.getModifiedDate());
-			parentMessage.setStatus(parent.getStatus());
+			discussionMBMessage.setCreateDate(parentMBMessage.getCreateDate());
+			discussionMBMessage.setModifiedDate(
+				parentMBMessage.getModifiedDate());
+			discussionMBMessage.setStatus(parentMBMessage.getStatus());
 
-			_mbMessageLocalService.updateMBMessage(parentMessage);
+			_mbMessageLocalService.updateMBMessage(discussionMBMessage);
 		}
 	}
 
