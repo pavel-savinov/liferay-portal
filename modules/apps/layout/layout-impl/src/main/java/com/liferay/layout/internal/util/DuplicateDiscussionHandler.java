@@ -31,7 +31,7 @@ import java.util.function.Function;
 /**
  * @author Alicia García García
  */
-public class DuplicateDiscussionHelper {
+public class DuplicateDiscussionHandler {
 
 	public void duplicateDisscussion(
 			long oldFragmentEntryLinkId, long newFragmentEntryLinkId)
@@ -115,7 +115,7 @@ public class DuplicateDiscussionHelper {
 		}
 	}
 
-	protected DuplicateDiscussionHelper(
+	protected DuplicateDiscussionHandler(
 		CommentManager commentManager,
 		MBMessageLocalService mbMessageLocalService, Layout targetLayout,
 		ServiceContext serviceContext) {

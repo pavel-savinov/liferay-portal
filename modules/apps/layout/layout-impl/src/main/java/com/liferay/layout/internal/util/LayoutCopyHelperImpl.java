@@ -215,8 +215,8 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 				JSONArray newFragmentEntryLinkIdsJSONArray =
 					JSONFactoryUtil.createJSONArray();
 
-				DuplicateDiscussionHelper duplicateDiscussionHelper =
-					new DuplicateDiscussionHelper(
+				DuplicateDiscussionHandler duplicateDiscussionHandler =
+					new DuplicateDiscussionHandler(
 						_commentManager, _mbMessageLocalService, targetLayout,
 						serviceContext);
 
@@ -257,7 +257,7 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 					newFragmentEntryLinkIdsJSONArray.put(
 						newFragmentEntryLink.getFragmentEntryLinkId());
 
-					duplicateDiscussionHelper.duplicateDisscussion(
+					duplicateDiscussionHandler.duplicateDisscussion(
 						fragmentEntryLink.getFragmentEntryLinkId(),
 						newFragmentEntryLink.getFragmentEntryLinkId());
 				}
