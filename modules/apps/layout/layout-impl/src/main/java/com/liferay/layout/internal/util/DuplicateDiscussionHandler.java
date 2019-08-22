@@ -46,7 +46,7 @@ public class DuplicateDiscussionHandler {
 		Discussion discussion = _commentManager.getDiscussion(
 			_targetLayout.getUserId(), _targetLayout.getGroupId(),
 			FragmentEntryLink.class.getName(), oldFragmentEntryLinkId,
-			createServiceContextFunction(_serviceContext));
+			(className) -> _serviceContext);
 
 		DiscussionComment rootDiscussionComment =
 			discussion.getRootDiscussionComment();
@@ -124,12 +124,6 @@ public class DuplicateDiscussionHandler {
 		_mbMessageLocalService = mbMessageLocalService;
 		_targetLayout = targetLayout;
 		_serviceContext = serviceContext;
-	}
-
-	protected Function<String, ServiceContext> createServiceContextFunction(
-		ServiceContext serviceContext) {
-
-		return className -> serviceContext;
 	}
 
 	private final CommentManager _commentManager;
