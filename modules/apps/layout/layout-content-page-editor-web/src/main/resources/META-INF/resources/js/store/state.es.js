@@ -589,6 +589,14 @@ const INITIAL_STATE = {
 	renderFragmentEntryURL: Config.string().value(''),
 
 	/**
+	 * URL for saving structured content
+	 * @default ''
+	 * @review
+	 * @type {string}
+	 */
+	saveStucturedContentURL: Config.string().value(''),
+
+	/**
 	 * When true, it indicates that are changes pending to save.
 	 * @default false
 	 * @review

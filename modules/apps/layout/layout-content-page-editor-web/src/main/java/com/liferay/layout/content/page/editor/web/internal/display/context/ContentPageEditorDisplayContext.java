@@ -334,6 +334,9 @@ public class ContentPageEditorDisplayContext {
 		).put(
 			"redirectURL", _getRedirect()
 		).put(
+			"saveStucturedContentURL",
+			getFragmentEntryActionURL("/content_layout/save_structured_content")
+		).put(
 			"sections",
 			_getFragmentCollectionsSoyContexts(FragmentConstants.TYPE_SECTION)
 		).put(
