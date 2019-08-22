@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * @author Alicia García García
@@ -46,7 +45,7 @@ public class DuplicateDiscussionHandler {
 		Discussion discussion = _commentManager.getDiscussion(
 			_targetLayout.getUserId(), _targetLayout.getGroupId(),
 			FragmentEntryLink.class.getName(), oldFragmentEntryLinkId,
-			(className) -> _serviceContext);
+			className -> _serviceContext);
 
 		DiscussionComment rootDiscussionComment =
 			discussion.getRootDiscussionComment();
@@ -63,9 +62,20 @@ public class DuplicateDiscussionHandler {
 
 		_mbMessageLocalService.updateMBMessage(rootMBMessage);
 
-		_commentManager.subscribeDiscussion(
-			_targetLayout.getUserId(), _targetLayout.getGroupId(),
-			FragmentEntryLink.class.getName(), newFragmentEntryLinkId);
+		if (_targetLayout.isSystem()) {
+			_commentManager.subscribeDiscussion(
+				_targetLayout.getUserId(), _targetLayout.getGroupId(),
+				FragmentEntryLink.class.getName(), newFragmentEntryLinkId);
+
+			if (_targetLayout.getUserId() !=
+					rootDiscussionComment.getUserId()) {
+
+				_commentManager.subscribeDiscussion(
+					rootDiscussionComment.getUserId(),
+					_targetLayout.getGroupId(),
+					FragmentEntryLink.class.getName(), newFragmentEntryLinkId);
+			}
+		}
 
 		if (rootDiscussionComment.getDescendantCommentsCount() <= 0) {
 			return;
