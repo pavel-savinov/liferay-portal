@@ -81,6 +81,18 @@ function addFragmentEntryLinkCommentReply(
 }
 
 /**
+ * @param {string} ddmFormValues
+ * @param {string} ddmStructureId
+ */
+function addStructuredContent(ddmFormValues, ddmStructureId, title) {
+	return _fetch(_store.getState().addStructuredContentURL, {
+		ddmFormValues,
+		ddmStructureId,
+		title
+	});
+}
+
+/**
  * @param {string} fragmentEntryLinkId
  * @return {Promise<Response>}
  */
@@ -292,6 +304,7 @@ export {
 	addFragmentEntryLinkComment,
 	addFragmentEntryLinkCommentReply,
 	addSegmentsExperience,
+	addStructuredContent,
 	deleteFragmentEntryLinkComment,
 	duplicateFragmentEntryLink,
 	editFragmentEntryLinks,
