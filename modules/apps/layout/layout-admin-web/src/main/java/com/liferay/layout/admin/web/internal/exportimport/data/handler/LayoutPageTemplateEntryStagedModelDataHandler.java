@@ -14,8 +14,6 @@
 
 package com.liferay.layout.admin.web.internal.exportimport.data.handler;
 
-import com.liferay.asset.display.page.model.AssetDisplayPageEntry;
-import com.liferay.asset.display.page.service.AssetDisplayPageEntryLocalService;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.exportimport.data.handler.base.BaseStagedModelDataHandler;
@@ -99,8 +97,6 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 				portletDataContext, layoutPageTemplateEntry, ddmStructure,
 				PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
 		}
-
-		_exportAssetDisplayPages(portletDataContext, layoutPageTemplateEntry);
 
 		if (layoutPageTemplateEntry.getLayoutPrototypeId() > 0) {
 			LayoutPrototype layoutPrototype =
@@ -338,10 +334,6 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 				portletDataContext, importedLayoutPageTemplateEntry);
 		}
 
-		_importAssetDisplayPages(
-			portletDataContext, layoutPageTemplateEntry,
-			importedLayoutPageTemplateEntry);
-
 		portletDataContext.importClassedModel(
 			layoutPageTemplateEntry, importedLayoutPageTemplateEntry);
 	}
@@ -405,74 +397,6 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 			portletDataContext, layoutPageTemplateEntry);
 	}
 
-	private void _exportAssetDisplayPages(
-			PortletDataContext portletDataContext,
-			LayoutPageTemplateEntry layoutPageTemplateEntry)
-		throws PortletDataException {
-
-		List<AssetDisplayPageEntry> assetDisplayPageEntries =
-			_assetDisplayPageEntryLocalService.
-				getAssetDisplayPageEntriesByLayoutPageTemplateEntryId(
-					layoutPageTemplateEntry.getLayoutPageTemplateEntryId());
-
-		for (AssetDisplayPageEntry assetDisplayPageEntry :
-				assetDisplayPageEntries) {
-
-			StagedModelDataHandlerUtil.exportReferenceStagedModel(
-				portletDataContext, layoutPageTemplateEntry,
-				assetDisplayPageEntry,
-				PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
-		}
-	}
-
-	private void _importAssetDisplayPages(
-			PortletDataContext portletDataContext,
-			LayoutPageTemplateEntry layoutPageTemplateEntry,
-			LayoutPageTemplateEntry importedLayoutPageTemplateEntry)
-		throws PortletDataException {
-
-		List<Element> assetDisplayPageEntryElements =
-			portletDataContext.getReferenceDataElements(
-				layoutPageTemplateEntry, AssetDisplayPageEntry.class);
-
-		for (Element assetDisplayPageEntryElement :
-				assetDisplayPageEntryElements) {
-
-			String path = assetDisplayPageEntryElement.attributeValue("path");
-
-			AssetDisplayPageEntry assetDisplayPageEntry =
-				(AssetDisplayPageEntry)portletDataContext.getZipEntryAsObject(
-					path);
-
-			StagedModelDataHandlerUtil.importStagedModel(
-				portletDataContext, assetDisplayPageEntry);
-
-			Map<Long, Long> assetDisplayPageEntries =
-				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
-					AssetDisplayPageEntry.class);
-
-			long assetDisplayPageEntryId = MapUtil.getLong(
-				assetDisplayPageEntries,
-				assetDisplayPageEntry.getAssetDisplayPageEntryId(),
-				assetDisplayPageEntry.getAssetDisplayPageEntryId());
-
-			AssetDisplayPageEntry existingAssetDisplayPageEntry =
-				_assetDisplayPageEntryLocalService.fetchAssetDisplayPageEntry(
-					assetDisplayPageEntryId);
-
-			if (existingAssetDisplayPageEntry != null) {
-				existingAssetDisplayPageEntry.setLayoutPageTemplateEntryId(
-					importedLayoutPageTemplateEntry.
-						getLayoutPageTemplateEntryId());
-				existingAssetDisplayPageEntry.setPlid(
-					importedLayoutPageTemplateEntry.getPlid());
-
-				_assetDisplayPageEntryLocalService.updateAssetDisplayPageEntry(
-					existingAssetDisplayPageEntry);
-			}
-		}
-	}
-
 	private void _validateLayoutPrototype(
 			PortletDataContext portletDataContext,
 			LayoutPageTemplateEntry layoutPageTemplateEntry,
@@ -523,10 +447,6 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 			}
 		}
 	}
-
-	@Reference
-	private AssetDisplayPageEntryLocalService
-		_assetDisplayPageEntryLocalService;
 
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
