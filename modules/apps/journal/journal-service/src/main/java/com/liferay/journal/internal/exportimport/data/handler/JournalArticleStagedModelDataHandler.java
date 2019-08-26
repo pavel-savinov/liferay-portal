@@ -1140,6 +1140,11 @@ public class JournalArticleStagedModelDataHandler
 			articleId, newArticleId, version, preloaded);
 	}
 
+	@Override
+	protected String[] getSkipImportReferenceStagedModelNames() {
+		return new String[] {AssetDisplayPageEntry.class.getName()};
+	}
+
 	protected boolean isExpireAllArticleVersions(long companyId)
 		throws PortalException {
 
@@ -1305,12 +1310,20 @@ public class JournalArticleStagedModelDataHandler
 	}
 
 	private void _importAssetDisplayPage(
-		PortletDataContext portletDataContext, JournalArticle article,
-		JournalArticle importedArticle) {
+			PortletDataContext portletDataContext, JournalArticle article,
+			JournalArticle importedArticle)
+		throws PortalException {
 
 		List<Element> assetDisplayPageEntryElements =
 			portletDataContext.getReferenceDataElements(
 				article, AssetDisplayPageEntry.class);
+
+		Map<Long, Long> articleNewPrimaryKeys =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				JournalArticle.class);
+
+		articleNewPrimaryKeys.put(
+			article.getResourcePrimKey(), importedArticle.getResourcePrimKey());
 
 		for (Element assetDisplayPageEntryElement :
 				assetDisplayPageEntryElements) {
@@ -1320,6 +1333,9 @@ public class JournalArticleStagedModelDataHandler
 			AssetDisplayPageEntry assetDisplayPageEntry =
 				(AssetDisplayPageEntry)portletDataContext.getZipEntryAsObject(
 					path);
+
+			StagedModelDataHandlerUtil.importStagedModel(
+				portletDataContext, assetDisplayPageEntryElement);
 
 			Map<Long, Long> assetDisplayPageEntries =
 				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
