@@ -108,6 +108,16 @@ public class AssetDisplayPageStagedModelDataHandler
 		if ((existingAssetDisplayPageEntry == null) ||
 			!portletDataContext.isDataStrategyMirror()) {
 
+			Map<Long, Long> newPrimaryKeysMap =
+				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+					importedAssetDisplayPageEntry.getClassName());
+
+			importedAssetDisplayPageEntry.setClassPK(
+				MapUtil.getLong(
+					newPrimaryKeysMap,
+					importedAssetDisplayPageEntry.getClassPK(),
+					importedAssetDisplayPageEntry.getClassPK()));
+
 			importedAssetDisplayPageEntry =
 				_stagedModelRepository.addStagedModel(
 					portletDataContext, importedAssetDisplayPageEntry);
