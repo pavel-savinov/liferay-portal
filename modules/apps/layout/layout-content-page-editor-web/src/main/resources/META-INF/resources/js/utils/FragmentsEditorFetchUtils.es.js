@@ -116,6 +116,20 @@ function addStructuredContent(ddmFormValues, ddmStructureId, title) {
 		ddmFormValues,
 		ddmStructureId,
 		title
+	}).then(response => {
+		if (response.errorMessage) {
+			throw new Error(response.errorMessage);
+		} else if (
+			!response.classNameId ||
+			!response.classPK ||
+			!response.title
+		) {
+			throw new Error(
+				Liferay.Language.get('an-unexpected-error-occurred')
+			);
+		}
+
+		return response;
 	});
 }
 

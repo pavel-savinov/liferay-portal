@@ -22,7 +22,19 @@ import templates from './CreateContentDialog.soy';
 import './CreateContentForm.es';
 import './MapContentForm.es';
 import {setIn} from '../../utils/FragmentsEditorUpdateUtils.es';
-import {addStructuredContent} from '../../utils/FragmentsEditorFetchUtils.es';
+import {
+	addStructuredContent,
+	getContentStructureMappingFields,
+	updateEditableValues
+} from '../../utils/FragmentsEditorFetchUtils.es';
+import {
+	COMPATIBLE_TYPES,
+	EDITABLE_FRAGMENT_ENTRY_PROCESSOR
+} from '../../utils/constants';
+import {
+	disableSavingChangesStatusAction,
+	enableSavingChangesStatusAction
+} from '../../actions/saveChanges.es';
 
 /**
  * CreateContentDialog
@@ -72,20 +84,67 @@ class CreateContentDialog extends Component {
 		if (this._step === 1) {
 			this._step = 2;
 		} else {
+			this.store.dispatch(enableSavingChangesStatusAction());
+
 			addStructuredContent(
-				this.refs.modal.refs.mapContentForm.getSerializedFields(),
+				this._serializedFields,
 				this._ddmStructure.id,
 				this._title
 			)
-				.then(response => response.json())
 				.then(response => {
-					if (response.errorMessage) {
-						this._errorMessage = response.errorMessage;
-					} else if (!response.classNameId || !response.classPK) {
-						this._errorMessage = Liferay.Language.get(
-							'an-unexpected-error-occurred'
-						);
-					}
+					const promises = [];
+					const updateFragmentEntryLinks = {};
+
+					this._fields
+						.filter(field => field.fragmentEntryLinkId)
+						.forEach(field => {
+							const currentValues = this.fragmentEntryLinks[
+								field.fragmentEntryLinkId
+							].editableValues;
+
+							const updateFragmentEntryLink =
+								updateFragmentEntryLinks[
+									field.fragmentEntryLinkId
+								] || Object.assign({}, currentValues);
+
+							const updateEditableValues =
+								updateFragmentEntryLink[
+									EDITABLE_FRAGMENT_ENTRY_PROCESSOR
+								];
+
+							updateEditableValues[field.editableId].classNameId =
+								response.classNameId;
+							updateEditableValues[field.editableId].classPK =
+								response.classPK;
+							updateEditableValues[field.editableId].fieldId =
+								field.key;
+
+							updateFragmentEntryLinks[
+								field.fragmentEntryLinkId
+							] = updateFragmentEntryLink;
+						});
+
+					Object.keys(updateFragmentEntryLinks).forEach(
+						fragmentEntryLinkId => {
+							promises.push(
+								updateEditableValues(
+									fragmentEntryLinkId,
+									updateFragmentEntryLinks[
+										fragmentEntryLinkId
+									]
+								)
+							);
+						}
+					);
+
+					Promise.all(promises).then(() => {
+						this.store
+							.dispatch(disableSavingChangesStatusAction())
+							.done(() => this.dispose());
+					});
+				})
+				.catch(error => {
+					this._errorMessage = error.message;
 				});
 		}
 	}
@@ -98,6 +157,49 @@ class CreateContentDialog extends Component {
 		this._ddmStructure = event.ddmStructure;
 		this._title = event.title;
 		this._valid = event.valid;
+
+		if (this._ddmStructure) {
+			getContentStructureMappingFields(this._ddmStructure.id).then(
+				response => {
+					const compatibleTypes = {};
+
+					Object.keys(COMPATIBLE_TYPES).forEach(editableType => {
+						const ddmTypes = COMPATIBLE_TYPES[editableType];
+
+						ddmTypes.forEach(ddmType => {
+							compatibleTypes[ddmType] = editableType;
+						});
+					});
+
+					const fields = [
+						{
+							key: '-',
+							label: Liferay.Language.get('unmapped'),
+							type: '-'
+						}
+					];
+
+					response.forEach(field => {
+						field.type = compatibleTypes[field.type];
+
+						fields.push(field);
+					});
+
+					this._fields = fields;
+				}
+			);
+		}
+	}
+
+	/**
+	 * @private
+	 * @review
+	 */
+	_handleMapContentFormFieldsChange(event) {
+		if (event.fields) {
+			this._fields = event.fields;
+			this._serializedFields = event.serializedFields;
+		}
 	}
 
 	/**
@@ -145,6 +247,46 @@ CreateContentDialog.STATE = {
 	_errorMessage: Config.string().value(null),
 
 	/**
+	 * List of available structure fields
+	 * @default null
+	 * @instance
+	 * @memberOf CreateContentDialog
+	 * @private
+	 * @review
+	 * @type {Array<{
+	 *   disabled: boolean,
+	 *   editableId: string,
+	 *   fragmentEntryLinkId: string,
+	 *   key: !string,
+	 *   label: !string,
+	 *   type: !string
+	 * }>}
+	 */
+	_fields: Config.arrayOf(
+		Config.shapeOf({
+			disabled: Config.bool().value(false),
+			editableId: Config.string().value(''),
+			fragmentEntryLinkId: Config.string().value(null),
+			key: Config.string().required(),
+			label: Config.string().required(),
+			type: Config.string().required()
+		})
+	)
+		.internal()
+		.value(null),
+
+	/**
+	 * Serialized DDM form fields
+	 * @default ''
+	 * @instance
+	 * @memberOf CreateContentDialog
+	 * @private
+	 * @review
+	 * @type {string}
+	 */
+	_serializedFields: Config.string().value(''),
+
+	/**
 	 * Current dialog step
 	 * @default 1
 	 * @instance
@@ -180,7 +322,7 @@ CreateContentDialog.STATE = {
 
 const ConnectedCreateContentDialog = getConnectedComponent(
 	CreateContentDialog,
-	['portletNamespace', 'savingChanges', 'spritemap']
+	['fragmentEntryLinks', 'portletNamespace', 'savingChanges', 'spritemap']
 );
 
 Soy.register(ConnectedCreateContentDialog, templates);

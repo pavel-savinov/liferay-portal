@@ -5,6 +5,14 @@
  */
 {template .render}
 	{@param? errorMessage: string}
+	{@param? fields: list<[
+		disabled: bool,
+		editableId: string,
+		fragmentEntryLinkId: string,
+		key: string,
+		label: string,
+		type: string
+	]>}
 	{@param? savingChanges: bool}
 	{@param? selectedItems: list<[
 		displayValue: string,
@@ -16,13 +24,6 @@
 	]>}
 	{@param? _handleFieldChange: any}
 	{@param? _structureLabel: string}
-	{@param? _fields: list<[
-		disabled: bool,
-		editableId: string,
-		key: string,
-		label: string,
-		type: string
-	]>}
 
 	<div class="map-content-form">
 		<div class="alert alert-fluid alert-info map-content-form-header p-3">
@@ -39,7 +40,7 @@
 			<div class="pr-1 w-50">
 				<h3 class="sheet-subtitle">{msg desc=""}content-value{/msg}</h3>
 
-				{if $selectedItems and length($selectedItems) > 0}
+				{if $selectedItems}
 					{foreach $selectedItem in $selectedItems}
 						<div class="mb-2">
 							<input
@@ -56,37 +57,67 @@
 			<div class="pl-1 w-50">
 				<h3 class="sheet-subtitle">{msg desc=""}structure-field{/msg}</h3>
 
-				{if $selectedItems and length($selectedItems) > 0}
+				{if $selectedItems}
 					{foreach $selectedItem in $selectedItems}
-						<div class="mb-2">
-							<select
-								class="form-control form-control-sm"
-								data-item-editable-id="{$selectedItem.editableId}"
-								data-item-fragment-entry-link-id="{$selectedItem.fragmentEntryLinkId}"
-								data-onchange="{$_handleFieldChange}"
-
-								{if $savingChanges}
-									disabled
-								{/if}
-							>
-								{if $_fields}
-									{foreach $field in $_fields}
-										<option
-											value="{$field.key}"
-
-											{if ($field.editableId and $field.editableId != $selectedItem.editableId) or $field.disabled}
-											disabled
-											{/if}
-										>
-											{$field.label}
-										</option>
-									{/foreach}
-								{/if}
-							</select>
-						</div>
+						{call .fieldSelector}
+							{param fields: $fields /}
+							{param handleFieldChange: $_handleFieldChange /}
+							{param savingChanges: $savingChanges /}
+							{param selectedItem: $selectedItem /}
+						{/call}
 					{/foreach}
 				{/if}
 			</div>
 		</div>
+	</div>
+{/template}
+
+{template .fieldSelector}
+	{@param? fields: list<[
+		disabled: bool,
+		editableId: string,
+		fragmentEntryLinkId: string,
+		key: string,
+		label: string,
+		type: string
+	]>}
+	{@param? handleFieldChange: any}
+	{@param? savingChanges: bool}
+	{@param? selectedItem: [
+		displayValue: string,
+		editableId: string,
+		fragmentEntryLinkId: string,
+		itemId: string,
+		itemType: string,
+		itemValue: string
+	]}
+
+	<div class="mb-2">
+		<select
+			class="form-control form-control-sm"
+			data-item-editable-id="{$selectedItem.editableId}"
+			data-item-fragment-entry-link-id="{$selectedItem.fragmentEntryLinkId}"
+			data-onchange="{$handleFieldChange}"
+
+			{if $savingChanges}
+				disabled
+			{/if}
+		>
+			{if $fields}
+				{foreach $field in $fields}
+					<option
+						value="{$field.key}"
+
+						{if ($field.editableId and $field.editableId != $selectedItem.editableId) or $field.disabled}
+							disabled
+						{elseif $field.editableId and $field.editableId == $selectedItem.editableId and $selectedItem.fragmentEntryLinkId == $field.fragmentEntryLinkId}
+							selected
+						{/if}
+					>
+						{$field.label}
+					</option>
+				{/foreach}
+			{/if}
+		</select>
 	</div>
 {/template}

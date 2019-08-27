@@ -9,8 +9,17 @@
 		label: string
 	]}
 	{@param? _errorMessage: string}
+	{@param? _fields: list<[
+		disabled: bool,
+		editableId: string,
+		fragmentEntryLinkId: string,
+		key: string,
+		label: string,
+		type: string
+	]>}
 	{@param? _handleCancelButtonClick: any}
 	{@param? _handleCreateContentFormChange: any}
+	{@param? _handleMapContentFormFieldsChange: any}
 	{@param? _handleSubmitButtonClick: any}
 	{@param? _handleVisibleChanged: any}
 	{@param? _step: number}
@@ -37,6 +46,10 @@
 				{call com.liferay.layout.content.page.editor.web.MapContentForm.render}
 					{param ddmStructure: $_ddmStructure /}
 					{param errorMessage: $_errorMessage /}
+					{param events: [
+						'fieldsChanged': $_handleMapContentFormFieldsChange
+					] /}
+					{param fields: $_fields /}
 					{param ref: 'mapContentForm' /}
 					{param spritemap: $spritemap /}
 					{param store: $store /}

@@ -19,12 +19,10 @@ import Soy from 'metal-soy';
 import getConnectedComponent from '../../store/ConnectedComponent.es';
 import templates from './MapContentForm.soy';
 import {
-	COMPATIBLE_TYPES,
 	EDITABLE_FRAGMENT_ENTRY_PROCESSOR,
 	FRAGMENTS_EDITOR_ITEM_TYPES
 } from '../../utils/constants';
 import {getItemPath} from '../../utils/FragmentsEditorGetUtils.es';
-import {getContentStructureMappingFields} from '../../utils/FragmentsEditorFetchUtils.es';
 import {stripHtml} from '../../utils/FragmentsEditorTextUtils.es';
 
 /**
@@ -52,49 +50,9 @@ class MapContentForm extends PortletBase {
 	 * @inheritdoc
 	 * @review
 	 */
-	syncDdmStructure() {
-		if (this.ddmStructure) {
-			this._fields = null;
-
-			getContentStructureMappingFields(this.ddmStructure.id).then(
-				response => {
-					const compatibleTypes = {};
-
-					Object.keys(COMPATIBLE_TYPES).forEach(editableType => {
-						const ddmTypes = COMPATIBLE_TYPES[editableType];
-
-						ddmTypes.forEach(ddmType => {
-							compatibleTypes[ddmType] = editableType;
-						});
-					});
-
-					const fields = [
-						{
-							key: '-',
-							label: Liferay.Language.get('unmapped'),
-							type: '-'
-						}
-					];
-
-					response.forEach(field => {
-						field.type = compatibleTypes[field.type];
-
-						fields.push(field);
-					});
-
-					this._fields = fields;
-				}
-			);
-		}
-	}
-
-	/**
-	 * @inheritdoc
-	 * @review
-	 */
 	syncSelectedItems() {
 		if (this.selectedItems) {
-			this.selectedItems.map(selectedItem => {
+			this.selectedItems = this.selectedItems.map(selectedItem => {
 				const itemPath = getItemPath(
 					selectedItem.itemId,
 					selectedItem.itemType,
@@ -147,31 +105,41 @@ class MapContentForm extends PortletBase {
 		const fieldKey =
 			targetElement.options[targetElement.selectedIndex].value;
 		const editableId = targetElement.dataset.itemEditableId;
+		const fragmentEntryLinkId =
+			targetElement.dataset.itemFragmentEntryLinkId;
 
-		if (fieldKey === '-') {
-			this._fields = this._fields.map(field => {
-				if (field.editableId === editableId) {
-					delete field.editableId;
+		this.emit('fieldsChanged', {
+			fields: this.fields.map(field => {
+				let newField = Object.assign({}, field);
+
+				if (fieldKey === '-' && field.editableId === editableId) {
+					newField = Object.assign(
+						{},
+						{
+							disabled: field.disabled,
+							key: field.key,
+							label: field.label,
+							type: field.type
+						}
+					);
+				} else if (field.key === fieldKey) {
+					newField = Object.assign(field, {
+						editableId,
+						fragmentEntryLinkId
+					});
 				}
 
-				return field;
-			});
-		} else {
-			this._fields = this._fields.map(field => {
-				if (field.key === fieldKey) {
-					field.editableId = editableId;
-				}
-
-				return field;
-			});
-		}
+				return newField;
+			}),
+			serializedFields: this._getSerializedFields()
+		});
 	}
 
-	getSerializedFields() {
+	_getSerializedFields() {
 		const ddmForm = {
 			availableLanguagesIds: [this.languageId],
 			defaultLanguageId: this.languageId,
-			fieldValues: this._fields.map(field => {
+			fieldValues: this.fields.map(field => {
 				let itemValue = '';
 
 				this.selectedItems.forEach(selectedItem => {
@@ -198,31 +166,6 @@ class MapContentForm extends PortletBase {
  * @type {!Object}
  */
 MapContentForm.STATE = {
-	/**
-	 * List of available structure fields
-	 * @default null
-	 * @instance
-	 * @memberOf MapContentForm
-	 * @private
-	 * @review
-	 * @type {Array<{
-	 *   key: !string,
-	 *   label: !string,
-	 *   type: !string
-	 * }>}
-	 */
-	_fields: Config.arrayOf(
-		Config.shapeOf({
-			disabled: Config.bool().value(false),
-			editableId: Config.string().value(''),
-			key: Config.string().required(),
-			label: Config.string().required(),
-			type: Config.string().required()
-		})
-	)
-		.internal()
-		.value(null),
-
 	/**
 	 * Selected structure label
 	 * @default null
@@ -255,7 +198,31 @@ MapContentForm.STATE = {
 	 * @review
 	 * @type {string}
 	 */
-	errorMessage: Config.string().value(null)
+	errorMessage: Config.string().value(null),
+
+	/**
+	 * List of available structure fields
+	 * @default null
+	 * @instance
+	 * @memberOf MapContentForm
+	 * @private
+	 * @review
+	 * @type {Array<{
+	 *   key: !string,
+	 *   label: !string,
+	 *   type: !string
+	 * }>}
+	 */
+	fields: Config.arrayOf(
+		Config.shapeOf({
+			disabled: Config.bool().value(false),
+			editableId: Config.string().value(''),
+			fragmentEntryLinkId: Config.string().value(null),
+			key: Config.string().required(),
+			label: Config.string().required(),
+			type: Config.string().required()
+		})
+	).value(null)
 };
 
 const ConnectedMapContentForm = getConnectedComponent(MapContentForm, [
