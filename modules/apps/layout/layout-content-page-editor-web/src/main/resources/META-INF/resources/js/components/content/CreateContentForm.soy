@@ -18,7 +18,11 @@
 	{@param? selectedStructureId: string}
 	{@param? spritemap: string}
 
-	<form class="p-4" data-onchange="{$_handleFormChange}">
+	<form
+		class="p-4"
+		data-onchange="{$_handleFormChange}"
+		data-onkeyup="{$_handleFormChange}"
+	>
 		<fieldset>
 			{let $nameFormGroupClasses kind="text"}
 				form-group
