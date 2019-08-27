@@ -5,6 +5,7 @@
  */
 {template .render}
 	{@param? errorMessage: string}
+	{@param? savingChanges: bool}
 	{@param? selectedItems: list<[
 		displayValue: string,
 		editableId: string,
@@ -63,6 +64,10 @@
 								data-item-editable-id="{$selectedItem.editableId}"
 								data-item-fragment-entry-link-id="{$selectedItem.fragmentEntryLinkId}"
 								data-onchange="{$_handleFieldChange}"
+
+								{if $savingChanges}
+									disabled
+								{/if}
 							>
 								{if $_fields}
 									{foreach $field in $_fields}

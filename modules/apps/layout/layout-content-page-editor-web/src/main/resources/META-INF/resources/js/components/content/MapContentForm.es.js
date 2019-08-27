@@ -265,6 +265,7 @@ const ConnectedMapContentForm = getConnectedComponent(MapContentForm, [
 	'languageId',
 	'layoutData',
 	'portletNamespace',
+	'savingChanges',
 	'segmentsExperienceId',
 	'selectedItems'
 ]);
