@@ -213,6 +213,7 @@ MapContentForm.STATE = {
 	 */
 	_fields: Config.arrayOf(
 		Config.shapeOf({
+			disabled: Config.bool().value(false),
 			editableId: Config.string().value(''),
 			key: Config.string().required(),
 			label: Config.string().required(),

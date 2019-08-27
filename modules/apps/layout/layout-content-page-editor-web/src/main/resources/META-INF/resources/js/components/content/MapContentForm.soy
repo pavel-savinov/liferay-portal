@@ -15,6 +15,7 @@
 	{@param? _handleFieldChange: any}
 	{@param? _structureLabel: string}
 	{@param? _fields: list<[
+		disabled: bool,
 		editableId: string,
 		key: string,
 		label: string,
@@ -61,7 +62,7 @@
 										<option
 											value="{$field.key}"
 
-											{if $field.editableId and $field.editableId != $selectedItem.editableId}
+											{if ($field.editableId and $field.editableId != $selectedItem.editableId) or $field.disabled}
 												disabled
 											{/if}
 										>
