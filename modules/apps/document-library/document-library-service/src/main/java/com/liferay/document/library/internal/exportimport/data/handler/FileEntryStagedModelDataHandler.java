@@ -14,6 +14,8 @@
 
 package com.liferay.document.library.internal.exportimport.data.handler;
 
+import com.liferay.asset.display.page.model.AssetDisplayPageEntry;
+import com.liferay.asset.display.page.service.AssetDisplayPageEntryLocalService;
 import com.liferay.changeset.service.ChangesetCollectionLocalService;
 import com.liferay.changeset.service.ChangesetEntryLocalService;
 import com.liferay.document.library.exportimport.data.handler.DLPluggableContentDataHandler;
@@ -337,6 +339,8 @@ public class FileEntryStagedModelDataHandler
 		}
 
 		exportMetaData(portletDataContext, fileEntryElement, fileEntry);
+
+		_exportAssetDisplayPage(portletDataContext, fileEntry);
 
 		portletDataContext.addClassedModel(
 			fileEntryElement, fileEntryPath, liferayFileEntry,
@@ -669,6 +673,9 @@ public class FileEntryStagedModelDataHandler
 
 			fileEntryIds.put(
 				fileEntry.getFileEntryId(), importedFileEntry.getFileEntryId());
+
+			_importAssetDisplayPage(
+				portletDataContext, fileEntry, importedFileEntry);
 		}
 		finally {
 			serviceContext.setAttribute(
@@ -798,6 +805,11 @@ public class FileEntryStagedModelDataHandler
 					portletDataContext, ddmStructure, ddmFormValues);
 
 		return DDMBeanTranslatorUtil.translate(ddmFormValues);
+	}
+
+	@Override
+	protected String[] getSkipImportReferenceStagedModelNames() {
+		return new String[] {AssetDisplayPageEntry.class.getName()};
 	}
 
 	protected void importMetaData(
@@ -946,6 +958,74 @@ public class FileEntryStagedModelDataHandler
 		}
 	}
 
+	private void _exportAssetDisplayPage(
+			PortletDataContext portletDataContext, FileEntry fileEntry)
+		throws PortletDataException {
+
+		AssetDisplayPageEntry assetDisplayPageEntry =
+			_assetDisplayPageEntryLocalService.fetchAssetDisplayPageEntry(
+				fileEntry.getGroupId(),
+				_portal.getClassNameId(DLFileEntry.class),
+				fileEntry.getFileEntryId());
+
+		if (assetDisplayPageEntry != null) {
+			StagedModelDataHandlerUtil.exportReferenceStagedModel(
+				portletDataContext, fileEntry, assetDisplayPageEntry,
+				PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
+		}
+	}
+
+	private void _importAssetDisplayPage(
+			PortletDataContext portletDataContext, FileEntry fileEntry,
+			FileEntry importedFileEntry)
+		throws PortalException {
+
+		List<Element> assetDisplayPageEntryElements =
+			portletDataContext.getReferenceDataElements(
+				fileEntry, AssetDisplayPageEntry.class);
+
+		Map<Long, Long> articleNewPrimaryKeys =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				DLFileEntry.class);
+
+		articleNewPrimaryKeys.put(
+			fileEntry.getFileEntryId(), importedFileEntry.getFileEntryId());
+
+		for (Element assetDisplayPageEntryElement :
+				assetDisplayPageEntryElements) {
+
+			String path = assetDisplayPageEntryElement.attributeValue("path");
+
+			AssetDisplayPageEntry assetDisplayPageEntry =
+				(AssetDisplayPageEntry)portletDataContext.getZipEntryAsObject(
+					path);
+
+			StagedModelDataHandlerUtil.importStagedModel(
+				portletDataContext, assetDisplayPageEntryElement);
+
+			Map<Long, Long> assetDisplayPageEntries =
+				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+					AssetDisplayPageEntry.class);
+
+			long assetDisplayPageEntryId = MapUtil.getLong(
+				assetDisplayPageEntries,
+				assetDisplayPageEntry.getAssetDisplayPageEntryId(),
+				assetDisplayPageEntry.getAssetDisplayPageEntryId());
+
+			AssetDisplayPageEntry existingAssetDisplayPageEntry =
+				_assetDisplayPageEntryLocalService.fetchAssetDisplayPageEntry(
+					assetDisplayPageEntryId);
+
+			if (existingAssetDisplayPageEntry != null) {
+				existingAssetDisplayPageEntry.setClassPK(
+					importedFileEntry.getFileEntryId());
+
+				_assetDisplayPageEntryLocalService.updateAssetDisplayPageEntry(
+					existingAssetDisplayPageEntry);
+			}
+		}
+	}
+
 	private FileEntry _overrideFileVersion(
 			final FileEntry importedFileEntry, final String version,
 			ServiceContext serviceContext)
@@ -1011,6 +1091,10 @@ public class FileEntryStagedModelDataHandler
 	private static final TransactionConfig _transactionConfig =
 		TransactionConfig.Factory.create(
 			Propagation.REQUIRED, new Class<?>[] {Exception.class});
+
+	@Reference
+	private AssetDisplayPageEntryLocalService
+		_assetDisplayPageEntryLocalService;
 
 	@Reference
 	private ChangesetCollectionLocalService _changesetCollectionLocalService;
