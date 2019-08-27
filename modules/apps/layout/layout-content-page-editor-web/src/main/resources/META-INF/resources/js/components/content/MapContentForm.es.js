@@ -25,6 +25,7 @@ import {
 } from '../../utils/constants';
 import {getItemPath} from '../../utils/FragmentsEditorGetUtils.es';
 import {getContentStructureMappingFields} from '../../utils/FragmentsEditorFetchUtils.es';
+import {stripHtml} from '../../utils/FragmentsEditorTextUtils.es';
 
 /**
  * MapContentForm
@@ -133,6 +134,7 @@ class MapContentForm extends PortletBase {
 							languageId
 					  ]
 					: editableValues[editableId].defaultValue.trim();
+				selectedItem.displayValue = stripHtml(selectedItem.itemValue);
 
 				return selectedItem;
 			});
