@@ -509,6 +509,7 @@ const ConnectedFloatingToolbarMappingPanel = getConnectedComponent(
 		'mappingFieldsURL',
 		'portletNamespace',
 		'segmentsExperienceId',
+		'selectedItems',
 		'selectedMappingTypes'
 	]
 );
