@@ -76,22 +76,11 @@ function openAssetBrowser({
 
 /**
  * @param {object} store Store
- * @param {function} onCancelButtonClick
- * @param {function} onSubmitButtonClick
- * @param {function} onVisibilityChange
  * @return {CreateContentDialog}
  */
-function openCreateContentDialog(
-	store,
-	onCancelButtonClick,
-	onSubmitButtonClick,
-	onVisibilityChange
-) {
+function openCreateContentDialog(store) {
 	return new CreateContentDialog({
-		store,
-		onCancelButtonClick,
-		onSubmitButtonClick,
-		onVisibilityChange
+		store
 	});
 }
 

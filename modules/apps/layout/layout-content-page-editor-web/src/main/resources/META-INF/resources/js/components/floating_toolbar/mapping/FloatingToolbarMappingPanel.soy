@@ -15,6 +15,7 @@
 	{@param? _fields: ?}
 	{@param? _handleAssetBrowserLinkClick: any}
 	{@param? _handleAssetEntryLinkClick: any}
+	{@param? _handleCreateContentClick: any}
 	{@param? _handleFieldOptionChange: any}
 	{@param? _handleSourceTypeChange: any}
 	{@param? _selectedSourceTypeId: string}
@@ -76,6 +77,19 @@
 				{param mappedFieldId: $item.editableValues.mappedField or $item.editableValues.fieldId /}
 			{/call}
 		</div>
+
+		{if not $item.editableValues.mappedField and not $item.editableValues.fieldId}
+			<div class="form-group">
+				<button
+					class="btn btn-block btn-secondary btn-sm"
+					data-onclick="{$_handleCreateContentClick}"
+				>
+					{msg desc=""}create-new-content{/msg}
+
+					<span class="badge badge-primary ml-2">1</span>
+				</button>
+			</div>
+		{/if}
 	</div>
 {/template}
 

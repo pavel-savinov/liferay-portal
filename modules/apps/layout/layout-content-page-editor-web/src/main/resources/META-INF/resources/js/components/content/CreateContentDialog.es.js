@@ -99,8 +99,6 @@ class CreateContentDialog extends Component {
 		if (!this.visible) {
 			this.dispose();
 		}
-
-		this.onVisibilityChange();
 	}
 }
 
@@ -156,34 +154,7 @@ CreateContentDialog.STATE = {
 	 * @review
 	 * @type {boolean}
 	 */
-	_valid: Config.bool().value(false),
-
-	/**
-	 * @default undefined
-	 * @instance
-	 * @memberof CreateContentDialog
-	 * @review
-	 * @type {function}
-	 */
-	onCancelButtonClick: Config.func().required(),
-
-	/**
-	 * @default undefined
-	 * @instance
-	 * @memberof CreateContentDialog
-	 * @review
-	 * @type {function}
-	 */
-	onSubmitButtonClick: Config.func().required(),
-
-	/**
-	 * @default undefined
-	 * @instance
-	 * @memberof CreateContentDialog
-	 * @review
-	 * @type {function}
-	 */
-	onVisibilityChange: Config.func().required()
+	_valid: Config.bool().value(false)
 };
 
 const ConnectedCreateContentDialog = getConnectedComponent(

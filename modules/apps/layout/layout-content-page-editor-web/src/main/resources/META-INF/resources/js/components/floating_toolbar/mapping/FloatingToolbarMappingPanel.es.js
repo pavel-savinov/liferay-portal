@@ -34,7 +34,10 @@ import {
 import {encodeAssetId} from '../../../utils/FragmentsEditorIdUtils.es';
 import getConnectedComponent from '../../../store/ConnectedComponent.es';
 import {getMappingSourceTypes} from '../../../utils/FragmentsEditorGetUtils.es';
-import {openAssetBrowser} from '../../../utils/FragmentsEditorDialogUtils';
+import {
+	openAssetBrowser,
+	openCreateContentDialog
+} from '../../../utils/FragmentsEditorDialogUtils';
 import {prefixSegmentsExperienceId} from '../../../utils/prefixSegmentsExperienceId.es';
 import {setIn} from '../../../utils/FragmentsEditorUpdateUtils.es';
 import {
@@ -287,6 +290,15 @@ class FloatingToolbarMappingPanel extends PortletBase {
 		requestAnimationFrame(() => {
 			this.refs.panel.focus();
 		});
+	}
+
+	/**
+	 * Opens content creation dialog
+	 * @private
+	 * @review
+	 */
+	_handleCreateContentClick() {
+		openCreateContentDialog(this.store);
 	}
 
 	/**
