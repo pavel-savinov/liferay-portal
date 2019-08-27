@@ -16,7 +16,6 @@ import {Config} from 'metal-state';
 import {PortletBase} from 'frontend-js-web';
 import Soy from 'metal-soy';
 
-import '../floating_toolbar/content/FloatingToolbarContentPanel.es';
 import '../floating_toolbar/image_properties/FloatingToolbarImagePropertiesPanel.es';
 import '../floating_toolbar/link/FloatingToolbarLinkPanel.es';
 import '../floating_toolbar/mapping/FloatingToolbarMappingPanel.es';
