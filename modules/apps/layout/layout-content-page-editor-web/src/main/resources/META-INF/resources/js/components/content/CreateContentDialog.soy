@@ -8,6 +8,7 @@
 		id: string,
 		label: string
 	]}
+	{@param? _errorMessage: string}
 	{@param? _handleCancelButtonClick: any}
 	{@param? _handleCreateContentFormChange: any}
 	{@param? _handleSubmitButtonClick: any}
@@ -35,6 +36,7 @@
 			{else}
 				{call com.liferay.layout.content.page.editor.web.MapContentForm.render}
 					{param ddmStructure: $_ddmStructure /}
+					{param errorMessage: $_errorMessage /}
 					{param ref: 'mapContentForm' /}
 					{param spritemap: $spritemap /}
 					{param store: $store /}

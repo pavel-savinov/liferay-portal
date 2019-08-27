@@ -244,7 +244,18 @@ MapContentForm.STATE = {
 	ddmStructure: Config.shapeOf({
 		id: Config.string().required(),
 		label: Config.string().required()
-	})
+	}),
+
+	/**
+	 * Error message
+	 * @default ''
+	 * @instance
+	 * @memberOf MapContentForm
+	 * @private
+	 * @review
+	 * @type {string}
+	 */
+	errorMessage: Config.string().value(null)
 };
 
 const ConnectedMapContentForm = getConnectedComponent(MapContentForm, [

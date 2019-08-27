@@ -4,6 +4,7 @@
  * MapContentForm
  */
 {template .render}
+	{@param? errorMessage: string}
 	{@param? selectedItems: list<[
 		displayValue: string,
 		editableId: string,
@@ -26,6 +27,12 @@
 		<div class="alert alert-fluid alert-info map-content-form-header p-3">
 			{$_structureLabel}
 		</div>
+
+		{if $errorMessage}
+			<div class="alert alert-danger p-3">
+				{$errorMessage}
+			</div>
+		{/if}
 
 		<div class="container container-fluid">
 			<div class="row">

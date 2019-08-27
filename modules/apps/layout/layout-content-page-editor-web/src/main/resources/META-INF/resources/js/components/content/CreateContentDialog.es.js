@@ -76,7 +76,17 @@ class CreateContentDialog extends Component {
 				this.refs.modal.refs.mapContentForm.getSerializedFields(),
 				this._ddmStructure.id,
 				this._title
-			).then(() => {});
+			)
+				.then(response => response.json())
+				.then(response => {
+					if (response.errorMessage) {
+						this._errorMessage = response.errorMessage;
+					} else if (!response.classNameId || !response.classPK) {
+						this._errorMessage = Liferay.Language.get(
+							'an-unexpected-error-occurred'
+						);
+					}
+				});
 		}
 	}
 
@@ -122,6 +132,17 @@ CreateContentDialog.STATE = {
 		id: Config.string().required(),
 		label: Config.string().required()
 	}),
+
+	/**
+	 * Error message
+	 * @default ''
+	 * @instance
+	 * @memberOf CreateContentDialog
+	 * @private
+	 * @review
+	 * @type {string}
+	 */
+	_errorMessage: Config.string().value(null),
 
 	/**
 	 * Current dialog step
