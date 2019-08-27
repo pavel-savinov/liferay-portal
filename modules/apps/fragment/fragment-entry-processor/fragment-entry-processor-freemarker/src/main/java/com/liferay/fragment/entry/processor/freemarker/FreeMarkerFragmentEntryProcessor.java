@@ -113,7 +113,7 @@ public class FreeMarkerFragmentEntryProcessor
 
 		Template template = TemplateManagerUtil.getTemplate(
 			TemplateConstants.LANG_TYPE_FTL,
-			new StringTemplateResource("template_id", "[#ftl]\n" + html), true);
+			new StringTemplateResource("template_id", "[#ftl] " + html), true);
 
 		template.put(TemplateConstants.WRITER, unsyncStringWriter);
 
@@ -169,7 +169,7 @@ public class FreeMarkerFragmentEntryProcessor
 
 		Template template = TemplateManagerUtil.getTemplate(
 			TemplateConstants.LANG_TYPE_FTL,
-			new StringTemplateResource("template_id", "[#ftl]\n" + html), true);
+			new StringTemplateResource("template_id", "[#ftl] " + html), true);
 
 		try {
 			HttpServletRequest httpServletRequest = null;

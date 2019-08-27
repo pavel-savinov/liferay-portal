@@ -203,7 +203,7 @@ public class FragmentEntryProcessorImpl implements FragmentEntryProcessorUtil {
 
 		Template template = TemplateManagerUtil.getTemplate(
 			TemplateConstants.LANG_TYPE_FTL,
-			new StringTemplateResource("template_id", "[#ftl]\n" + html), true);
+			new StringTemplateResource("template_id", "[#ftl] " + html), true);
 
 		TemplateManager templateManager =
 			TemplateManagerUtil.getTemplateManager(
