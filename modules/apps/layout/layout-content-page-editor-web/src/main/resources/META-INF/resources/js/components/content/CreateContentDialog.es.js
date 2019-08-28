@@ -126,18 +126,22 @@ class CreateContentDialog extends Component {
 							] = updateFragmentEntryLink;
 						});
 
-					Object.keys(updateFragmentEntryLinks).forEach(
-						fragmentEntryLinkId => {
-							promises.push(
-								updateEditableValues(
-									fragmentEntryLinkId,
-									updateFragmentEntryLinks[
-										fragmentEntryLinkId
-									]
-								)
-							);
-						}
+					const fragmentEntryLinkIds = Object.keys(
+						updateFragmentEntryLinks
 					);
+
+					fragmentEntryLinkIds.forEach(fragmentEntryLinkId => {
+						promises.push(
+							updateEditableValues(
+								fragmentEntryLinkId,
+								updateFragmentEntryLinks[fragmentEntryLinkId],
+								fragmentEntryLinkIds.indexOf(
+									fragmentEntryLinkId
+								) ===
+									fragmentEntryLinkIds.length - 1
+							)
+						);
+					});
 
 					Promise.all(promises).then(() => {
 						this.store

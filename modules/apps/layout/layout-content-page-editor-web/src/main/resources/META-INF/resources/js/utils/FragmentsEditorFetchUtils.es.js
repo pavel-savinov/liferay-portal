@@ -314,14 +314,21 @@ function setStore(store) {
 /**
  * @param {string} fragmentEntryLinkId
  * @param {object} editableValues
+ * @param {boolean} updateClassedModel Update classed model(Layout) associated
+ * with the fragment entry link
  * @return {Promise<Response>}
  */
-function updateEditableValues(fragmentEntryLinkId, editableValues) {
+function updateEditableValues(
+	fragmentEntryLinkId,
+	editableValues,
+	updateClassedModel = true
+) {
 	const state = _store.getState();
 
 	return _fetch(state.editFragmentEntryLinkURL, {
 		editableValues: JSON.stringify(editableValues),
-		fragmentEntryLinkId
+		fragmentEntryLinkId,
+		updateClassedModel
 	});
 }
 

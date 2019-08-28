@@ -56,8 +56,11 @@ public class EditFragmentEntryLinkMVCActionCommand
 		String editableValues = ParamUtil.getString(
 			actionRequest, "editableValues");
 
+		boolean updateClassedModel = ParamUtil.getBoolean(
+			actionRequest, "updateClassedModel", true);
+
 		_fragmentEntryLinkService.updateFragmentEntryLink(
-			fragmentEntryLinkId, editableValues);
+			fragmentEntryLinkId, editableValues, updateClassedModel);
 
 		hideDefaultSuccessMessage(actionRequest);
 
