@@ -35,6 +35,8 @@ import {
 	disableSavingChangesStatusAction,
 	enableSavingChangesStatusAction
 } from '../../actions/saveChanges.es';
+import {updateMappedContentsAction} from '../../actions/updateMappedContents.es';
+import {ADD_MAPPED_ASSET_ENTRY} from '../../actions/actions.es';
 
 /**
  * CreateContentDialog
@@ -139,6 +141,11 @@ class CreateContentDialog extends Component {
 
 					Promise.all(promises).then(() => {
 						this.store
+							.dispatch(updateMappedContentsAction())
+							.dispatch({
+								...response,
+								type: ADD_MAPPED_ASSET_ENTRY
+							})
 							.dispatch(disableSavingChangesStatusAction())
 							.done(() => this.dispose());
 					});
