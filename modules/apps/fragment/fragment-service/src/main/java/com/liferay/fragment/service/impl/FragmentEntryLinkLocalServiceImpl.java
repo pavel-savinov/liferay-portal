@@ -512,13 +512,26 @@ public class FragmentEntryLinkLocalServiceImpl
 			long fragmentEntryLinkId, String editableValues)
 		throws PortalException {
 
+		return updateFragmentEntryLink(
+			fragmentEntryLinkId, editableValues, true);
+	}
+
+	@Override
+	public FragmentEntryLink updateFragmentEntryLink(
+			long fragmentEntryLinkId, String editableValues,
+			boolean updateClassedModel)
+		throws PortalException {
+
 		FragmentEntryLink fragmentEntryLink = fetchFragmentEntryLink(
 			fragmentEntryLinkId);
 
 		fragmentEntryLink.setEditableValues(editableValues);
 
-		updateClassedModel(
-			fragmentEntryLink.getClassNameId(), fragmentEntryLink.getClassPK());
+		if (updateClassedModel) {
+			updateClassedModel(
+				fragmentEntryLink.getClassNameId(),
+				fragmentEntryLink.getClassPK());
+		}
 
 		fragmentEntryLinkPersistence.update(fragmentEntryLink);
 
