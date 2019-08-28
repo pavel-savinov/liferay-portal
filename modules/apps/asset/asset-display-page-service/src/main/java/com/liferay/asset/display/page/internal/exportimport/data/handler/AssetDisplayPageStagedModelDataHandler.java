@@ -23,6 +23,7 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.xml.Element;
 
@@ -95,10 +96,19 @@ public class AssetDisplayPageStagedModelDataHandler
 				assetDisplayPageEntry.getLayoutPageTemplateEntryId());
 		}
 
+		Map<Long, Long> plids =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				Layout.class);
+
+		long plid = MapUtil.getLong(
+			plids, assetDisplayPageEntry.getPlid(),
+			assetDisplayPageEntry.getPlid());
+
 		importedAssetDisplayPageEntry.setGroupId(
 			portletDataContext.getScopeGroupId());
 		importedAssetDisplayPageEntry.setLayoutPageTemplateEntryId(
 			layoutPageTemplateEntryId);
+		importedAssetDisplayPageEntry.setPlid(plid);
 
 		AssetDisplayPageEntry existingAssetDisplayPageEntry =
 			_stagedModelRepository.fetchStagedModelByUuidAndGroupId(
