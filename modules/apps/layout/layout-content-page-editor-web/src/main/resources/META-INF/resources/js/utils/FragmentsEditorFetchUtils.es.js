@@ -208,7 +208,7 @@ function getAssetMappingFields(classNameId, classPK) {
 function getContentStructureMappingFields(ddmStructureId) {
 	return _fetch(_store.getState().getContentStructureMappingFieldsURL, {
 		ddmStructureId
-	}).then(response => response.json());
+	});
 }
 
 function getExperienceUsedPortletIds(segmentsExperienceId) {
