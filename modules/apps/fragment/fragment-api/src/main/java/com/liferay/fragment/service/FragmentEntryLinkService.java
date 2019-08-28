@@ -88,6 +88,11 @@ public interface FragmentEntryLinkService extends BaseService {
 			long fragmentEntryLinkId, String editableValues)
 		throws PortalException;
 
+	public FragmentEntryLink updateFragmentEntryLink(
+			long fragmentEntryLinkId, String editableValues,
+			boolean updateClassedModel)
+		throws PortalException;
+
 	public void updateFragmentEntryLinks(
 			long groupId, long classNameId, long classPK,
 			long[] fragmentEntryIds, String editableValues,

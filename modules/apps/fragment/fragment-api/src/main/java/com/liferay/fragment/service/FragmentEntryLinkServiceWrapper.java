@@ -102,6 +102,16 @@ public class FragmentEntryLinkServiceWrapper
 	}
 
 	@Override
+	public com.liferay.fragment.model.FragmentEntryLink updateFragmentEntryLink(
+			long fragmentEntryLinkId, String editableValues,
+			boolean updateClassedModel)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _fragmentEntryLinkService.updateFragmentEntryLink(
+			fragmentEntryLinkId, editableValues, updateClassedModel);
+	}
+
+	@Override
 	public void updateFragmentEntryLinks(
 			long groupId, long classNameId, long classPK,
 			long[] fragmentEntryIds, String editableValues,

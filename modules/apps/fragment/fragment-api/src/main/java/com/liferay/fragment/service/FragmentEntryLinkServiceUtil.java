@@ -103,6 +103,16 @@ public class FragmentEntryLinkServiceUtil {
 			fragmentEntryLinkId, editableValues);
 	}
 
+	public static com.liferay.fragment.model.FragmentEntryLink
+			updateFragmentEntryLink(
+				long fragmentEntryLinkId, String editableValues,
+				boolean updateClassedModel)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return getService().updateFragmentEntryLink(
+			fragmentEntryLinkId, editableValues, updateClassedModel);
+	}
+
 	public static void updateFragmentEntryLinks(
 			long groupId, long classNameId, long classPK,
 			long[] fragmentEntryIds, String editableValues,
