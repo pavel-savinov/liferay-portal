@@ -61,8 +61,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import org.hamcrest.core.StringStartsWith;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -426,8 +424,7 @@ public class FragmentEntryProcessorFreemarkerTest {
 					null, null);
 
 		expectedException.expect(FragmentEntryContentException.class);
-		expectedException.expectMessage(
-			new StringStartsWith("FreeMarker syntax is invalid"));
+		expectedException.expectMessage("FreeMarker syntax is invalid");
 		expectedException.expectMessage(
 			"Syntax error in template \"template_id\" in line 5, column 12");
 
