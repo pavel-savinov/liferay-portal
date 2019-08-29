@@ -16,6 +16,8 @@ package com.liferay.fragment.entry.processor.internal.util;
 
 import com.liferay.asset.info.display.contributor.util.ContentAccessor;
 import com.liferay.asset.info.display.contributor.util.ContentAccessorUtil;
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.entry.processor.util.FragmentEntryProcessorUtil;
 import com.liferay.fragment.processor.DefaultFragmentEntryProcessorContext;
@@ -104,7 +106,10 @@ public class FragmentEntryProcessorImpl implements FragmentEntryProcessorUtil {
 
 		InfoDisplayObjectProvider infoDisplayObjectProvider = null;
 
-		if (fragmentEntryProcessorContext.getPreviewClassPK() > 0) {
+		if ((fragmentEntryProcessorContext.getPreviewClassPK() > 0) &&
+			_isSameEntity(
+				classPK, fragmentEntryProcessorContext.getPreviewClassPK())) {
+
 			infoDisplayObjectProvider =
 				infoDisplayContributor.getPreviewInfoDisplayObjectProvider(
 					fragmentEntryProcessorContext.getPreviewClassPK(),
@@ -310,6 +315,20 @@ public class FragmentEntryProcessorImpl implements FragmentEntryProcessorUtil {
 
 		return false;
 	}
+
+	private boolean _isSameEntity(long classPK, long previewClassPK) {
+		AssetEntry assetEntry = _assetEntryLocalService.fetchAssetEntry(
+			previewClassPK);
+
+		if (assetEntry.getClassPK() == classPK) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Reference
+	private AssetEntryLocalService _assetEntryLocalService;
 
 	@Reference
 	private InfoDisplayContributorTracker _infoDisplayContributorTracker;
