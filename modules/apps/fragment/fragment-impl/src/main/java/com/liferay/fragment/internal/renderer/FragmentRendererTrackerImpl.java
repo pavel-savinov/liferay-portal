@@ -19,6 +19,7 @@ import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.renderer.DefaultFragmentRendererContext;
 import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererTracker;
+import com.liferay.fragment.renderer.constants.FragmentRendererConstants;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.fragment.validator.FragmentEntryValidator;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
@@ -26,6 +27,7 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
@@ -121,6 +123,17 @@ public class FragmentRendererTrackerImpl implements FragmentRendererTracker {
 
 			FragmentRenderer fragmentRenderer = _bundleContext.getService(
 				serviceReference);
+
+			if (Validator.isNull(fragmentRenderer.getCollectionKey()) &&
+				!StringUtil.equals(
+					fragmentRenderer.getKey(),
+					FragmentRendererConstants.
+						FRAGMENT_ENTRY_FRAGMENT_RENDERER_KEY)) {
+
+				_log.error("Fragment renderer collection key cannot be empty");
+
+				return null;
+			}
 
 			try {
 				FragmentEntryLink fragmentEntryLink =
