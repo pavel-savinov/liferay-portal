@@ -43,6 +43,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -78,6 +79,11 @@ public class RenderFragmentEntryStrutsActionTest {
 		_guestUser = UserTestUtil.addGroupUser(_group, RoleConstants.GUEST);
 
 		ServiceTestUtil.setUser(_groupUser);
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		GroupTestUtil.deleteGroup(_group);
 	}
 
 	@Test
@@ -189,11 +195,7 @@ public class RenderFragmentEntryStrutsActionTest {
 		"com/liferay/fragment/dependencies/fragments/";
 
 	private Bundle _bundle;
-
-	@DeleteAfterTestRun
 	private Group _group;
-
-	@DeleteAfterTestRun
 	private User _groupUser;
 
 	@DeleteAfterTestRun
