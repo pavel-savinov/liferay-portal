@@ -50,6 +50,7 @@ import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorWebKeys;
 import com.liferay.layout.content.page.editor.web.internal.comment.CommentUtil;
+import com.liferay.layout.content.page.editor.web.internal.configuration.util.ContentCreationContentPageEditorConfigurationUtil;
 import com.liferay.layout.content.page.editor.web.internal.configuration.util.ContentPageEditorConfigurationUtil;
 import com.liferay.layout.content.page.editor.web.internal.util.MappedContentUtil;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
@@ -201,6 +202,10 @@ public class ContentPageEditorDisplayContext {
 			"classNameId", classNameId
 		).put(
 			"classPK", classPK
+		).put(
+			"contentCreationEnabled",
+			ContentCreationContentPageEditorConfigurationUtil.
+				isContentCreationEnabled(themeDisplay.getCompanyId())
 		).put(
 			"defaultEditorConfigurations", _getDefaultConfigurations()
 		).put(
