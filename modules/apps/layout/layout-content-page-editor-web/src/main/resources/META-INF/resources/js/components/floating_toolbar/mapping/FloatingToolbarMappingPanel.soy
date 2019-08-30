@@ -31,6 +31,7 @@
 		href: string,
 		typeName: string
 	]>}
+	{@param? contentCreationEnabled: bool}
 	{@param? mappedAssetEntries: list<[
 		encodedId: string,
 		classNameId: string,
@@ -84,22 +85,24 @@
 			</div>
 		{/if}
 
-		<div class="form-group">
-			<button
-				class="btn btn-block btn-secondary btn-sm"
-				data-onclick="{$_handleCreateContentClick}"
+		{if $contentCreationEnabled}
+			<div class="form-group">
+				<button
+					class="btn btn-block btn-secondary btn-sm"
+					data-onclick="{$_handleCreateContentClick}"
 
-				{if $item.editableValues.mappedField or $item.editableValues.fieldId}
+					{if $item.editableValues.mappedField or $item.editableValues.fieldId}
 					disabled
-				{/if}
-			>
-				{msg desc=""}create-new-content{/msg}
+					{/if}
+				>
+					{msg desc=""}create-new-content{/msg}
 
-				{if $selectedItems}
-					<span class="badge badge-primary ml-2">{length($selectedItems)}</span>
-				{/if}
-			</button>
-		</div>
+					{if $selectedItems}
+						<span class="badge badge-primary ml-2">{length($selectedItems)}</span>
+					{/if}
+				</button>
+			</div>
+		{/if}
 	</div>
 {/template}
 

@@ -51,7 +51,7 @@ function updateActiveItemReducer(state, action) {
 			}
 		];
 
-		if (action.appendItem) {
+		if (action.appendItem && state.contentCreationEnabled) {
 			selectedItems = nextState.selectedItems
 				.filter(
 					item =>

@@ -185,6 +185,14 @@ const INITIAL_STATE = {
 	classPK: Config.string().value(''),
 
 	/**
+	 * Flag indicating if the content creation is enabled
+	 * @default false
+	 * @review
+	 * @type {boolean}
+	 */
+	contentCreationEnabled: Config.bool().value(false),
+
+	/**
 	 * Flag indicating if the Create Content dialog should be shown
 	 * @default false
 	 * @review

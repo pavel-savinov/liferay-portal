@@ -502,6 +502,7 @@ const ConnectedFloatingToolbarMappingPanel = getConnectedComponent(
 	FloatingToolbarMappingPanel,
 	[
 		'assetBrowserLinks',
+		'contentCreationEnabled',
 		'defaultSegmentsExperienceId',
 		'getAssetMappingFieldsURL',
 		'languageId',
