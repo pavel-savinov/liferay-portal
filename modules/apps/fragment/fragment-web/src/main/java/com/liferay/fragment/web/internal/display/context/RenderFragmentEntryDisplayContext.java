@@ -64,8 +64,13 @@ public class RenderFragmentEntryDisplayContext {
 		FragmentEntryLink fragmentEntryLink =
 			FragmentEntryLinkLocalServiceUtil.createFragmentEntryLink(0);
 
-		fragmentEntryLink.setFragmentEntryId(
-			fragmentEntry.getFragmentEntryId());
+		long fragmentEntryId = 0;
+
+		if (fragmentEntry != null) {
+			fragmentEntryId = fragmentEntry.getFragmentEntryId();
+		}
+
+		fragmentEntryLink.setFragmentEntryId(fragmentEntryId);
 		fragmentEntryLink.setCss(css);
 		fragmentEntryLink.setHtml(html);
 		fragmentEntryLink.setJs(js);
