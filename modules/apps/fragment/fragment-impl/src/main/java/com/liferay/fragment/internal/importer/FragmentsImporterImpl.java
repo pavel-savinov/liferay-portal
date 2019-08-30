@@ -29,6 +29,7 @@ import com.liferay.fragment.service.FragmentCollectionLocalService;
 import com.liferay.fragment.service.FragmentCollectionService;
 import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.fragment.service.FragmentEntryService;
+import com.liferay.fragment.validator.FragmentEntryValidator;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -215,6 +216,8 @@ public class FragmentsImporterImpl implements FragmentsImporter {
 		try {
 			_fragmentEntryProcessorRegistry.validateFragmentEntryHTML(
 				html, configuration);
+
+			_fragmentEntryValidator.validateConfiguration(configuration);
 		}
 		catch (PortalException pe) {
 			if (_log.isDebugEnabled()) {
@@ -697,6 +700,9 @@ public class FragmentsImporterImpl implements FragmentsImporter {
 
 	@Reference
 	private FragmentEntryService _fragmentEntryService;
+
+	@Reference
+	private FragmentEntryValidator _fragmentEntryValidator;
 
 	private List<String> _invalidFragmentEntriesNames;
 
