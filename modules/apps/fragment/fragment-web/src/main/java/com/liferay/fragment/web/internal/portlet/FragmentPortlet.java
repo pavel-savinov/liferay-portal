@@ -24,16 +24,22 @@ import com.liferay.fragment.service.FragmentCollectionService;
 import com.liferay.fragment.web.internal.configuration.FragmentPortletConfiguration;
 import com.liferay.fragment.web.internal.constants.FragmentWebKeys;
 import com.liferay.item.selector.ItemSelector;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.service.GroupService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
 
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.portlet.Portlet;
 import javax.portlet.PortletException;
@@ -94,7 +100,8 @@ public class FragmentPortlet extends MVCPortlet {
 			_fragmentCollectionContributorTracker);
 		renderRequest.setAttribute(
 			FragmentWebKeys.FRAGMENT_COLLECTIONS,
-			_getFragmentCollections(renderRequest));
+			_fragmentCollectionService.getFragmentCollections(
+				themeDisplay.getScopeGroupId()));
 		renderRequest.setAttribute(
 			FragmentPortletConfiguration.class.getName(),
 			fragmentPortletConfiguration);
@@ -105,29 +112,57 @@ public class FragmentPortlet extends MVCPortlet {
 			FragmentActionKeys.FRAGMENT_RENDERER_CONTROLLER,
 			_fragmentRendererController);
 
+		Map<String, List<FragmentCollection>> inheritedFragmentCollections =
+			new TreeMap<>();
+
+		if (themeDisplay.getScopeGroupId() !=
+				themeDisplay.getCompanyGroupId()) {
+
+			try {
+				inheritedFragmentCollections = _getInheritedFragmentCollections(
+					themeDisplay);
+			}
+			catch (PortalException pe) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(pe, pe);
+				}
+			}
+		}
+
+		renderRequest.setAttribute(
+			FragmentWebKeys.INHERITED_FRAGMENT_COLLECTIONS,
+			inheritedFragmentCollections);
+
 		renderRequest.setAttribute(
 			FragmentWebKeys.ITEM_SELECTOR, _itemSelector);
 
 		super.doDispatch(renderRequest, renderResponse);
 	}
 
-	private List<FragmentCollection> _getFragmentCollections(
-		RenderRequest renderRequest) {
+	private Map<String, List<FragmentCollection>>
+			_getInheritedFragmentCollections(ThemeDisplay themeDisplay)
+		throws PortalException {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		Map<String, List<FragmentCollection>> inheritedFragmentCollections =
+			new TreeMap<>();
 
-		long[] groupIds = {themeDisplay.getCompanyGroupId()};
+		Group group = _groupService.getGroup(themeDisplay.getCompanyGroupId());
 
-		if (themeDisplay.getScopeGroupId() !=
-				themeDisplay.getCompanyGroupId()) {
+		List<FragmentCollection> fragmentCollections =
+			_fragmentCollectionService.getFragmentCollections(
+				group.getGroupId());
 
-			groupIds = ArrayUtil.append(
-				groupIds, themeDisplay.getScopeGroupId());
+		if (!fragmentCollections.isEmpty()) {
+			inheritedFragmentCollections.put(
+				group.getDescriptiveName(themeDisplay.getLocale()),
+				fragmentCollections);
 		}
 
-		return _fragmentCollectionService.getFragmentCollections(groupIds);
+		return inheritedFragmentCollections;
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		FragmentPortlet.class);
 
 	@Reference
 	private ConfigurationProvider _configurationProvider;
@@ -144,6 +179,9 @@ public class FragmentPortlet extends MVCPortlet {
 
 	@Reference
 	private FragmentRendererController _fragmentRendererController;
+
+	@Reference
+	private GroupService _groupService;
 
 	@Reference
 	private ItemSelector _itemSelector;
