@@ -18,6 +18,7 @@
 
 <%
 List<FragmentCollection> fragmentCollections = (List<FragmentCollection>)request.getAttribute(FragmentWebKeys.FRAGMENT_COLLECTIONS);
+Map<String, List<FragmentCollection>> inheritedFragmentCollections = (Map<String, List<FragmentCollection>>)request.getAttribute(FragmentWebKeys.INHERITED_FRAGMENT_COLLECTIONS);
 
 List<FragmentCollectionContributor> fragmentCollectionContributors = fragmentDisplayContext.getFragmentCollectionContributors(locale);
 %>
@@ -34,8 +35,8 @@ List<FragmentCollectionContributor> fragmentCollectionContributors = fragmentDis
 						</portlet:renderURL>
 
 						<c:choose>
-							<c:when test="<%= ListUtil.isNotEmpty(fragmentCollections) || ListUtil.isNotEmpty(fragmentCollectionContributors) %>">
-								<div class="autofit-row autofit-row-center">
+							<c:when test="<%= ListUtil.isNotEmpty(fragmentCollections) || ListUtil.isNotEmpty(fragmentCollectionContributors) || MapUtil.isNotEmpty(inheritedFragmentCollections) %>">
+								<div class="autofit-row autofit-row-center mb-4">
 									<div class="autofit-col autofit-col-expand">
 										<strong class="text-uppercase">
 											<liferay-ui:message key="collections" />
@@ -64,9 +65,19 @@ List<FragmentCollectionContributor> fragmentCollectionContributors = fragmentDis
 									</div>
 								</div>
 
-								<ul class="nav nav-stacked">
+								<ul class="mb-2 nav nav-stacked">
 
 									<%
+									if (!fragmentCollectionContributors.isEmpty()) {
+									%>
+
+										<span class="truncate-text">
+											<liferay-ui:message key="default" />
+										</span>
+
+									<%
+									}
+
 									for (FragmentCollectionContributor fragmentCollectionContributor : fragmentCollectionContributors) {
 									%>
 
@@ -89,6 +100,59 @@ List<FragmentCollectionContributor> fragmentCollectionContributors = fragmentDis
 												/>
 											</a>
 										</li>
+
+									<%
+									}
+									%>
+
+								</ul>
+
+								<ul class="mb-2 nav nav-stacked">
+
+									<%
+									for (Map.Entry<String, List<FragmentCollection>> entry : inheritedFragmentCollections.entrySet()) {
+									%>
+
+										<span class="truncate-text"><%= entry.getKey() %></span>
+
+										<%
+										for (FragmentCollection fragmentCollection : entry.getValue()) {
+										%>
+
+											<li class="nav-item">
+
+												<%
+												PortletURL fragmentCollectionURL = renderResponse.createRenderURL();
+
+												fragmentCollectionURL.setParameter("mvcRenderCommandName", "/fragment/view");
+												fragmentCollectionURL.setParameter("fragmentCollectionId", String.valueOf(fragmentCollection.getFragmentCollectionId()));
+												%>
+
+												<a class="nav-link truncate-text <%= (fragmentCollection.getFragmentCollectionId() == fragmentDisplayContext.getFragmentCollectionId()) ? "active" : StringPool.BLANK %>" href="<%= fragmentCollectionURL.toString() %>">
+													<%= HtmlUtil.escape(fragmentCollection.getName()) %>
+
+													<liferay-ui:icon
+														icon="lock"
+														iconCssClass="text-muted"
+														markupView="lexicon"
+													/>
+												</a>
+											</li>
+
+									<%
+										}
+									}
+									%>
+
+								</ul>
+
+								<ul class="mb-2 nav nav-stacked">
+
+									<%
+									if (!fragmentCollections.isEmpty()) {
+									%>
+
+										<span class="truncate-text"><%= fragmentDisplayContext.getGroupName(scopeGroupId) %></span>
 
 									<%
 									}
