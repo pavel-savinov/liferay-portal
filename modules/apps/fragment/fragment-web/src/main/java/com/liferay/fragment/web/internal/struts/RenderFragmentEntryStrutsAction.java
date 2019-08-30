@@ -16,7 +16,9 @@ package com.liferay.fragment.web.internal.struts;
 
 import com.liferay.fragment.constants.FragmentActionKeys;
 import com.liferay.fragment.constants.FragmentConstants;
+import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.renderer.FragmentRendererController;
+import com.liferay.fragment.web.internal.constants.FragmentWebKeys;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
@@ -67,6 +69,10 @@ public class RenderFragmentEntryStrutsAction implements StrutsAction {
 			FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES);
 
 		httpServletRequest.setAttribute(
+			FragmentWebKeys.FRAGMENT_COLLECTION_CONTRIBUTOR_TRACKER,
+			_fragmentCollectionContributorTracker);
+
+		httpServletRequest.setAttribute(
 			FragmentActionKeys.FRAGMENT_RENDERER_CONTROLLER,
 			_fragmentRendererController);
 
@@ -97,6 +103,10 @@ public class RenderFragmentEntryStrutsAction implements StrutsAction {
 
 		return null;
 	}
+
+	@Reference
+	private FragmentCollectionContributorTracker
+		_fragmentCollectionContributorTracker;
 
 	@Reference
 	private FragmentRendererController _fragmentRendererController;
