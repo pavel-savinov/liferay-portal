@@ -277,8 +277,7 @@ public class FragmentDisplayContext {
 				fragmentCollection.getGroupId());
 
 			fragmentCollectionName = StringUtil.appendParentheticalSuffix(
-				fragmentCollectionName,
-				group.getDescriptiveName(_themeDisplay.getLocale()));
+				fragmentCollectionName, getGroupName(group.getGroupId()));
 		}
 
 		return HtmlUtil.escape(fragmentCollectionName);
@@ -452,6 +451,12 @@ public class FragmentDisplayContext {
 		}
 
 		return FragmentTypeConstants.INHERITED_FRAGMENT_TYPE;
+	}
+
+	public String getGroupName(long groupId) throws PortalException {
+		Group group = GroupLocalServiceUtil.getGroup(groupId);
+
+		return group.getDescriptiveName(_themeDisplay.getLocale());
 	}
 
 	public String getNavigation() {
