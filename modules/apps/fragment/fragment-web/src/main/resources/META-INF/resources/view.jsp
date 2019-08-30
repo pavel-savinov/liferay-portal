@@ -68,7 +68,7 @@ List<FragmentCollectionContributor> fragmentCollectionContributors = fragmentDis
 								<ul class="mb-2 nav nav-stacked">
 
 									<%
-									if (!fragmentCollectionContributors.isEmpty()) {
+									if (ListUtil.isNotEmpty(fragmentCollectionContributors)) {
 									%>
 
 										<span class="truncate-text">
@@ -149,7 +149,7 @@ List<FragmentCollectionContributor> fragmentCollectionContributors = fragmentDis
 								<ul class="mb-2 nav nav-stacked">
 
 									<%
-									if (!fragmentCollections.isEmpty()) {
+									if (ListUtil.isNotEmpty(fragmentCollections)) {
 									%>
 
 										<span class="truncate-text"><%= fragmentDisplayContext.getGroupName(scopeGroupId) %></span>

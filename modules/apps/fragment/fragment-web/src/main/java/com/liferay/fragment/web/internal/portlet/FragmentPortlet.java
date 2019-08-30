@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.service.GroupService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.IOException;
@@ -152,7 +153,7 @@ public class FragmentPortlet extends MVCPortlet {
 			_fragmentCollectionService.getFragmentCollections(
 				group.getGroupId());
 
-		if (!fragmentCollections.isEmpty()) {
+		if (ListUtil.isNotEmpty(fragmentCollections)) {
 			inheritedFragmentCollections.put(
 				group.getDescriptiveName(themeDisplay.getLocale()),
 				fragmentCollections);
