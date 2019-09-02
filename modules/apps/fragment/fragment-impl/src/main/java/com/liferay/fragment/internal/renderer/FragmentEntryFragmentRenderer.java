@@ -25,6 +25,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.taglib.servlet.PipingServletResponse;
 
@@ -115,7 +116,7 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 
 		if (Validator.isNotNull(css)) {
 			sb.append("<style>");
-			sb.append(css);
+			sb.append(HtmlUtil.escapeCSS(css));
 			sb.append("</style>");
 		}
 
@@ -172,8 +173,8 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 			fragmentEntryLink, html, httpServletRequest, httpServletResponse);
 
 		return _renderFragmentEntry(
-			fragmentEntryLink.getFragmentEntryId(), css, html,
-			fragmentEntryLink.getJs(), fragmentEntryLink.getNamespace());
+			fragmentEntryLink.getFragmentEntryId(), HtmlUtil.escapeCSS(css),
+			html, fragmentEntryLink.getJs(), fragmentEntryLink.getNamespace());
 	}
 
 	private String _writePortletPaths(
