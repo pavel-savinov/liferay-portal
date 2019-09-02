@@ -21,6 +21,7 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.soy.BaseBaseClayCard;
 import com.liferay.frontend.taglib.clay.servlet.taglib.soy.VerticalCard;
 import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import javax.portlet.RenderRequest;
@@ -77,7 +78,7 @@ public abstract class FragmentEntryVerticalCard
 
 	@Override
 	public String getTitle() {
-		return fragmentEntry.getName();
+		return HtmlUtil.escape(fragmentEntry.getName());
 	}
 
 	protected final FragmentEntry fragmentEntry;
