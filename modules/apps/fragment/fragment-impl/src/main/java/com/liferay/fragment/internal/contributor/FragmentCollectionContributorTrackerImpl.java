@@ -18,6 +18,8 @@ import com.liferay.fragment.constants.FragmentConstants;
 import com.liferay.fragment.contributor.FragmentCollectionContributor;
 import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.model.FragmentEntry;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.util.AggregateResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 
@@ -32,10 +34,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
  * @author Jürgen Kappler
@@ -50,7 +54,7 @@ public class FragmentCollectionContributorTrackerImpl
 	public FragmentCollectionContributor getFragmentCollectionContributor(
 		String fragmentCollectionKey) {
 
-		return _fragmentCollectionContributorsMap.get(fragmentCollectionKey);
+		return _serviceTrackerMap.getService(fragmentCollectionKey);
 	}
 
 	/**
@@ -68,7 +72,7 @@ public class FragmentCollectionContributorTrackerImpl
 	public List<FragmentCollectionContributor>
 		getFragmentCollectionContributors() {
 
-		return new ArrayList<>(_fragmentCollectionContributorsMap.values());
+		return new ArrayList<>(_serviceTrackerMap.values());
 	}
 
 	@Override
@@ -79,8 +83,7 @@ public class FragmentCollectionContributorTrackerImpl
 	@Override
 	public Map<String, FragmentEntry> getFragmentEntries(Locale locale) {
 		Collection<FragmentCollectionContributor>
-			fragmentCollectionContributors =
-				_fragmentCollectionContributorsMap.values();
+			fragmentCollectionContributors = _serviceTrackerMap.values();
 
 		Stream<FragmentCollectionContributor> stream =
 			fragmentCollectionContributors.stream();
@@ -124,8 +127,7 @@ public class FragmentCollectionContributorTrackerImpl
 
 	public ResourceBundleLoader getResourceBundleLoader() {
 		Collection<FragmentCollectionContributor>
-			fragmentCollectionContributors =
-				_fragmentCollectionContributorsMap.values();
+			fragmentCollectionContributors = _serviceTrackerMap.values();
 
 		Stream<FragmentCollectionContributor> stream =
 			fragmentCollectionContributors.stream();
@@ -140,43 +142,24 @@ public class FragmentCollectionContributorTrackerImpl
 			));
 	}
 
-	@Reference(
-		cardinality = ReferenceCardinality.MULTIPLE,
-		policy = ReferencePolicy.DYNAMIC
-	)
-	protected void setFragmentCollectionContributor(
-		FragmentCollectionContributor fragmentCollectionContributor) {
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
+			bundleContext, FragmentCollectionContributor.class, null,
+			(serviceReference, emitter) -> {
+				FragmentCollectionContributor fragmentCollectionContributor =
+					bundleContext.getService(serviceReference);
 
-		_fragmentCollectionContributorsMap.put(
-			fragmentCollectionContributor.getFragmentCollectionKey(),
-			fragmentCollectionContributor);
-
-		Map<String, FragmentEntry> fragmentEntries = _fragmentEntries;
-
-		if (fragmentEntries != null) {
-			_populateFragmentEntries(
-				_fragmentEntries, fragmentCollectionContributor);
-		}
+				emitter.emit(
+					fragmentCollectionContributor.getFragmentCollectionKey());
+			},
+			new FragmentCollectionContributorTrackerServiceTrackerCustomizer(
+				bundleContext));
 	}
 
-	protected void unsetFragmentCollectionContributor(
-		FragmentCollectionContributor fragmentCollectionContributor) {
-
-		Map<String, FragmentEntry> fragmentEntries = _fragmentEntries;
-
-		if (fragmentEntries != null) {
-			for (int type : _SUPPORTED_FRAGMENT_TYPES) {
-				for (FragmentEntry fragmentEntry :
-						fragmentCollectionContributor.getFragmentEntries(
-							type)) {
-
-					fragmentEntries.remove(fragmentEntry.getFragmentEntryKey());
-				}
-			}
-		}
-
-		_fragmentCollectionContributorsMap.remove(
-			fragmentCollectionContributor.getFragmentCollectionKey());
+	@Deactivate
+	protected void deactivate() {
+		_serviceTrackerMap.close();
 	}
 
 	private synchronized Map<String, FragmentEntry> _getFragmentEntries() {
@@ -187,7 +170,7 @@ public class FragmentCollectionContributorTrackerImpl
 		_fragmentEntries = new ConcurrentHashMap<>();
 
 		for (FragmentCollectionContributor fragmentCollectionContributor :
-				_fragmentCollectionContributorsMap.values()) {
+				_serviceTrackerMap.values()) {
 
 			_populateFragmentEntries(
 				_fragmentEntries, fragmentCollectionContributor);
@@ -214,8 +197,67 @@ public class FragmentCollectionContributorTrackerImpl
 		FragmentConstants.TYPE_COMPONENT, FragmentConstants.TYPE_SECTION
 	};
 
-	private final Map<String, FragmentCollectionContributor>
-		_fragmentCollectionContributorsMap = new ConcurrentHashMap<>();
 	private volatile Map<String, FragmentEntry> _fragmentEntries;
+	private ServiceTrackerMap<String, FragmentCollectionContributor>
+		_serviceTrackerMap;
+
+	private class FragmentCollectionContributorTrackerServiceTrackerCustomizer
+		implements ServiceTrackerCustomizer
+			<FragmentCollectionContributor, FragmentCollectionContributor> {
+
+		public FragmentCollectionContributorTrackerServiceTrackerCustomizer(
+			BundleContext bundleContext) {
+
+			_bundleContext = bundleContext;
+		}
+
+		@Override
+		public FragmentCollectionContributor addingService(
+			ServiceReference<FragmentCollectionContributor> serviceReference) {
+
+			FragmentCollectionContributor fragmentCollectionContributor =
+				_bundleContext.getService(serviceReference);
+
+			Map<String, FragmentEntry> fragmentEntries = _fragmentEntries;
+
+			if (fragmentEntries != null) {
+				_populateFragmentEntries(
+					_fragmentEntries, fragmentCollectionContributor);
+			}
+
+			return fragmentCollectionContributor;
+		}
+
+		@Override
+		public void modifiedService(
+			ServiceReference<FragmentCollectionContributor> serviceReference,
+			FragmentCollectionContributor fragmentCollectionContributor) {
+		}
+
+		@Override
+		public void removedService(
+			ServiceReference<FragmentCollectionContributor> serviceReference,
+			FragmentCollectionContributor fragmentCollectionContributor) {
+
+			Map<String, FragmentEntry> fragmentEntries = _fragmentEntries;
+
+			if (fragmentEntries != null) {
+				for (int type : _SUPPORTED_FRAGMENT_TYPES) {
+					for (FragmentEntry fragmentEntry :
+							fragmentCollectionContributor.getFragmentEntries(
+								type)) {
+
+						fragmentEntries.remove(
+							fragmentEntry.getFragmentEntryKey());
+					}
+				}
+			}
+
+			_bundleContext.ungetService(serviceReference);
+		}
+
+		private final BundleContext _bundleContext;
+
+	}
 
 }
