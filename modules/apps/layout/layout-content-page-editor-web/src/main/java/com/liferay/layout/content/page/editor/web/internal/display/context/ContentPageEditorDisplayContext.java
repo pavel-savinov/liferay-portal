@@ -1410,9 +1410,10 @@ public class ContentPageEditorDisplayContext {
 		_redirect = ParamUtil.getString(request, "redirect");
 
 		if (Validator.isNull(_redirect)) {
-			_redirect = ParamUtil.getString(
-				PortalUtil.getOriginalServletRequest(request), "p_l_back_url",
-				themeDisplay.getURLCurrent());
+			_redirect = PortalUtil.escapeRedirect(
+				ParamUtil.getString(
+					PortalUtil.getOriginalServletRequest(request),
+					"p_l_back_url", themeDisplay.getURLCurrent()));
 		}
 
 		return _redirect;
