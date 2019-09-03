@@ -307,15 +307,6 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 				layoutPageTemplateEntry.getLayoutPageTemplateEntryId());
 		}
 
-		// Fragment entry instance links
-
-		_fragmentEntryLinkLocalService.
-			deleteLayoutPageTemplateEntryFragmentEntryLinks(
-				layoutPageTemplateEntry.getGroupId(),
-				classNameLocalService.getClassNameId(
-					LayoutPageTemplateEntry.class.getName()),
-				layoutPageTemplateEntry.getLayoutPageTemplateEntryId());
-
 		return layoutPageTemplateEntry;
 	}
 
