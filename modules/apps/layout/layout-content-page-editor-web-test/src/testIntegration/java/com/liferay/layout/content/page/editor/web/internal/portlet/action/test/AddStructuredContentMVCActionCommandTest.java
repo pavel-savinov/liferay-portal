@@ -80,6 +80,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -102,6 +103,19 @@ public class AddStructuredContentMVCActionCommandTest {
 		_group = GroupTestUtil.addGroup();
 
 		_company = _companyLocalService.getCompany(_group.getCompanyId());
+	}
+
+	@Test
+	public void testAddStructuredContentValidStructureWithFieldText()
+		throws Exception {
+
+		String fieldValue = StringUtil.randomString(10);
+
+		_testAddStructuredContentValidStructureWithField(
+			DDMFormFieldType.TEXT, StringUtil.randomString(10), fieldValue,
+			StringUtil.randomString(10),
+			actualFieldValue -> Assert.assertEquals(
+				fieldValue, actualFieldValue));
 	}
 
 	private DDMStructure _addDDMStructure(DDMFormField... ddmFormFields)
