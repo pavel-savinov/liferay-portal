@@ -28,11 +28,13 @@ import com.liferay.dynamic.data.mapping.util.DDM;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletActionRequest;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -53,6 +55,8 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
 import java.io.InputStream;
+
+import javax.portlet.ActionRequest;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -100,6 +104,26 @@ public class AddStructuredContentMVCActionCommandTest {
 
 		return DDMStructureTestUtil.addStructure(
 			_group.getGroupId(), JournalArticle.class.getName(), ddmForm);
+	}
+
+	private JSONObject _addStructuredContentStructureWithField(
+			String fieldType, String fieldName, String fieldValue, String title)
+		throws Exception {
+
+		DDMStructure ddmStructure = _addDDMStructure(
+			DDMFormTestUtil.createDDMFormField(
+				fieldName, StringUtil.randomString(10), fieldType, "string",
+				false, false, false));
+
+		DDMFormValues ddmFormValues = _getDDMFormValues(
+			ddmStructure, fieldName, fieldValue);
+
+		MockActionRequest mockActionRequest = _getMockActionRequest(
+			ddmFormValues, ddmStructure.getStructureId(), title);
+
+		return ReflectionTestUtil.invoke(
+			_mvcActionCommand, "addJournalArticle",
+			new Class<?>[] {ActionRequest.class}, mockActionRequest);
 	}
 
 	private byte[] _getBytes(String fileName) throws Exception {
