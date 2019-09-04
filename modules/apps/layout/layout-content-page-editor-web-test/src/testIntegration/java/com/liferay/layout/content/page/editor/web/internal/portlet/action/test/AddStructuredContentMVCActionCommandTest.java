@@ -106,6 +106,14 @@ public class AddStructuredContentMVCActionCommandTest {
 	}
 
 	@Test
+	public void testAddStructuredContentInvalidStructureWithFieldImageURL()
+		throws Exception {
+
+		_testAddStructuredContentInvalidStructureWithFieldImage(
+			"http://nonexistingimage");
+	}
+
+	@Test
 	public void testAddStructuredContentValidStructureWithFieldImageURLJpg()
 		throws Exception {
 
