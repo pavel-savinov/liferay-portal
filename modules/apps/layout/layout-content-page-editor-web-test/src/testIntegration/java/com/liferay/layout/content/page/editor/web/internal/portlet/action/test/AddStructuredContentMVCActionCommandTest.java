@@ -17,6 +17,7 @@ package com.liferay.layout.content.page.editor.web.internal.portlet.action.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.util.DLURLHelper;
+import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.util.DDM;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -34,6 +35,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -76,6 +78,29 @@ public class AddStructuredContentMVCActionCommandTest {
 			"dependencies/" + fileName);
 
 		return FileUtil.getBytes(inputStream);
+	}
+
+	private MockActionRequest _getMockActionRequest(
+			DDMFormValues ddmFormValues, long ddmStructureId, String title)
+		throws PortalException {
+
+		MockActionRequest mockActionRequest = new MockActionRequest();
+
+		mockActionRequest.setAttribute(
+			WebKeys.THEME_DISPLAY, _getThemeDisplay());
+
+		mockActionRequest.addParameter(
+			"ddmFormValues", _ddm.getDDMFormValuesJSONString(ddmFormValues));
+
+		mockActionRequest.addParameter(
+			"ddmStructureId", String.valueOf(ddmStructureId));
+
+		mockActionRequest.addParameter(
+			"groupId", String.valueOf(_group.getGroupId()));
+
+		mockActionRequest.addParameter("title", title);
+
+		return mockActionRequest;
 	}
 
 	private ThemeDisplay _getThemeDisplay() throws PortalException {
