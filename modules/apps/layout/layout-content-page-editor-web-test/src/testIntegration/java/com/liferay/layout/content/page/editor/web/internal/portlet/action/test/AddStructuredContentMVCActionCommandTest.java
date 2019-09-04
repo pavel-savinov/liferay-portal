@@ -106,6 +106,14 @@ public class AddStructuredContentMVCActionCommandTest {
 	}
 
 	@Test
+	public void testAddStructuredContentInvalidStructureWithFieldImageBase64Png()
+		throws Exception {
+
+		_testAddStructuredContentInvalidStructureWithFieldImage(
+			"data:image/png;base64,iVB");
+	}
+
+	@Test
 	public void testAddStructuredContentInvalidStructureWithFieldImageURL()
 		throws Exception {
 
