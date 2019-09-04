@@ -19,6 +19,7 @@ import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
+import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
@@ -30,10 +31,12 @@ import com.liferay.journal.model.JournalFolderConstants;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
@@ -43,6 +46,7 @@ import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -273,6 +277,44 @@ public class AddStructuredContentMVCActionCommandTest {
 			_getFieldValue(actualJournalArticle, fieldName));
 
 		Assert.assertEquals(title, jsonObject.getString("title"));
+	}
+
+	private void _testAddStructuredContentValidStructureWithFieldImage(
+			String fieldValue, String expectedFieldValue)
+		throws Exception {
+
+		String fieldName = StringUtil.randomString(10);
+		String title = StringUtil.randomString(10);
+
+		_testAddStructuredContentValidStructureWithField(
+			DDMFormFieldType.IMAGE, fieldName, fieldValue, title,
+			actualFieldValue -> {
+				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+					actualFieldValue);
+
+				Assert.assertEquals(
+					_group.getGroupId(), jsonObject.getLong("groupId"));
+
+				String expectedTitle = title + " - " + fieldName;
+
+				Assert.assertEquals(
+					expectedTitle, jsonObject.getString("title"));
+
+				Assert.assertEquals(
+					_group.getGroupId(), jsonObject.getLong("groupId"));
+
+				FileEntry fileEntry =
+					_dlAppLocalService.getFileEntryByUuidAndGroupId(
+						jsonObject.getString("uuid"),
+						jsonObject.getLong("groupId"));
+
+				Assert.assertEquals(expectedTitle, fileEntry.getTitle());
+
+				Assert.assertEquals(
+					expectedFieldValue,
+					Base64.encode(
+						FileUtil.getBytes(fileEntry.getContentStream())));
+			});
 	}
 
 	private Company _company;
