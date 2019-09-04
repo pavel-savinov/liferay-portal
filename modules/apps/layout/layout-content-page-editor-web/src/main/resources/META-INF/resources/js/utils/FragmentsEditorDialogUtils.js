@@ -26,6 +26,8 @@ let _widgetConfigurationChangeHandler = null;
  * Possible types that can be returned by the image selector
  */
 const IMAGE_SELECTOR_RETURN_TYPES = {
+	downloadFileEntryItemSelector:
+		'com.liferay.item.selector.criteria.DownloadFileEntryItemSelectorReturnType',
 	downloadUrl:
 		'com.liferay.item.selector.criteria.DownloadURLItemSelectorReturnType',
 	fileEntryItemSelector:
@@ -105,25 +107,31 @@ function openImageSelector({
 					const selectedItem = event.newVal || {};
 
 					const {returnType, value} = selectedItem;
-					let selectedImageURL = '';
+					const selectedImage = {};
 
 					if (
 						returnType ===
 							IMAGE_SELECTOR_RETURN_TYPES.downloadUrl ||
 						returnType === IMAGE_SELECTOR_RETURN_TYPES.url
 					) {
-						selectedImageURL = value;
+						selectedImage.title = _parseImageTitle(value);
+						selectedImage.url = value;
 					}
 
 					if (
 						returnType ===
-						IMAGE_SELECTOR_RETURN_TYPES.fileEntryItemSelector
+							IMAGE_SELECTOR_RETURN_TYPES.fileEntryItemSelector ||
+						returnType ===
+							IMAGE_SELECTOR_RETURN_TYPES.downloadFileEntryItemSelector
 					) {
-						selectedImageURL = JSON.parse(value).url;
+						const fileEntry = JSON.parse(value);
+
+						selectedImage.title = fileEntry.title;
+						selectedImage.url = fileEntry.url;
 					}
 
-					if (selectedImageURL) {
-						callback(selectedImageURL);
+					if (selectedImage.url) {
+						callback(selectedImage);
 					}
 				},
 
@@ -181,6 +189,12 @@ function stopListeningWidgetConfigurationChange() {
 
 		_widgetConfigurationChangeHandler = null;
 	}
+}
+
+function _parseImageTitle(url) {
+	const match = /\/([^\/\.]+\.\w{3,4})$/i.exec(url);
+
+	return match[1] || url;
 }
 
 export {
