@@ -212,6 +212,31 @@ public class AddStructuredContentMVCActionCommandTest {
 		return StringUtil.read(inputStream);
 	}
 
+	private void _testAddStructuredContentInvalidStructureWithField(
+			String fieldType, String fieldName, String fieldValue, String title,
+			UnsafeConsumer<JSONObject, Exception> errorValidator)
+		throws Exception {
+
+		List<JournalArticle> originalJournalArticles =
+			_journalArticleLocalService.getArticles(
+				_group.getGroupId(),
+				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+
+		JSONObject jsonObject = _addStructuredContentStructureWithField(
+			fieldType, fieldName, fieldValue, title);
+
+		List<JournalArticle> actualJournalArticles =
+			_journalArticleLocalService.getArticles(
+				_group.getGroupId(),
+				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+
+		Assert.assertEquals(
+			actualJournalArticles.toString(), originalJournalArticles.size(),
+			actualJournalArticles.size());
+
+		errorValidator.accept(jsonObject);
+	}
+
 	private void _testAddStructuredContentValidStructureWithField(
 			String fieldType, String fieldName, String fieldValue, String title,
 			UnsafeConsumer<String, Exception> fieldValueValidator)
