@@ -53,6 +53,7 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Base64;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -169,6 +170,14 @@ public class AddStructuredContentMVCActionCommandTest {
 
 		_testAddStructuredContentValidStructureWithFieldImage(
 			fieldValue, fieldValue.split("base64,")[1]);
+	}
+
+	@Test
+	public void testAddStructuredContentValidStructureWithFieldImageDocumentLibraryBmp()
+		throws Exception {
+
+		_testAddStructuredContentValidStructureWithFieldImageDocumentLibrary(
+			"bmp", ContentTypes.IMAGE_BMP);
 	}
 
 	@Test
