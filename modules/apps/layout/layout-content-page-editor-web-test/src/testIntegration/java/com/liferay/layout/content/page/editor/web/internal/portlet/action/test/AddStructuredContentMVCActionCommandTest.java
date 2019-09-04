@@ -118,6 +118,19 @@ public class AddStructuredContentMVCActionCommandTest {
 				fieldValue, actualFieldValue));
 	}
 
+	@Test
+	public void testAddStructuredContentValidStructureWithFieldTextArea()
+		throws Exception {
+
+		String fieldValue = StringUtil.randomString(10);
+
+		_testAddStructuredContentValidStructureWithField(
+			DDMFormFieldType.TEXT_AREA, StringUtil.randomString(10), fieldValue,
+			StringUtil.randomString(10),
+			actualFieldValue -> Assert.assertEquals(
+				fieldValue, actualFieldValue));
+	}
+
 	private DDMStructure _addDDMStructure(DDMFormField... ddmFormFields)
 		throws Exception {
 
