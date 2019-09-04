@@ -189,6 +189,14 @@ public class AddStructuredContentMVCActionCommandTest {
 	}
 
 	@Test
+	public void testAddStructuredContentValidStructureWithFieldImageDocumentLibraryJpeg()
+		throws Exception {
+
+		_testAddStructuredContentValidStructureWithFieldImageDocumentLibrary(
+			"jpeg", ContentTypes.IMAGE_JPEG);
+	}
+
+	@Test
 	public void testAddStructuredContentValidStructureWithFieldImageURLJpg()
 		throws Exception {
 
