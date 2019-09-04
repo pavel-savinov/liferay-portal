@@ -144,6 +144,16 @@ public class AddStructuredContentMVCActionCommandTest {
 	}
 
 	@Test
+	public void testAddStructuredContentValidStructureWithFieldImageBase64Jpg()
+		throws Exception {
+
+		String fieldValue = _read("liferay_base_64_jpg.txt");
+
+		_testAddStructuredContentValidStructureWithFieldImage(
+			fieldValue, fieldValue.split("base64,")[1]);
+	}
+
+	@Test
 	public void testAddStructuredContentValidStructureWithFieldImageURLJpg()
 		throws Exception {
 
