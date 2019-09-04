@@ -17,12 +17,19 @@ package com.liferay.fragment.internal.contributor;
 import com.liferay.fragment.constants.FragmentConstants;
 import com.liferay.fragment.contributor.FragmentCollectionContributor;
 import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
+import com.liferay.fragment.exception.FragmentEntryConfigurationException;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
+import com.liferay.fragment.processor.FragmentEntryProcessorRegistry;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
+import com.liferay.fragment.validator.FragmentEntryValidator;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.AggregateResourceBundleLoader;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 
 import java.util.ArrayList;
@@ -165,18 +172,31 @@ public class FragmentCollectionContributorTrackerImpl
 		_serviceTrackerMap.close();
 	}
 
+	@Reference
+	protected FragmentEntryProcessorRegistry fragmentEntryProcessorRegistry;
+
+	@Reference
+	protected FragmentEntryValidator fragmentEntryValidator;
+
 	private synchronized Map<String, FragmentEntry> _getFragmentEntries() {
 		return new HashMap<>(_fragmentEntries);
 	}
 
-	private Map<String, FragmentEntry> _populateFragmentEntries(
-		FragmentCollectionContributor fragmentCollectionContributor) {
+	private Map<String, FragmentEntry> _getFragmentEntries(
+			FragmentCollectionContributor fragmentCollectionContributor)
+		throws PortalException {
 
 		Map<String, FragmentEntry> fragmentEntries = new HashMap<>();
 
 		for (int type : _SUPPORTED_FRAGMENT_TYPES) {
 			for (FragmentEntry fragmentEntry :
 					fragmentCollectionContributor.getFragmentEntries(type)) {
+
+				fragmentEntryValidator.validateConfiguration(
+					fragmentEntry.getConfiguration());
+
+				fragmentEntryProcessorRegistry.validateFragmentEntryHTML(
+					fragmentEntry.getHtml(), fragmentEntry.getConfiguration());
 
 				fragmentEntries.put(
 					fragmentEntry.getFragmentEntryKey(), fragmentEntry);
@@ -209,6 +229,9 @@ public class FragmentCollectionContributorTrackerImpl
 		FragmentConstants.TYPE_COMPONENT, FragmentConstants.TYPE_SECTION
 	};
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		FragmentCollectionContributorTrackerImpl.class);
+
 	private volatile Map<String, FragmentEntry> _fragmentEntries =
 		new ConcurrentHashMap<>();
 
@@ -235,12 +258,32 @@ public class FragmentCollectionContributorTrackerImpl
 			FragmentCollectionContributor fragmentCollectionContributor =
 				_bundleContext.getService(serviceReference);
 
-			Map<String, FragmentEntry> fragmentEntries =
-				_populateFragmentEntries(fragmentCollectionContributor);
+			try {
+				Map<String, FragmentEntry> fragmentEntries =
+					_getFragmentEntries(fragmentCollectionContributor);
 
-			_fragmentEntries.putAll(fragmentEntries);
+				if (MapUtil.isEmpty(fragmentEntries)) {
+					return null;
+				}
 
-			return fragmentCollectionContributor;
+				_fragmentEntries.putAll(fragmentEntries);
+
+				return fragmentCollectionContributor;
+			}
+			catch (PortalException pe) {
+				if (pe instanceof FragmentEntryConfigurationException) {
+					_log.error(
+						"There are fragment entries with invalid" +
+							"configuration for " +
+								fragmentCollectionContributor.getName(),
+						pe);
+				}
+				else {
+					_log.error(pe, pe);
+				}
+			}
+
+			return null;
 		}
 
 		@Override
