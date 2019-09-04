@@ -26,7 +26,9 @@ import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestUtil;
 import com.liferay.dynamic.data.mapping.util.DDM;
 import com.liferay.journal.model.JournalArticle;
+import com.liferay.journal.model.JournalFolderConstants;
 import com.liferay.journal.service.JournalArticleLocalService;
+import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Company;
@@ -56,10 +58,13 @@ import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
 import java.io.InputStream;
 
+import java.util.List;
+
 import javax.portlet.ActionRequest;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -205,6 +210,44 @@ public class AddStructuredContentMVCActionCommandTest {
 			"dependencies/" + fileName);
 
 		return StringUtil.read(inputStream);
+	}
+
+	private void _testAddStructuredContentValidStructureWithField(
+			String fieldType, String fieldName, String fieldValue, String title,
+			UnsafeConsumer<String, Exception> fieldValueValidator)
+		throws Exception {
+
+		List<JournalArticle> originalJournalArticles =
+			_journalArticleLocalService.getArticles(
+				_group.getGroupId(),
+				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+
+		JSONObject jsonObject = _addStructuredContentStructureWithField(
+			fieldType, fieldName, fieldValue, title);
+
+		List<JournalArticle> actualJournalArticles =
+			_journalArticleLocalService.getArticles(
+				_group.getGroupId(),
+				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+
+		Assert.assertEquals(
+			actualJournalArticles.toString(),
+			originalJournalArticles.size() + 1, actualJournalArticles.size());
+
+		Assert.assertEquals(
+			JournalArticle.class.getName(),
+			_portal.getClassName(jsonObject.getLong("classNameId")));
+
+		JournalArticle actualJournalArticle =
+			_journalArticleLocalService.getLatestArticle(
+				jsonObject.getLong("classPK"));
+
+		Assert.assertEquals(title, actualJournalArticle.getTitle());
+
+		fieldValueValidator.accept(
+			_getFieldValue(actualJournalArticle, fieldName));
+
+		Assert.assertEquals(title, jsonObject.getString("title"));
 	}
 
 	private Company _company;
