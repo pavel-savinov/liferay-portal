@@ -17,7 +17,9 @@ package com.liferay.layout.content.page.editor.web.internal.portlet.action.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.util.DLURLHelper;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
+import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
 import com.liferay.dynamic.data.mapping.util.DDM;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -78,6 +80,19 @@ public class AddStructuredContentMVCActionCommandTest {
 			"dependencies/" + fileName);
 
 		return FileUtil.getBytes(inputStream);
+	}
+
+	private DDMFormValues _getDDMFormValues(
+		DDMStructure ddmStructure, String fieldName, String fieldValue) {
+
+		DDMFormValues ddmFormValues = DDMFormValuesTestUtil.createDDMFormValues(
+			ddmStructure.getDDMForm());
+
+		ddmFormValues.addDDMFormFieldValue(
+			DDMFormValuesTestUtil.createUnlocalizedDDMFormFieldValue(
+				fieldName, fieldValue));
+
+		return ddmFormValues;
 	}
 
 	private MockActionRequest _getMockActionRequest(
