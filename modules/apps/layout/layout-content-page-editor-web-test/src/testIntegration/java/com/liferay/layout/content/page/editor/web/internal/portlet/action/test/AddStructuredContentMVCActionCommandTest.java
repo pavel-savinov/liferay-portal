@@ -241,6 +241,20 @@ public class AddStructuredContentMVCActionCommandTest {
 		errorValidator.accept(jsonObject);
 	}
 
+	private void _testAddStructuredContentInvalidStructureWithFieldImage(
+			String fieldValue)
+		throws Exception {
+
+		String fieldName = StringUtil.randomString(10);
+		String title = StringUtil.randomString(10);
+
+		_testAddStructuredContentInvalidStructureWithField(
+			DDMFormFieldType.IMAGE, fieldName, fieldValue, title,
+			jsonObject -> Assert.assertEquals(
+				"the-web-content-article-could-not-be-created",
+				jsonObject.getString("errorMessage")));
+	}
+
 	private void _testAddStructuredContentValidStructureWithField(
 			String fieldType, String fieldName, String fieldValue, String title,
 			UnsafeConsumer<String, Exception> fieldValueValidator)
