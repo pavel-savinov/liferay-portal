@@ -405,7 +405,8 @@ class FragmentEditableField extends PortletBase {
 				.dispatch(enableSavingChangesStatusAction())
 				.dispatch({
 					config: {
-						[EDITABLE_FIELD_CONFIG_KEYS.imageSource]: newValue
+						[EDITABLE_FIELD_CONFIG_KEYS.imageSource]: newValue.url,
+						[EDITABLE_FIELD_CONFIG_KEYS.imageTitle]: newValue.title
 					},
 					editableId: this.editableId,
 					fragmentEntryLinkId: this.fragmentEntryLinkId,

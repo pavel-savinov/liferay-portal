@@ -26,11 +26,38 @@ import {prefixSegmentsExperienceId} from '../../../utils/prefixSegmentsExperienc
 import {openImageSelector} from '../../../utils/FragmentsEditorDialogUtils';
 import templates from './FloatingToolbarFragmentBackgroundImagePanel.soy';
 import {updateEditableValueAction} from '../../../actions/updateEditableValue.es';
+import {setIn} from '../../../utils/FragmentsEditorUpdateUtils.es';
 
 /**
  * FloatingToolbarFragmentBackgroundImagePanel
  */
 class FloatingToolbarFragmentBackgroundImagePanel extends Component {
+	/**
+	 * @inheritdoc
+	 * @param {object} state
+	 * @return {object}
+	 * @review
+	 */
+	prepareStateForRender(state) {
+		let nextState = state;
+
+		if (this.item.backgroundImage.title) {
+			nextState = setIn(
+				nextState,
+				['_backgroundImage'],
+				this.item.backgroundImage.title
+			);
+		} else {
+			nextState = setIn(
+				nextState,
+				['_backgroundImage'],
+				this.item.backgroundImage
+			);
+		}
+
+		return nextState;
+	}
+
 	/**
 	 * Show image selector
 	 * @private
@@ -38,7 +65,7 @@ class FloatingToolbarFragmentBackgroundImagePanel extends Component {
 	 */
 	_handleSelectButtonClick() {
 		openImageSelector({
-			callback: url => this._updateFragmentBackgroundImage(url),
+			callback: image => this._updateFragmentBackgroundImage(image),
 			imageSelectorURL: this.imageSelectorURL,
 			portletNamespace: this.portletNamespace
 		});
@@ -57,11 +84,11 @@ class FloatingToolbarFragmentBackgroundImagePanel extends Component {
 	 * Dispatches action to update editableValues with new background image url
 	 * @param {string} backgroundImageURL
 	 */
-	_updateFragmentBackgroundImage(backgroundImageURL) {
+	_updateFragmentBackgroundImage(image) {
 		this.store.dispatch(
 			updateEditableValueAction({
 				editableId: this.item.editableId,
-				editableValueContent: backgroundImageURL,
+				editableValueContent: image,
 				editableValueId: this.languageId || DEFAULT_LANGUAGE_ID_KEY,
 				fragmentEntryLinkId: this.item.fragmentEntryLinkId,
 				processor: BACKGROUND_IMAGE_FRAGMENT_ENTRY_PROCESSOR,
@@ -81,6 +108,14 @@ class FloatingToolbarFragmentBackgroundImagePanel extends Component {
  * @type {!Object}
  */
 FloatingToolbarFragmentBackgroundImagePanel.STATE = {
+	/**
+	 * @default ''
+	 * @memberof FloatingToolbarFragmentBackgroundImagePanel
+	 * @review
+	 * @type {string}
+	 */
+	_backgroundImage: Config.object().value(''),
+
 	/**
 	 * @default undefined
 	 * @memberof FloatingToolbarFragmentBackgroundImagePanel

@@ -4,9 +4,7 @@
  * FloatingToolbarLayoutBackgroundImagePanel
  */
 {template .render}
-	{@param item: [
-		backgroundImage: string
-	]}
+	{@param? _backgroundImage: string}
 	{@param? _handleClearButtonClick: any}
 	{@param? _handleSelectButtonClick: any}
 
@@ -21,8 +19,8 @@
 			{/let}
 
 			{let $inputValue kind="text"}
-				{if $item.backgroundImage}
-					{$item.backgroundImage}
+				{if $_backgroundImage}
+					{$_backgroundImage}
 				{/if}
 			{/let}
 
@@ -44,7 +42,7 @@
 					data-onclick="{$_handleSelectButtonClick}"
 					type="button"
 				>
-					{if $item.backgroundImage}
+					{if $_backgroundImage}
 						{msg desc=""}change-image{/msg}
 					{else}
 						{msg desc=""}select{/msg}
@@ -58,7 +56,7 @@
 					data-onclick="{$_handleClearButtonClick}"
 					type="button"
 
-					{if (not $item.backgroundImage)}
+					{if (not $_backgroundImage)}
 						disabled
 					{/if}
 				{/let}

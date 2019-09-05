@@ -260,7 +260,7 @@ class FragmentEditableBackgroundImage extends Component {
 
 		if (item === this.element && this._active) {
 			openImageSelector({
-				callback: url => this._updateFragmentBackgroundImage(url),
+				callback: image => this._updateFragmentBackgroundImage(image),
 				imageSelectorURL: this.imageSelectorURL,
 				portletNamespace: this.portletNamespace
 			});
@@ -281,7 +281,7 @@ class FragmentEditableBackgroundImage extends Component {
 			panelId === FLOATING_TOOLBAR_BUTTONS.fragmentBackgroundImage.panelId
 		) {
 			openImageSelector({
-				callback: url => this._updateFragmentBackgroundImage(url),
+				callback: image => this._updateFragmentBackgroundImage(image),
 				imageSelectorURL: this.imageSelectorURL,
 				portletNamespace: this.portletNamespace
 			});
@@ -360,11 +360,11 @@ class FragmentEditableBackgroundImage extends Component {
 	 * Dispatches action to update editableValues with new background image url
 	 * @param {string} backgroundImageURL
 	 */
-	_updateFragmentBackgroundImage(backgroundImageURL) {
+	_updateFragmentBackgroundImage(image) {
 		this.store.dispatch(
 			updateEditableValueAction({
 				editableId: this.editableId,
-				editableValueContent: backgroundImageURL,
+				editableValueContent: image,
 				editableValueId: this.languageId || DEFAULT_LANGUAGE_ID_KEY,
 				fragmentEntryLinkId: this.fragmentEntryLinkId,
 				processor: BACKGROUND_IMAGE_FRAGMENT_ENTRY_PROCESSOR,
