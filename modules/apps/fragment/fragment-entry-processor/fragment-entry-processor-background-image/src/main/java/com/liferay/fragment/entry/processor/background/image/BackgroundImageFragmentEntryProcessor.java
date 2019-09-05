@@ -158,6 +158,13 @@ public class BackgroundImageFragmentEntryProcessor
 			}
 
 			if (Validator.isNotNull(value)) {
+				if (value.startsWith(StringPool.OPEN_CURLY_BRACE)) {
+					JSONObject valueJSONObject =
+						JSONFactoryUtil.createJSONObject(value);
+
+					value = valueJSONObject.getString("url", value);
+				}
+
 				element.attr(
 					"style",
 					"background-image: url(" + value +
