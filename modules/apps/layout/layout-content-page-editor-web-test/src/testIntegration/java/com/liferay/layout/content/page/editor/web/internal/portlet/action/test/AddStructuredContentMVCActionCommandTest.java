@@ -507,7 +507,9 @@ public class AddStructuredContentMVCActionCommandTest {
 		String previewURL = _dlURLHelper.getPreviewURL(
 			fileEntry, fileEntry.getFileVersion(), null, StringPool.BLANK);
 
-		String fieldValue = "http://localhost:8080" + previewURL;
+		String portalURL = _company.getPortalURL(_group.getGroupId());
+
+		String fieldValue = portalURL + previewURL;
 
 		URL url = new URL(fieldValue);
 
