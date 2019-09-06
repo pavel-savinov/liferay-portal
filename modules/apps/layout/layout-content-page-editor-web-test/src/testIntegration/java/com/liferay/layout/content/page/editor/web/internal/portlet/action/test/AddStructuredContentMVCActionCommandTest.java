@@ -213,20 +213,6 @@ public class AddStructuredContentMVCActionCommandTest {
 	}
 
 	@Test
-	public void testAddStructuredContentValidStructureWithFieldImageURLJpg()
-		throws Exception {
-
-		String fieldValue =
-			"https://pbs.twimg.com/profile_images/1016933890274025472/hnd_Al" +
-				"2U_400x400.jpg";
-
-		URL url = new URL(fieldValue);
-
-		_testAddStructuredContentValidStructureWithFieldImage(
-			fieldValue, Base64.encode(FileUtil.getBytes(url.openStream())));
-	}
-
-	@Test
 	public void testAddStructuredContentValidStructureWithFieldText()
 		throws Exception {
 
