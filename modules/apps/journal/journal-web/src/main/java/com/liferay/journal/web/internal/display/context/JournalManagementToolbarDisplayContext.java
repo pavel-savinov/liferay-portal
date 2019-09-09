@@ -56,6 +56,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.portlet.PortletURL;
 
@@ -400,6 +401,15 @@ public class JournalManagementToolbarDisplayContext
 	@Override
 	public String getSearchFormName() {
 		return "fm1";
+	}
+
+	@Override
+	public String getSortingOrder() {
+		if (Objects.equals(getOrderByCol(), "relevance")) {
+			return null;
+		}
+
+		return super.getSortingOrder();
 	}
 
 	@Override
