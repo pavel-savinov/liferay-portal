@@ -22,6 +22,7 @@ import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
+import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLinkLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestUtil;
@@ -32,12 +33,14 @@ import com.liferay.journal.model.JournalFolderConstants;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -128,6 +131,66 @@ public class JournalArticleLocalServiceTest {
 			Assert.assertEquals(
 				oldResourcePermission.isViewActionId(),
 				newResourcePermission.isViewActionId());
+		}
+	}
+
+	@Test
+	public void testDeleteDDMStructurePredefinedValues() throws Exception {
+		Tuple tuple = _createJournalArticleWithPredefinedValues("Test Article");
+
+		JournalArticle journalArticle = (JournalArticle)tuple.getObject(0);
+		DDMStructure ddmStructure = (DDMStructure)tuple.getObject(1);
+
+		DDMStructure actualDDMStrucure = journalArticle.getDDMStructure();
+
+		List<DDMFormField> ddmFormFields = actualDDMStrucure.getDDMFormFields(
+			false);
+
+		for (DDMFormField ddmFormField : ddmFormFields) {
+			LocalizedValue localizedValue = ddmFormField.getPredefinedValue();
+
+			Map<Locale, String> values = localizedValue.getValues();
+
+			for (Map.Entry<Locale, String> entry : values.entrySet()) {
+				Assert.assertNotEquals(StringPool.BLANK, entry.getValue());
+			}
+		}
+
+		Assert.assertEquals(
+			actualDDMStrucure.getStructureId(), ddmStructure.getStructureId());
+
+		JournalArticle defaultJournalArticle =
+			JournalArticleLocalServiceUtil.getArticle(
+				ddmStructure.getGroupId(), DDMStructure.class.getName(),
+				ddmStructure.getStructureId());
+
+		Assert.assertEquals(
+			defaultJournalArticle.getTitle(), journalArticle.getTitle());
+
+		ServiceContextThreadLocal.pushServiceContext(
+			ServiceContextTestUtil.getServiceContext());
+
+		JournalArticleLocalServiceUtil.deleteArticleDefaultValues(
+			journalArticle.getGroupId(), journalArticle.getArticleId(),
+			journalArticle.getDDMStructureKey());
+
+		Assert.assertNull(
+			JournalArticleLocalServiceUtil.fetchLatestArticle(
+				defaultJournalArticle.getResourcePrimKey()));
+
+		actualDDMStrucure = DDMStructureLocalServiceUtil.getDDMStructure(
+			actualDDMStrucure.getStructureId());
+
+		ddmFormFields = actualDDMStrucure.getDDMFormFields(false);
+
+		for (DDMFormField ddmFormField : ddmFormFields) {
+			LocalizedValue localizedValue = ddmFormField.getPredefinedValue();
+
+			Map<Locale, String> values = localizedValue.getValues();
+
+			for (Map.Entry<Locale, String> entry : values.entrySet()) {
+				Assert.assertEquals(StringPool.BLANK, entry.getValue());
+			}
 		}
 	}
 
