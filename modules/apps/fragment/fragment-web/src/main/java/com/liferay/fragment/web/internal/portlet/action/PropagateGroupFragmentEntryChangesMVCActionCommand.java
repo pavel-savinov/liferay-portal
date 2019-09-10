@@ -17,13 +17,15 @@ package com.liferay.fragment.web.internal.portlet.action;
 import com.liferay.fragment.constants.FragmentPortletKeys;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.Property;
+import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ParamUtil;
-
-import java.util.List;
+import com.liferay.portal.kernel.util.WebKeys;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -56,16 +58,31 @@ public class PropagateGroupFragmentEntryChangesMVCActionCommand
 
 		long[] groupIds = ParamUtil.getLongValues(actionRequest, "rowIds");
 
-		for (long groupId : groupIds) {
-			List<FragmentEntryLink> fragmentEntryLinks =
-				_fragmentEntryLinkLocalService.getFragmentEntryLinks(
-					groupId, fragmentEntryId, QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS, null);
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
 
-			for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
-				_fragmentEntryLinkLocalService.updateLatestChanges(
-					fragmentEntryLink.getFragmentEntryLinkId());
-			}
+		for (long groupId : groupIds) {
+			ActionableDynamicQuery actionableDynamicQuery =
+				_fragmentEntryLinkLocalService.getActionableDynamicQuery();
+
+			actionableDynamicQuery.setAddCriteriaMethod(
+				dynamicQuery -> {
+					Property fragmentEntryIdProperty =
+						PropertyFactoryUtil.forName("fragmentEntryId");
+
+					dynamicQuery.add(
+						fragmentEntryIdProperty.eq(fragmentEntryId));
+				});
+
+			actionableDynamicQuery.setCompanyId(themeDisplay.getCompanyId());
+			actionableDynamicQuery.setGroupId(groupId);
+
+			actionableDynamicQuery.setPerformActionMethod(
+				(FragmentEntryLink fragmentEntryLink) ->
+					_fragmentEntryLinkLocalService.updateLatestChanges(
+						fragmentEntryLink.getFragmentEntryLinkId()));
+
+			actionableDynamicQuery.performActions();
 		}
 
 		String redirect = ParamUtil.getString(actionRequest, "redirect");
