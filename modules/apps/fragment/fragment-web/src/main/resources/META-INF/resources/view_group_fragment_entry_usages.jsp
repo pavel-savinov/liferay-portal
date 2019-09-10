@@ -33,11 +33,11 @@ renderResponse.setTitle(LanguageUtil.format(request, "usages-and-propagation-x",
 			<div class="col-lg-12">
 
 				<%
-				FragmentEntryUsageManagementToolbarDisplayContext fragmentEntryUsageManagementToolbarDisplayContext = new FragmentEntryUsageManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, groupFragmentEntryLinkDisplayContext.getSearchContainer());
+				GroupFragmentEntryUsageManagementToolbarDisplayContext groupFragmentEntryUsageManagementToolbarDisplayContext = new GroupFragmentEntryUsageManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, groupFragmentEntryLinkDisplayContext.getSearchContainer());
 				%>
 
 				<clay:management-toolbar
-					displayContext="<%= fragmentEntryUsageManagementToolbarDisplayContext %>"
+					displayContext="<%= groupFragmentEntryUsageManagementToolbarDisplayContext %>"
 				/>
 
 				<portlet:actionURL name="/fragment/propagate_group_fragment_entry_changes" var="propagateGroupFragmentEntryChangesURL">
@@ -80,6 +80,6 @@ renderResponse.setTitle(LanguageUtil.format(request, "usages-and-propagation-x",
 </div>
 
 <liferay-frontend:component
-	componentId="<%= fragmentEntryUsageManagementToolbarDisplayContext.getDefaultEventHandler() %>"
+	componentId="<%= groupFragmentEntryUsageManagementToolbarDisplayContext.getDefaultEventHandler() %>"
 	module="js/FragmentEntryUsageManagementToolbarDefaultEventHandler.es"
 />

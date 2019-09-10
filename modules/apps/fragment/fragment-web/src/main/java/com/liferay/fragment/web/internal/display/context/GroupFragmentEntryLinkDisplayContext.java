@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -92,6 +93,27 @@ public class GroupFragmentEntryLinkDisplayContext {
 		return groupFragmentEntryUsages.get(group);
 	}
 
+	public String getOrderByCol() {
+		if (Validator.isNotNull(_orderByCol)) {
+			return _orderByCol;
+		}
+
+		_orderByCol = ParamUtil.getString(_renderRequest, "orderByCol", "name");
+
+		return _orderByCol;
+	}
+
+	public String getOrderByType() {
+		if (Validator.isNotNull(_orderByType)) {
+			return _orderByType;
+		}
+
+		_orderByType = ParamUtil.getString(
+			_renderRequest, "orderByType", "asc");
+
+		return _orderByType;
+	}
+
 	public String getRedirect() {
 		if (_redirect != null) {
 			return _redirect;
@@ -125,12 +147,27 @@ public class GroupFragmentEntryLinkDisplayContext {
 				new EmptyOnClickRowChecker(_renderResponse));
 		}
 
+		boolean orderByAsc = false;
+
+		String orderByType = getOrderByType();
+
+		if (orderByType.equals("asc")) {
+			orderByAsc = true;
+		}
+
+		OrderByComparator<Group> orderByComparator = new GroupNameComparator(
+			orderByAsc);
+
+		groupsSearchContainer.setOrderByCol(getOrderByCol());
+		groupsSearchContainer.setOrderByComparator(orderByComparator);
+		groupsSearchContainer.setOrderByType(orderByType);
+
 		Map<Group, Long> groupFragmentEntryUsages =
 			_getGroupFragmentEntryUsages();
 
 		List<Group> groups = new ArrayList<>(groupFragmentEntryUsages.keySet());
 
-		Collections.sort(groups, new GroupNameComparator(true));
+		Collections.sort(groups, orderByComparator);
 
 		groupsSearchContainer.setResults(groups);
 
@@ -165,6 +202,8 @@ public class GroupFragmentEntryLinkDisplayContext {
 	private FragmentEntry _fragmentEntry;
 	private Long _fragmentEntryId;
 	private Map<Group, Long> _groupFragmentEntryUsages;
+	private String _orderByCol;
+	private String _orderByType;
 	private String _redirect;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
