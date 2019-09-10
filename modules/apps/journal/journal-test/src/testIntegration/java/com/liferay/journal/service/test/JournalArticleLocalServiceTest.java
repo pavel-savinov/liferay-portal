@@ -45,6 +45,7 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.HashMap;
@@ -212,6 +213,41 @@ public class JournalArticleLocalServiceTest {
 
 	@Test
 	public void testUpdateDDMStructurePredefinedValues() throws Exception {
+		Tuple tuple = _createJournalArticleWithPredefinedValues("Test Article");
+
+		JournalArticle journalArticle = (JournalArticle)tuple.getObject(0);
+		DDMStructure ddmStructure = (DDMStructure)tuple.getObject(1);
+
+		DDMStructure actualDDMStrucure = journalArticle.getDDMStructure();
+
+		Assert.assertEquals(
+			actualDDMStrucure.getStructureId(), ddmStructure.getStructureId());
+
+		DDMFormField actualDDMFormField = actualDDMStrucure.getDDMFormField(
+			"name");
+
+		Assert.assertNotNull(actualDDMFormField);
+
+		LocalizedValue actualDDMFormFieldPredefinedValue =
+			actualDDMFormField.getPredefinedValue();
+
+		Assert.assertEquals(
+			"Valor Predefinido",
+			actualDDMFormFieldPredefinedValue.getString(LocaleUtil.BRAZIL));
+		Assert.assertEquals(
+			"Valeur Prédéfinie",
+			actualDDMFormFieldPredefinedValue.getString(LocaleUtil.FRENCH));
+		Assert.assertEquals(
+			"Valore Predefinito",
+			actualDDMFormFieldPredefinedValue.getString(LocaleUtil.ITALY));
+		Assert.assertEquals(
+			"Predefined Value",
+			actualDDMFormFieldPredefinedValue.getString(LocaleUtil.US));
+	}
+
+	private Tuple _createJournalArticleWithPredefinedValues(String title)
+		throws Exception {
+
 		Set<Locale> availableLocales = DDMFormTestUtil.createAvailableLocales(
 			LocaleUtil.BRAZIL, LocaleUtil.FRENCH, LocaleUtil.ITALY,
 			LocaleUtil.US);
@@ -257,9 +293,9 @@ public class JournalArticleLocalServiceTest {
 
 		Map<Locale, String> titleMap = new HashMap<>();
 
-		titleMap.put(LocaleUtil.US, "Test Article");
+		titleMap.put(LocaleUtil.US, title);
 
-		JournalArticle journalArticle =
+		JournalArticle article =
 			JournalArticleLocalServiceUtil.addArticleDefaultValues(
 				serviceContext.getUserId(), serviceContext.getScopeGroupId(),
 				ClassNameLocalServiceUtil.getClassNameId(DDMStructure.class),
@@ -267,31 +303,7 @@ public class JournalArticleLocalServiceTest {
 				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
 				null, true, false, null, null, serviceContext);
 
-		DDMStructure actualDDMStrucure = journalArticle.getDDMStructure();
-
-		Assert.assertEquals(
-			actualDDMStrucure.getStructureId(), ddmStructure.getStructureId());
-
-		DDMFormField actualDDMFormField = actualDDMStrucure.getDDMFormField(
-			"name");
-
-		Assert.assertNotNull(actualDDMFormField);
-
-		LocalizedValue actualDDMFormFieldPredefinedValue =
-			actualDDMFormField.getPredefinedValue();
-
-		Assert.assertEquals(
-			"Valor Predefinido",
-			actualDDMFormFieldPredefinedValue.getString(LocaleUtil.BRAZIL));
-		Assert.assertEquals(
-			"Valeur Prédéfinie",
-			actualDDMFormFieldPredefinedValue.getString(LocaleUtil.FRENCH));
-		Assert.assertEquals(
-			"Valore Predefinito",
-			actualDDMFormFieldPredefinedValue.getString(LocaleUtil.ITALY));
-		Assert.assertEquals(
-			"Predefined Value",
-			actualDDMFormFieldPredefinedValue.getString(LocaleUtil.US));
+		return new Tuple(article, ddmStructure);
 	}
 
 	@DeleteAfterTestRun
