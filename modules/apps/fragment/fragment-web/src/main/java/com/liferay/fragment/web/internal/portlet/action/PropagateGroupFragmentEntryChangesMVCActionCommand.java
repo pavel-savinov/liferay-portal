@@ -20,6 +20,7 @@ import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ParamUtil;
 
 import java.util.List;
@@ -45,6 +46,7 @@ public class PropagateGroupFragmentEntryChangesMVCActionCommand
 	extends BaseMVCActionCommand {
 
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	protected void doProcessAction(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
