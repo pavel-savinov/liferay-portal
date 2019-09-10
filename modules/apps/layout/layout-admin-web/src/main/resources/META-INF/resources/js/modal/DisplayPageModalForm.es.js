@@ -55,6 +55,7 @@ const DisplayPageModalForm = React.forwardRef((props, ref) => {
 				<input
 					className={'form-control'}
 					defaultValue={props.displayPageName}
+					id={`${props.namespace}name`}
 					name={`${props.namespace}name`}
 					ref={nameInput}
 				/>
