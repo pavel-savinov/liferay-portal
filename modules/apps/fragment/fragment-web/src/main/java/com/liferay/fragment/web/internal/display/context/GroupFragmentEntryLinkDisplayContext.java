@@ -86,7 +86,7 @@ public class GroupFragmentEntryLinkDisplayContext {
 		return _fragmentEntryId;
 	}
 
-	public long getFragmentGroupUsage(Group group) {
+	public long getFragmentGroupUsageCount(Group group) {
 		Map<Group, Long> groupFragmentEntryUsages =
 			_getGroupFragmentEntryUsages();
 

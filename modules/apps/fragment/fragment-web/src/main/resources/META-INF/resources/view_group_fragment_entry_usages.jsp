@@ -62,7 +62,7 @@ renderResponse.setTitle(LanguageUtil.format(request, "usages-and-propagation-x",
 							<liferay-ui:search-container-column-text
 								name="usages"
 								translate="<%= true %>"
-								value="<%= String.valueOf(groupFragmentEntryLinkDisplayContext.getFragmentGroupUsage(group)) %>"
+								value="<%= String.valueOf(groupFragmentEntryLinkDisplayContext.getFragmentGroupUsageCount(group)) %>"
 							/>
 						</liferay-ui:search-container-row>
 
