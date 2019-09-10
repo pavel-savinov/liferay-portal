@@ -82,6 +82,14 @@ public class BasicFragmentEntryActionDropdownItemsProvider {
 					add(_getCopyFragmentEntryActionUnsafeConsumer());
 					add(_getUpdateFragmentEntryPreviewActionUnsafeConsumer());
 
+					if ((_fragmentEntry.getGroupId() ==
+							_themeDisplay.getCompanyGroupId()) &&
+						(_fragmentEntry.getGlobalUsageCount() > 0)) {
+
+						add(
+							_getViewGroupFragmentEntryUsagesActionUnsafeConsumer());
+					}
+
 					if (_fragmentEntry.getPreviewFileEntryId() > 0) {
 						add(
 							_getDeleteFragmentEntryPreviewActionUnsafeConsumer());
@@ -90,7 +98,10 @@ public class BasicFragmentEntryActionDropdownItemsProvider {
 
 				add(_getExportFragmentEntryActionUnsafeConsumer());
 
-				if (_fragmentEntry.getUsageCount() > 0) {
+				if ((_fragmentEntry.getGroupId() !=
+						_themeDisplay.getCompanyGroupId()) &&
+					(_fragmentEntry.getUsageCount() > 0)) {
+
 					add(_getViewFragmentEntryUsagesActionUnsafeConsumer());
 				}
 
@@ -341,6 +352,21 @@ public class BasicFragmentEntryActionDropdownItemsProvider {
 				_fragmentEntry.getFragmentEntryId());
 			dropdownItem.setLabel(
 				LanguageUtil.get(_httpServletRequest, "view-usages"));
+		};
+	}
+
+	private UnsafeConsumer<DropdownItem, Exception>
+		_getViewGroupFragmentEntryUsagesActionUnsafeConsumer() {
+
+		return dropdownItem -> {
+			dropdownItem.setHref(
+				_renderResponse.createRenderURL(), "mvcRenderCommandName",
+				"/fragment/view_group_fragment_entry_usages", "redirect",
+				_themeDisplay.getURLCurrent(), "fragmentCollectionId",
+				_fragmentEntry.getFragmentCollectionId(), "fragmentEntryId",
+				_fragmentEntry.getFragmentEntryId());
+			dropdownItem.setLabel(
+				LanguageUtil.get(_httpServletRequest, "view-site-usages"));
 		};
 	}
 

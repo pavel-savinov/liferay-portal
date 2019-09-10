@@ -51,6 +51,7 @@ page import="com.liferay.fragment.web.internal.display.context.FragmentEntryLink
 page import="com.liferay.fragment.web.internal.display.context.FragmentEntryUsageManagementToolbarDisplayContext" %><%@
 page import="com.liferay.fragment.web.internal.display.context.FragmentManagementToolbarDisplayContext" %><%@
 page import="com.liferay.fragment.web.internal.display.context.FragmentManagementToolbarDisplayContextFactory" %><%@
+page import="com.liferay.fragment.web.internal.display.context.GroupFragmentEntryLinkDisplayContext" %><%@
 page import="com.liferay.fragment.web.internal.display.context.RenderFragmentEntryDisplayContext" %><%@
 page import="com.liferay.fragment.web.internal.display.context.SelectFragmentCollectionDisplayContext" %><%@
 page import="com.liferay.fragment.web.internal.display.context.SelectFragmentCollectionManagementToolbarDisplayContext" %><%@
