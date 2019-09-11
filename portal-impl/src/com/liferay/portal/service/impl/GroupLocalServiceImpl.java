@@ -3818,10 +3818,10 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 				group.setNameMap(oldNameMap, defaultLocale);
 
-				Map<Locale, String> oldDecriptionMap =
+				Map<Locale, String> oldDescriptionMap =
 					group.getDescriptionMap();
 
-				group.setDescriptionMap(oldDecriptionMap, defaultLocale);
+				group.setDescriptionMap(oldDescriptionMap, defaultLocale);
 
 				Map<Locale, String> nameMap = group.getNameMap();
 
