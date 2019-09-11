@@ -533,7 +533,10 @@ class FragmentEditableField extends PortletBase {
 					const {fieldValue} = response;
 
 					if (fieldValue) {
-						if (this.type === 'image' && fieldValue.url) {
+						if (
+							this.type === 'image' &&
+							typeof fieldValue.url === 'string'
+						) {
 							this._mappedFieldValue = fieldValue.url;
 						} else {
 							this._mappedFieldValue = fieldValue;
