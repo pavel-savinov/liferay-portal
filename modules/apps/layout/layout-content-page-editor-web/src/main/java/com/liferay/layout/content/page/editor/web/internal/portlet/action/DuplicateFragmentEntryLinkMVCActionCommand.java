@@ -22,22 +22,28 @@ import com.liferay.fragment.renderer.DefaultFragmentRendererContext;
 import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererController;
 import com.liferay.fragment.renderer.FragmentRendererTracker;
+import com.liferay.fragment.renderer.constants.FragmentRendererConstants;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.fragment.util.FragmentEntryConfigUtil;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.PortletIdException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
+import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Locale;
@@ -89,6 +95,24 @@ public class DuplicateFragmentEntryLinkMVCActionCommand
 				_fragmentEntryLinkLocalService.getFragmentEntryLink(
 					fragmentEntryLinkId);
 
+			JSONObject editableValuesJSONObject =
+				JSONFactoryUtil.createJSONObject(
+					fragmentEntryLink.getEditableValues());
+
+			String portletId = editableValuesJSONObject.getString("portletId");
+
+			if (Validator.isNotNull(portletId)) {
+				Portlet portlet = _portletLocalService.getPortletById(
+					portletId);
+
+				if (!portlet.isInstanceable()) {
+					throw new PortletIdException();
+				}
+
+				editableValuesJSONObject.put(
+					"instanceId", PortletIdCodec.generateInstanceId());
+			}
+
 			ServiceContext serviceContext = ServiceContextFactory.getInstance(
 				actionRequest);
 
@@ -101,7 +125,7 @@ public class DuplicateFragmentEntryLinkMVCActionCommand
 					fragmentEntryLink.getClassPK(), fragmentEntryLink.getCss(),
 					fragmentEntryLink.getHtml(), fragmentEntryLink.getJs(),
 					fragmentEntryLink.getConfiguration(),
-					fragmentEntryLink.getEditableValues(),
+					editableValuesJSONObject.toString(),
 					fragmentEntryLink.getNamespace(), 0,
 					fragmentEntryLink.getRendererKey(), serviceContext);
 
@@ -140,9 +164,16 @@ public class DuplicateFragmentEntryLinkMVCActionCommand
 				name = fragmentEntry.getName();
 			}
 			else {
+				String rendererKey = fragmentEntryLink.getRendererKey();
+
+				if (Validator.isNull(rendererKey)) {
+					rendererKey =
+						FragmentRendererConstants.
+							FRAGMENT_ENTRY_FRAGMENT_RENDERER_KEY;
+				}
+
 				FragmentRenderer fragmentRenderer =
-					_fragmentRendererTracker.getFragmentRenderer(
-						fragmentEntryLink.getRendererKey());
+					_fragmentRendererTracker.getFragmentRenderer(rendererKey);
 
 				fragmentEntryKey = fragmentRenderer.getKey();
 				name = fragmentRenderer.getLabel(serviceContext.getLocale());
@@ -163,6 +194,9 @@ public class DuplicateFragmentEntryLinkMVCActionCommand
 				errorMessage =
 					"the-section-could-not-be-duplicated-because-it-has-been-" +
 						"deleted";
+			}
+			else if (pe instanceof PortletIdException) {
+				errorMessage = "non-instanceable-widget-cannot-be-duplicated";
 			}
 
 			ThemeDisplay themeDisplay =
@@ -215,5 +249,8 @@ public class DuplicateFragmentEntryLinkMVCActionCommand
 
 	@Reference
 	private FragmentRendererTracker _fragmentRendererTracker;
+
+	@Reference
+	private PortletLocalService _portletLocalService;
 
 }
