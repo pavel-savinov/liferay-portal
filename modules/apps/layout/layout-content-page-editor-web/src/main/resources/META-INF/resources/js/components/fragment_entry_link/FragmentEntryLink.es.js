@@ -36,6 +36,7 @@ import {
 	getItemMoveDirection,
 	getItemPath,
 	getTargetBorder,
+	getWidget,
 	itemIsInPath
 } from '../../utils/FragmentsEditorGetUtils.es';
 import {
@@ -240,7 +241,17 @@ class FragmentEntryLink extends Component {
 
 		buttons.push(FLOATING_TOOLBAR_BUTTONS.removeFragment);
 
-		buttons.push(FLOATING_TOOLBAR_BUTTONS.duplicateFragment);
+		const fragmentEntryLink = this.fragmentEntryLinks[
+			this.fragmentEntryLinkId
+		];
+
+		const widget =
+			fragmentEntryLink.portletId &&
+			getWidget(this.widgets, fragmentEntryLink.portletId);
+
+		if (!widget || widget.instanceable) {
+			buttons.push(FLOATING_TOOLBAR_BUTTONS.duplicateFragment);
+		}
 
 		if (this._shouldShowConfigPanel()) {
 			buttons.push(FLOATING_TOOLBAR_BUTTONS.fragmentConfiguration);
@@ -477,7 +488,8 @@ const ConnectedFragmentEntryLink = getConnectedComponent(FragmentEntryLink, [
 	'selectedMappingTypes',
 	'selectedSidebarPanelId',
 	'sidebarPanels',
-	'spritemap'
+	'spritemap',
+	'widgets'
 ]);
 
 Soy.register(ConnectedFragmentEntryLink, templates);
