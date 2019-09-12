@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -150,24 +149,6 @@ public class FragmentEntryLinkDisplayContext {
 		return "page-template";
 	}
 
-	public PortletURL getIteratorURL() {
-		PortletURL currentURL = PortletURLUtil.getCurrent(
-			_renderRequest, _renderResponse);
-
-		PortletURL portletURL = _renderResponse.createRenderURL();
-
-		portletURL.setParameter(
-			"mvcRenderCommandName", "/fragment/view_fragment_entry_usages");
-		portletURL.setParameter("redirect", currentURL.toString());
-		portletURL.setParameter(
-			"fragmentCollectionId", String.valueOf(getFragmentCollectionId()));
-		portletURL.setParameter(
-			"fragmentEntryId", String.valueOf(getFragmentEntryId()));
-		portletURL.setParameter("navigation", getNavigation());
-
-		return portletURL;
-	}
-
 	public String getKeywords() {
 		if (Validator.isNotNull(_keywords)) {
 			return _keywords;
@@ -236,6 +217,7 @@ public class FragmentEntryLinkDisplayContext {
 			"fragmentCollectionId", String.valueOf(getFragmentCollectionId()));
 		portletURL.setParameter(
 			"fragmentEntryId", String.valueOf(getFragmentEntryId()));
+		portletURL.setParameter("navigation", getNavigation());
 
 		return portletURL;
 	}
@@ -259,7 +241,7 @@ public class FragmentEntryLinkDisplayContext {
 			WebKeys.THEME_DISPLAY);
 
 		SearchContainer fragmentEntryLinksSearchContainer = new SearchContainer(
-			_renderRequest, getIteratorURL(), null,
+			_renderRequest, getPortletURL(), null,
 			"there-are-no-fragment-usages");
 
 		fragmentEntryLinksSearchContainer.setId(
