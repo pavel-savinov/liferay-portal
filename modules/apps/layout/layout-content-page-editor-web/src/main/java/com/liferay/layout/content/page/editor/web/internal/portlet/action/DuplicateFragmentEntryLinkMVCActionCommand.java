@@ -24,6 +24,7 @@ import com.liferay.fragment.renderer.FragmentRendererController;
 import com.liferay.fragment.renderer.FragmentRendererTracker;
 import com.liferay.fragment.renderer.constants.FragmentRendererConstants;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
+import com.liferay.fragment.service.FragmentEntryLinkService;
 import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.fragment.util.FragmentEntryConfigUtil;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
@@ -117,8 +118,8 @@ public class DuplicateFragmentEntryLinkMVCActionCommand
 				actionRequest);
 
 			FragmentEntryLink duplicateFragmentEntryLink =
-				_fragmentEntryLinkLocalService.addFragmentEntryLink(
-					serviceContext.getUserId(), fragmentEntryLink.getGroupId(),
+				_fragmentEntryLinkService.addFragmentEntryLink(
+					fragmentEntryLink.getGroupId(),
 					fragmentEntryLink.getOriginalFragmentEntryLinkId(),
 					fragmentEntryLink.getFragmentEntryId(),
 					fragmentEntryLink.getClassNameId(),
@@ -240,6 +241,9 @@ public class DuplicateFragmentEntryLinkMVCActionCommand
 
 	@Reference
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
+
+	@Reference
+	private FragmentEntryLinkService _fragmentEntryLinkService;
 
 	@Reference
 	private FragmentEntryLocalService _fragmentEntryLocalService;
