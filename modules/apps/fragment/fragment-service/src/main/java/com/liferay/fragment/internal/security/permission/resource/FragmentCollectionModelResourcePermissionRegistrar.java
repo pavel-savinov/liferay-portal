@@ -54,10 +54,6 @@ public class FragmentCollectionModelResourcePermissionRegistrar {
 				_portletResourcePermission,
 				(modelResourcePermission, consumer) -> consumer.accept(
 					(permissionChecker, name, fragmentCollection, actionId) -> {
-						if (actionId.equals(ActionKeys.VIEW)) {
-							return true;
-						}
-
 						return _portletResourcePermission.contains(
 							permissionChecker, fragmentCollection.getGroupId(),
 							FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES);
