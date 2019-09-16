@@ -130,14 +130,15 @@ public class FragmentCollectionServiceImpl
 
 	@Override
 	public List<FragmentCollection> getFragmentCollections(long groupId) {
-		return fragmentCollectionPersistence.findByGroupId(groupId);
+		return fragmentCollectionPersistence.filterFindByGroupId(groupId);
 	}
 
 	@Override
 	public List<FragmentCollection> getFragmentCollections(
 		long groupId, int start, int end) {
 
-		return fragmentCollectionPersistence.findByGroupId(groupId, start, end);
+		return fragmentCollectionPersistence.filterFindByGroupId(
+			groupId, start, end);
 	}
 
 	@Override
@@ -145,7 +146,7 @@ public class FragmentCollectionServiceImpl
 		long groupId, int start, int end,
 		OrderByComparator<FragmentCollection> orderByComparator) {
 
-		return fragmentCollectionPersistence.findByGroupId(
+		return fragmentCollectionPersistence.filterFindByGroupId(
 			groupId, start, end, orderByComparator);
 	}
 
@@ -154,7 +155,7 @@ public class FragmentCollectionServiceImpl
 		long groupId, String name, int start, int end,
 		OrderByComparator<FragmentCollection> orderByComparator) {
 
-		return fragmentCollectionPersistence.findByG_LikeN(
+		return fragmentCollectionPersistence.filterFindByG_LikeN(
 			groupId, _customSQL.keywords(name, false, WildcardMode.SURROUND)[0],
 			start, end, orderByComparator);
 	}
@@ -172,12 +173,12 @@ public class FragmentCollectionServiceImpl
 
 	@Override
 	public int getFragmentCollectionsCount(long groupId) {
-		return fragmentCollectionPersistence.countByGroupId(groupId);
+		return fragmentCollectionPersistence.filterCountByGroupId(groupId);
 	}
 
 	@Override
 	public int getFragmentCollectionsCount(long groupId, String name) {
-		return fragmentCollectionPersistence.countByG_LikeN(
+		return fragmentCollectionPersistence.filterCountByG_LikeN(
 			groupId,
 			_customSQL.keywords(name, false, WildcardMode.SURROUND)[0]);
 	}
