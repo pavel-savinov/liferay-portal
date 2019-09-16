@@ -18,7 +18,6 @@ import com.liferay.fragment.constants.FragmentActionKeys;
 import com.liferay.fragment.constants.FragmentConstants;
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.service.FragmentCollectionLocalService;
-import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
@@ -53,11 +52,10 @@ public class FragmentCollectionModelResourcePermissionRegistrar {
 				_fragmentCollectionLocalService::getFragmentCollection,
 				_portletResourcePermission,
 				(modelResourcePermission, consumer) -> consumer.accept(
-					(permissionChecker, name, fragmentCollection, actionId) -> {
-						return _portletResourcePermission.contains(
+					(permissionChecker, name, fragmentCollection, actionId) ->
+						_portletResourcePermission.contains(
 							permissionChecker, fragmentCollection.getGroupId(),
-							FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES);
-					})),
+							FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES))),
 			properties);
 	}
 
