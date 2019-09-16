@@ -24,6 +24,7 @@ import com.liferay.portal.dao.orm.custom.sql.CustomSQL;
 import com.liferay.portal.kernel.dao.orm.WildcardMode;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -120,9 +121,8 @@ public class FragmentCollectionServiceImpl
 				fragmentCollectionId);
 
 		if (fragmentCollection != null) {
-			_portletResourcePermission.check(
-				getPermissionChecker(), fragmentCollection.getGroupId(),
-				ActionKeys.VIEW);
+			_modelResourcePermission.check(
+				getPermissionChecker(), fragmentCollection, ActionKeys.VIEW);
 		}
 
 		return fragmentCollection;
@@ -216,6 +216,13 @@ public class FragmentCollectionServiceImpl
 
 	@Reference
 	private FragmentEntryLocalService _fragmentEntryLocalService;
+
+	@Reference(
+		target = "(model.class.name=com.liferay.fragment.model.FragmentCollection)",
+		unbind = "-"
+	)
+	private ModelResourcePermission<FragmentCollection>
+		_modelResourcePermission;
 
 	@Reference(
 		target = "(resource.name=" + FragmentConstants.RESOURCE_NAME + ")"
