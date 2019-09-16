@@ -14,6 +14,8 @@
 
 package com.liferay.portlet;
 
+import com.liferay.petra.encryptor.Encryptor;
+import com.liferay.petra.encryptor.EncryptorException;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.PortalCacheHelperUtil;
@@ -25,6 +27,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
@@ -288,9 +291,25 @@ public class PortletPreferencesFactoryImpl
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
+		String doAsUserIdEncoded = themeDisplay.getDoAsUserId();
+
+		long userId = themeDisplay.getUserId();
+
+		if (Validator.isNotNull(doAsUserIdEncoded)) {
+			Company company = themeDisplay.getCompany();
+
+			try {
+				userId = GetterUtil.getLong(
+					Encryptor.decrypt(company.getKeyObj(), doAsUserIdEncoded),
+					userId);
+			}
+			catch (EncryptorException ee) {
+				_log.error("Unable to decrypt user id", ee);
+			}
+		}
+
 		return getPortalPreferences(
-			httpServletRequest.getSession(), themeDisplay.getUserId(),
-			themeDisplay.isSignedIn());
+			httpServletRequest.getSession(), userId, themeDisplay.isSignedIn());
 	}
 
 	@Override
