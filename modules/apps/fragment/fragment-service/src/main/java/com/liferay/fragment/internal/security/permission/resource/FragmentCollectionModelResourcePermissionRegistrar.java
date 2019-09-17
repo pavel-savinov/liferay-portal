@@ -18,12 +18,14 @@ import com.liferay.fragment.constants.FragmentActionKeys;
 import com.liferay.fragment.constants.FragmentConstants;
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.service.FragmentCollectionLocalService;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 
 import java.util.Dictionary;
+import java.util.Objects;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -52,10 +54,15 @@ public class FragmentCollectionModelResourcePermissionRegistrar {
 				_fragmentCollectionLocalService::getFragmentCollection,
 				_portletResourcePermission,
 				(modelResourcePermission, consumer) -> consumer.accept(
-					(permissionChecker, name, fragmentCollection, actionId) ->
-						_portletResourcePermission.contains(
+					(permissionChecker, name, fragmentCollection, actionId) -> {
+						if (Objects.equals(actionId, ActionKeys.VIEW)) {
+							return true;
+						}
+
+						return _portletResourcePermission.contains(
 							permissionChecker, fragmentCollection.getGroupId(),
-							FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES))),
+							FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES);
+					})),
 			properties);
 	}
 
