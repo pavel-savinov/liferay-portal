@@ -119,12 +119,6 @@ public class FragmentCollectionServiceImpl
 			fragmentCollectionLocalService.fetchFragmentCollection(
 				fragmentCollectionId);
 
-		if (fragmentCollection != null) {
-			_portletResourcePermission.check(
-				getPermissionChecker(), fragmentCollection.getGroupId(),
-				ActionKeys.VIEW);
-		}
-
 		return fragmentCollection;
 	}
 
