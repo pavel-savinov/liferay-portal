@@ -3829,13 +3829,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 				if ((nameMap != null) &&
 					Validator.isNotNull(nameMap.get(defaultLocale))) {
 
-					String groupKey = nameMap.get(defaultLocale);
-
-					validateGroupKey(
-						group.getGroupId(), group.getCompanyId(), groupKey,
-						group.isSite());
-
-					group.setGroupKey(groupKey);
+					group.setGroupKey(nameMap.get(defaultLocale));
 				}
 			}
 

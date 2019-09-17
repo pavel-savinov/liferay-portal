@@ -750,6 +750,8 @@ public class SiteAdminPortlet extends MVCPortlet {
 
 			if (!liveGroup.isGuest()) {
 				validateDefaultLocaleGroupName(nameMap, defaultLocale);
+
+				validateGroupKey(liveGroup, nameMap.get(defaultLocale));
 			}
 
 			liveGroup = groupService.updateGroup(
@@ -1075,6 +1077,28 @@ public class SiteAdminPortlet extends MVCPortlet {
 
 		if ((nameMap == null) || Validator.isNull(nameMap.get(defaultLocale))) {
 			throw new GroupNameException();
+		}
+	}
+
+	protected void validateGroupKey(Group group, String groupKey)
+		throws DuplicateGroupException {
+
+		Group existingGroup = null;
+
+		try {
+			existingGroup = groupLocalService.getGroup(
+				group.getCompanyId(), groupKey);
+		}
+		catch (PortalException pe) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(pe, pe);
+			}
+		}
+
+		if ((existingGroup != null) &&
+			(group.getGroupId() != existingGroup.getGroupId())) {
+
+			throw new DuplicateGroupException();
 		}
 	}
 
