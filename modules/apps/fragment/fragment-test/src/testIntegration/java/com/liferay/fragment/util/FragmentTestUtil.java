@@ -36,32 +36,25 @@ public class FragmentTestUtil {
 	public static FragmentCollection addFragmentCollection(long groupId)
 		throws PortalException {
 
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(groupId);
-
 		return FragmentCollectionLocalServiceUtil.addFragmentCollection(
 			TestPropsValues.getUserId(), groupId, RandomTestUtil.randomString(),
-			StringPool.BLANK, serviceContext);
+			StringPool.BLANK, getServiceContext(groupId));
 	}
 
 	public static FragmentCollection addFragmentCollection(
 			long groupId, String name)
 		throws PortalException {
 
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(groupId);
-
 		return FragmentCollectionLocalServiceUtil.addFragmentCollection(
 			TestPropsValues.getUserId(), groupId, name, StringPool.BLANK,
-			serviceContext);
+			getServiceContext(groupId));
 	}
 
 	public static FragmentCollection addFragmentCollection(
 			long groupId, String name, Date createDate)
 		throws PortalException {
 
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(groupId);
+		ServiceContext serviceContext = getServiceContext(groupId);
 
 		serviceContext.setCreateDate(createDate);
 		serviceContext.setModifiedDate(createDate);
@@ -75,21 +68,17 @@ public class FragmentTestUtil {
 			long groupId, String name, String fragmentCollectionKey)
 		throws PortalException {
 
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(groupId);
-
 		return FragmentCollectionLocalServiceUtil.addFragmentCollection(
 			TestPropsValues.getUserId(), groupId, fragmentCollectionKey, name,
-			StringPool.BLANK, serviceContext);
+			StringPool.BLANK, getServiceContext(groupId));
 	}
 
 	public static FragmentEntryLink addFragmentEntryLink(
 			FragmentEntry fragmentEntry, long classNameId, long classPK)
 		throws PortalException {
 
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(
-				fragmentEntry.getGroupId());
+		ServiceContext serviceContext = getServiceContext(
+			fragmentEntry.getGroupId());
 
 		return FragmentEntryLinkLocalServiceUtil.addFragmentEntryLink(
 			TestPropsValues.getUserId(), serviceContext.getScopeGroupId(), 0,
@@ -105,6 +94,17 @@ public class FragmentTestUtil {
 
 		return FragmentEntryLinkLocalServiceUtil.
 			fetchFragmentEntryLinkByUuidAndGroupId(uuid, groupId);
+	}
+
+	protected static ServiceContext getServiceContext(long groupId)
+		throws PortalException {
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(groupId);
+
+		serviceContext.setDeriveDefaultPermissions(true);
+
+		return serviceContext;
 	}
 
 }
