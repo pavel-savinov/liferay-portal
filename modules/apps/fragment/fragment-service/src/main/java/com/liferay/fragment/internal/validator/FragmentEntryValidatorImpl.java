@@ -18,19 +18,24 @@ import com.liferay.fragment.exception.FragmentEntryConfigurationException;
 import com.liferay.fragment.validator.FragmentEntryValidator;
 import com.liferay.petra.string.StringPool;
 import com.liferay.petra.string.StringUtil;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.InputStream;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import org.osgi.service.component.annotations.Component;
@@ -54,12 +59,48 @@ public class FragmentEntryValidatorImpl implements FragmentEntryValidator {
 				"dependencies/configuration-json-schema.json");
 
 		try {
-			JSONObject jsonObject = new JSONObject(
+			org.json.JSONObject jsonObject = new org.json.JSONObject(
 				new JSONTokener(configurationJSONSchemaInputStream));
 
 			Schema schema = SchemaLoader.load(jsonObject);
 
-			schema.validate(new JSONObject(configuration));
+			org.json.JSONObject configurationJSONObject =
+				new org.json.JSONObject(configuration);
+
+			schema.validate(configurationJSONObject);
+
+			org.json.JSONArray fieldSetsNativeJSONArray =
+				configurationJSONObject.getJSONArray("fieldSets");
+
+			JSONArray fieldSetsJSONArray = JSONFactoryUtil.createJSONArray(
+				fieldSetsNativeJSONArray.toString());
+
+			Iterator<JSONObject> iterator = fieldSetsJSONArray.iterator();
+
+			Set<String> fieldNames = new HashSet<>();
+
+			while (iterator.hasNext()) {
+				JSONObject fieldSetJSONObject = iterator.next();
+
+				JSONArray fieldsJSONArray = fieldSetJSONObject.getJSONArray(
+					"fields");
+
+				Iterator<JSONObject> fieldsIterator =
+					fieldsJSONArray.iterator();
+
+				while (fieldsIterator.hasNext()) {
+					JSONObject fieldJSONObject = fieldsIterator.next();
+
+					if (fieldNames.contains(
+							fieldJSONObject.getString("name"))) {
+
+						throw new FragmentEntryConfigurationException(
+							"Field names must be unique");
+					}
+
+					fieldNames.add(fieldJSONObject.getString("name"));
+				}
+			}
 		}
 		catch (Exception e) {
 			if (e instanceof JSONException) {
