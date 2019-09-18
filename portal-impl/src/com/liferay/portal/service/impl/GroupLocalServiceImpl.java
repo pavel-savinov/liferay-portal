@@ -3788,6 +3788,8 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	public Group updateGroup(long groupId, String typeSettings)
 		throws PortalException {
 
+		_validateGroupKeyChange(groupId, typeSettings);
+
 		Group group = groupPersistence.findByPrimaryKey(groupId);
 
 		UnicodeProperties typeSettingsProperties = new UnicodeProperties(true);
@@ -3829,13 +3831,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 				if ((nameMap != null) &&
 					Validator.isNotNull(nameMap.get(defaultLocale))) {
 
-					String groupKey = nameMap.get(defaultLocale);
-
-					validateGroupKey(
-						group.getGroupId(), group.getCompanyId(), groupKey,
-						group.isSite());
-
-					group.setGroupKey(groupKey);
+					group.setGroupKey(nameMap.get(defaultLocale));
 				}
 			}
 
@@ -5199,6 +5195,31 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	}
 
 	protected File publicLARFile;
+
+	private void _validateGroupKeyChange(long groupId, String typeSettings)
+		throws PortalException {
+
+		Group group = groupPersistence.findByPrimaryKey(groupId);
+
+		UnicodeProperties typeSettingsProperties = new UnicodeProperties(true);
+
+		typeSettingsProperties.fastLoad(typeSettings);
+
+		String defaultLanguageId = typeSettingsProperties.getProperty(
+			"languageId", LocaleUtil.toLanguageId(LocaleUtil.getDefault()));
+
+		Locale defaultLocale = LocaleUtil.fromLanguageId(defaultLanguageId);
+
+		Map<Locale, String> nameMap = group.getNameMap();
+
+		if ((nameMap != null) &&
+			Validator.isNotNull(nameMap.get(defaultLocale))) {
+
+			validateGroupKey(
+				group.getGroupId(), group.getCompanyId(),
+				nameMap.get(defaultLocale), group.isSite());
+		}
+	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		GroupLocalServiceImpl.class);
