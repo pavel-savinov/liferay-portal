@@ -295,7 +295,9 @@ public class PortletPreferencesFactoryImpl
 
 		String doAsUserId = themeDisplay.getDoAsUserId();
 
-		if (Validator.isNotNull(doAsUserId)) {
+		if (Validator.isNotNull(doAsUserId) &&
+			!Objects.equals(String.valueOf(userId), doAsUserId)) {
+
 			Company company = themeDisplay.getCompany();
 
 			try {
