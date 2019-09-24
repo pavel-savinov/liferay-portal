@@ -144,7 +144,11 @@ class MapContentForm extends PortletBase {
 		const newFields = this.fields.map(field => {
 			let newField = Object.assign({}, field);
 
-			if (fieldKey === '-' && field.editableId === editableId) {
+			if (
+				(fieldKey === '-' || field.key !== fieldKey) &&
+				field.editableId === editableId &&
+				field.fragmentEntryLinkId === fragmentEntryLinkId
+			) {
 				newField = {
 					disabled: false,
 					key: field.key,
