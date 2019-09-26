@@ -5171,6 +5171,13 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 		Group group = groupPersistence.findByPrimaryKey(groupId);
 
+		if (!Objects.equals(
+				PortalUtil.getClassName(group.getClassNameId()),
+				Group.class.getName())) {
+
+			return;
+		}
+
 		UnicodeProperties typeSettingsProperties = new UnicodeProperties(true);
 
 		typeSettingsProperties.fastLoad(typeSettings);
@@ -5183,7 +5190,8 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 		Map<Locale, String> nameMap = group.getNameMap();
 
 		if ((nameMap != null) &&
-			Validator.isNotNull(nameMap.get(defaultLocale))) {
+			Validator.isNotNull(nameMap.get(defaultLocale)) &&
+			(group.getCompanyId() > 0)) {
 
 			validateGroupKey(
 				group.getGroupId(), group.getCompanyId(),
