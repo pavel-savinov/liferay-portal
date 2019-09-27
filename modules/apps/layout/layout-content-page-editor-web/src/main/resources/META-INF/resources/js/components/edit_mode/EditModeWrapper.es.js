@@ -36,6 +36,8 @@ class EditModeWrapper extends Component {
 	 * @review
 	 */
 	created() {
+		this._url = new URL(location.href);
+
 		requestAnimationFrame(() => {
 			this._handleMessageIdURLParameter();
 
@@ -228,13 +230,10 @@ EditModeWrapper.STATE = {
 	 * Internal URL object
 	 * @default new URL
 	 * @memberof EditModeWrapper
-	 * @private
 	 * @review
 	 * @type {URL}
 	 */
-	_url: Config.instanceOf(URL)
-		.internal()
-		.value(new URL(location.href))
+	_url: Config.instanceOf(URL).internal()
 };
 
 const ConnectedEditModeWrapper = getConnectedComponent(EditModeWrapper, [
