@@ -139,8 +139,6 @@ public class AssetDisplayPageStagedModelDataHandler
 				existingAssetDisplayPageEntry.getAssetDisplayPageEntryId());
 			importedAssetDisplayPageEntry.setClassPK(
 				existingAssetDisplayPageEntry.getClassPK());
-			importedAssetDisplayPageEntry.setLayoutPageTemplateEntryId(
-				existingAssetDisplayPageEntry.getLayoutPageTemplateEntryId());
 
 			importedAssetDisplayPageEntry =
 				_stagedModelRepository.updateStagedModel(
