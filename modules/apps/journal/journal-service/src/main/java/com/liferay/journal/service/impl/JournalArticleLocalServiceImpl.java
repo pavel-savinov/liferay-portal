@@ -1816,16 +1816,6 @@ public class JournalArticleLocalServiceImpl
 	public JournalArticle fetchArticleByUrlTitle(
 		long groupId, String urlTitle) {
 
-		FriendlyURLEntry friendlyURLEntry =
-			friendlyURLEntryLocalService.fetchFriendlyURLEntry(
-				groupId, JournalArticle.class, urlTitle);
-
-		if (friendlyURLEntry != null) {
-			return fetchLatestArticle(
-				friendlyURLEntry.getClassPK(), WorkflowConstants.STATUS_ANY,
-				true);
-		}
-
 		JournalArticle article = fetchLatestArticleByUrlTitle(
 			groupId, urlTitle, WorkflowConstants.STATUS_APPROVED);
 
@@ -2015,7 +2005,15 @@ public class JournalArticleLocalServiceImpl
 				groupId, JournalArticle.class, urlTitle);
 
 		if (friendlyURLEntry != null) {
-			return fetchLatestArticle(friendlyURLEntry.getClassPK(), status);
+			JournalArticle article = fetchLatestArticle(
+				friendlyURLEntry.getClassPK(), status);
+
+			if ((article != null) && (article.getGroupId() != groupId)) {
+				article = fetchLatestArticle(
+					groupId, article.getArticleId(), status);
+			}
+
+			return article;
 		}
 
 		List<JournalArticle> articles = null;
