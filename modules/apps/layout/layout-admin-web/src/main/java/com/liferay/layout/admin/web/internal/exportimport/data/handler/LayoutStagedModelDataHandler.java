@@ -1294,13 +1294,6 @@ public class LayoutStagedModelDataHandler
 			Layout importedLayout)
 		throws Exception {
 
-		if (!Objects.equals(layout.getType(), LayoutConstants.TYPE_CONTENT) &&
-			!Objects.equals(
-				layout.getType(), LayoutConstants.TYPE_ASSET_DISPLAY)) {
-
-			return;
-		}
-
 		_fragmentEntryLinkLocalService.
 			deleteLayoutPageTemplateEntryFragmentEntryLinks(
 				portletDataContext.getScopeGroupId(),
@@ -1377,6 +1370,13 @@ public class LayoutStagedModelDataHandler
 			PortletDataContext portletDataContext, Layout layout,
 			Layout importedLayout)
 		throws Exception {
+
+		if (!Objects.equals(layout.getType(), LayoutConstants.TYPE_CONTENT) &&
+			!Objects.equals(
+				layout.getType(), LayoutConstants.TYPE_ASSET_DISPLAY)) {
+
+			return;
+		}
 
 		importFragmentEntryLinks(portletDataContext, layout, importedLayout);
 
@@ -2038,6 +2038,13 @@ public class LayoutStagedModelDataHandler
 	private void _exportLayoutPageTemplateStructure(
 			PortletDataContext portletDataContext, Layout layout)
 		throws PortletDataException {
+
+		if (!Objects.equals(layout.getType(), LayoutConstants.TYPE_CONTENT) &&
+			!Objects.equals(
+				layout.getType(), LayoutConstants.TYPE_ASSET_DISPLAY)) {
+
+			return;
+		}
 
 		List<FragmentEntryLink> fragmentEntryLinks =
 			_fragmentEntryLinkLocalService.getFragmentEntryLinks(
