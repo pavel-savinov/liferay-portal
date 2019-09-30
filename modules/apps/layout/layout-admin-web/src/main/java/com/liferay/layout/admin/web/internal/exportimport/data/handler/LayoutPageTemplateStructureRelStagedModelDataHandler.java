@@ -129,6 +129,8 @@ public class LayoutPageTemplateStructureRelStagedModelDataHandler
 				setLayoutPageTemplateStructureRelId(
 					existingLayoutPageTemplateStructureRel.
 						getLayoutPageTemplateStructureRelId());
+			importedLayoutPageTemplateStructureRel.setMvccVersion(
+				existingLayoutPageTemplateStructureRel.getMvccVersion());
 
 			importedLayoutPageTemplateStructureRel =
 				_stagedModelRepository.updateStagedModel(
