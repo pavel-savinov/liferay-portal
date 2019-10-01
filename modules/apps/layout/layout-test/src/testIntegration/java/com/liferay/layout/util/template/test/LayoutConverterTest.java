@@ -90,6 +90,14 @@ public class LayoutConverterTest {
 	}
 
 	@Test
+	public void testConvertOneColumnSinglePortlet() throws Exception {
+		_testConvertOneColumn(
+			new String[] {
+				"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
+			});
+	}
+
+	@Test
 	public void testIsConvertibleFalseWidgetPageCustomizable()
 		throws Exception {
 
