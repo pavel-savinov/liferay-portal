@@ -85,6 +85,11 @@ public class LayoutConverterTest {
 	}
 
 	@Test
+	public void testConvertOneColumnNoPortlets() throws Exception {
+		_testConvertOneColumn(new String[0]);
+	}
+
+	@Test
 	public void testIsConvertibleFalseWidgetPageCustomizable()
 		throws Exception {
 
