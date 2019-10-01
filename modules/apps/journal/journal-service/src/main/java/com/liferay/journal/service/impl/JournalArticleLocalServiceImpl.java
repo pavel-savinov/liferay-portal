@@ -4486,9 +4486,9 @@ public class JournalArticleLocalServiceImpl
 				journalArticlePersistence.findByPrimaryKey(
 					trashVersion.getClassPK());
 
-			trashArticleVersion.setStatus(trashVersion.getStatus());
+			trashArticleVersion.setStatus(trashEntry.getStatus());
 
-			if (trashVersion.getStatus() == WorkflowConstants.STATUS_APPROVED) {
+			if (trashEntry.getStatus() == WorkflowConstants.STATUS_APPROVED) {
 				visible = true;
 			}
 
