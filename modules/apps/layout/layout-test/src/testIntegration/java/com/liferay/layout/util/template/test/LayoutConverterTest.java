@@ -224,8 +224,7 @@ public class LayoutConverterTest {
 
 		JSONObject layoutDataJSONObject = layoutData.getLayoutDataJSONObject();
 
-		String expectedLayoutData = _read(
-			"expected_layout_data_1column_empty.json");
+		String expectedLayoutData = _read("expected_layout_data_1_column.json");
 
 		expectedLayoutData = StringUtil.replace(
 			expectedLayoutData, "[]",
