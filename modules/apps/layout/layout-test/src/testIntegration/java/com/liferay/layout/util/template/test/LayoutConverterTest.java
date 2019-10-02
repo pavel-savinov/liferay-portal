@@ -197,17 +197,27 @@ public class LayoutConverterTest {
 				_portal.getClassNameId(Layout.class.getName()),
 				layout.getPlid());
 
+		Set<String> existingPortletIds = new HashSet<>();
 		List<String> fragmentEntryLinkIds = new ArrayList<>();
 
 		for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
 			fragmentEntryLinkIds.add(
 				String.format(
 					"\"%s\"", fragmentEntryLink.getFragmentEntryLinkId()));
+
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+				fragmentEntryLink.getEditableValues());
+
+			existingPortletIds.add(jsonObject.getString("portletId"));
 		}
 
 		Assert.assertEquals(
 			fragmentEntryLinkIds.toString(), portletIds.length,
 			fragmentEntryLinkIds.size());
+
+		for (String portletId : portletIds) {
+			Assert.assertTrue(existingPortletIds.contains(portletId));
+		}
 
 		String fragmentEntryLinkIdsJoined = StringUtil.merge(
 			fragmentEntryLinkIds, StringPool.COMMA_AND_SPACE);
