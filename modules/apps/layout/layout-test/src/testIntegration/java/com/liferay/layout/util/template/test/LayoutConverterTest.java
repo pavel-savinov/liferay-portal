@@ -44,10 +44,11 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -196,14 +197,20 @@ public class LayoutConverterTest {
 				_portal.getClassNameId(Layout.class.getName()),
 				layout.getPlid());
 
-		Stream<FragmentEntryLink> stream = fragmentEntryLinks.stream();
+		List<String> fragmentEntryLinkIds = new ArrayList<>();
 
-		String fragmentEntryLinkIdsJoined = stream.map(
-			fragmentEntryLink -> String.format(
-				"\"%s\"", fragmentEntryLink.getFragmentEntryLinkId())
-		).collect(
-			Collectors.joining(StringPool.COMMA_AND_SPACE)
-		);
+		for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
+			fragmentEntryLinkIds.add(
+				String.format(
+					"\"%s\"", fragmentEntryLink.getFragmentEntryLinkId()));
+		}
+
+		Assert.assertEquals(
+			fragmentEntryLinkIds.toString(), portletIds.length,
+			fragmentEntryLinkIds.size());
+
+		String fragmentEntryLinkIdsJoined = StringUtil.merge(
+			fragmentEntryLinkIds, StringPool.COMMA_AND_SPACE);
 
 		JSONObject layoutDataJSONObject = layoutData.getLayoutDataJSONObject();
 
