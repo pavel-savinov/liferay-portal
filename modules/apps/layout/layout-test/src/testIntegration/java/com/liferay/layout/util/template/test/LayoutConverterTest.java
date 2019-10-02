@@ -15,14 +15,21 @@
 package com.liferay.layout.util.template.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.fragment.model.FragmentEntryLink;
+import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.layout.util.template.LayoutConverter;
 import com.liferay.layout.util.template.LayoutConverterRegistry;
+import com.liferay.layout.util.template.LayoutData;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.model.LayoutTypePortletConstants;
+import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -30,11 +37,17 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -133,10 +146,69 @@ public class LayoutConverterTest {
 			FileUtil.getBytes(getClass(), "dependencies/" + fileName));
 	}
 
+	private void _testConvertOneColumn(String[] portletIds) throws Exception {
+		UnicodeProperties typeSettingsProperties = new UnicodeProperties();
+
+		typeSettingsProperties.setProperty(
+			LayoutTypePortletConstants.LAYOUT_TEMPLATE_ID, "1_column");
+
+		Layout layout = LayoutTestUtil.addLayout(
+			_group.getGroupId(), typeSettingsProperties.toString());
+
+		for (String portletId : portletIds) {
+			LayoutTestUtil.addPortletToLayout(
+				TestPropsValues.getUserId(), layout,
+				PortletIdCodec.encode(portletId), "column-1", new HashMap<>());
+		}
+
+		LayoutConverter layoutConverter =
+			_layoutConverterRegistry.getLayoutConverter(
+				_getLayoutTemplateId(layout));
+
+		LayoutData layoutData = layoutConverter.convert(layout);
+
+		List<FragmentEntryLink> fragmentEntryLinks =
+			_fragmentEntryLinkLocalService.getFragmentEntryLinks(
+				_group.getGroupId(),
+				_portal.getClassNameId(Layout.class.getName()),
+				layout.getPlid());
+
+		Stream<FragmentEntryLink> stream = fragmentEntryLinks.stream();
+
+		String fragmentEntryLinkIdsJoined = stream.map(
+			fragmentEntryLink -> String.format(
+				"\"%s\"", fragmentEntryLink.getFragmentEntryLinkId())
+		).collect(
+			Collectors.joining(StringPool.COMMA_AND_SPACE)
+		);
+
+		JSONObject layoutDataJSONObject = layoutData.getLayoutDataJSONObject();
+
+		String expectedLayoutData = _read(
+			"expected_layout_data_1column_empty.json");
+
+		expectedLayoutData = StringUtil.replace(
+			expectedLayoutData, "[]",
+			String.format("[%s]", fragmentEntryLinkIdsJoined));
+
+		JSONObject expectedLayoutDataJSONObject =
+			JSONFactoryUtil.createJSONObject(expectedLayoutData);
+
+		Assert.assertEquals(
+			expectedLayoutDataJSONObject.toJSONString(),
+			layoutDataJSONObject.toJSONString());
+	}
+
+	@Inject
+	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
+
 	@DeleteAfterTestRun
 	private Group _group;
 
 	@Inject
 	private LayoutConverterRegistry _layoutConverterRegistry;
+
+	@Inject
+	private Portal _portal;
 
 }
