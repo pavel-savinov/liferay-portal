@@ -104,7 +104,7 @@ public class LayoutConverterTest {
 
 	@Test
 	public void testConvertOneColumnNoPortlets() throws Exception {
-		_testConvert("1_column", new HashMap());
+		_testConvertNoPortlets("1_column");
 	}
 
 	@Test
@@ -122,7 +122,7 @@ public class LayoutConverterTest {
 
 	@Test
 	public void testConvertTwoColumnsIINoPortlets() throws Exception {
-		_testConvert("2_columns_ii", new TreeMap());
+		_testConvertNoPortlets("2_columns_ii");
 	}
 
 	@Test
@@ -148,7 +148,7 @@ public class LayoutConverterTest {
 
 	@Test
 	public void testConvertTwoColumnsINoPortlets() throws Exception {
-		_testConvert("2_columns_i", new TreeMap());
+		_testConvertNoPortlets("2_columns_i");
 	}
 
 	@Test
