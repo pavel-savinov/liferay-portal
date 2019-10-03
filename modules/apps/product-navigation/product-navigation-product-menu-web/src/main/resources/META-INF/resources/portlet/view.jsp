@@ -18,6 +18,7 @@
 
 <%
 String productMenuState = SessionClicks.get(request, "com.liferay.product.navigation.product.menu.web_productMenuState", "closed");
+String pagesTreeState = SessionClicks.get(request, "com.liferay.product.navigation.product.menu.web_pagesTreeState", "closed");
 %>
 
 <div class="lfr-product-menu-sidebar" id="productMenuSidebar">
@@ -42,20 +43,28 @@ String productMenuState = SessionClicks.get(request, "com.liferay.product.naviga
 	</div>
 
 	<div class="sidebar-body">
-		<c:if test='<%= Objects.equals(productMenuState, "open") %>'>
-			<liferay-util:include page="/portlet/product_menu.jsp" servletContext="<%= application %>" />
-		</c:if>
+		<c:choose>
+			<c:when test='<%= Objects.equals(productMenuState, "open") %>'>
+				<liferay-util:include page="/portlet/product_menu.jsp" servletContext="<%= application %>" />
+			</c:when>
+			<c:when test='<%= Objects.equals(pagesTreeState, "open") %>'>
+				<liferay-util:include page="/portlet/pages_tree.jsp" servletContext="<%= application %>" />
+			</c:when>
+		</c:choose>
 	</div>
 </div>
 
 <aui:script use="aui-base">
 	var sidenavToggle = document.getElementById('<portlet:namespace />sidenavToggleId');
+	var pagesTreeSidenavToggle = document.getElementById('<portlet:namespace />pagesTreeSidenavToggleId');
 
 	var sidenavInstance = Liferay.SideNavigation.initialize(sidenavToggle);
+	var pagesTreeSidenavInstance = Liferay.SideNavigation.initialize(pagesTreeSidenavToggle);
 
 	Liferay.once(
 		'screenLoad',
 		function() {
+			Liferay.SideNavigation.destroy(pagesTreeSidenavToggle);
 			Liferay.SideNavigation.destroy(sidenavToggle);
 		}
 	);
@@ -67,6 +76,13 @@ String productMenuState = SessionClicks.get(request, "com.liferay.product.naviga
 		}
 	);
 
+	pagesTreeSidenavInstance.on(
+		'closed.lexicon.sidenav',
+		function(event) {
+			Liferay.Util.Session.set('com.liferay.product.navigation.product.menu.web_pagesTreeState', 'closed');
+		}
+	);
+
 	sidenavInstance.on(
 		'open.lexicon.sidenav',
 		function(event) {
@@ -74,7 +90,15 @@ String productMenuState = SessionClicks.get(request, "com.liferay.product.naviga
 		}
 	);
 
+	pagesTreeSidenavInstance.on(
+		'open.lexicon.sidenav',
+		function(event) {
+			Liferay.Util.Session.set('com.liferay.product.navigation.product.menu.web_pagesTreeState', 'open');
+		}
+	);
+
 	if (Liferay.Util.isPhone() && (document.body.classList.contains('open'))) {
 		Liferay.SideNavigation.hide(sidenavToggle);
+		Liferay.SideNavigation.hide(pagesTreeSidenavToggle);
 	}
 </aui:script>
