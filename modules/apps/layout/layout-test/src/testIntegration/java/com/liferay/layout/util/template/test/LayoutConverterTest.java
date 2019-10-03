@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.After;
@@ -87,25 +88,35 @@ public class LayoutConverterTest {
 
 	@Test
 	public void testConvertOneColumnMultiplePortlets() throws Exception {
-		_testConvertOneColumn(
+		Map portletIdsMap = new HashMap();
+
+		portletIdsMap.put(
+			"column-1",
 			new String[] {
 				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet",
 				"com_liferay_hello_world_web_portlet_HelloWorldPortlet",
 				"hello_soy_portlet"
 			});
+
+		_testConvert(portletIdsMap);
 	}
 
 	@Test
 	public void testConvertOneColumnNoPortlets() throws Exception {
-		_testConvertOneColumn(new String[0]);
+		_testConvert(new HashMap());
 	}
 
 	@Test
 	public void testConvertOneColumnSinglePortlet() throws Exception {
-		_testConvertOneColumn(
+		Map portletIdsMap = new HashMap();
+
+		portletIdsMap.put(
+			"column-1",
 			new String[] {
 				"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
 			});
+
+		_testConvert(portletIdsMap);
 	}
 
 	@Test
@@ -170,7 +181,9 @@ public class LayoutConverterTest {
 			FileUtil.getBytes(getClass(), "dependencies/" + fileName));
 	}
 
-	private void _testConvertOneColumn(String[] portletIds) throws Exception {
+	private void _testConvert(Map<String, String[]> portletIdsMap)
+		throws Exception {
+
 		UnicodeProperties typeSettingsProperties = new UnicodeProperties();
 
 		typeSettingsProperties.setProperty(
@@ -179,10 +192,15 @@ public class LayoutConverterTest {
 		Layout layout = LayoutTestUtil.addLayout(
 			_group.getGroupId(), typeSettingsProperties.toString());
 
-		for (String portletId : portletIds) {
-			LayoutTestUtil.addPortletToLayout(
-				TestPropsValues.getUserId(), layout,
-				PortletIdCodec.encode(portletId), "column-1", new HashMap<>());
+		Set<Map.Entry<String, String[]>> entries = portletIdsMap.entrySet();
+
+		for (Map.Entry<String, String[]> entry : entries) {
+			for (String portletId : entry.getValue()) {
+				LayoutTestUtil.addPortletToLayout(
+					TestPropsValues.getUserId(), layout,
+					PortletIdCodec.encode(portletId), entry.getKey(),
+					new HashMap<>());
+			}
 		}
 
 		LayoutConverter layoutConverter =
@@ -191,44 +209,60 @@ public class LayoutConverterTest {
 
 		LayoutData layoutData = layoutConverter.convert(layout);
 
+		JSONObject layoutDataJSONObject = layoutData.getLayoutDataJSONObject();
+
+		String expectedLayoutData = _read("expected_layout_data_1_column.json");
+
 		List<FragmentEntryLink> fragmentEntryLinks =
 			_fragmentEntryLinkLocalService.getFragmentEntryLinks(
 				_group.getGroupId(),
 				_portal.getClassNameId(Layout.class.getName()),
 				layout.getPlid());
 
-		Set<String> existingPortletIds = new HashSet<>();
-		List<String> fragmentEntryLinkIds = new ArrayList<>();
+		int fromIndex = 0;
 
-		for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
-			fragmentEntryLinkIds.add(
-				String.format(
-					"\"%s\"", fragmentEntryLink.getFragmentEntryLinkId()));
+		for (Map.Entry<String, String[]> entry : entries) {
+			String[] portletIds = entry.getValue();
 
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-				fragmentEntryLink.getEditableValues());
+			int numberOfPortletsInColumn = portletIds.length;
 
-			existingPortletIds.add(jsonObject.getString("portletId"));
+			List<FragmentEntryLink> fragmentEntryLinksInColumn =
+				fragmentEntryLinks.subList(
+					fromIndex, fromIndex + numberOfPortletsInColumn);
+
+			fromIndex = fromIndex + numberOfPortletsInColumn;
+
+			Set<String> existingPortletIds = new HashSet<>();
+			List<String> fragmentEntryLinkIdsInColumn = new ArrayList<>();
+
+			for (FragmentEntryLink fragmentEntryLink :
+					fragmentEntryLinksInColumn) {
+
+				fragmentEntryLinkIdsInColumn.add(
+					String.format(
+						"\"%s\"", fragmentEntryLink.getFragmentEntryLinkId()));
+
+				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+					fragmentEntryLink.getEditableValues());
+
+				existingPortletIds.add(jsonObject.getString("portletId"));
+			}
+
+			Assert.assertEquals(
+				fragmentEntryLinkIdsInColumn.toString(), portletIds.length,
+				fragmentEntryLinkIdsInColumn.size());
+
+			for (String portletId : portletIds) {
+				Assert.assertTrue(existingPortletIds.contains(portletId));
+			}
+
+			String fragmentEntryLinkIdsJoined = StringUtil.merge(
+				fragmentEntryLinkIdsInColumn, StringPool.COMMA_AND_SPACE);
+
+			expectedLayoutData = StringUtil.replaceFirst(
+				expectedLayoutData, "[]",
+				String.format("[%s]", fragmentEntryLinkIdsJoined));
 		}
-
-		Assert.assertEquals(
-			fragmentEntryLinkIds.toString(), portletIds.length,
-			fragmentEntryLinkIds.size());
-
-		for (String portletId : portletIds) {
-			Assert.assertTrue(existingPortletIds.contains(portletId));
-		}
-
-		String fragmentEntryLinkIdsJoined = StringUtil.merge(
-			fragmentEntryLinkIds, StringPool.COMMA_AND_SPACE);
-
-		JSONObject layoutDataJSONObject = layoutData.getLayoutDataJSONObject();
-
-		String expectedLayoutData = _read("expected_layout_data_1_column.json");
-
-		expectedLayoutData = StringUtil.replace(
-			expectedLayoutData, "[]",
-			String.format("[%s]", fragmentEntryLinkIdsJoined));
 
 		JSONObject expectedLayoutDataJSONObject =
 			JSONFactoryUtil.createJSONObject(expectedLayoutData);
