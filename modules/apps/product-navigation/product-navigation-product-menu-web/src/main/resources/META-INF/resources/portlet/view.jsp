@@ -87,6 +87,11 @@ String pagesTreeState = SessionClicks.get(request, "com.liferay.product.navigati
 		'open.lexicon.sidenav',
 		function(event) {
 			Liferay.Util.Session.set('com.liferay.product.navigation.product.menu.web_productMenuState', 'open');
+
+			if (Liferay.Util.Session.set('com.liferay.product.navigation.product.menu.web_pagesTreeState') === 'open') {
+				pagesTreeSidenavInstance.hideSimpleSidenav();
+				Liferay.Util.Session.set('com.liferay.product.navigation.product.menu.web_pagesTreeState', 'closed');
+			}
 		}
 	);
 
@@ -94,6 +99,11 @@ String pagesTreeState = SessionClicks.get(request, "com.liferay.product.navigati
 		'open.lexicon.sidenav',
 		function(event) {
 			Liferay.Util.Session.set('com.liferay.product.navigation.product.menu.web_pagesTreeState', 'open');
+
+			if (Liferay.Util.Session.set('com.liferay.product.navigation.product.menu.web_productMenuState') === 'open') {
+				sidenavInstance.hideSimpleSidenav();
+				Liferay.Util.Session.set('com.liferay.product.navigation.product.menu.web_productMenuState', 'closed');
+			}
 		}
 	);
 

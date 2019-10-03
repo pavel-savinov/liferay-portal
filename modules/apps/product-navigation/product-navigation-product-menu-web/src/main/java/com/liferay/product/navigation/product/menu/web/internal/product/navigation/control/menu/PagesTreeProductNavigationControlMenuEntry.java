@@ -161,7 +161,7 @@ public class PagesTreeProductNavigationControlMenuEntry
 	public boolean isShow(HttpServletRequest httpServletRequest)
 		throws PortalException {
 
-		return false;
+		return true;
 	}
 
 	private void _processBodyBottomContent(PageContext pageContext) {
@@ -178,6 +178,10 @@ public class PagesTreeProductNavigationControlMenuEntry
 				"com.liferay.product.navigation.product.menu.web_" +
 					"pagesTreeState",
 				"closed");
+
+			if (Objects.equals(pagesTreeState, "open")) {
+				pagesTreeState += StringPool.SPACE + "pages-tree-open";
+			}
 
 			jspWriter.write(pagesTreeState);
 
