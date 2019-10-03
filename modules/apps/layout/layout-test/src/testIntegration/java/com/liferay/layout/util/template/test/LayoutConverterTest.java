@@ -98,12 +98,12 @@ public class LayoutConverterTest {
 				"hello_soy_portlet"
 			});
 
-		_testConvert(portletIdsMap);
+		_testConvert("1_column", portletIdsMap);
 	}
 
 	@Test
 	public void testConvertOneColumnNoPortlets() throws Exception {
-		_testConvert(new HashMap());
+		_testConvert("1_column", new HashMap());
 	}
 
 	@Test
@@ -116,7 +116,7 @@ public class LayoutConverterTest {
 				"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
 			});
 
-		_testConvert(portletIdsMap);
+		_testConvert("1_column", portletIdsMap);
 	}
 
 	@Test
@@ -181,13 +181,14 @@ public class LayoutConverterTest {
 			FileUtil.getBytes(getClass(), "dependencies/" + fileName));
 	}
 
-	private void _testConvert(Map<String, String[]> portletIdsMap)
+	private void _testConvert(
+			String layoutTemplateId, Map<String, String[]> portletIdsMap)
 		throws Exception {
 
 		UnicodeProperties typeSettingsProperties = new UnicodeProperties();
 
 		typeSettingsProperties.setProperty(
-			LayoutTypePortletConstants.LAYOUT_TEMPLATE_ID, "1_column");
+			LayoutTypePortletConstants.LAYOUT_TEMPLATE_ID, layoutTemplateId);
 
 		Layout layout = LayoutTestUtil.addLayout(
 			_group.getGroupId(), typeSettingsProperties.toString());
@@ -211,7 +212,8 @@ public class LayoutConverterTest {
 
 		JSONObject layoutDataJSONObject = layoutData.getLayoutDataJSONObject();
 
-		String expectedLayoutData = _read("expected_layout_data_1_column.json");
+		String expectedLayoutData = _read(
+			String.format("expected_layout_data_%s.json", layoutTemplateId));
 
 		List<FragmentEntryLink> fragmentEntryLinks =
 			_fragmentEntryLinkLocalService.getFragmentEntryLinks(
