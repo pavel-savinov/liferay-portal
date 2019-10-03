@@ -45,3 +45,13 @@ context.put("totalCount", 0);
 	module="js/LayoutFinder.es"
 	templateNamespace="com.liferay.product.navigation.product.menu.web.LayoutFinder.render"
 />
+
+<aui:script>
+	function handleDestroyPortlet () {
+		Liferay.destroyComponent('layoutFinder');
+
+		Liferay.detach('destroyPortlet', handleDestroyPortlet);
+	}
+
+	Liferay.on('destroyPortlet', handleDestroyPortlet);
+</aui:script>
