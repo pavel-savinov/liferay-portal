@@ -126,6 +126,11 @@ public class LayoutConverterTest {
 	}
 
 	@Test
+	public void testConvertTwoColumnsIISinglePortlet() throws Exception {
+		_testConvertTwoColumnsSinglePortlet("2_columns_ii");
+	}
+
+	@Test
 	public void testConvertTwoColumnsIMultiplePortlets() throws Exception {
 		Map portletIdsMap = new TreeMap();
 
