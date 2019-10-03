@@ -121,6 +121,27 @@ public class LayoutConverterTest {
 	}
 
 	@Test
+	public void testConvertTwoColumnsIMultiplePortlets() throws Exception {
+		Map portletIdsMap = new TreeMap();
+
+		portletIdsMap.put(
+			"column-1",
+			new String[] {
+				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			});
+
+		portletIdsMap.put(
+			"column-2",
+			new String[] {
+				"com_liferay_hello_world_web_portlet_HelloWorldPortlet",
+				"hello_soy_portlet"
+			});
+
+		_testConvert("2_columns_i", portletIdsMap);
+	}
+
+	@Test
 	public void testConvertTwoColumnsINoPortlets() throws Exception {
 		_testConvert("2_columns_i", new TreeMap());
 	}
