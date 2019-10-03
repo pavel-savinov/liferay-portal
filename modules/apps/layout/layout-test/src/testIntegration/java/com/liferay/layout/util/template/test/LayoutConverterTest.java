@@ -331,6 +331,26 @@ public class LayoutConverterTest {
 		_testConvert(layoutTemplateId, new HashMap());
 	}
 
+	private void _testConvertTwoColumnsSinglePortlet(String layoutTemplateId)
+		throws Exception {
+
+		Map portletIdsMap = new TreeMap();
+
+		portletIdsMap.put(
+			"column-1",
+			new String[] {
+				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet"
+			});
+
+		portletIdsMap.put(
+			"column-2",
+			new String[] {
+				"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
+			});
+
+		_testConvert(layoutTemplateId, portletIdsMap);
+	}
+
 	@Inject
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
 
