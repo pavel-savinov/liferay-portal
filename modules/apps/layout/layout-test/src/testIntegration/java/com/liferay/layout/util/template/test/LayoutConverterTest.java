@@ -50,6 +50,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -117,6 +118,11 @@ public class LayoutConverterTest {
 			});
 
 		_testConvert("1_column", portletIdsMap);
+	}
+
+	@Test
+	public void testConvertTwoColumnsINoPortlets() throws Exception {
+		_testConvert("2_columns_i", new TreeMap());
 	}
 
 	@Test
