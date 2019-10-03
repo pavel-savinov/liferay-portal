@@ -43,5 +43,5 @@ context.put("totalCount", 0);
 	componentId="layoutFinder"
 	context="<%= context %>"
 	module="js/LayoutFinder.es"
-	templateNamespace="com.liferay.product.navigation.control.menu.web.LayoutFinder.render"
+	templateNamespace="com.liferay.product.navigation.product.menu.web.LayoutFinder.render"
 />
