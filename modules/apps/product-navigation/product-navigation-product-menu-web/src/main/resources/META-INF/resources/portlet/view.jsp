@@ -19,6 +19,8 @@
 <%
 String productMenuState = SessionClicks.get(request, "com.liferay.product.navigation.product.menu.web_productMenuState", "closed");
 String pagesTreeState = SessionClicks.get(request, "com.liferay.product.navigation.product.menu.web_pagesTreeState", "closed");
+
+String panelName = GetterUtil.getString(request.getAttribute(ProductNavigationProductMenuWebKeys.PANEL_NAME));
 %>
 
 <div class="lfr-product-menu-sidebar" id="productMenuSidebar">
@@ -44,10 +46,10 @@ String pagesTreeState = SessionClicks.get(request, "com.liferay.product.navigati
 
 	<div class="sidebar-body">
 		<c:choose>
-			<c:when test='<%= Objects.equals(productMenuState, "open") %>'>
+			<c:when test='<%= Objects.equals(productMenuState, "open") && Objects.equals(panelName, ProductNavigationProductMenuWebKeys.PRODUCT_MENU) %>'>
 				<liferay-util:include page="/portlet/product_menu.jsp" servletContext="<%= application %>" />
 			</c:when>
-			<c:when test='<%= Objects.equals(pagesTreeState, "open") %>'>
+			<c:when test='<%= Objects.equals(pagesTreeState, "open") && Objects.equals(panelName, ProductNavigationProductMenuWebKeys.PAGES_TREE) %>'>
 				<liferay-util:include page="/portlet/pages_tree.jsp" servletContext="<%= application %>" />
 			</c:when>
 		</c:choose>
@@ -66,6 +68,8 @@ String pagesTreeState = SessionClicks.get(request, "com.liferay.product.navigati
 		function() {
 			Liferay.SideNavigation.destroy(pagesTreeSidenavToggle);
 			Liferay.SideNavigation.destroy(sidenavToggle);
+
+			Liferay.destroyComponent('layoutFinder');
 		}
 	);
 

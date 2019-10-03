@@ -33,6 +33,7 @@ import com.liferay.product.navigation.control.menu.BaseProductNavigationControlM
 import com.liferay.product.navigation.control.menu.ProductNavigationControlMenuEntry;
 import com.liferay.product.navigation.control.menu.constants.ProductNavigationControlMenuCategoryKeys;
 import com.liferay.product.navigation.product.menu.web.internal.constants.ProductNavigationProductMenuPortletKeys;
+import com.liferay.product.navigation.product.menu.web.internal.constants.ProductNavigationProductMenuWebKeys;
 import com.liferay.taglib.portletext.RuntimeTag;
 import com.liferay.taglib.servlet.PageContextFactoryUtil;
 
@@ -209,6 +210,10 @@ public class PagesTreeProductNavigationControlMenuEntry
 			jspWriter.write("pagesTreeSidenavSliderId\">");
 			jspWriter.write(
 				"<div class=\"pages-tree product-menu sidebar sidenav-menu\">");
+
+			httpServletRequest.setAttribute(
+				ProductNavigationProductMenuWebKeys.PANEL_NAME,
+				ProductNavigationProductMenuWebKeys.PAGES_TREE);
 
 			RuntimeTag runtimeTag = new RuntimeTag();
 
