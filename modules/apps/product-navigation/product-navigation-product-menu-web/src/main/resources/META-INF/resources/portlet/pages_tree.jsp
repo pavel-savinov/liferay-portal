@@ -29,7 +29,7 @@ context.put("administrationPortletURL", administrationPortletURL.toString());
 
 LiferayPortletURL findLayoutsURL = PortletURLFactoryUtil.create(request, ProductNavigationProductMenuPortletKeys.PRODUCT_NAVIGATION_PRODUCT_MENU, PortletRequest.RESOURCE_PHASE);
 
-findLayoutsURL.setResourceID("/control_menu/find_layouts");
+findLayoutsURL.setResourceID("/product_menu/find_layouts");
 
 context.put("findLayoutsURL", findLayoutsURL.toString());
 
