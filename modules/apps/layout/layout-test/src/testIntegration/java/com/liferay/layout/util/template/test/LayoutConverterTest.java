@@ -325,6 +325,12 @@ public class LayoutConverterTest {
 			layoutDataJSONObject.toJSONString());
 	}
 
+	private void _testConvertNoPortlets(String layoutTemplateId)
+		throws Exception {
+
+		_testConvert(layoutTemplateId, new HashMap());
+	}
+
 	@Inject
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
 
