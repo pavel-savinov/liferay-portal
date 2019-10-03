@@ -322,6 +322,28 @@ public class LayoutConverterTest {
 		_testConvert(layoutTemplateId, new HashMap());
 	}
 
+	private void _testConvertTwoColumnsMultiplePortlets(String layoutTemplateId)
+		throws Exception {
+
+		Map portletIdsMap = new TreeMap();
+
+		portletIdsMap.put(
+			"column-1",
+			new String[] {
+				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			});
+
+		portletIdsMap.put(
+			"column-2",
+			new String[] {
+				"com_liferay_hello_world_web_portlet_HelloWorldPortlet",
+				"hello_soy_portlet"
+			});
+
+		_testConvert(layoutTemplateId, portletIdsMap);
+	}
+
 	private void _testConvertTwoColumnsSinglePortlet(String layoutTemplateId)
 		throws Exception {
 
