@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.product.navigation.control.menu.web.internal.portlet.action;
+package com.liferay.product.navigation.product.menu.web.internal.portlet.action;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -33,7 +33,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.product.navigation.control.menu.web.internal.constants.ProductNavigationControlMenuPortletKeys;
+import com.liferay.product.navigation.product.menu.web.internal.constants.ProductNavigationProductMenuPortletKeys;
 
 import java.util.List;
 
@@ -51,8 +51,8 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	property = {
-		"javax.portlet.name=" + ProductNavigationControlMenuPortletKeys.PRODUCT_NAVIGATION_CONTROL_MENU,
-		"mvc.command.name=/control_menu/find_layouts"
+		"javax.portlet.name=" + ProductNavigationProductMenuPortletKeys.PRODUCT_NAVIGATION_PRODUCT_MENU,
+		"mvc.command.name=/product_menu/find_layouts"
 	},
 	service = MVCResourceCommand.class
 )
