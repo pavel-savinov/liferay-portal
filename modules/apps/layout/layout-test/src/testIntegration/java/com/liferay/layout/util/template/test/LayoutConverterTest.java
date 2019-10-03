@@ -153,21 +153,7 @@ public class LayoutConverterTest {
 
 	@Test
 	public void testConvertTwoColumnsISinglePortlet() throws Exception {
-		Map portletIdsMap = new TreeMap();
-
-		portletIdsMap.put(
-			"column-1",
-			new String[] {
-				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet"
-			});
-
-		portletIdsMap.put(
-			"column-2",
-			new String[] {
-				"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
-			});
-
-		_testConvert("2_columns_i", portletIdsMap);
+		_testConvertTwoColumnsSinglePortlet("2_columns_i");
 	}
 
 	@Test
