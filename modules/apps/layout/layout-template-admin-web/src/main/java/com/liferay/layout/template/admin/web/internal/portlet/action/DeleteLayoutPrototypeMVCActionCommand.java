@@ -12,9 +12,9 @@
  * details.
  */
 
-package com.liferay.layout.admin.web.internal.portlet.action;
+package com.liferay.layout.template.admin.web.internal.portlet.action;
 
-import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
+import com.liferay.layout.template.admin.constants.LayoutTemplateAdminPortletKeys;
 import com.liferay.portal.kernel.exception.RequiredLayoutPrototypeException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	property = {
-		"javax.portlet.name=" + LayoutAdminPortletKeys.GROUP_PAGES,
+		"javax.portlet.name=" + LayoutTemplateAdminPortletKeys.GROUP_PAGE_TEMPLATES,
 		"mvc.command.name=/layout_prototype/delete_layout_prototype"
 	},
 	service = MVCActionCommand.class
