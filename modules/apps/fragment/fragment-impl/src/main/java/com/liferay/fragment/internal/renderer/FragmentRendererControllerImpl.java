@@ -44,8 +44,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.taglib.servlet.PipingServletResponse;
 
-import java.io.IOException;
-
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -116,28 +114,28 @@ public class FragmentRendererControllerImpl
 				new PipingServletResponse(
 					httpServletResponse, unsyncStringWriter));
 		}
-		catch (IOException ioe) {
+		catch (Exception e) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
 					StringBundler.concat(
 						"Unable to render content of fragment entry ",
 						fragmentEntryLink.getFragmentEntryId(), ":",
-						ioe.getMessage()),
-					ioe);
+						e.getMessage()),
+					e);
 			}
 			else {
 				_log.error(
 					StringBundler.concat(
 						"Unable to render content of fragment entry ",
 						fragmentEntryLink.getFragmentEntryId(), ":",
-						ioe.getMessage()));
+						e.getMessage()));
 			}
 
 			SessionErrors.add(
 				httpServletRequest, "fragmentEntryContentInvalid");
 
 			return _getFragmentEntryContentExceptionMessage(
-				httpServletRequest, ioe);
+				httpServletRequest, e);
 		}
 
 		return unsyncStringWriter.toString();
@@ -177,7 +175,7 @@ public class FragmentRendererControllerImpl
 	}
 
 	private String _getFragmentEntryContentExceptionMessage(
-		HttpServletRequest httpServletRequest, IOException ioe) {
+		HttpServletRequest httpServletRequest, Exception e) {
 
 		StringBundler sb = new StringBundler(3);
 
@@ -185,7 +183,7 @@ public class FragmentRendererControllerImpl
 
 		String errorMessage = "an-unexpected-error-occurred";
 
-		Throwable cause = ioe.getCause();
+		Throwable cause = e.getCause();
 
 		if (cause instanceof FragmentEntryContentException) {
 			FragmentEntryContentException fece =
