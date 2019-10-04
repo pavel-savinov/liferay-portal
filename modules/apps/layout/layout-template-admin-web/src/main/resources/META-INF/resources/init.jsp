@@ -20,7 +20,8 @@
 taglib uri="http://liferay.com/tld/clay" prefix="clay" %><%@
 taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
-taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
+taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %><%@
+taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
 <%@ page import="com.liferay.layout.template.admin.web.internal.constants.LayoutTemplateAdminWebKeys" %><%@
 page import="com.liferay.layout.template.admin.web.internal.display.context.LayoutPrototypeDisplayContext" %><%@
@@ -28,11 +29,18 @@ page import="com.liferay.layout.template.admin.web.internal.display.context.Layo
 page import="com.liferay.layout.template.admin.web.internal.display.context.LayoutTemplatesAdminDisplayContext" %><%@
 page import="com.liferay.layout.template.admin.web.internal.servlet.taglib.clay.LayoutPrototypeVerticalCard" %><%@
 page import="com.liferay.portal.kernel.exception.RequiredLayoutPrototypeException" %><%@
+page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
 page import="com.liferay.portal.kernel.model.LayoutPrototype" %><%@
-page import="com.liferay.portal.kernel.service.LayoutPrototypeServiceUtil" %>
+page import="com.liferay.portal.kernel.service.LayoutPrototypeServiceUtil" %><%@
+page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
+page import="com.liferay.portal.kernel.util.Validator" %><%@
+page import="com.liferay.portal.model.impl.LayoutPrototypeImpl" %>
 
 <%@ page import="java.util.HashMap" %><%@
 page import="java.util.Map" %>
+
+<%@ page import="javax.portlet.PortletURL" %><%@
+page import="javax.portlet.WindowState" %>
 
 <liferay-frontend:defineObjects />
 
