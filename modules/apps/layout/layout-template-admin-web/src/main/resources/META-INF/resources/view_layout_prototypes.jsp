@@ -16,9 +16,13 @@
 
 <%@ include file="/init.jsp" %>
 
+<%
+LayoutPrototypeDisplayContext layoutPrototypeDisplayContext = new LayoutPrototypeDisplayContext(renderRequest, renderResponse, request);
+%>
+
 <clay:navigation-bar
 	inverted="<%= true %>"
-	navigationItems="<%= layoutsAdminDisplayContext.getNavigationItems() %>"
+	navigationItems="<%= layoutTemplatesAdminDisplayContext.getNavigationItems() %>"
 />
 
 <%
@@ -74,7 +78,7 @@ LayoutPrototypeManagementToolbarDisplayContext layoutPrototypeManagementToolbarD
 </aui:form>
 
 <liferay-frontend:component
-	componentId="<%= LayoutAdminWebKeys.LAYOUT_PROTOTYPE_DROPDOWN_DEFAULT_EVENT_HANDLER %>"
+	componentId="<%= LayoutTemplateAdminWebKeys.LAYOUT_PROTOTYPE_DROPDOWN_DEFAULT_EVENT_HANDLER %>"
 	module="js/LayoutPrototypeDropdownDefaultEventHandler.es"
 />
 
