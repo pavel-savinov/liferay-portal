@@ -15,3 +15,13 @@
 --%>
 
 <%@ include file="/init.jsp" %>
+
+<%
+Group scopeGroup = themeDisplay.getScopeGroup();
+%>
+
+<c:choose>
+	<c:when test='<%= Objects.equals(layoutTemplatesAdminDisplayContext.getTabs1(), "page-templates") && scopeGroup.isCompany() %>'>
+		<liferay-util:include page="/view_layout_prototypes.jsp" servletContext="<%= application %>" />
+	</c:when>
+</c:choose>
