@@ -12,15 +12,15 @@
  * details.
  */
 
-package com.liferay.layout.admin.web.internal.servlet.taglib.clay;
+package com.liferay.layout.template.admin.web.internal.servlet.taglib.clay;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.soy.BaseBaseClayCard;
 import com.liferay.frontend.taglib.clay.servlet.taglib.soy.VerticalCard;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemList;
-import com.liferay.layout.admin.web.internal.constants.LayoutAdminWebKeys;
-import com.liferay.layout.admin.web.internal.servlet.taglib.util.LayoutPrototypeActionDropdownItemsProvider;
+import com.liferay.layout.template.admin.web.internal.constants.LayoutTemplateAdminWebKeys;
+import com.liferay.layout.template.admin.web.internal.servlet.taglib.util.LayoutPrototypeActionDropdownItemsProvider;
 import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.BaseModel;
@@ -80,7 +80,7 @@ public class LayoutPrototypeVerticalCard
 
 	@Override
 	public String getDefaultEventHandler() {
-		return LayoutAdminWebKeys.
+		return LayoutTemplateAdminWebKeys.
 			LAYOUT_PROTOTYPE_DROPDOWN_DEFAULT_EVENT_HANDLER;
 	}
 

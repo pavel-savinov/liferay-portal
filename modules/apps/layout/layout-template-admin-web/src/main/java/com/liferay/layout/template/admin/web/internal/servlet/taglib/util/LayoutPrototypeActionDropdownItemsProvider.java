@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.layout.admin.web.internal.servlet.taglib.util;
+package com.liferay.layout.template.admin.web.internal.servlet.taglib.util;
 
 import com.liferay.exportimport.constants.ExportImportPortletKeys;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
