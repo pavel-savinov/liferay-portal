@@ -160,6 +160,34 @@ public class LayoutConverterTest {
 	}
 
 	@Test
+	public void testConvertThreeColumnsMultiplePortlets() throws Exception {
+		Map portletIdsMap = new TreeMap();
+
+		portletIdsMap.put(
+			"column-1",
+			new String[] {
+				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			});
+
+		portletIdsMap.put(
+			"column-2",
+			new String[] {
+				"com_liferay_hello_world_web_portlet_HelloWorldPortlet",
+				"hello_soy_portlet"
+			});
+
+		portletIdsMap.put(
+			"column-3",
+			new String[] {
+				"com_liferay_clay_sample_web_portlet_ClaySamplePortlet",
+				"com_liferay_clay_sample_web_portlet_ClaySamplePortlet"
+			});
+
+		_testConvert("3_columns", portletIdsMap);
+	}
+
+	@Test
 	public void testConvertThreeColumnsNoPortlets() throws Exception {
 		_testConvertNoPortlets("3_columns");
 	}
