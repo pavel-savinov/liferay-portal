@@ -89,7 +89,7 @@ public class LayoutConverterTest {
 
 	@Test
 	public void testConvertOneColumnMultiplePortlets() throws Exception {
-		Map portletIdsMap = new HashMap();
+		Map<String, String[]> portletIdsMap = new HashMap();
 
 		portletIdsMap.put(
 			"column-1",
@@ -109,7 +109,7 @@ public class LayoutConverterTest {
 
 	@Test
 	public void testConvertOneColumnSinglePortlet() throws Exception {
-		Map portletIdsMap = new HashMap();
+		Map<String, String[]> portletIdsMap = new HashMap();
 
 		portletIdsMap.put(
 			"column-1",
@@ -329,7 +329,7 @@ public class LayoutConverterTest {
 	private void _testConvertTwoColumnsMultiplePortlets(String layoutTemplateId)
 		throws Exception {
 
-		Map portletIdsMap = new TreeMap();
+		Map<String, String[]> portletIdsMap = new TreeMap<>();
 
 		portletIdsMap.put(
 			"column-1",
@@ -351,7 +351,7 @@ public class LayoutConverterTest {
 	private void _testConvertTwoColumnsSinglePortlet(String layoutTemplateId)
 		throws Exception {
 
-		Map portletIdsMap = new TreeMap();
+		Map<String, String[]> portletIdsMap = new TreeMap();
 
 		portletIdsMap.put(
 			"column-1",
