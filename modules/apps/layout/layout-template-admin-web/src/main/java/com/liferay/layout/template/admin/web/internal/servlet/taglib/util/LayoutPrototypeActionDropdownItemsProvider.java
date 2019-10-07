@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.service.permission.LayoutPrototypePermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.taglib.security.PermissionsURLTag;
@@ -147,7 +148,7 @@ public class LayoutPrototypeActionDropdownItemsProvider {
 
 		return dropdownItem -> {
 			dropdownItem.setHref(
-				layoutPrototypeGroup.getDisplayURL(_themeDisplay, true));
+				_getLayoutPrototypeGroupHref(layoutPrototypeGroup));
 			dropdownItem.setLabel(
 				LanguageUtil.get(_httpServletRequest, "edit"));
 		};
@@ -217,6 +218,14 @@ public class LayoutPrototypeActionDropdownItemsProvider {
 			dropdownItem.setLabel(
 				LanguageUtil.get(_httpServletRequest, "import"));
 		};
+	}
+
+	private String _getLayoutPrototypeGroupHref(Group layoutPrototypeGroup) {
+		String layoutFullURL = layoutPrototypeGroup.getDisplayURL(
+			_themeDisplay, true);
+
+		return HttpUtil.setParameter(
+			layoutFullURL, "p_l_back_url", _themeDisplay.getURLCurrent());
 	}
 
 	private UnsafeConsumer<DropdownItem, Exception>
