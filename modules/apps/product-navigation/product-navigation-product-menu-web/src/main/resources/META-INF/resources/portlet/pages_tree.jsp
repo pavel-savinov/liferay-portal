@@ -17,41 +17,31 @@
 <%@ include file="/portlet/init.jsp" %>
 
 <%
-Map<String, Object> context = new HashMap<>();
+Map<String, Object> data = new HashMap<>();
 
-context.put("administrationPortletNamespace", PortalUtil.getPortletNamespace(LayoutAdminPortletKeys.GROUP_PAGES));
+data.put("administrationPortletNamespace", PortalUtil.getPortletNamespace(LayoutAdminPortletKeys.GROUP_PAGES));
 
 PortletURL administrationPortletURL = PortalUtil.getControlPanelPortletURL(request, LayoutAdminPortletKeys.GROUP_PAGES, PortletRequest.RENDER_PHASE);
 
 administrationPortletURL.setParameter("redirect", themeDisplay.getURLCurrent());
 
-context.put("administrationPortletURL", administrationPortletURL.toString());
+data.put("administrationPortletURL", administrationPortletURL.toString());
 
 LiferayPortletURL findLayoutsURL = PortletURLFactoryUtil.create(request, ProductNavigationProductMenuPortletKeys.PRODUCT_NAVIGATION_PRODUCT_MENU, PortletRequest.RESOURCE_PHASE);
 
 findLayoutsURL.setResourceID("/product_menu/find_layouts");
 
-context.put("findLayoutsURL", findLayoutsURL.toString());
+data.put("findLayoutsURL", findLayoutsURL.toString());
 
-context.put("layouts", JSONFactoryUtil.createJSONArray());
-context.put("namespace", PortalUtil.getPortletNamespace(ProductNavigationProductMenuPortletKeys.PRODUCT_NAVIGATION_PRODUCT_MENU));
-context.put("spritemap", themeDisplay.getPathThemeImages() + "/lexicon/icons.svg");
-context.put("totalCount", 0);
+data.put("layouts", JSONFactoryUtil.createJSONArray());
+data.put("namespace", PortalUtil.getPortletNamespace(ProductNavigationProductMenuPortletKeys.PRODUCT_NAVIGATION_PRODUCT_MENU));
+data.put("totalCount", 0);
 %>
 
-<soy:component-renderer
-	componentId="layoutFinder"
-	context="<%= context %>"
-	module="js/LayoutFinder.es"
-	templateNamespace="com.liferay.product.navigation.product.menu.web.LayoutFinder.render"
-/>
-
-<aui:script>
-	function handleDestroyPortlet () {
-		Liferay.destroyComponent('layoutFinder');
-
-		Liferay.detach('destroyPortlet', handleDestroyPortlet);
-	}
-
-	Liferay.on('destroyPortlet', handleDestroyPortlet);
-</aui:script>
+<div id="<%= renderResponse.getNamespace() + "-layout-finder" %>">
+	<react:component
+		data="<%= data %>"
+		module="js/LayoutFinder.es"
+		servletContext="<%= application %>"
+	/>
+</div>
