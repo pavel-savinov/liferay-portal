@@ -68,8 +68,6 @@ String panelName = GetterUtil.getString(request.getAttribute(ProductNavigationPr
 		function() {
 			Liferay.SideNavigation.destroy(pagesTreeSidenavToggle);
 			Liferay.SideNavigation.destroy(sidenavToggle);
-
-			Liferay.destroyComponent('layoutFinder');
 		}
 	);
 
