@@ -89,15 +89,18 @@ public class LayoutConverterTest {
 
 	@Test
 	public void testConvertOneColumnMultiplePortlets() throws Exception {
-		Map<String, String[]> portletIdsMap = new HashMap();
-
-		portletIdsMap.put(
-			"column-1",
-			new String[] {
-				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet",
-				"com_liferay_hello_world_web_portlet_HelloWorldPortlet",
-				"hello_soy_portlet"
-			});
+		Map<String, String[]> portletIdsMap = new HashMap<String, String[]>() {
+			{
+				put(
+					"column-1",
+					new String[] {
+						"com_liferay_hello_velocity_web_portlet_" +
+							"HelloVelocityPortlet",
+						"com_liferay_hello_world_web_portlet_HelloWorldPortlet",
+						"hello_soy_portlet"
+					});
+			}
+		};
 
 		_testConvert("1_column", portletIdsMap);
 	}
@@ -109,13 +112,15 @@ public class LayoutConverterTest {
 
 	@Test
 	public void testConvertOneColumnSinglePortlet() throws Exception {
-		Map<String, String[]> portletIdsMap = new HashMap();
-
-		portletIdsMap.put(
-			"column-1",
-			new String[] {
-				"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
-			});
+		Map<String, String[]> portletIdsMap = new HashMap<String, String[]>() {
+			{
+				put(
+					"column-1",
+					new String[] {
+						"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
+					});
+			}
+		};
 
 		_testConvert("1_column", portletIdsMap);
 	}
@@ -329,21 +334,24 @@ public class LayoutConverterTest {
 	private void _testConvertTwoColumnsMultiplePortlets(String layoutTemplateId)
 		throws Exception {
 
-		Map<String, String[]> portletIdsMap = new TreeMap<>();
-
-		portletIdsMap.put(
-			"column-1",
-			new String[] {
-				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet",
-				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
-			});
-
-		portletIdsMap.put(
-			"column-2",
-			new String[] {
-				"com_liferay_hello_world_web_portlet_HelloWorldPortlet",
-				"hello_soy_portlet"
-			});
+		Map<String, String[]> portletIdsMap = new TreeMap<String, String[]>() {
+			{
+				put(
+					"column-1",
+					new String[] {
+						"com_liferay_hello_velocity_web_portlet_" +
+							"HelloVelocityPortlet",
+						"com_liferay_chart_sample_web_portlet_" +
+							"ChartSamplePortlet"
+					});
+				put(
+					"column-2",
+					new String[] {
+						"com_liferay_hello_world_web_portlet_HelloWorldPortlet",
+						"hello_soy_portlet"
+					});
+			}
+		};
 
 		_testConvert(layoutTemplateId, portletIdsMap);
 	}
@@ -351,19 +359,21 @@ public class LayoutConverterTest {
 	private void _testConvertTwoColumnsSinglePortlet(String layoutTemplateId)
 		throws Exception {
 
-		Map<String, String[]> portletIdsMap = new TreeMap();
-
-		portletIdsMap.put(
-			"column-1",
-			new String[] {
-				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet"
-			});
-
-		portletIdsMap.put(
-			"column-2",
-			new String[] {
-				"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
-			});
+		Map<String, String[]> portletIdsMap = new TreeMap<String, String[]>() {
+			{
+				put(
+					"column-1",
+					new String[] {
+						"com_liferay_hello_velocity_web_portlet_" +
+							"HelloVelocityPortlet"
+					});
+				put(
+					"column-2",
+					new String[] {
+						"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
+					});
+			}
+		};
 
 		_testConvert(layoutTemplateId, portletIdsMap);
 	}
