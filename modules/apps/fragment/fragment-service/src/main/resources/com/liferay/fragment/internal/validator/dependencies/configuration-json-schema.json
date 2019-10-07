@@ -229,7 +229,8 @@
 								"required": [
 									"value"
 								],
-								"title": "The Validvalue Schema"
+								"title": "The Validvalue Schema",
+								"type": "object"
 							},
 							"minItems": 1,
 							"title": "The Validvalues Schema",
