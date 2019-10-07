@@ -29,7 +29,9 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.model.LayoutTypePortletConstants;
+import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
+import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -41,6 +43,7 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -248,12 +251,29 @@ public class LayoutConverterTest {
 
 		Set<Map.Entry<String, String[]>> entries = portletIdsMap.entrySet();
 
+		Map<String, List<String>> encodedPortletIdsMap = new TreeMap<>();
+
 		for (Map.Entry<String, String[]> entry : entries) {
+			encodedPortletIdsMap.put(entry.getKey(), new ArrayList<>());
+
+			List<String> encodedPortletIds = encodedPortletIdsMap.get(
+				entry.getKey());
+
 			for (String portletId : entry.getValue()) {
+				Portlet portlet = _portletLocalService.getPortletById(
+					_group.getCompanyId(), portletId);
+
+				String encodedPortletId = portletId;
+
+				if (portlet.isInstanceable()) {
+					encodedPortletId = PortletIdCodec.encode(portletId);
+				}
+
 				LayoutTestUtil.addPortletToLayout(
-					TestPropsValues.getUserId(), layout,
-					PortletIdCodec.encode(portletId), entry.getKey(),
-					new HashMap<>());
+					TestPropsValues.getUserId(), layout, encodedPortletId,
+					entry.getKey(), new HashMap<>());
+
+				encodedPortletIds.add(encodedPortletId);
 			}
 		}
 
@@ -280,10 +300,12 @@ public class LayoutConverterTest {
 
 		int fromIndex = 0;
 
-		for (Map.Entry<String, String[]> entry : entries) {
-			String[] portletIds = entry.getValue();
+		for (Map.Entry<String, List<String>> entry :
+				encodedPortletIdsMap.entrySet()) {
 
-			int numberOfPortletsInColumn = portletIds.length;
+			List<String> portletIds = entry.getValue();
+
+			int numberOfPortletsInColumn = portletIds.size();
 
 			List<FragmentEntryLink> fragmentEntryLinksInColumn =
 				sortedFragmentEntryLinks.subList(
@@ -304,11 +326,19 @@ public class LayoutConverterTest {
 				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 					fragmentEntryLink.getEditableValues());
 
-				existingPortletIds.add(jsonObject.getString("portletId"));
+				String portletId = jsonObject.getString("portletId");
+
+				String instanceId = jsonObject.getString("instanceId");
+
+				if (Validator.isNotNull(instanceId)) {
+					portletId = PortletIdCodec.encode(portletId, instanceId);
+				}
+
+				existingPortletIds.add(portletId);
 			}
 
 			Assert.assertEquals(
-				fragmentEntryLinkIdsInColumn.toString(), portletIds.length,
+				fragmentEntryLinkIdsInColumn.toString(), portletIds.size(),
 				fragmentEntryLinkIdsInColumn.size());
 
 			for (String portletId : portletIds) {
@@ -395,5 +425,8 @@ public class LayoutConverterTest {
 
 	@Inject
 	private Portal _portal;
+
+	@Inject
+	private PortletLocalService _portletLocalService;
 
 }
