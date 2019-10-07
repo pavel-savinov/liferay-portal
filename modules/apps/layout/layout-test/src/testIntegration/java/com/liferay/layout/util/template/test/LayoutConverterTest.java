@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
@@ -45,6 +46,7 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -272,6 +274,10 @@ public class LayoutConverterTest {
 				_portal.getClassNameId(Layout.class.getName()),
 				layout.getPlid());
 
+		List<FragmentEntryLink> sortedFragmentEntryLinks = ListUtil.sort(
+			fragmentEntryLinks,
+			Comparator.comparing(FragmentEntryLink::getFragmentEntryLinkId));
+
 		int fromIndex = 0;
 
 		for (Map.Entry<String, String[]> entry : entries) {
@@ -280,7 +286,7 @@ public class LayoutConverterTest {
 			int numberOfPortletsInColumn = portletIds.length;
 
 			List<FragmentEntryLink> fragmentEntryLinksInColumn =
-				fragmentEntryLinks.subList(
+				sortedFragmentEntryLinks.subList(
 					fromIndex, fromIndex + numberOfPortletsInColumn);
 
 			fromIndex = fromIndex + numberOfPortletsInColumn;
