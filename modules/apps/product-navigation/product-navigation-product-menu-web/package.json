@@ -6,7 +6,9 @@
 		"metal-dom": "2.16.8",
 		"metal-position": "2.1.2",
 		"metal-soy": "2.16.8",
-		"metal-state": "2.16.8"
+		"metal-state": "2.16.8",
+		"react": "16.9.0",
+		"react-dom": "16.9.0"
 	},
 	"name": "product-navigation-control-menu-web",
 	"scripts": {
