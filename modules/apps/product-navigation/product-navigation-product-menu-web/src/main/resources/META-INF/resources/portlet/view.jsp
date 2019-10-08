@@ -58,10 +58,8 @@ String panelName = GetterUtil.getString(request.getAttribute(ProductNavigationPr
 
 <aui:script use="aui-base">
 	var sidenavToggle = document.getElementById('<portlet:namespace />sidenavToggleId');
-	var pagesTreeSidenavToggle = document.getElementById('<portlet:namespace />pagesTreeSidenavToggleId');
 
 	var sidenavInstance = Liferay.SideNavigation.initialize(sidenavToggle);
-	var pagesTreeSidenavInstance = Liferay.SideNavigation.initialize(pagesTreeSidenavToggle);
 
 	Liferay.once(
 		'screenLoad',
@@ -78,13 +76,6 @@ String panelName = GetterUtil.getString(request.getAttribute(ProductNavigationPr
 		}
 	);
 
-	pagesTreeSidenavInstance.on(
-		'closed.lexicon.sidenav',
-		function(event) {
-			Liferay.Util.Session.set('com.liferay.product.navigation.product.menu.web_pagesTreeState', 'closed');
-		}
-	);
-
 	sidenavInstance.on(
 		'open.lexicon.sidenav',
 		function(event) {
@@ -97,17 +88,30 @@ String panelName = GetterUtil.getString(request.getAttribute(ProductNavigationPr
 		}
 	);
 
-	pagesTreeSidenavInstance.on(
-		'open.lexicon.sidenav',
-		function(event) {
-			Liferay.Util.Session.set('com.liferay.product.navigation.product.menu.web_pagesTreeState', 'open');
+	var pagesTreeSidenavToggle = document.getElementById('<portlet:namespace />pagesTreeSidenavToggleId');
 
-			if (Liferay.Util.Session.set('com.liferay.product.navigation.product.menu.web_productMenuState') === 'open') {
-				sidenavInstance.hideSimpleSidenav();
-				Liferay.Util.Session.set('com.liferay.product.navigation.product.menu.web_productMenuState', 'closed');
+	if (pagesTreeSidenavToggle) {
+		var pagesTreeSidenavInstance = Liferay.SideNavigation.initialize(pagesTreeSidenavToggle);
+
+		pagesTreeSidenavInstance.on(
+			'closed.lexicon.sidenav',
+			function(event) {
+				Liferay.Util.Session.set('com.liferay.product.navigation.product.menu.web_pagesTreeState', 'closed');
 			}
-		}
-	);
+		);
+
+		pagesTreeSidenavInstance.on(
+			'open.lexicon.sidenav',
+			function(event) {
+				Liferay.Util.Session.set('com.liferay.product.navigation.product.menu.web_pagesTreeState', 'open');
+
+				if (Liferay.Util.Session.set('com.liferay.product.navigation.product.menu.web_productMenuState') === 'open') {
+					sidenavInstance.hideSimpleSidenav();
+					Liferay.Util.Session.set('com.liferay.product.navigation.product.menu.web_productMenuState', 'closed');
+				}
+			}
+		);
+	}
 
 	if (Liferay.Util.isPhone() && (document.body.classList.contains('open'))) {
 		Liferay.SideNavigation.hide(sidenavToggle);
