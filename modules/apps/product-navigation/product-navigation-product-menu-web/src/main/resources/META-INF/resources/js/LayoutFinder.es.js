@@ -23,10 +23,6 @@ function LayoutFinder(props) {
 	const [layouts, setLayouts] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [totalCount, setTotalCount] = useState(-1);
-	const [
-		viewInPageAdministrationURL,
-		setViewInPageAdministrationURL
-	] = useState('');
 
 	const handleFormSubmit = useCallback(event => {
 		event.preventDefault();
@@ -61,22 +57,12 @@ function LayoutFinder(props) {
 						setLayouts(response.layouts);
 						setLoading(false);
 						setTotalCount(response.totalCount);
-						setViewInPageAdministrationURL(
-							`${props.administrationPortletURL}&${props.administrationPortletNamespace}keywords=${keywords}`
-						);
 					});
 			}
 
 			return promise;
 		},
-		[
-			keywords,
-			loading,
-			props.administrationPortletNamespace,
-			props.administrationPortletURL,
-			props.findLayoutsURL,
-			props.namespace
-		]
+		[loading, props.findLayoutsURL, props.namespace]
 	);
 
 	const handleSearchInputKeyUp = useCallback(
@@ -153,7 +139,7 @@ function LayoutFinder(props) {
 							<div className="text-center">
 								<a
 									className="text-primary"
-									href={viewInPageAdministrationURL}
+									href={`${props.administrationPortletURL}&${props.administrationPortletNamespace}keywords=${keywords}`}
 								>
 									{Liferay.Language.get(
 										'view-in-page-administration'
