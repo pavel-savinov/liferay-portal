@@ -27,12 +27,12 @@ function LayoutFinder(props) {
 		setViewInPageAdministrationURL
 	] = useState('');
 
-	const _handleFormSubmit = useCallback(event => {
+	const handleFormSubmit = useCallback(event => {
 		event.preventDefault();
 		event.stopPropagation();
 	}, []);
 
-	const _updatePageResults = useCallback(
+	const updatePageResults = useCallback(
 		newKeywords => {
 			let promise = Promise.resolve();
 
@@ -78,7 +78,7 @@ function LayoutFinder(props) {
 		]
 	);
 
-	const _handleSearchInputKeyUp = useCallback(
+	const handleSearchInputKeyUp = useCallback(
 		event => {
 			const newKeywords = event.target.value;
 
@@ -89,15 +89,15 @@ function LayoutFinder(props) {
 			} else if (newKeywords !== keywords) {
 				setKeywords(keywords);
 
-				_updatePageResults(newKeywords);
+				updatePageResults(newKeywords);
 			}
 		},
-		[_updatePageResults, keywords]
+		[updatePageResults, keywords]
 	);
 
 	return (
 		<div className="layout-finder">
-			<form onSubmit={_handleFormSubmit} role="search">
+			<form onSubmit={handleFormSubmit} role="search">
 				<label
 					className="sr-only"
 					htmlFor={`${props.namespace}-layout-finder-page-input`}
@@ -110,7 +110,7 @@ function LayoutFinder(props) {
 					autoFocus
 					className="form-control"
 					id={`${props.namespace}-layout-finder-page-input`}
-					onKeyUp={_handleSearchInputKeyUp}
+					onKeyUp={handleSearchInputKeyUp}
 					placeholder={Liferay.Language.get(
 						'start-typing-to-find-a-page'
 					)}
