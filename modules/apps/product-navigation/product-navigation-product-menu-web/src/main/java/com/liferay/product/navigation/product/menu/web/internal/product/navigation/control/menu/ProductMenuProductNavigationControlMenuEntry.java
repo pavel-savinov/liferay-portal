@@ -204,6 +204,10 @@ public class ProductMenuProductNavigationControlMenuEntry
 					"productMenuState",
 				"closed");
 
+			if (Objects.equals(productMenuState, "open")) {
+				productMenuState += StringPool.SPACE + "product-menu-open";
+			}
+
 			jspWriter.write(productMenuState);
 
 			jspWriter.write(
