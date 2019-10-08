@@ -33,9 +33,7 @@ findLayoutsURL.setResourceID("/product_menu/find_layouts");
 
 data.put("findLayoutsURL", findLayoutsURL.toString());
 
-data.put("layouts", JSONFactoryUtil.createJSONArray());
 data.put("namespace", PortalUtil.getPortletNamespace(ProductNavigationProductMenuPortletKeys.PRODUCT_NAVIGATION_PRODUCT_MENU));
-data.put("totalCount", 0);
 %>
 
 <div id="<%= renderResponse.getNamespace() + "-layout-finder" %>">

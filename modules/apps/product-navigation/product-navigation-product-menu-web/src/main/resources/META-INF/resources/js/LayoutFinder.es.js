@@ -188,17 +188,7 @@ LayoutFinder.propTypes = {
 	administrationPortletNamespace: PropTypes.string,
 	administrationPortletURL: PropTypes.string,
 	findLayoutsURL: PropTypes.string,
-	keywords: PropTypes.string,
-	layouts: PropTypes.arrayOf(
-		PropTypes.shape({
-			name: PropTypes.string,
-			url: PropTypes.string
-		})
-	),
-	loading: PropTypes.bool,
-	maxItems: PropTypes.number,
 	namespace: PropTypes.string,
-	totalCount: PropTypes.number,
 	viewInPageAdministrationURL: PropTypes.string
 };
 
