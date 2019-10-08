@@ -12,6 +12,7 @@
  * details.
  */
 
+import ClayLoadingIndicator from '@clayui/loading-indicator';
 import {fetch} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useState, useCallback} from 'react';
@@ -23,7 +24,7 @@ function LayoutFinder(props) {
 	const [keywords, setKeywords] = useState('');
 	const [layouts, setLayouts] = useState([]);
 	const [loading, setLoading] = useState(false);
-	const [totalCount, setTotalCount] = useState(-1);
+	const [totalCount, setTotalCount] = useState(0);
 
 	const handleFormSubmit = useCallback(event => {
 		event.preventDefault();
@@ -58,17 +59,17 @@ function LayoutFinder(props) {
 		event => {
 			const newKeywords = event.target.value;
 
-			if (newKeywords.length < 2) {
+			setKeywords(newKeywords);
+
+			if (newKeywords.length <= 1) {
 				setLayouts([]);
 				setTotalCount(0);
-				setKeywords('');
-			} else if (newKeywords !== keywords) {
-				setKeywords(keywords);
-
+			} else {
+				setLoading(true);
 				updatePageResults(newKeywords);
 			}
 		},
-		[updatePageResults, keywords]
+		[updatePageResults]
 	);
 
 	return (
@@ -95,34 +96,29 @@ function LayoutFinder(props) {
 			</form>
 
 			{totalCount > 0 && (
-				<div>
-					<table className="mt-3">
-						<tbody>
-							{layouts.map(
-								(layout, layoutIndex) =>
-									layoutIndex < MAX_ITEMS_TO_SHOW && (
-										<tr key={layout.url}>
-											<td>
-												<a
-													className="d-block p-2 text-truncate"
-													href={layout.url}
-												>
-													{layout.name}
-												</a>
-											</td>
-										</tr>
-									)
-							)}
-						</tbody>
-					</table>
+				<>
+					<nav className="mt-2">
+						{layouts.map(
+							(layout, layoutIndex) =>
+								layoutIndex < MAX_ITEMS_TO_SHOW && (
+									<a
+										className="d-block p-2 text-break"
+										href={layout.url}
+										key={layout.url}
+									>
+										{layout.name}
+									</a>
+								)
+						)}
+					</nav>
 
 					{totalCount > MAX_ITEMS_TO_SHOW && (
 						<div>
-							<div className="mt-3 text-center">
-								{totalCount - MAX_ITEMS_TO_SHOW}
-								{Liferay.Language.get(
+							<div className="mt-2 text-center">
+								{`${totalCount -
+									MAX_ITEMS_TO_SHOW} ${Liferay.Language.get(
 									'results-more-refine-keywords'
-								)}
+								)}`}
 							</div>
 
 							<div className="text-center">
@@ -137,23 +133,16 @@ function LayoutFinder(props) {
 							</div>
 						</div>
 					)}
-
-					{loading && (
-						<span
-							aria-hidden="true"
-							className="loading-animation"
-						></span>
-					)}
-				</div>
+				</>
 			)}
 
-			{totalCount === 0 && !loading && (
-				<div className="taglib-empty-result-message">
-					<div className="taglib-empty-result-message-header"></div>
+			{loading && (
+				<ClayLoadingIndicator className="mt-3 mb-0" light small />
+			)}
 
-					<div className="text-center text-muted">
-						{Liferay.Language.get('page-not-found')}
-					</div>
+			{totalCount === 0 && !loading && keywords.length > 1 && (
+				<div className="text-center mt-3">
+					{Liferay.Language.get('page-not-found')}
 				</div>
 			)}
 		</div>

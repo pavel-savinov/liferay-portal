@@ -1,5 +1,6 @@
 {
 	"dependencies": {
+		"@clayui/loading-indicator": "3.0.0",
 		"frontend-js-web": "*",
 		"react": "16.9.0",
 		"react-dom": "16.9.0"
