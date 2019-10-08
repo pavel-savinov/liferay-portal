@@ -13,7 +13,7 @@
  */
 
 import ClayLoadingIndicator from '@clayui/loading-indicator';
-import {fetch} from 'frontend-js-web';
+import {fetch, objectToFormData} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useState, useCallback} from 'react';
 import {useDebounceCallback} from './useDebounceCallback.es';
@@ -32,12 +32,10 @@ function LayoutFinder(props) {
 	}, []);
 
 	const [updatePageResults] = useDebounceCallback(newKeywords => {
-		const formData = new FormData();
-
-		formData.append(`${props.namespace}keywords`, newKeywords);
-
 		fetch(props.findLayoutsURL, {
-			body: formData,
+			body: objectToFormData({
+				[`${props.namespace}keywords`]: newKeywords
+			}),
 			method: 'post'
 		})
 			.then(response => {
