@@ -238,7 +238,7 @@ public class LayoutConverterTest {
 	}
 
 	private void _testConvert(
-			String layoutTemplateId, Map<String, String[]> portletIdsMap)
+			String layoutTemplateId, List<Map<String, String[]>> portletIdsMaps)
 		throws Exception {
 
 		UnicodeProperties typeSettingsProperties = new UnicodeProperties();
@@ -249,32 +249,43 @@ public class LayoutConverterTest {
 		Layout layout = LayoutTestUtil.addLayout(
 			_group.getGroupId(), typeSettingsProperties.toString());
 
-		Set<Map.Entry<String, String[]>> entries = portletIdsMap.entrySet();
+		List<Map<String, List<String>>> encodedPortletIdsMaps =
+			new ArrayList<>();
 
-		Map<String, List<String>> encodedPortletIdsMap = new TreeMap<>();
+		int columnId = 0;
 
-		for (Map.Entry<String, String[]> entry : entries) {
-			encodedPortletIdsMap.put(entry.getKey(), new ArrayList<>());
+		for (Map<String, String[]> portletIdsMap : portletIdsMaps) {
+			Set<Map.Entry<String, String[]>> entries = portletIdsMap.entrySet();
 
-			List<String> encodedPortletIds = encodedPortletIdsMap.get(
-				entry.getKey());
+			Map<String, List<String>> encodedPortletIdsMap = new TreeMap<>();
 
-			for (String portletId : entry.getValue()) {
-				Portlet portlet = _portletLocalService.getPortletById(
-					_group.getCompanyId(), portletId);
+			for (Map.Entry<String, String[]> entry : entries) {
+				columnId++;
 
-				String encodedPortletId = portletId;
+				encodedPortletIdsMap.put(entry.getKey(), new ArrayList<>());
 
-				if (portlet.isInstanceable()) {
-					encodedPortletId = PortletIdCodec.encode(portletId);
+				List<String> encodedPortletIds = encodedPortletIdsMap.get(
+					entry.getKey());
+
+				for (String portletId : entry.getValue()) {
+					Portlet portlet = _portletLocalService.getPortletById(
+						_group.getCompanyId(), portletId);
+
+					String encodedPortletId = portletId;
+
+					if (portlet.isInstanceable()) {
+						encodedPortletId = PortletIdCodec.encode(portletId);
+					}
+
+					LayoutTestUtil.addPortletToLayout(
+						TestPropsValues.getUserId(), layout, encodedPortletId,
+						"column-" + columnId, new HashMap<>());
+
+					encodedPortletIds.add(encodedPortletId);
 				}
-
-				LayoutTestUtil.addPortletToLayout(
-					TestPropsValues.getUserId(), layout, encodedPortletId,
-					entry.getKey(), new HashMap<>());
-
-				encodedPortletIds.add(encodedPortletId);
 			}
+
+			encodedPortletIdsMaps.add(encodedPortletIdsMap);
 		}
 
 		LayoutConverter layoutConverter =
@@ -300,57 +311,63 @@ public class LayoutConverterTest {
 
 		int fromIndex = 0;
 
-		for (Map.Entry<String, List<String>> entry :
-				encodedPortletIdsMap.entrySet()) {
+		for (Map<String, List<String>> encodedPortletIdsMap :
+				encodedPortletIdsMaps) {
 
-			List<String> portletIds = entry.getValue();
+			for (Map.Entry<String, List<String>> entry :
+					encodedPortletIdsMap.entrySet()) {
 
-			int numberOfPortletsInColumn = portletIds.size();
+				List<String> portletIds = entry.getValue();
 
-			List<FragmentEntryLink> fragmentEntryLinksInColumn =
-				sortedFragmentEntryLinks.subList(
-					fromIndex, fromIndex + numberOfPortletsInColumn);
+				int numberOfPortletsInColumn = portletIds.size();
 
-			fromIndex = fromIndex + numberOfPortletsInColumn;
+				List<FragmentEntryLink> fragmentEntryLinksInColumn =
+					sortedFragmentEntryLinks.subList(
+						fromIndex, fromIndex + numberOfPortletsInColumn);
 
-			Set<String> existingPortletIds = new HashSet<>();
-			List<String> fragmentEntryLinkIdsInColumn = new ArrayList<>();
+				fromIndex = fromIndex + numberOfPortletsInColumn;
 
-			for (FragmentEntryLink fragmentEntryLink :
-					fragmentEntryLinksInColumn) {
+				Set<String> existingPortletIds = new HashSet<>();
+				List<String> fragmentEntryLinkIdsInColumn = new ArrayList<>();
 
-				fragmentEntryLinkIdsInColumn.add(
-					String.format(
-						"\"%s\"", fragmentEntryLink.getFragmentEntryLinkId()));
+				for (FragmentEntryLink fragmentEntryLink :
+						fragmentEntryLinksInColumn) {
 
-				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-					fragmentEntryLink.getEditableValues());
+					fragmentEntryLinkIdsInColumn.add(
+						String.format(
+							"\"%s\"",
+							fragmentEntryLink.getFragmentEntryLinkId()));
 
-				String portletId = jsonObject.getString("portletId");
+					JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+						fragmentEntryLink.getEditableValues());
 
-				String instanceId = jsonObject.getString("instanceId");
+					String portletId = jsonObject.getString("portletId");
 
-				if (Validator.isNotNull(instanceId)) {
-					portletId = PortletIdCodec.encode(portletId, instanceId);
+					String instanceId = jsonObject.getString("instanceId");
+
+					if (Validator.isNotNull(instanceId)) {
+						portletId = PortletIdCodec.encode(
+							portletId, instanceId);
+					}
+
+					existingPortletIds.add(portletId);
 				}
 
-				existingPortletIds.add(portletId);
+				Assert.assertEquals(
+					fragmentEntryLinkIdsInColumn.toString(), portletIds.size(),
+					fragmentEntryLinkIdsInColumn.size());
+
+				for (String portletId : portletIds) {
+					Assert.assertTrue(existingPortletIds.contains(portletId));
+				}
+
+				String fragmentEntryLinkIdsJoined = StringUtil.merge(
+					fragmentEntryLinkIdsInColumn, StringPool.COMMA_AND_SPACE);
+
+				expectedLayoutData = StringUtil.replaceFirst(
+					expectedLayoutData, "[]",
+					String.format("[%s]", fragmentEntryLinkIdsJoined));
 			}
-
-			Assert.assertEquals(
-				fragmentEntryLinkIdsInColumn.toString(), portletIds.size(),
-				fragmentEntryLinkIdsInColumn.size());
-
-			for (String portletId : portletIds) {
-				Assert.assertTrue(existingPortletIds.contains(portletId));
-			}
-
-			String fragmentEntryLinkIdsJoined = StringUtil.merge(
-				fragmentEntryLinkIdsInColumn, StringPool.COMMA_AND_SPACE);
-
-			expectedLayoutData = StringUtil.replaceFirst(
-				expectedLayoutData, "[]",
-				String.format("[%s]", fragmentEntryLinkIdsJoined));
 		}
 
 		JSONObject expectedLayoutDataJSONObject =
