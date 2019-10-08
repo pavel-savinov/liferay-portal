@@ -16,11 +16,12 @@ import {fetch} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useState, useCallback} from 'react';
 
+const MAX_ITEMS_TO_SHOW = 10;
+
 function LayoutFinder(props) {
 	const [keywords, setKeywords] = useState('');
 	const [layouts, setLayouts] = useState([]);
 	const [loading, setLoading] = useState(false);
-	const [maxItems] = useState(10);
 	const [totalCount, setTotalCount] = useState(-1);
 	const [
 		viewInPageAdministrationURL,
@@ -124,7 +125,7 @@ function LayoutFinder(props) {
 						<tbody>
 							{layouts.map(
 								(layout, layoutIndex) =>
-									layoutIndex < maxItems && (
+									layoutIndex < MAX_ITEMS_TO_SHOW && (
 										<tr key={layout.url}>
 											<td>
 												<a
@@ -140,10 +141,10 @@ function LayoutFinder(props) {
 						</tbody>
 					</table>
 
-					{totalCount > maxItems && (
+					{totalCount > MAX_ITEMS_TO_SHOW && (
 						<div>
 							<div className="mt-3 text-center">
-								{totalCount - maxItems}
+								{totalCount - MAX_ITEMS_TO_SHOW}
 								{Liferay.Language.get(
 									'results-more-refine-keywords'
 								)}
