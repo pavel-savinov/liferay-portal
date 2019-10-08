@@ -55,7 +55,7 @@ function LayoutFinder(props) {
 			});
 	}, 1000);
 
-	const handleSearchInputKeyUp = useCallback(
+	const handleOnChange = useCallback(
 		event => {
 			const newKeywords = event.target.value;
 
@@ -87,11 +87,12 @@ function LayoutFinder(props) {
 					autoFocus
 					className="form-control"
 					id={`${props.namespace}-layout-finder-page-input`}
-					onKeyUp={handleSearchInputKeyUp}
+					onChange={handleOnChange}
 					placeholder={Liferay.Language.get(
 						'start-typing-to-find-a-page'
 					)}
 					type="text"
+					value={keywords}
 				/>
 			</form>
 
