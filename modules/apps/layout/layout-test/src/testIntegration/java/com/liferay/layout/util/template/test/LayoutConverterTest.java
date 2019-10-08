@@ -145,6 +145,11 @@ public class LayoutConverterTest {
 	}
 
 	@Test
+	public void testConvertOneTwoColumnsINoPortlets() throws Exception {
+		_testConvertNoPortlets("1_2_columns_i");
+	}
+
+	@Test
 	public void testConvertTwoColumnsIIIMultiplePortlets() throws Exception {
 		_testConvertTwoColumnsMultiplePortlets("2_columns_iii");
 	}
