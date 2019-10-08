@@ -15,6 +15,7 @@
 import {fetch} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useState, useCallback} from 'react';
+import {useDebounceCallback} from './useDebounceCallback.es';
 
 const MAX_ITEMS_TO_SHOW = 10;
 
@@ -29,41 +30,29 @@ function LayoutFinder(props) {
 		event.stopPropagation();
 	}, []);
 
-	const updatePageResults = useCallback(
-		newKeywords => {
-			let promise = Promise.resolve();
+	const [updatePageResults] = useDebounceCallback(newKeywords => {
+		const formData = new FormData();
 
-			if (!loading && newKeywords.length >= 2) {
-				setLoading(true);
+		formData.append(`${props.namespace}keywords`, newKeywords);
 
-				const formData = new FormData();
-
-				formData.append(`${props.namespace}keywords`, newKeywords);
-
-				promise = fetch(props.findLayoutsURL, {
-					body: formData,
-					method: 'post'
-				})
-					.then(response => {
-						return response.ok
-							? response.json()
-							: {
-									layouts: [],
-									totalCount: 0
-							  };
-					})
-					.then(response => {
-						setKeywords(newKeywords);
-						setLayouts(response.layouts);
-						setLoading(false);
-						setTotalCount(response.totalCount);
-					});
-			}
-
-			return promise;
-		},
-		[loading, props.findLayoutsURL, props.namespace]
-	);
+		fetch(props.findLayoutsURL, {
+			body: formData,
+			method: 'post'
+		})
+			.then(response => {
+				return response.ok
+					? response.json()
+					: {
+							layouts: [],
+							totalCount: 0
+					  };
+			})
+			.then(response => {
+				setLoading(false);
+				setLayouts(response.layouts);
+				setTotalCount(response.totalCount);
+			});
+	}, 1000);
 
 	const handleSearchInputKeyUp = useCallback(
 		event => {
