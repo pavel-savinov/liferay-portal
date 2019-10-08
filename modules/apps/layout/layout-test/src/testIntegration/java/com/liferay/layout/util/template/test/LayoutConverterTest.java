@@ -403,6 +403,46 @@ public class LayoutConverterTest {
 		_testConvert(layoutTemplateId, new ArrayList<>());
 	}
 
+	private void _testConvertOneTwoColumnsSinglePortlet(String layoutTemplateId)
+		throws Exception {
+
+		Map<String, String[]> portletIdsMap1 = new TreeMap<String, String[]>() {
+			{
+				put(
+					"column-1",
+					new String[] {
+						"com_liferay_chart_sample_web_portlet_" +
+							"ChartSamplePortlet"
+					});
+			}
+		};
+		Map<String, String[]> portletIdsMap2 = new TreeMap<String, String[]>() {
+			{
+				put(
+					"column-1",
+					new String[] {
+						"com_liferay_hello_velocity_web_portlet_" +
+							"HelloVelocityPortlet"
+					});
+				put(
+					"column-2",
+					new String[] {
+						"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
+					});
+			}
+		};
+
+		List<Map<String, String[]>> portletIdsMaps =
+			new ArrayList<Map<String, String[]>>() {
+				{
+					add(portletIdsMap1);
+					add(portletIdsMap2);
+				}
+			};
+
+		_testConvert(layoutTemplateId, portletIdsMaps);
+	}
+
 	private void _testConvertTwoColumnsMultiplePortlets(String layoutTemplateId)
 		throws Exception {
 
