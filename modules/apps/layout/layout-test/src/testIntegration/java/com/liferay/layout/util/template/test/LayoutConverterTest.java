@@ -107,7 +107,14 @@ public class LayoutConverterTest {
 			}
 		};
 
-		_testConvert("1_column", portletIdsMap);
+		List<Map<String, String[]>> portletIdsMaps =
+			new ArrayList<Map<String, String[]>>() {
+				{
+					add(portletIdsMap);
+				}
+			};
+
+		_testConvert("1_column", portletIdsMaps);
 	}
 
 	@Test
@@ -127,7 +134,14 @@ public class LayoutConverterTest {
 			}
 		};
 
-		_testConvert("1_column", portletIdsMap);
+		List<Map<String, String[]>> portletIdsMaps =
+			new ArrayList<Map<String, String[]>>() {
+				{
+					add(portletIdsMap);
+				}
+			};
+
+		_testConvert("1_column", portletIdsMaps);
 	}
 
 	@Test
@@ -381,7 +395,7 @@ public class LayoutConverterTest {
 	private void _testConvertNoPortlets(String layoutTemplateId)
 		throws Exception {
 
-		_testConvert(layoutTemplateId, new HashMap());
+		_testConvert(layoutTemplateId, new ArrayList<>());
 	}
 
 	private void _testConvertTwoColumnsMultiplePortlets(String layoutTemplateId)
@@ -406,7 +420,14 @@ public class LayoutConverterTest {
 			}
 		};
 
-		_testConvert(layoutTemplateId, portletIdsMap);
+		List<Map<String, String[]>> portletIdsMaps =
+			new ArrayList<Map<String, String[]>>() {
+				{
+					add(portletIdsMap);
+				}
+			};
+
+		_testConvert(layoutTemplateId, portletIdsMaps);
 	}
 
 	private void _testConvertTwoColumnsSinglePortlet(String layoutTemplateId)
@@ -428,7 +449,14 @@ public class LayoutConverterTest {
 			}
 		};
 
-		_testConvert(layoutTemplateId, portletIdsMap);
+		List<Map<String, String[]>> portletIdsMaps =
+			new ArrayList<Map<String, String[]>>() {
+				{
+					add(portletIdsMap);
+				}
+			};
+
+		_testConvert(layoutTemplateId, portletIdsMaps);
 	}
 
 	@Inject
