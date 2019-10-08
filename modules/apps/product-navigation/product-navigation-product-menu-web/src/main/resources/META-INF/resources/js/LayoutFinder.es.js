@@ -27,23 +27,11 @@ function LayoutFinder(props) {
 		setViewInPageAdministrationURL
 	] = useState('');
 
-	/**
-	 * @param {!Event} event
-	 * @private
-	 * @review
-	 */
 	const _handleFormSubmit = useCallback(event => {
 		event.preventDefault();
 		event.stopPropagation();
 	}, []);
 
-	/**
-	 * Update page results with the given keywords
-	 * @param {string} newKeywords
-	 * @private
-	 * @return {Promise}
-	 * @review
-	 */
 	const _updatePageResults = useCallback(
 		newKeywords => {
 			let promise = Promise.resolve();
@@ -90,12 +78,6 @@ function LayoutFinder(props) {
 		]
 	);
 
-	/**
-	 * Handles keyUp event on the filter input to filter the layouts
-	 * @param {!KeyboardEvent} event
-	 * @private
-	 * @preview
-	 */
 	const _handleSearchInputKeyUp = useCallback(
 		event => {
 			const newKeywords = event.target.value;
@@ -202,118 +184,21 @@ function LayoutFinder(props) {
 	);
 }
 
-/**
- * State definition
- * @review
- * @static
- * @type {!Object}
- */
 LayoutFinder.propTypes = {
-	/**
-	 * Namespace for Pages Administration portlet
-	 * @default undefined
-	 * @instance
-	 * @memberOf LayoutFinder
-	 * @review
-	 * @type {!string}
-	 */
 	administrationPortletNamespace: PropTypes.string,
-
-	/**
-	 * URL to access Pages Administration portlet
-	 * @default undefined
-	 * @instance
-	 * @memberOf LayoutFinder
-	 * @review
-	 * @type {!string}
-	 */
 	administrationPortletURL: PropTypes.string,
-
-	/**
-	 * URL to find layouts by keywords
-	 * @default undefined
-	 * @instance
-	 * @memberOf LayoutFinder
-	 * @review
-	 * @type {!string}
-	 */
 	findLayoutsURL: PropTypes.string,
-
-	/**
-	 * Keywords to find layouts with
-	 * @default ''
-	 * @instance
-	 * @memberOf LayoutFinder
-	 * @private
-	 * @review
-	 * @type {string}
-	 */
 	keywords: PropTypes.string,
-
-	/**
-	 * Layouts found by current keywords
-	 * @default []
-	 * @instance
-	 * @memberOf LayoutFinder
-	 * @review
-	 * @type {!Array}
-	 */
 	layouts: PropTypes.arrayOf(
 		PropTypes.shape({
 			name: PropTypes.string,
 			url: PropTypes.string
 		})
 	),
-
-	/**
-	 * True when it's loading page results
-	 * @default false
-	 * @instance
-	 * @memberOf LayoutFinder
-	 * @private
-	 * @review
-	 * @type {boolean}
-	 */
 	loading: PropTypes.bool,
-
-	/**
-	 * Current portlet max items
-	 * @default undefined
-	 * @instance
-	 * @memberOf LayoutFinder
-	 * @review
-	 * @type {number}
-	 */
 	maxItems: PropTypes.number,
-
-	/**
-	 * Current portlet namespace
-	 * @default undefined
-	 * @instance
-	 * @memberOf LayoutFinder
-	 * @review
-	 * @type {!string}
-	 */
 	namespace: PropTypes.string,
-
-	/**
-	 * Total count of layouts found
-	 * @default 0
-	 * @instance
-	 * @memberOf LayoutFinder
-	 * @review
-	 * @type {number}
-	 */
 	totalCount: PropTypes.number,
-
-	/**
-	 * URL to access Pages Administration portlet with keywords parameter
-	 * @default undefined
-	 * @instance
-	 * @memberOf LayoutFinder
-	 * @review
-	 * @type {string}
-	 */
 	viewInPageAdministrationURL: PropTypes.string
 };
 
