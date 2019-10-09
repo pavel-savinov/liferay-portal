@@ -146,11 +146,6 @@ public class LayoutConverterTest {
 	}
 
 	@Test
-	public void testConvertOneThreeOneColumnsINoPortlets() throws Exception {
-		_testConvertNoPortlets("1_3_1_columns");
-	}
-
-	@Test
 	public void testConvertOneThreeOneColumnsMultiplePortlets()
 		throws Exception {
 
@@ -216,6 +211,11 @@ public class LayoutConverterTest {
 			};
 
 		_testConvert("1_3_1_columns", portletIdsMaps);
+	}
+
+	@Test
+	public void testConvertOneThreeOneColumnsNoPortlets() throws Exception {
+		_testConvertNoPortlets("1_3_1_columns");
 	}
 
 	@Test
