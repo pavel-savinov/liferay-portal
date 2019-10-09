@@ -229,6 +229,13 @@ public class LayoutConverterTest {
 		_testConvert("3_columns", Collections.singletonList(portletIdsMap));
 	}
 
+	public void testConvertOneTwoOneColumnsIMultiplePortlets()
+		throws Exception {
+
+		_testConvertOneTwoOneColumnsMultiplePortlets("1_2_1_columns_i");
+	}
+
+	@Test
 	public void testConvertOneTwoOneColumnsINoPortlets() throws Exception {
 		_testConvertNoPortlets("1_2_1_columns_i");
 	}
