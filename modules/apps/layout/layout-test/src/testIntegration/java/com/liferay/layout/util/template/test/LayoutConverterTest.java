@@ -214,19 +214,23 @@ public class LayoutConverterTest {
 
 		portletIdsMap.put(
 			"column-1",
-			new String[] {
+			new String[]{
 				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet"
 			});
 
 		portletIdsMap.put(
 			"column-2",
-			new String[] {
+			new String[]{
 				"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
 			});
 
-		portletIdsMap.put("column-3", new String[] {"hello_soy_portlet"});
+		portletIdsMap.put("column-3", new String[]{"hello_soy_portlet"});
 
 		_testConvert("3_columns", Collections.singletonList(portletIdsMap));
+	}
+
+	public void testConvertOneTwoOneColumnsINoPortlets() throws Exception {
+		_testConvertNoPortlets("1_2_1_columns_i");
 	}
 
 	@Test
