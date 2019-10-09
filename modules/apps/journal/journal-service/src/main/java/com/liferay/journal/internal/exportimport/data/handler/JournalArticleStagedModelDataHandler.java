@@ -1095,7 +1095,7 @@ public class JournalArticleStagedModelDataHandler
 
 		if (article != null) {
 			article = fetchExistingArticleVersion(
-				articleUuid, groupId, article.getArticleId(), version);
+				article.getUuid(), groupId, article.getArticleId(), version);
 		}
 
 		return article;
