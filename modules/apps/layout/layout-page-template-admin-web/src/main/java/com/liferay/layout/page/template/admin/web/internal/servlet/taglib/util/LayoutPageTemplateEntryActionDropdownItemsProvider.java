@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.layout.admin.web.internal.servlet.taglib.util;
+package com.liferay.layout.page.template.admin.web.internal.servlet.taglib.util;
 
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
@@ -20,10 +20,10 @@ import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorCriterion;
 import com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType;
 import com.liferay.item.selector.criteria.upload.criterion.UploadItemSelectorCriterion;
-import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
-import com.liferay.layout.admin.web.internal.configuration.LayoutAdminWebConfiguration;
-import com.liferay.layout.admin.web.internal.constants.LayoutAdminWebKeys;
-import com.liferay.layout.admin.web.internal.security.permission.resource.LayoutPageTemplateEntryPermission;
+import com.liferay.layout.page.template.admin.constants.LayoutPageTemplateAdminPortletKeys;
+import com.liferay.layout.page.template.admin.web.internal.configuration.LayoutPageTemplateAdminWebConfiguration;
+import com.liferay.layout.page.template.admin.web.internal.constants.LayoutPageTemplateAdminWebKeys;
+import com.liferay.layout.page.template.admin.web.internal.security.permission.resource.LayoutPageTemplateEntryPermission;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.petra.function.UnsafeConsumer;
@@ -66,10 +66,11 @@ public class LayoutPageTemplateEntryActionDropdownItemsProvider {
 		_httpServletRequest = PortalUtil.getHttpServletRequest(renderRequest);
 
 		_itemSelector = (ItemSelector)_httpServletRequest.getAttribute(
-			LayoutAdminWebKeys.ITEM_SELECTOR);
-		_layoutAdminWebConfiguration =
-			(LayoutAdminWebConfiguration)_httpServletRequest.getAttribute(
-				LayoutAdminWebConfiguration.class.getName());
+			LayoutPageTemplateAdminWebKeys.ITEM_SELECTOR);
+		_layoutPageTemplateAdminWebConfiguration =
+			(LayoutPageTemplateAdminWebConfiguration)
+				_httpServletRequest.getAttribute(
+					LayoutPageTemplateAdminWebConfiguration.class.getName());
 		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
@@ -202,10 +203,11 @@ public class LayoutPageTemplateEntryActionDropdownItemsProvider {
 
 		ItemSelectorCriterion itemSelectorCriterion =
 			new UploadItemSelectorCriterion(
-				LayoutAdminPortletKeys.GROUP_PAGES, uploadURL.toString(),
+				LayoutPageTemplateAdminPortletKeys.LAYOUT_PAGE_TEMPLATES,
+				uploadURL.toString(),
 				LanguageUtil.get(_themeDisplay.getLocale(), "page-template"),
 				UploadServletRequestConfigurationHelperUtil.getMaxSize(),
-				_layoutAdminWebConfiguration.thumbnailExtensions());
+				_layoutPageTemplateAdminWebConfiguration.thumbnailExtensions());
 
 		itemSelectorCriterion.setDesiredItemSelectorReturnTypes(
 			new FileEntryItemSelectorReturnType());
@@ -343,7 +345,8 @@ public class LayoutPageTemplateEntryActionDropdownItemsProvider {
 
 	private final HttpServletRequest _httpServletRequest;
 	private final ItemSelector _itemSelector;
-	private final LayoutAdminWebConfiguration _layoutAdminWebConfiguration;
+	private final LayoutPageTemplateAdminWebConfiguration
+		_layoutPageTemplateAdminWebConfiguration;
 	private final LayoutPageTemplateEntry _layoutPageTemplateEntry;
 	private final RenderResponse _renderResponse;
 	private final ThemeDisplay _themeDisplay;
