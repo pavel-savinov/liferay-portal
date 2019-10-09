@@ -154,10 +154,6 @@ public class ContentUtil {
 		AssetRenderer<?> assetRenderer = assetRendererFactory.getAssetRenderer(
 			assetEntry.getClassPK());
 
-		if (assetRenderer.getAssetObject() == null) {
-			return jsonObject;
-		}
-
 		if (AssetEntryPermission.contains(
 				themeDisplay.getPermissionChecker(), assetEntry,
 				ActionKeys.UPDATE)) {
