@@ -115,6 +115,11 @@ AUI.add(
 						instance._afterRenderTree,
 						instance
 					),
+					instance.after(
+						'childrenChange',
+						instance._afterRenderTree,
+						instance
+					),
 					instance.on('dropAppend', instance._onDropAppend, instance),
 					instance.on('dropInsert', instance._onDropInsert, instance)
 				);
