@@ -49,6 +49,7 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -184,7 +185,7 @@ public class LayoutConverterTest {
 				"com_liferay_clay_sample_web_portlet_ClaySamplePortlet"
 			});
 
-		_testConvert("3_columns", portletIdsMap);
+		_testConvert("3_columns", Collections.singletonList(portletIdsMap));
 	}
 
 	@Test
@@ -210,7 +211,7 @@ public class LayoutConverterTest {
 
 		portletIdsMap.put("column-3", new String[] {"hello_soy_portlet"});
 
-		_testConvert("3_columns", portletIdsMap);
+		_testConvert("3_columns", Collections.singletonList(portletIdsMap));
 	}
 
 	@Test
