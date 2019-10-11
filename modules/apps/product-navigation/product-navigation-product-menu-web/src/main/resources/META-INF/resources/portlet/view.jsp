@@ -20,7 +20,7 @@
 String productMenuState = SessionClicks.get(request, "com.liferay.product.navigation.product.menu.web_productMenuState", "closed");
 String pagesTreeState = SessionClicks.get(request, "com.liferay.product.navigation.product.menu.web_pagesTreeState", "closed");
 
-String panelName = GetterUtil.getString(request.getAttribute(ProductNavigationProductMenuWebKeys.PANEL_NAME));
+String panelName = GetterUtil.getString(request.getAttribute(ProductNavigationProductMenuWebKeys.PANEL_NAME), ProductNavigationProductMenuWebKeys.PRODUCT_MENU);
 %>
 
 <div class="lfr-product-menu-sidebar" id="productMenuSidebar">
