@@ -13,12 +13,33 @@
  */
 
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useCallback} from 'react';
 
 function PageTypeSelector(props) {
+	const handleOnChange = useCallback(
+		event => {
+			const pageType = event.target.value;
+
+			if (pageType === 'private-pages') {
+				Liferay.Util.Session.set(
+					`${props.namespace}PRIVATE_LAYOUT`,
+					'true'
+				);
+			} else {
+				Liferay.Util.Session.set(
+					`${props.namespace}PRIVATE_LAYOUT`,
+					'false'
+				);
+			}
+
+			Liferay.Util.navigate(window.location);
+		},
+		[props.namespace]
+	);
+
 	return (
 		<div className="page-type-selector">
-			<select className="form-control">
+			<select className="form-control" onChange={handleOnChange}>
 				<option selected={!props.privateLayout} value="public-pages">
 					{Liferay.Language.get('public-pages')}
 				</option>
