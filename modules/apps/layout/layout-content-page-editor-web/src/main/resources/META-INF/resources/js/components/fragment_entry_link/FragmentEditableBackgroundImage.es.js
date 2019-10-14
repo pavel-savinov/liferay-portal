@@ -116,7 +116,7 @@ class FragmentEditableBackgroundImage extends Component {
 			this._createFloatingToolbar();
 		}
 
-		if (editableIsMapped(editableValues)) {
+		if (editableIsMapped(editableValues, this.mappedAssetEntries)) {
 			this._updateMappedFieldValue();
 			this.element.classList.add(
 				'fragments-editor__background-image-editable--mapped'
@@ -291,7 +291,10 @@ class FragmentEditableBackgroundImage extends Component {
 	 * @review
 	 */
 	_renderBackgroundImage() {
-		const backgroundImageValue = editableIsMapped(this.editableValues)
+		const backgroundImageValue = editableIsMapped(
+			this.editableValues,
+			this.mappedAssetEntries
+		)
 			? this._mappedFieldValue
 			: this._getBackgroundImageValue();
 
@@ -369,7 +372,10 @@ class FragmentEditableBackgroundImage extends Component {
 	_updateMappedFieldValue() {
 		if (
 			this.getAssetFieldValueURL &&
-			editableIsMappedToAssetEntry(this.editableValues)
+			editableIsMappedToAssetEntry(
+				this.editableValues,
+				this.mappedAssetEntries
+			)
 		) {
 			getAssetFieldValue(
 				this.editableValues.classNameId,
@@ -487,6 +493,7 @@ const ConnectedFragmentEditableBackgroundImage = getConnectedComponent(
 		'imageSelectorURL',
 		'languageId',
 		'layoutData',
+		'mappedAssetEntries',
 		'mappingFieldsURL',
 		'portletNamespace',
 		'segmentsExperienceId',

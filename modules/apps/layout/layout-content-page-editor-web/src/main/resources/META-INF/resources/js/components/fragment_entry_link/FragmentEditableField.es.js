@@ -120,7 +120,10 @@ class FragmentEditableField extends PortletBase {
 			segmentedValue[this.languageId] ||
 			segmentedValue[this.defaultLanguageId];
 
-		const mapped = editableIsMapped(this.editableValues);
+		const mapped = editableIsMapped(
+			this.editableValues,
+			this.mappedAssetEntries
+		);
 
 		const value = mapped
 			? this._mappedFieldValue || this.editableValues.defaultValue
@@ -522,7 +525,10 @@ class FragmentEditableField extends PortletBase {
 	_updateMappedFieldValue() {
 		if (
 			this.getAssetFieldValueURL &&
-			editableIsMappedToAssetEntry(this.editableValues)
+			editableIsMappedToAssetEntry(
+				this.editableValues,
+				this.mappedAssetEntries
+			)
 		) {
 			this.fetch(this.getAssetFieldValueURL, {
 				classNameId: this.editableValues.classNameId,
@@ -697,6 +703,7 @@ const ConnectedFragmentEditableField = getConnectedComponent(
 		'hoveredItemType',
 		'languageId',
 		'layoutData',
+		'mappedAssetEntries',
 		'mappingFieldsURL',
 		'portletNamespace',
 		'segmentsExperienceId',

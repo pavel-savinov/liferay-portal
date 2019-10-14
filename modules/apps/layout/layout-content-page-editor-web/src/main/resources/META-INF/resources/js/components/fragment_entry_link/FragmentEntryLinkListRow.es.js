@@ -491,7 +491,10 @@ class FragmentEntryLinkListRow extends Component {
 		if (
 			this.getAssetFieldValueURL &&
 			this.row.config.backgroundImage &&
-			editableIsMappedToAssetEntry(this.row.config.backgroundImage)
+			editableIsMappedToAssetEntry(
+				this.row.config.backgroundImage,
+				this.mappedAssetEntries
+			)
 		) {
 			getAssetFieldValue(
 				this.row.config.backgroundImage.classNameId,
@@ -637,6 +640,7 @@ const ConnectedFragmentEntryLinkListRow = getConnectedComponent(
 		'hoveredItemId',
 		'hoveredItemType',
 		'layoutData',
+		'mappedAssetEntries',
 		'mappingFieldsURL',
 		'selectedMappingTypes',
 		'spritemap'
