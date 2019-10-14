@@ -132,7 +132,7 @@ function LayoutFinder(props) {
 							<div className="mt-2 text-center">
 								{Liferay.Util.sub(
 									Liferay.Language.get(
-										'there-are-x-more-results-narrow-your-search'
+										'there-are-x-more-results-narrow-your-searc-to-get-more-precise-results'
 									),
 									totalCount - MAX_ITEMS_TO_SHOW
 								)}
