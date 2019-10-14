@@ -448,6 +448,40 @@ public class LayoutConverterTest {
 	}
 
 	@Test
+	public void testConvertOneTwoOneColumnsIIMultiplePortlets()
+		throws Exception {
+
+		_testConvertOneTwoOneColumnsMultiplePortlets("1_2_1_columns_i");
+	}
+
+	@Test
+	public void testConvertOneTwoOneColumnsIINoPortlets() throws Exception {
+		_testConvertNoPortlets("1_2_1_columns_ii");
+	}
+
+	@Test
+	public void testConvertOneTwoOneColumnsIISinglePortlet() throws Exception {
+		_testConvertOneTwoOneColumnsSinglePortlet("1_2_1_columns_ii");
+	}
+
+	@Test
+	public void testConvertOneTwoOneColumnsIMultiplePortlets()
+		throws Exception {
+
+		_testConvertOneTwoOneColumnsMultiplePortlets("1_2_1_columns_i");
+	}
+
+	@Test
+	public void testConvertOneTwoOneColumnsINoPortlets() throws Exception {
+		_testConvertNoPortlets("1_2_1_columns_i");
+	}
+
+	@Test
+	public void testConvertOneTwoOneColumnsISinglePortlet() throws Exception {
+		_testConvertOneTwoOneColumnsSinglePortlet("1_2_1_columns_i");
+	}
+
+	@Test
 	public void testConvertThreeColumnsMultiplePortlets() throws Exception {
 		Map portletIdsMap = new TreeMap();
 
@@ -486,52 +520,19 @@ public class LayoutConverterTest {
 
 		portletIdsMap.put(
 			"column-1",
-			new String[]{
+			new String[] {
 				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet"
 			});
 
 		portletIdsMap.put(
 			"column-2",
-			new String[]{
+			new String[] {
 				"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
 			});
 
-		portletIdsMap.put("column-3", new String[]{"hello_soy_portlet"});
+		portletIdsMap.put("column-3", new String[] {"hello_soy_portlet"});
 
 		_testConvert("3_columns", Collections.singletonList(portletIdsMap));
-	}
-
-	public void testConvertOneTwoOneColumnsIIMultiplePortlets()
-		throws Exception {
-
-		_testConvertOneTwoOneColumnsMultiplePortlets("1_2_1_columns_i");
-	}
-
-	@Test
-	public void testConvertOneTwoOneColumnsIINoPortlets() throws Exception {
-		_testConvertNoPortlets("1_2_1_columns_ii");
-	}
-
-	@Test
-	public void testConvertOneTwoOneColumnsIISinglePortlet() throws Exception {
-		_testConvertOneTwoOneColumnsSinglePortlet("1_2_1_columns_ii");
-	}
-
-	@Test
-	public void testConvertOneTwoOneColumnsIMultiplePortlets()
-		throws Exception {
-
-		_testConvertOneTwoOneColumnsMultiplePortlets("1_2_1_columns_i");
-	}
-
-	@Test
-	public void testConvertOneTwoOneColumnsINoPortlets() throws Exception {
-		_testConvertNoPortlets("1_2_1_columns_i");
-	}
-
-	@Test
-	public void testConvertOneTwoOneColumnsISinglePortlet() throws Exception {
-		_testConvertOneTwoOneColumnsSinglePortlet("1_2_1_columns_i");
 	}
 
 	@Test
