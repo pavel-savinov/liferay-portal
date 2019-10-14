@@ -52,27 +52,36 @@ function deepClone(objectToClone) {
 /**
  * Checks if the given editable is mapped
  * @param {object} editableValues
+ * @param {Array} mappedAssetEntries
  * @private
  * @return {boolean}
  * @review
  */
-function editableIsMapped(editableValues) {
+function editableIsMapped(editableValues, mappedAssetEntries) {
 	return Boolean(
 		editableValues.mappedField ||
-			editableIsMappedToAssetEntry(editableValues)
+			editableIsMappedToAssetEntry(editableValues, mappedAssetEntries)
 	);
 }
 
 /**
  * Checks if the given editable is mapped to an asset entry
  * @param {object} editableValues
+ * @param {Array} mappedAssetEntries
  * @private
  * @return {boolean}
  * @review
  */
-function editableIsMappedToAssetEntry(editableValues) {
+function editableIsMappedToAssetEntry(editableValues, mappedAssetEntries) {
+	const mappedAssetEntry = mappedAssetEntries.find(
+		assetEntry =>
+			assetEntry.classNameId === editableValues.classNameId &&
+			assetEntry.classPK === editableValues.classPK
+	);
+
 	return Boolean(
-		editableValues.classNameId &&
+		mappedAssetEntry &&
+			editableValues.classNameId &&
 			editableValues.classPK &&
 			editableValues.fieldId
 	);
