@@ -78,7 +78,12 @@ public class FragmentEntryLinkModelListener
 	public void onAfterUpdate(FragmentEntryLink fragmentEntryLink)
 		throws ModelListenerException {
 
-		_updateAssetEntryUsage(fragmentEntryLink);
+		try {
+			_updateAssetEntryUsage(fragmentEntryLink);
+		}
+		catch (PortalException pe) {
+			throw new ModelListenerException(pe);
+		}
 
 		_updateDDMTemplateLink(fragmentEntryLink);
 	}
@@ -129,7 +134,9 @@ public class FragmentEntryLinkModelListener
 		}
 	}
 
-	private void _updateAssetEntryUsage(FragmentEntryLink fragmentEntryLink) {
+	private void _updateAssetEntryUsage(FragmentEntryLink fragmentEntryLink)
+		throws PortalException {
+
 		_assetEntryUsageLocalService.deleteAssetEntryUsages(
 			_portal.getClassNameId(FragmentEntryLink.class),
 			String.valueOf(fragmentEntryLink.getFragmentEntryLinkId()),

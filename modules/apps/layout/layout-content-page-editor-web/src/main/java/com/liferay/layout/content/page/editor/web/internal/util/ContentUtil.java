@@ -42,6 +42,8 @@ import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.trash.TrashHandler;
+import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -68,7 +70,8 @@ import javax.servlet.http.HttpServletRequest;
 public class ContentUtil {
 
 	public static Set<AssetEntry> getFragmentEntryLinkMappedAssetEntries(
-		FragmentEntryLink fragmentEntryLink) {
+			FragmentEntryLink fragmentEntryLink)
+		throws PortalException {
 
 		return _getFragmentEntryLinkMappedAssetEntries(
 			fragmentEntryLink, new HashSet<>());
@@ -201,7 +204,8 @@ public class ContentUtil {
 	}
 
 	private static AssetEntry _getAssetEntry(
-		JSONObject jsonObject, Set<Long> mappedClassPKs) {
+			JSONObject jsonObject, Set<Long> mappedClassPKs)
+		throws PortalException {
 
 		if (!jsonObject.has("classNameId") || !jsonObject.has("classPK")) {
 			return null;
@@ -225,6 +229,13 @@ public class ContentUtil {
 			return null;
 		}
 
+		TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(
+			PortalUtil.getClassName(classNameId));
+
+		if ((trashHandler != null) && trashHandler.isInTrash(classPK)) {
+			return null;
+		}
+
 		try {
 			return AssetEntryServiceUtil.getEntry(
 				PortalUtil.getClassName(classNameId), classPK);
@@ -243,7 +254,8 @@ public class ContentUtil {
 	}
 
 	private static Set<AssetEntry> _getFragmentEntryLinkMappedAssetEntries(
-		FragmentEntryLink fragmentEntryLink, Set<Long> mappedClassPKs) {
+			FragmentEntryLink fragmentEntryLink, Set<Long> mappedClassPKs)
+		throws PortalException {
 
 		JSONObject editableValuesJSONObject = null;
 
@@ -318,7 +330,8 @@ public class ContentUtil {
 	}
 
 	private static Set<AssetEntry> _getFragmentEntryLinksMappedAssetEntries(
-		long groupId, long plid, Set<Long> mappedClassPKs) {
+			long groupId, long plid, Set<Long> mappedClassPKs)
+		throws PortalException {
 
 		Set<AssetEntry> assetEntries = new HashSet<>();
 
@@ -380,11 +393,16 @@ public class ContentUtil {
 						configJSONObject.getJSONObject("backgroundImage");
 
 					if (backgroundImageJSONObject != null) {
-						AssetEntry assetEntry = _getAssetEntry(
-							backgroundImageJSONObject, mappedClassPKs);
+						try {
+							AssetEntry assetEntry = _getAssetEntry(
+								backgroundImageJSONObject, mappedClassPKs);
 
-						if (assetEntry != null) {
-							assetEntries.add(assetEntry);
+							if (assetEntry != null) {
+								assetEntries.add(assetEntry);
+							}
+						}
+						catch (PortalException pe) {
+							_log.error("Unable to get asset entry", pe);
 						}
 					}
 				}
