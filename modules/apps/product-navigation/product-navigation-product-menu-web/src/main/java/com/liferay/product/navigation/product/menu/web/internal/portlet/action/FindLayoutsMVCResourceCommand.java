@@ -14,13 +14,11 @@
 
 package com.liferay.product.navigation.product.menu.web.internal.portlet.action;
 
-import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
@@ -29,13 +27,16 @@ import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.product.navigation.product.menu.web.internal.constants.ProductNavigationProductMenuPortletKeys;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
@@ -102,24 +103,13 @@ public class FindLayoutsMVCResourceCommand extends BaseMVCResourceCommand {
 			0, 10, null);
 
 		for (Layout layout : layouts) {
-			StringBundler sb = new StringBundler(5);
-
-			sb.append(layout.getName(themeDisplay.getLocale()));
-			sb.append(StringPool.SPACE);
-			sb.append(StringPool.OPEN_PARENTHESIS);
-
-			if (layout.isPrivateLayout()) {
-				sb.append(
-					LanguageUtil.get(themeDisplay.getLocale(), "private"));
-			}
-			else {
-				sb.append(LanguageUtil.get(themeDisplay.getLocale(), "public"));
-			}
-
-			sb.append(StringPool.CLOSE_PARENTHESIS);
+			JSONArray layoutPathJSONArray = _getLayoutPathJSONArray(
+				layout, themeDisplay.getLocale());
 
 			JSONObject layoutJSONObject = JSONUtil.put(
-				"name", sb.toString()
+				"name", layout.getName(themeDisplay.getLocale())
+			).put(
+				"path", layoutPathJSONArray
 			).put(
 				"url", _portal.getLayoutFullURL(layout, themeDisplay)
 			);
@@ -142,6 +132,22 @@ public class FindLayoutsMVCResourceCommand extends BaseMVCResourceCommand {
 		jsonObject.put("totalCount", totalCount);
 
 		ServletResponseUtil.write(httpServletResponse, jsonObject.toString());
+	}
+
+	private JSONArray _getLayoutPathJSONArray(Layout layout, Locale locale)
+		throws PortalException {
+
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+		List<Layout> ancestors = layout.getAncestors();
+
+		Collections.reverse(ancestors);
+
+		for (Layout ancestor : ancestors) {
+			jsonArray.put(HtmlUtil.escape(ancestor.getName(locale)));
+		}
+
+		return jsonArray;
 	}
 
 	@Reference
