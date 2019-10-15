@@ -62,9 +62,9 @@ function PageTypeSelector(props) {
 				</select>
 			</div>
 			<div className="flex-fill flex-grow-1 text-right">
-				<a href="javascript: void(0);" onClick={handleOnClick}>
+				<button className="btn btn-unstyled" onClick={handleOnClick}>
 					{Liferay.Language.get('collapse-all')}
-				</a>
+				</button>
 			</div>
 		</div>
 	);
