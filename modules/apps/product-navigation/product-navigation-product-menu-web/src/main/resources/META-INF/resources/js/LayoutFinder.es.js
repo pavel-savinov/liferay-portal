@@ -108,6 +108,15 @@ function LayoutFinder(props) {
 					type="text"
 					value={keywords}
 				/>
+
+				<div className="layout-finder-icon">
+					<svg
+						aria-hidden="true"
+						className={`lexicon-icon lexicon-icon-search`}
+					>
+						<use xlinkHref={`${props.spritemap}#search`} />
+					</svg>
+				</div>
 			</form>
 
 			{totalCount > 0 && (

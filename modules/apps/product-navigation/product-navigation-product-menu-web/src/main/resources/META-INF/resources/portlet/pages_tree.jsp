@@ -36,6 +36,7 @@ data.put("findLayoutsURL", findLayoutsURL.toString());
 String namespace = PortalUtil.getPortletNamespace(ProductNavigationProductMenuPortletKeys.PRODUCT_NAVIGATION_PRODUCT_MENU);
 
 data.put("namespace", namespace);
+data.put("spritemap", themeDisplay.getPathThemeImages() + "/lexicon/icons.svg");
 
 Group scopeGroup = themeDisplay.getScopeGroup();
 
@@ -75,6 +76,6 @@ pageTypeSelectorData.put("namespace", PortalUtil.getPortletNamespace(ProductNavi
 	/>
 
 	<div class="pages-administration-link">
-		<aui:a cssClass="ml-2" href="<%= administrationPortletURL.toString() %>"><%= LanguageUtil.get(request, "view-in-page-administration") %></aui:a>
+		<aui:a cssClass="ml-2" href="<%= administrationPortletURL.toString() %>"><%= LanguageUtil.get(request, "go-to-pages-administration") %></aui:a>
 	</div>
 </div>
