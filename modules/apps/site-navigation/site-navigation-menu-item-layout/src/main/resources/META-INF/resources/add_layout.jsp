@@ -46,9 +46,7 @@ PortletURL portletURL = currentURLObj;
 
 <aui:input id="groupId" name="TypeSettingsProperties--groupId--" type="hidden" value="<%= scopeGroupId %>" />
 
-<aui:input id="layoutUuid" name="TypeSettingsProperties--layoutUuid--" type="hidden" value="">
-	<aui:validator name="required" />
-</aui:input>
+<aui:input id="layoutUuid" name="TypeSettingsProperties--layoutUuid--" type="hidden" value="" />
 
 <aui:input id="privateLayout" name="TypeSettingsProperties--privateLayout--" type="hidden" value="<%= privateLayout %>" />
 
