@@ -133,6 +133,51 @@ public class CopyLayoutPageTemplateEntryMVCActionCommandTest {
 		Assert.assertNotNull(targetLayoutPageTemplateEntry);
 	}
 
+	@Test
+	public void testCopyLayoutPageTemplateEntryUniqueNameMVCActionCommand()
+		throws Exception {
+
+		ActionRequest actionRequest = _getMockActionRequest();
+		ActionResponse actionResponse = new MockActionResponse();
+
+		LayoutPageTemplateEntry targetLayoutPageTemplateEntry =
+			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
+				_group.getGroupId(),
+				StringUtil.appendParentheticalSuffix(
+					_layoutPageTemplateEntry.getName(),
+					LanguageUtil.get(_serviceContext.getLocale(), "copy")));
+
+		Assert.assertNull(targetLayoutPageTemplateEntry);
+
+		ReflectionTestUtil.invoke(
+			_mvcActionCommand, "doProcessAction",
+			new Class<?>[] {ActionRequest.class, ActionResponse.class},
+			actionRequest, actionResponse);
+
+		ReflectionTestUtil.invoke(
+			_mvcActionCommand, "doProcessAction",
+			new Class<?>[] {ActionRequest.class, ActionResponse.class},
+			actionRequest, actionResponse);
+
+		targetLayoutPageTemplateEntry =
+			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
+				_group.getGroupId(),
+				StringUtil.appendParentheticalSuffix(
+					_layoutPageTemplateEntry.getName(),
+					LanguageUtil.get(_serviceContext.getLocale(), "copy")));
+
+		LayoutPageTemplateEntry secondTargetLayoutPageTemplateEntry =
+			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
+				_group.getGroupId(),
+				StringUtil.appendParentheticalSuffix(
+					_layoutPageTemplateEntry.getName(),
+					LanguageUtil.get(_serviceContext.getLocale(), "copy") +
+						StringPool.SPACE + 1));
+
+		Assert.assertNotNull(targetLayoutPageTemplateEntry);
+		Assert.assertNotNull(secondTargetLayoutPageTemplateEntry);
+	}
+
 	private MockActionRequest _getMockActionRequest() throws PortalException {
 		ThemeDisplay themeDisplay = _getThemeDisplay();
 
