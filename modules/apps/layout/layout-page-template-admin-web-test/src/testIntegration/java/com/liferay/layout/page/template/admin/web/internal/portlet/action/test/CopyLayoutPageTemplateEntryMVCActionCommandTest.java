@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
@@ -133,6 +134,37 @@ public class CopyLayoutPageTemplateEntryMVCActionCommandTest {
 		Assert.assertNotNull(targetLayoutPageTemplateEntry);
 	}
 
+	@Test(expected = Error.class)
+	public void testCopyLayoutPageTemplateEntryRollbackMVCActionCommand()
+		throws Exception {
+
+		ActionRequest actionRequest = _getMockActionRequest();
+		ActionResponse actionResponse = new MockActionResponse();
+
+		_layoutLocalService.deleteLayout(_layoutPageTemplateEntry.getPlid());
+
+		try {
+			ReflectionTestUtil.invoke(
+				_mvcActionCommand, "doProcessAction",
+				new Class<?>[] {ActionRequest.class, ActionResponse.class},
+				actionRequest, actionResponse);
+		}
+		catch (Exception e) {
+			LayoutPageTemplateEntry targetLayoutPageTemplateEntry =
+				_layoutPageTemplateEntryLocalService.
+					fetchLayoutPageTemplateEntry(
+						_group.getGroupId(),
+						StringUtil.appendParentheticalSuffix(
+							_layoutPageTemplateEntry.getName(),
+							LanguageUtil.get(
+								_serviceContext.getLocale(), "copy")));
+
+			Assert.assertNull(targetLayoutPageTemplateEntry);
+
+			throw e;
+		}
+	}
+
 	@Test
 	public void testCopyLayoutPageTemplateEntryUniqueNameMVCActionCommand()
 		throws Exception {
@@ -234,6 +266,9 @@ public class CopyLayoutPageTemplateEntryMVCActionCommandTest {
 
 	@DeleteAfterTestRun
 	private Group _group;
+
+	@Inject
+	private LayoutLocalService _layoutLocalService;
 
 	private LayoutPageTemplateEntry _layoutPageTemplateEntry;
 
