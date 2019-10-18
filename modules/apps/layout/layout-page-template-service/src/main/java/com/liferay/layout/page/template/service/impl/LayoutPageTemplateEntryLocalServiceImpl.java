@@ -29,6 +29,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.NoSuchClassNameException;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Layout;
@@ -40,6 +41,7 @@ import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutPrototypeLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
@@ -47,6 +49,8 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -306,6 +310,29 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 			userId, groupId, layoutPageTemplateCollectionId, 0, 0, name,
 			LayoutPageTemplateEntryTypeConstants.TYPE_BASIC, false, 0, 0, 0,
 			WorkflowConstants.STATUS_DRAFT, serviceContext);
+	}
+
+	@Override
+	public LayoutPageTemplateEntry copyLayoutPageTemplateEntry(
+			long userId, long groupId, long layoutPageTemplateCollectionId,
+			long layoutPageTemplateEntryId, ServiceContext serviceContext)
+		throws PortalException {
+
+		LayoutPageTemplateEntry sourceLayoutPageTemplateEntry =
+			layoutPageTemplateEntryPersistence.findByPrimaryKey(
+				layoutPageTemplateEntryId);
+
+		String name = _getUniqueCopyName(
+			groupId, sourceLayoutPageTemplateEntry.getName(),
+			serviceContext.getLocale());
+
+		return addLayoutPageTemplateEntry(
+			userId, groupId, layoutPageTemplateCollectionId,
+			sourceLayoutPageTemplateEntry.getClassNameId(),
+			sourceLayoutPageTemplateEntry.getClassTypeId(), name,
+			sourceLayoutPageTemplateEntry.getType(), false, 0,
+			sourceLayoutPageTemplateEntry.getPreviewFileEntryId(), 0,
+			sourceLayoutPageTemplateEntry.getStatus(), serviceContext);
 	}
 
 	@Override
@@ -934,6 +961,25 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 		return layout;
 	}
 
+	private String _getUniqueCopyName(
+		long groupId, String sourceName, Locale locale) {
+
+		String name = StringUtil.appendParentheticalSuffix(
+			sourceName, LanguageUtil.get(locale, "copy"));
+
+		int index = 1;
+
+		while (layoutPageTemplateEntryPersistence.countByG_N(groupId, name) >
+					0) {
+
+			name = StringUtil.appendParentheticalSuffix(
+				sourceName,
+				LanguageUtil.get(locale, "copy") + StringPool.SPACE + index++);
+		}
+
+		return name;
+	}
+
 	private static final char[] _BLACKLIST_CHAR = {
 		';', '/', '?', ':', '@', '=', '&', '\"', '<', '>', '#', '%', '{', '}',
 		'|', '\\', '^', '~', '[', ']', '`'
@@ -955,7 +1001,13 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 	private InfoDisplayContributorTracker _infoDisplayContributorTracker;
 
 	@Reference
+	private LayoutLocalService _layoutLocalService;
+
+	@Reference
 	private LayoutPrototypeLocalService _layoutPrototypeLocalService;
+
+	@Reference
+	private Portal _portal;
 
 	@Reference
 	private StagingGroupHelper _stagingGroupHelper;
