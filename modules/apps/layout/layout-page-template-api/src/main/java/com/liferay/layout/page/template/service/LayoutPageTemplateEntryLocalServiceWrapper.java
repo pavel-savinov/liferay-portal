@@ -219,6 +219,19 @@ public class LayoutPageTemplateEntryLocalServiceWrapper
 			serviceContext);
 	}
 
+	@Override
+	public com.liferay.layout.page.template.model.LayoutPageTemplateEntry
+			copyLayoutPageTemplateEntry(
+				long userId, long groupId, long layoutPageTemplateCollectionId,
+				long layoutPageTemplateEntryId,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _layoutPageTemplateEntryLocalService.copyLayoutPageTemplateEntry(
+			userId, groupId, layoutPageTemplateCollectionId,
+			layoutPageTemplateEntryId, serviceContext);
+	}
+
 	/**
 	 * Creates a new layout page template entry with the primary key. Does not add the layout page template entry to the database.
 	 *
