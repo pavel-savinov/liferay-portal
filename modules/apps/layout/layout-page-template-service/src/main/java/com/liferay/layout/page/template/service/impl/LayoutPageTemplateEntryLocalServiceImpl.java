@@ -964,17 +964,20 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 	private String _getUniqueCopyName(
 		long groupId, String sourceName, Locale locale) {
 
-		String name = StringUtil.appendParentheticalSuffix(
-			sourceName, LanguageUtil.get(locale, "copy"));
+		String copy = LanguageUtil.get(locale, "copy");
 
-		int index = 1;
+		String name = StringUtil.appendParentheticalSuffix(sourceName, copy);
 
-		while (layoutPageTemplateEntryPersistence.countByG_N(groupId, name) >
-					0) {
+		for (int i = 1;; i++) {
+			LayoutPageTemplateEntry layoutPageTemplateEntry =
+				layoutPageTemplateEntryPersistence.fetchByG_N(groupId, name);
+
+			if (layoutPageTemplateEntry == null) {
+				break;
+			}
 
 			name = StringUtil.appendParentheticalSuffix(
-				sourceName,
-				LanguageUtil.get(locale, "copy") + StringPool.SPACE + index++);
+				sourceName, copy + StringPool.SPACE + i);
 		}
 
 		return name;
