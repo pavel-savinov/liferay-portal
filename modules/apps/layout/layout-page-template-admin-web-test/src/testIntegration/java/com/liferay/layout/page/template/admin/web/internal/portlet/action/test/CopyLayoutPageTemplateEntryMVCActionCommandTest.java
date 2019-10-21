@@ -112,10 +112,7 @@ public class CopyLayoutPageTemplateEntryMVCActionCommandTest {
 
 		LayoutPageTemplateEntry targetLayoutPageTemplateEntry =
 			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
-				_group.getGroupId(),
-				StringUtil.appendParentheticalSuffix(
-					_layoutPageTemplateEntry.getName(),
-					LanguageUtil.get(_serviceContext.getLocale(), "copy")));
+				_group.getGroupId(), _getName());
 
 		Assert.assertNull(targetLayoutPageTemplateEntry);
 
@@ -126,10 +123,7 @@ public class CopyLayoutPageTemplateEntryMVCActionCommandTest {
 
 		targetLayoutPageTemplateEntry =
 			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
-				_group.getGroupId(),
-				StringUtil.appendParentheticalSuffix(
-					_layoutPageTemplateEntry.getName(),
-					LanguageUtil.get(_serviceContext.getLocale(), "copy")));
+				_group.getGroupId(), _getName());
 
 		Assert.assertNotNull(targetLayoutPageTemplateEntry);
 	}
@@ -153,11 +147,7 @@ public class CopyLayoutPageTemplateEntryMVCActionCommandTest {
 			LayoutPageTemplateEntry targetLayoutPageTemplateEntry =
 				_layoutPageTemplateEntryLocalService.
 					fetchLayoutPageTemplateEntry(
-						_group.getGroupId(),
-						StringUtil.appendParentheticalSuffix(
-							_layoutPageTemplateEntry.getName(),
-							LanguageUtil.get(
-								_serviceContext.getLocale(), "copy")));
+						_group.getGroupId(), _getName());
 
 			Assert.assertNull(targetLayoutPageTemplateEntry);
 
@@ -174,10 +164,7 @@ public class CopyLayoutPageTemplateEntryMVCActionCommandTest {
 
 		LayoutPageTemplateEntry targetLayoutPageTemplateEntry =
 			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
-				_group.getGroupId(),
-				StringUtil.appendParentheticalSuffix(
-					_layoutPageTemplateEntry.getName(),
-					LanguageUtil.get(_serviceContext.getLocale(), "copy")));
+				_group.getGroupId(), _getName());
 
 		Assert.assertNull(targetLayoutPageTemplateEntry);
 
@@ -193,10 +180,7 @@ public class CopyLayoutPageTemplateEntryMVCActionCommandTest {
 
 		targetLayoutPageTemplateEntry =
 			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
-				_group.getGroupId(),
-				StringUtil.appendParentheticalSuffix(
-					_layoutPageTemplateEntry.getName(),
-					LanguageUtil.get(_serviceContext.getLocale(), "copy")));
+				_group.getGroupId(), _getName());
 
 		LayoutPageTemplateEntry secondTargetLayoutPageTemplateEntry =
 			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
@@ -224,6 +208,12 @@ public class CopyLayoutPageTemplateEntryMVCActionCommandTest {
 				_layoutPageTemplateEntry.getLayoutPageTemplateEntryId()));
 
 		return mockActionRequest;
+	}
+
+	private String _getName() {
+		return StringUtil.appendParentheticalSuffix(
+			_layoutPageTemplateEntry.getName(),
+			LanguageUtil.get(_serviceContext.getLocale(), "copy"));
 	}
 
 	private ServiceContext _getServiceContext(Group group, long userId) {
