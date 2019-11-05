@@ -381,7 +381,7 @@ const INITIAL_STATE = {
 	getAssetMappingFieldsURL: Config.string().value(''),
 
 	/**
-	 * Get available templates url
+	 * Get available DDM templates url
 	 * @default undefined
 	 * @review
 	 * @type {string}
