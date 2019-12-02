@@ -712,7 +712,7 @@ public class LayoutsAdminDisplayContext {
 				LayoutRevision layoutRevision =
 					LayoutStagingUtil.getLayoutRevision(layout);
 
-				if (layoutRevision.isIncomplete()) {
+				if ((layoutRevision != null) && layoutRevision.isIncomplete()) {
 					continue;
 				}
 			}
