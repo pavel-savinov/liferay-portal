@@ -365,7 +365,7 @@ public class JournalArticleItemSelectorViewDisplayContext {
 
 			List results = JournalFolderServiceUtil.getFoldersAndArticles(
 				_themeDisplay.getScopeGroupId(), 0, _getFolderId(),
-				_infoItemItemSelectorCriterion.getStatus(),
+				_infoItemItemSelectorCriterion.getStatuses(),
 				_themeDisplay.getLocale(), articleSearchContainer.getStart(),
 				articleSearchContainer.getEnd(), folderOrderByComparator);
 
