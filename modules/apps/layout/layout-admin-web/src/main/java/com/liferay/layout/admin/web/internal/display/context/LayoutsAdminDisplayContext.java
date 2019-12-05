@@ -755,10 +755,20 @@ public class LayoutsAdminDisplayContext {
 				}
 
 				layoutJSONObject.put(
-					"draft", modifiedDate.getTime() > publishDate.getTime());
+					"conversionPreview", false
+				).put(
+					"draft", modifiedDate.getTime() > publishDate.getTime()
+				);
 			}
 			else {
-				layoutJSONObject.put("draft", false);
+				Layout draftLayout = LayoutLocalServiceUtil.fetchLayout(
+					PortalUtil.getClassNameId(Layout.class), layout.getPlid());
+
+				layoutJSONObject.put(
+					"conversionPreview", draftLayout != null
+				).put(
+					"draft", false
+				);
 			}
 
 			int childLayoutsCount = LayoutLocalServiceUtil.getLayoutsCount(
