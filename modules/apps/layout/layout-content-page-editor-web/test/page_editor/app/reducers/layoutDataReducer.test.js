@@ -150,7 +150,7 @@ describe('layoutDataReducer', () => {
 		it('removes an item from layoutData.items', () => {
 			const nextState = layoutDataReducer(
 				state,
-				removeItem('example-fragment-0')
+				removeItem({itemId: 'example-fragment-0'})
 			);
 
 			expect(nextState.layoutData.items).toEqual({
