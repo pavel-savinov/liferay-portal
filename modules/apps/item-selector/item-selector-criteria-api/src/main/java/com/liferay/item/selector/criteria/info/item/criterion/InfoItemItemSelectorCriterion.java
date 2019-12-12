@@ -41,7 +41,11 @@ public class InfoItemItemSelectorCriterion extends BaseItemSelectorCriterion {
 	 */
 	@Deprecated
 	public int getStatus() {
-		return _status;
+		if (_statuses.length > 0) {
+			return _statuses[0];
+		}
+
+		return WorkflowConstants.STATUS_ANY;
 	}
 
 	public int[] getStatuses() {
@@ -66,7 +70,6 @@ public class InfoItemItemSelectorCriterion extends BaseItemSelectorCriterion {
 	 */
 	@Deprecated
 	public void setStatus(int status) {
-		_status = status;
 		setStatuses(status);
 	}
 
@@ -84,14 +87,6 @@ public class InfoItemItemSelectorCriterion extends BaseItemSelectorCriterion {
 	private String _itemSubtype;
 	private String _itemType;
 	private String[] _mimeTypes;
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #_statuses}
-	 */
-	@Deprecated
-	private int _status = WorkflowConstants.STATUS_APPROVED;
-
-	private int[] _statuses = {getStatus()};
+	private int[] _statuses = {};
 
 }

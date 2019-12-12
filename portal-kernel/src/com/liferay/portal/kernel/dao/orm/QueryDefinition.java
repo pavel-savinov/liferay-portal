@@ -48,14 +48,11 @@ public class QueryDefinition<T> {
 		boolean includeOwner, int start, int end,
 		OrderByComparator<T> orderByComparator) {
 
-		_status = status;
-		_excludeStatus = excludeStatus;
-		_ownerUserId = ownerUserId;
-		_includeOwner = includeOwner;
-		_start = start;
-		_end = end;
+		this(
+			new int[] {status}, ownerUserId, includeOwner, start, end,
+			orderByComparator);
 
-		setOrderByComparator(orderByComparator);
+		_excludeStatuses = excludeStatus;
 	}
 
 	public QueryDefinition(
@@ -157,7 +154,11 @@ public class QueryDefinition<T> {
 	 */
 	@Deprecated
 	public int getStatus() {
-		return _status;
+		if (_statuses.length > 0) {
+			return _statuses[0];
+		}
+
+		return WorkflowConstants.STATUS_ANY;
 	}
 
 	public int[] getStatuses() {
@@ -170,7 +171,7 @@ public class QueryDefinition<T> {
 	 */
 	@Deprecated
 	public boolean isExcludeStatus() {
-		return _excludeStatus;
+		return _excludeStatuses;
 	}
 
 	public boolean isExcludeStatuses() {
@@ -228,8 +229,6 @@ public class QueryDefinition<T> {
 	 */
 	@Deprecated
 	public void setStatus(int status, boolean exclude) {
-		_excludeStatus = exclude;
-		_status = status;
 		setStatuses(new int[] {status}, exclude);
 	}
 
@@ -244,27 +243,11 @@ public class QueryDefinition<T> {
 
 	private Map<String, Serializable> _attributes;
 	private int _end = QueryUtil.ALL_POS;
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #_excludeStatuses}
-	 */
-	@Deprecated
-	private boolean _excludeStatus;
-
 	private boolean _excludeStatuses;
 	private boolean _includeOwner;
 	private OrderByComparator<T> _orderByComparator;
 	private long _ownerUserId;
 	private int _start = QueryUtil.ALL_POS;
-
-	/**
-	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
-	 *             #_statuses}
-	 */
-	@Deprecated
-	private int _status = WorkflowConstants.STATUS_ANY;
-
-	private int[] _statuses = {getStatus()};
+	private int[] _statuses = {};
 
 }
