@@ -70,6 +70,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.Portlet;
@@ -814,7 +815,10 @@ public class ContentPageEditorDisplayContext {
 
 		soyContexts.addAll(_getDynamicFragmentsSoyContexts());
 
-		long[] groupIds = {themeDisplay.getCompanyGroupId(), getGroupId()};
+		long[] groupIds = {
+			themeDisplay.getCompanyGroupId(), getGroupId(),
+			CompanyConstants.SYSTEM
+		};
 
 		List<FragmentCollection> fragmentCollections =
 			FragmentCollectionServiceUtil.getFragmentCollections(groupIds);
