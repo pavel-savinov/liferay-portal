@@ -121,10 +121,16 @@ public class BulkLayoutConverterImpl implements BulkLayoutConverter {
 				"Layout with PLID " + layout.getPlid() + " is not convertible");
 		}
 
-		Layout draftLayout = _getOrCreateDraftLayout(layout);
+		ServiceContext serviceContext = Optional.ofNullable(
+			ServiceContextThreadLocal.getServiceContext()
+		).orElse(
+			new ServiceContext()
+		);
+
+		Layout draftLayout = _getOrCreateDraftLayout(layout, serviceContext);
 
 		_addOrUpdateLayoutPageTemplateStructure(
-			draftLayout, _getLayoutData(draftLayout));
+			draftLayout, _getLayoutData(draftLayout), serviceContext);
 
 		draftLayout = _layoutLocalService.fetchLayout(draftLayout.getPlid());
 
@@ -189,7 +195,7 @@ public class BulkLayoutConverterImpl implements BulkLayoutConverter {
 	}
 
 	private LayoutPageTemplateStructure _addOrUpdateLayoutPageTemplateStructure(
-			Layout layout, LayoutData layoutData)
+			Layout layout, LayoutData layoutData, ServiceContext serviceContext)
 		throws PortalException {
 
 		JSONObject layoutDataJSONObject = layoutData.getLayoutDataJSONObject();
@@ -201,12 +207,6 @@ public class BulkLayoutConverterImpl implements BulkLayoutConverter {
 					layout.getPlid());
 
 		if (layoutPageTemplateStructure == null) {
-			ServiceContext serviceContext = Optional.ofNullable(
-				ServiceContextThreadLocal.getServiceContext()
-			).orElse(
-				new ServiceContext()
-			);
-
 			return _layoutPageTemplateStructureLocalService.
 				addLayoutPageTemplateStructure(
 					serviceContext.getUserId(), layout.getGroupId(),
@@ -228,14 +228,26 @@ public class BulkLayoutConverterImpl implements BulkLayoutConverter {
 				"Layout with PLID " + layout.getPlid() + " is not convertible");
 		}
 
+		ServiceContext serviceContext = Optional.ofNullable(
+			ServiceContextThreadLocal.getServiceContext()
+		).orElse(
+			new ServiceContext()
+		);
+
+		serviceContext.setScopeGroupId(layout.getGroupId());
+		serviceContext.setUserId(layout.getUserId());
+
+		ServiceContextThreadLocal.pushServiceContext(serviceContext);
+
 		_updatePortletDecorator(layout);
 
-		_addOrUpdateLayoutPageTemplateStructure(layout, _getLayoutData(layout));
+		_addOrUpdateLayoutPageTemplateStructure(
+			layout, _getLayoutData(layout), serviceContext);
 
 		layout = _layoutLocalService.updateType(
 			plid, LayoutConstants.TYPE_CONTENT);
 
-		_getOrCreateDraftLayout(layout);
+		_getOrCreateDraftLayout(layout, serviceContext);
 
 		return _layoutLocalService.updateLayout(
 			layout.getGroupId(), layout.isPrivateLayout(), layout.getLayoutId(),
@@ -300,7 +312,8 @@ public class BulkLayoutConverterImpl implements BulkLayoutConverter {
 		return layoutConverter.convert(layout);
 	}
 
-	private Layout _getOrCreateDraftLayout(Layout layout)
+	private Layout _getOrCreateDraftLayout(
+			Layout layout, ServiceContext serviceContext)
 		throws PortalException {
 
 		if ((layout.getClassNameId() != 0) || (layout.getClassPK() != 0)) {
@@ -317,12 +330,6 @@ public class BulkLayoutConverterImpl implements BulkLayoutConverter {
 			_portal.getClassNameId(Layout.class), layout.getPlid());
 
 		if (draftLayout == null) {
-			ServiceContext serviceContext = Optional.ofNullable(
-				ServiceContextThreadLocal.getServiceContext()
-			).orElse(
-				new ServiceContext()
-			);
-
 			draftLayout = _layoutLocalService.addLayout(
 				layout.getUserId(), layout.getGroupId(),
 				layout.isPrivateLayout(), layout.getParentLayoutId(),
