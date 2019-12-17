@@ -504,6 +504,8 @@ public class FragmentEntryConfigurationParserImpl
 				"template",
 				GetterUtil.getLong(
 					configurationValueJSONObject.getString("template"))
+			).put(
+				"title", configurationValueJSONObject.getString("title")
 			);
 
 			return jsonObject;
