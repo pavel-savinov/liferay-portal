@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,6 +93,25 @@ public class LayoutColumn {
 				StringPool.BLANK, 0, null, serviceContext);
 
 		_fragmentEntryLinkIds.add(fragmentEntryLink.getFragmentEntryLinkId());
+	}
+
+	private List<String> _getNestedColumnIds(String portletId) {
+		String property = _layout.getTypeSettingsProperty(
+			"nested-column-ids", StringPool.BLANK);
+
+		String[] nestedColumnIds = property.split(StringPool.COMMA);
+
+		List<String> portletNestedColumnIds = new ArrayList<>();
+
+		for (String nestedColumnId : nestedColumnIds) {
+			if (Validator.isNotNull(nestedColumnId) &&
+				nestedColumnId.startsWith(StringPool.UNDERLINE + portletId)) {
+
+				portletNestedColumnIds.add(nestedColumnId);
+			}
+		}
+
+		return portletNestedColumnIds;
 	}
 
 	private final List<Long> _fragmentEntryLinkIds = new ArrayList<>();
