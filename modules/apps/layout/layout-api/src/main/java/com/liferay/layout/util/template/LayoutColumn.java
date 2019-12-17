@@ -55,7 +55,19 @@ public class LayoutColumn {
 			_layout.getTypeSettingsProperties(), columnId);
 
 		for (String portletId : portletIds) {
-			_addPortlet(portletId);
+			if (portletId.startsWith(
+					"com_liferay_nested_portlets_web_portlet_" +
+						"NestedPortletsPortlet")) {
+
+				for (String portletNestedColumnId :
+						_getNestedColumnIds(portletId)) {
+
+					addPortlets(portletNestedColumnId);
+				}
+			}
+			else {
+				_addPortlet(portletId);
+			}
 		}
 	}
 
