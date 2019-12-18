@@ -16,6 +16,7 @@
 	{@param? draft: bool}
 	{@param? hasUpdatePermissions: bool }
 	{@param? lastSaveDate: string}
+	{@param? masterUsed: bool }
 	{@param? portletNamespace: string}
 	{@param? publishURL: string}
 	{@param? redirectURL: string}
@@ -37,6 +38,10 @@
 
 		{if $selectedSidebarPanelId}
 			{sp}fragments-editor-toolbar--padded
+		{/if}
+
+		{if $masterUsed}
+			{sp}fragments-editor-toolbar__master-used
 		{/if}
 	{/let}
 
@@ -140,6 +145,8 @@
 						{let $publishLabel kind="text"}
 							{if $singleSegmentsExperienceMode}
 								{msg desc=""}save-variant{/msg}
+							{elseif $masterUsed}
+								{msg desc=""}publish-master{/msg}
 							{else}
 								{msg desc=""}publish{/msg}
 							{/if}

@@ -226,6 +226,7 @@ const ConnectedFragmentsEditorToolbar = getConnectedComponent(
 		'hasUpdatePermissions',
 		'lastSaveDate',
 		'layoutData',
+		'masterUsed',
 		'portletNamespace',
 		'pageType',
 		'publishURL',
