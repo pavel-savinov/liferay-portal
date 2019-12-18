@@ -21,10 +21,12 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutTypePortletConstants;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
@@ -55,10 +57,7 @@ public class LayoutColumn {
 			_layout.getTypeSettingsProperties(), columnId);
 
 		for (String portletId : portletIds) {
-			if (portletId.startsWith(
-					"com_liferay_nested_portlets_web_portlet_" +
-						"NestedPortletsPortlet")) {
-
+			if (portletId.startsWith(PortletKeys.NESTED_PORTLETS)) {
 				for (String portletNestedColumnId :
 						_getNestedColumnIds(portletId)) {
 
@@ -109,7 +108,7 @@ public class LayoutColumn {
 
 	private List<String> _getNestedColumnIds(String portletId) {
 		String property = _layout.getTypeSettingsProperty(
-			"nested-column-ids", StringPool.BLANK);
+			LayoutTypePortletConstants.NESTED_COLUMN_IDS, StringPool.BLANK);
 
 		String[] nestedColumnIds = property.split(StringPool.COMMA);
 
