@@ -412,6 +412,8 @@ public class ContentPageEditorDisplayContext {
 			"masterLayoutData",
 			JSONFactoryUtil.createJSONObject(_getMasterLayoutData())
 		).put(
+			"masterUsed", _isMasterUsed()
+		).put(
 			"pageContents",
 			ContentUtil.getPageContentsJSONArray(
 				themeDisplay.getPlid(), themeDisplay.getURLCurrent(), request)
@@ -477,6 +479,8 @@ public class ContentPageEditorDisplayContext {
 			"draft", modifiedDate.after(publishDate)
 		).put(
 			"lastSaveDate", StringPool.BLANK
+		).put(
+			"masterUsed", _isMasterUsed()
 		).put(
 			"pageType", String.valueOf(_getPageType())
 		).put(
@@ -1272,12 +1276,18 @@ public class ContentPageEditorDisplayContext {
 	}
 
 	private int _getPageType() throws PortalException {
+		if (_pageType != null) {
+			return _pageType;
+		}
+
 		Layout publishedLayout = _getPublishedLayout();
 
 		if (Objects.equals(
 				publishedLayout.getType(), LayoutConstants.TYPE_PORTLET)) {
 
-			return LayoutConverterTypeConstants.TYPE_CONVERSION;
+			_pageType = LayoutConverterTypeConstants.TYPE_CONVERSION;
+
+			return _pageType;
 		}
 
 		Layout layout = themeDisplay.getLayout();
@@ -1293,10 +1303,13 @@ public class ContentPageEditorDisplayContext {
 		}
 
 		if (layoutPageTemplateEntry == null) {
-			return LayoutPageTemplateEntryTypeConstants.TYPE_BASIC;
+			_pageType = LayoutPageTemplateEntryTypeConstants.TYPE_BASIC;
+		}
+		else {
+			_pageType = layoutPageTemplateEntry.getType();
 		}
 
-		return layoutPageTemplateEntry.getType();
+		return _pageType;
 	}
 
 	private String _getPortletCategoryTitle(PortletCategory portletCategory) {
@@ -1554,6 +1567,25 @@ public class ContentPageEditorDisplayContext {
 		return false;
 	}
 
+	private boolean _isMasterUsed() throws PortalException {
+		if (_getPageType() !=
+				LayoutPageTemplateEntryTypeConstants.TYPE_MASTER_LAYOUT) {
+
+			return false;
+		}
+
+		Layout layout = _getPublishedLayout();
+
+		int masterUsagesCount = LayoutLocalServiceUtil.getLayoutsCount(
+			themeDisplay.getScopeGroupId(), layout.getPlid());
+
+		if (masterUsagesCount > 0) {
+			return true;
+		}
+
+		return false;
+	}
+
 	private boolean _isUsed(Portlet portlet, long plid) {
 		if (portlet.isInstanceable()) {
 			return false;
@@ -1596,6 +1628,7 @@ public class ContentPageEditorDisplayContext {
 	private ItemSelectorCriterion _imageItemSelectorCriterion;
 	private final ItemSelector _itemSelector;
 	private String _layoutData;
+	private Integer _pageType;
 	private Layout _publishedLayout;
 	private String _redirect;
 	private final RenderResponse _renderResponse;
