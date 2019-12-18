@@ -143,9 +143,11 @@ if (layoutPageTemplateEntry == null) {
 		<%
 		Layout masterLayout = LayoutLocalServiceUtil.getLayout(selLayout.getMasterLayoutPlid());
 
+		Layout masterDraftLayout = LayoutLocalServiceUtil.fetchLayout(PortalUtil.getClassNameId(Layout.class), masterLayout.getPlid());
+
 		String editPageURL = HttpUtil.addParameter(PortalUtil.getLayoutFullURL(selLayout, themeDisplay), "p_l_mode", Constants.EDIT);
 
-		String editMasterURL = HttpUtil.addParameter(HttpUtil.addParameter(PortalUtil.getLayoutFullURL(masterLayout, themeDisplay), "p_l_mode", Constants.EDIT), "p_l_back_url", editPageURL);
+		String editMasterURL = HttpUtil.addParameter(HttpUtil.addParameter(PortalUtil.getLayoutFullURL(masterDraftLayout, themeDisplay), "p_l_mode", Constants.EDIT), "p_l_back_url", editPageURL);
 		%>
 
 		<aui:script>
