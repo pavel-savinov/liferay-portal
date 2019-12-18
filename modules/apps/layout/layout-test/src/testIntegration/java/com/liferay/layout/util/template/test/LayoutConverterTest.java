@@ -816,7 +816,7 @@ public class LayoutConverterTest {
 	}
 
 	@Test
-	public void testIsConvertibleFalseWidgetPageCustomizable()
+	public void testIsConvertibleTrueWidgetPageCustomizable()
 		throws Exception {
 
 		UnicodeProperties typeSettingsProperties = new UnicodeProperties();
@@ -831,7 +831,7 @@ public class LayoutConverterTest {
 			_layoutConverterRegistry.getLayoutConverter(
 				_getLayoutTemplateId(layout));
 
-		Assert.assertEquals(false, layoutConverter.isConvertible(layout));
+		Assert.assertTrue(layoutConverter.isConvertible(layout));
 	}
 
 	@Test
