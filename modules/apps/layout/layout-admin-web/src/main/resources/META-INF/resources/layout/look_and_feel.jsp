@@ -143,7 +143,9 @@ if (layoutPageTemplateEntry == null) {
 		<%
 		Layout masterLayout = LayoutLocalServiceUtil.getLayout(selLayout.getMasterLayoutPlid());
 
-		String editMasterURL = HttpUtil.addParameter(HttpUtil.addParameter(PortalUtil.getLayoutFullURL(masterLayout, themeDisplay), "p_l_mode", Constants.EDIT), "p_l_back_url", currentURL);
+		String editPageURL = HttpUtil.addParameter(PortalUtil.getLayoutFullURL(selLayout, themeDisplay), "p_l_mode", Constants.EDIT);
+
+		String editMasterURL = HttpUtil.addParameter(HttpUtil.addParameter(PortalUtil.getLayoutFullURL(masterLayout, themeDisplay), "p_l_mode", Constants.EDIT), "p_l_back_url", editPageURL);
 		%>
 
 		<aui:script>
@@ -157,14 +159,6 @@ if (layoutPageTemplateEntry == null) {
 					Liferay.Util.navigate('<%= editMasterURL %>');
 				}
 			);
-
-			function handleDestroyPortlet() {
-				editMasterButtonEventListener.removeListener();
-
-				Liferay.detach('destroyPortlet', handleDestroyPortlet);
-			}
-
-			Liferay.on('destroyPortlet', handleDestroyPortlet);
 		</aui:script>
 	</c:otherwise>
 </c:choose>
