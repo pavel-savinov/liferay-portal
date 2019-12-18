@@ -6,6 +6,7 @@
 {template .render}
 	{@param? _conversionDraft: bool}
 	{@param? _handleDiscardDraft: any}
+	{@param? _handlePublish: any}
 	{@param? _handleToggleContextualSidebarButtonClick: any}
 	{@param? _online: bool}
 	{@param? _publishButtonEnabled: bool}
@@ -152,7 +153,11 @@
 							{/if}
 						{/let}
 						<li class="nav-item">
-							<form action="{$publishURL}" method="POST">
+							<form
+								action="{$publishURL}"
+								data-onsubmit="{$_handlePublish}"
+								method="POST"
+							>
 								<input
 									name="{$portletNamespace ?: ''}classPK"
 									type="hidden"
