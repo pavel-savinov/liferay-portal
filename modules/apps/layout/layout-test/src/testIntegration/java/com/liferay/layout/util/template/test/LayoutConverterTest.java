@@ -816,9 +816,18 @@ public class LayoutConverterTest {
 	}
 
 	@Test
-	public void testIsConvertibleTrueWidgetPageCustomizable()
-		throws Exception {
+	public void testIsConvertibleTrue() throws Exception {
+		Layout layout = LayoutTestUtil.addLayout(_group.getGroupId());
 
+		LayoutConverter layoutConverter =
+			_layoutConverterRegistry.getLayoutConverter(
+				_getLayoutTemplateId(layout));
+
+		Assert.assertEquals(true, layoutConverter.isConvertible(layout));
+	}
+
+	@Test
+	public void testIsConvertibleTrueWidgetPageCustomizable() throws Exception {
 		UnicodeProperties typeSettingsProperties = new UnicodeProperties();
 
 		typeSettingsProperties.setProperty(
@@ -846,17 +855,6 @@ public class LayoutConverterTest {
 
 		Layout layout = LayoutTestUtil.addLayout(
 			_group.getGroupId(), typeSettingsProperties.toString());
-
-		LayoutConverter layoutConverter =
-			_layoutConverterRegistry.getLayoutConverter(
-				_getLayoutTemplateId(layout));
-
-		Assert.assertEquals(true, layoutConverter.isConvertible(layout));
-	}
-
-	@Test
-	public void testIsConvertibleTrue() throws Exception {
-		Layout layout = LayoutTestUtil.addLayout(_group.getGroupId());
 
 		LayoutConverter layoutConverter =
 			_layoutConverterRegistry.getLayoutConverter(
