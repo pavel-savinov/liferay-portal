@@ -844,17 +844,6 @@ public class LayoutConverterTest {
 	}
 
 	@Test
-	public void testIsConvertibleTrue() throws Exception {
-		Layout layout = LayoutTestUtil.addLayout(_group.getGroupId());
-
-		LayoutConverter layoutConverter =
-			_layoutConverterRegistry.getLayoutConverter(
-				_getLayoutTemplateId(layout));
-
-		Assert.assertEquals(true, layoutConverter.isConvertible(layout));
-	}
-
-	@Test
 	public void testIsConvertibleTrueWidgetPageWithNestedApplicationsWidget()
 		throws Exception {
 
