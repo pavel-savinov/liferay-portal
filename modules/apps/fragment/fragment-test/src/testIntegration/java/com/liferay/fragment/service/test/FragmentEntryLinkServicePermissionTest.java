@@ -109,11 +109,10 @@ public class FragmentEntryLinkServicePermissionTest {
 
 		_fragmentEntryLinkService.addFragmentEntryLink(
 			_group.getGroupId(), 0, _fragmentEntry.getFragmentEntryId(),
-			PortalUtil.getClassNameId(Layout.class),
-			RandomTestUtil.randomLong(), _fragmentEntry.getCss(),
-			_fragmentEntry.getHtml(), _fragmentEntry.getJs(),
-			_fragmentEntry.getConfiguration(), StringPool.BLANK,
-			StringPool.BLANK, 0, null, serviceContext);
+			PortalUtil.getClassNameId(Layout.class), _layout.getPlid(),
+			_fragmentEntry.getCss(), _fragmentEntry.getHtml(),
+			_fragmentEntry.getJs(), _fragmentEntry.getConfiguration(),
+			StringPool.BLANK, StringPool.BLANK, 0, null, serviceContext);
 	}
 
 	@Test
@@ -138,7 +137,7 @@ public class FragmentEntryLinkServicePermissionTest {
 		FragmentEntryLink fragmentEntryLink =
 			FragmentTestUtil.addFragmentEntryLink(
 				_fragmentEntry, PortalUtil.getClassNameId(Layout.class),
-				RandomTestUtil.randomLong());
+				_layout.getPlid());
 
 		ServiceTestUtil.setUser(_user);
 
@@ -223,7 +222,7 @@ public class FragmentEntryLinkServicePermissionTest {
 		FragmentEntryLink fragmentEntryLink =
 			FragmentTestUtil.addFragmentEntryLink(
 				_fragmentEntry, PortalUtil.getClassNameId(Layout.class),
-				RandomTestUtil.randomLong());
+				_layout.getPlid());
 
 		ServiceTestUtil.setUser(_user);
 
