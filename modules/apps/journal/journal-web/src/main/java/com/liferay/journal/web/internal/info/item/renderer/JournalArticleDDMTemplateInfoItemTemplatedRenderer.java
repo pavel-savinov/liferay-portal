@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.staging.StagingGroupHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +59,10 @@ public class JournalArticleDDMTemplateInfoItemTemplatedRenderer
 		DDMStructure ddmStructure = article.getDDMStructure();
 
 		for (DDMTemplate ddmTemplate : ddmStructure.getTemplates()) {
+			if (_stagingGroupHelper.isLiveGroup(ddmTemplate.getGroupId())) {
+				continue;
+			}
+
 			infoItemTemplates.add(
 				new InfoItemRendererTemplate(
 					ddmTemplate.getName(locale), ddmTemplate.getTemplateKey()));
@@ -126,5 +131,8 @@ public class JournalArticleDDMTemplateInfoItemTemplatedRenderer
 	private volatile ResourceBundleLoader _resourceBundleLoader;
 
 	private ServletContext _servletContext;
+
+	@Reference
+	private StagingGroupHelper _stagingGroupHelper;
 
 }
