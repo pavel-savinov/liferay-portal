@@ -32,6 +32,8 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.portlet.ResourceRequest;
@@ -83,6 +85,10 @@ public class GetAvailableTemplatesMVCResourceCommand
 
 				JSONArray templatesJSONArray =
 					JSONFactoryUtil.createJSONArray();
+
+				Collections.sort(
+					infoItemRendererTemplates,
+					Comparator.comparing(InfoItemRendererTemplate::getLabel));
 
 				for (InfoItemRendererTemplate infoItemRendererTemplate :
 						infoItemRendererTemplates) {
