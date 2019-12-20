@@ -71,10 +71,7 @@ function PageTypeSelector(props) {
 							className="dropdown-toggle"
 							displayType="unstyled"
 						>
-							<ClayIcon
-								className="inline-item inline-item-after"
-								symbol="ellipsis-v"
-							/>
+							<ClayIcon symbol="ellipsis-v" />
 						</ClayButton>
 					}
 				>
