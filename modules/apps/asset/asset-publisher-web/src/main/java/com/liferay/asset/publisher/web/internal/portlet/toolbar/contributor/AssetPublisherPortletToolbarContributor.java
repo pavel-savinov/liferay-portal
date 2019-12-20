@@ -82,7 +82,9 @@ public class AssetPublisherPortletToolbarContributor
 			(AssetPublisherDisplayContext)portletRequest.getAttribute(
 				AssetPublisherWebKeys.ASSET_PUBLISHER_DISPLAY_CONTEXT);
 
-		if (!_isVisible(assetPublisherDisplayContext, portletRequest)) {
+		if ((assetPublisherDisplayContext == null) ||
+			!_isVisible(assetPublisherDisplayContext, portletRequest)) {
+
 			return;
 		}
 
