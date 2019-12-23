@@ -85,6 +85,14 @@ public class LayoutPageTemplateStructureStagedModelDataHandler
 				layoutPageTemplateStructure.getUuid(),
 				portletDataContext.getScopeGroupId());
 
+		Element element = portletDataContext.getImportDataElement(
+			importedLayoutPageTemplateStructure);
+
+		importedLayoutPageTemplateStructure.setClassNameId(
+			_portal.getClassNameId(element.attributeValue("className")));
+		importedLayoutPageTemplateStructure.setClassPK(
+			GetterUtil.getLong(element.attributeValue("classPK")));
+
 		if ((existingLayoutPageTemplateStructure == null) ||
 			!portletDataContext.isDataStrategyMirror()) {
 
@@ -93,19 +101,12 @@ public class LayoutPageTemplateStructureStagedModelDataHandler
 					portletDataContext, importedLayoutPageTemplateStructure);
 		}
 		else {
-			Element element = portletDataContext.getImportDataElement(
-				importedLayoutPageTemplateStructure);
-
 			importedLayoutPageTemplateStructure.setMvccVersion(
 				existingLayoutPageTemplateStructure.getMvccVersion());
 			importedLayoutPageTemplateStructure.
 				setLayoutPageTemplateStructureId(
 					existingLayoutPageTemplateStructure.
 						getLayoutPageTemplateStructureId());
-			importedLayoutPageTemplateStructure.setClassNameId(
-				_portal.getClassNameId(element.attributeValue("className")));
-			importedLayoutPageTemplateStructure.setClassPK(
-				GetterUtil.getLong(element.attributeValue("classPK")));
 
 			importedLayoutPageTemplateStructure =
 				_stagedModelRepository.updateStagedModel(
