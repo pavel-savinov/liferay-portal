@@ -338,7 +338,7 @@ public class JournalArticleItemSelectorViewDisplayContext {
 		else {
 			int total = JournalFolderServiceUtil.getFoldersAndArticlesCount(
 				_themeDisplay.getScopeGroupId(), 0, _getFolderId(),
-				_infoItemItemSelectorCriterion.getStatus());
+				_infoItemItemSelectorCriterion.getStatuses());
 
 			articleSearchContainer.setTotal(total);
 
@@ -415,7 +415,7 @@ public class JournalArticleItemSelectorViewDisplayContext {
 			).put(
 				Field.DESCRIPTION, getKeywords()
 			).put(
-				Field.STATUS, _infoItemItemSelectorCriterion.getStatus()
+				Field.STATUS, _infoItemItemSelectorCriterion.getStatuses()
 			).put(
 				Field.TITLE, getKeywords()
 			).put(
