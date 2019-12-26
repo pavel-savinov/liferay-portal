@@ -63,34 +63,30 @@ public class QueryDefinition<T> {
 	}
 
 	public QueryDefinition(int status, long ownerUserId, boolean includeOwner) {
-		if (status == WorkflowConstants.STATUS_ANY) {
-			setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
-		}
-		else {
-			setStatus(status);
-		}
-
-		_ownerUserId = ownerUserId;
-		_includeOwner = includeOwner;
+		this(new int[] {status}, ownerUserId, includeOwner);
 	}
 
 	public QueryDefinition(
 		int status, long ownerUserId, boolean includeOwner, int start, int end,
 		OrderByComparator<T> orderByComparator) {
 
-		if (status == WorkflowConstants.STATUS_ANY) {
-			setStatus(WorkflowConstants.STATUS_IN_TRASH, true);
+		this(
+			new int[] {status}, ownerUserId, includeOwner, start, end,
+			orderByComparator);
+	}
+
+	public QueryDefinition(
+		int[] statuses, long ownerUserId, boolean includeOwner) {
+
+		if (ArrayUtil.contains(statuses, WorkflowConstants.STATUS_ANY)) {
+			setStatuses(new int[] {WorkflowConstants.STATUS_IN_TRASH}, true);
 		}
 		else {
-			setStatus(status);
+			setStatuses(statuses);
 		}
 
 		_ownerUserId = ownerUserId;
 		_includeOwner = includeOwner;
-		_start = start;
-		_end = end;
-
-		setOrderByComparator(orderByComparator);
 	}
 
 	public QueryDefinition(
