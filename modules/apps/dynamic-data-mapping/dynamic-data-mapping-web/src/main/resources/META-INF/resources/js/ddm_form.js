@@ -1640,7 +1640,11 @@ AUI.add(
 					var criterionJSON = {
 						desiredItemSelectorReturnTypes:
 							'com.liferay.item.selector.criteria.JournalArticleItemSelectorReturnType',
-						statuses: [0,2,7]
+						statuses: [
+							Liferay.Workflow.STATUS_APPROVED,
+							Liferay.Workflow.STATUS_DRAFT,
+							Liferay.Workflow.STATUS_SCHEDULED
+						]
 					};
 
 					var webContentParameters = {
