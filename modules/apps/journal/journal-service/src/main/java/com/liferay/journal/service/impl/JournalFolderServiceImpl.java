@@ -275,6 +275,17 @@ public class JournalFolderServiceImpl extends JournalFolderServiceBaseImpl {
 	}
 
 	@Override
+	public int getFoldersAndArticlesCount(
+		long groupId, long userId, long folderId, int[] statuses) {
+
+		QueryDefinition<?> queryDefinition = new QueryDefinition<>(
+			statuses, userId, true);
+
+		return journalFolderFinder.filterCountF_A_ByG_F(
+			groupId, folderId, queryDefinition);
+	}
+
+	@Override
 	public int getFoldersCount(long groupId, long parentFolderId) {
 		return getFoldersCount(
 			groupId, parentFolderId, WorkflowConstants.STATUS_APPROVED);
