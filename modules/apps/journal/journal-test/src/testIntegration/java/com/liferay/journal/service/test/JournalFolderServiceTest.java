@@ -29,16 +29,22 @@ import com.liferay.journal.service.JournalFolderLocalService;
 import com.liferay.journal.service.JournalFolderService;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.service.test.ServiceTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -160,6 +166,250 @@ public class JournalFolderServiceTest {
 				RESTRICTION_TYPE_DDM_STRUCTURES_AND_WORKFLOW);
 
 		Assert.assertTrue(ddmStructures.toString(), ddmStructures.isEmpty());
+	}
+
+	@Test
+	public void testGetFoldersAndArticlesCountWithArticleAndFolder()
+		throws Exception {
+
+		int initialCount = _journalFolderService.getFoldersAndArticlesCount(
+			_group.getGroupId(), TestPropsValues.getUserId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			new int[] {WorkflowConstants.STATUS_ANY});
+
+		JournalTestUtil.addFolder(
+			_group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, "Test Folder");
+
+		JournalTestUtil.addArticle(
+			_group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, "Test Article",
+			"This is a test article.");
+
+		int actualCount = _journalFolderService.getFoldersAndArticlesCount(
+			_group.getGroupId(), TestPropsValues.getUserId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			new int[] {WorkflowConstants.STATUS_ANY});
+
+		Assert.assertEquals(initialCount + 2, actualCount);
+	}
+
+	@Test
+	public void testGetFoldersAndArticlesCountWithDifferentStatuses()
+		throws Exception {
+
+		int initialCount = _journalFolderService.getFoldersAndArticlesCount(
+			_group.getGroupId(), TestPropsValues.getUserId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			new int[] {
+				WorkflowConstants.STATUS_APPROVED,
+				WorkflowConstants.STATUS_DRAFT
+			});
+
+		User user = UserTestUtil.addUser();
+
+		try {
+			ServiceContext serviceContext =
+				ServiceContextTestUtil.getServiceContext(
+					_group, user.getUserId());
+
+			serviceContext.setCommand(Constants.ADD);
+			serviceContext.setLayoutFullURL("http://localhost");
+
+			JournalTestUtil.addArticle(
+				_group.getGroupId(),
+				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+				JournalArticleConstants.CLASSNAME_ID_DEFAULT,
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(), LocaleUtil.getSiteDefault(),
+				true, true, serviceContext);
+
+			JournalTestUtil.addArticle(
+				_group.getGroupId(),
+				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+				JournalArticleConstants.CLASSNAME_ID_DEFAULT,
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(), LocaleUtil.getSiteDefault(),
+				true, false, serviceContext);
+
+			int actualCount = _journalFolderService.getFoldersAndArticlesCount(
+				_group.getGroupId(), TestPropsValues.getUserId(),
+				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+				new int[] {
+					WorkflowConstants.STATUS_APPROVED,
+					WorkflowConstants.STATUS_DRAFT
+				});
+
+			Assert.assertEquals(initialCount + 2, actualCount);
+		}
+		finally {
+			UserLocalServiceUtil.deleteUser(user);
+		}
+	}
+
+	@Test
+	public void testGetFoldersAndArticlesCountWithStatus() throws Exception {
+		int initialCount = _journalFolderService.getFoldersAndArticlesCount(
+			_group.getGroupId(), TestPropsValues.getUserId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			new int[] {WorkflowConstants.STATUS_APPROVED});
+
+		User user = UserTestUtil.addUser();
+
+		try {
+			ServiceContext serviceContext =
+				ServiceContextTestUtil.getServiceContext(
+					_group, user.getUserId());
+
+			serviceContext.setCommand(Constants.ADD);
+			serviceContext.setLayoutFullURL("http://localhost");
+
+			JournalTestUtil.addArticle(
+				_group.getGroupId(),
+				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+				JournalArticleConstants.CLASSNAME_ID_DEFAULT,
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(), LocaleUtil.getSiteDefault(),
+				true, true, serviceContext);
+
+			JournalTestUtil.addArticle(
+				_group.getGroupId(),
+				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+				JournalArticleConstants.CLASSNAME_ID_DEFAULT,
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(), LocaleUtil.getSiteDefault(),
+				true, false, serviceContext);
+
+			int actualCount = _journalFolderService.getFoldersAndArticlesCount(
+				_group.getGroupId(), TestPropsValues.getUserId(),
+				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+				new int[] {WorkflowConstants.STATUS_APPROVED});
+
+			Assert.assertEquals(initialCount + 1, actualCount);
+		}
+		finally {
+			UserLocalServiceUtil.deleteUser(user);
+		}
+	}
+
+	@Test
+	public void testGetFoldersAndArticlesWithArticleAndFolder()
+		throws Exception {
+
+		JournalFolder journalFolder = JournalTestUtil.addFolder(
+			_group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, "Test Folder");
+
+		JournalArticle journalArticle = JournalTestUtil.addArticle(
+			_group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, "Test Article",
+			"This is a test article.");
+
+		List<Object> foldersAndArticles =
+			_journalFolderService.getFoldersAndArticles(
+				_group.getGroupId(), TestPropsValues.getUserId(),
+				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+				new int[] {WorkflowConstants.STATUS_ANY}, LocaleUtil.US, 0, 100,
+				null);
+
+		Assert.assertEquals(
+			foldersAndArticles.toString(), 2, foldersAndArticles.size());
+
+		Assert.assertTrue(foldersAndArticles.contains(journalFolder));
+		Assert.assertTrue(foldersAndArticles.contains(journalArticle));
+	}
+
+	@Test
+	public void testGetFoldersAndArticlesWithDifferentStatuses()
+		throws Exception {
+
+		User user = UserTestUtil.addUser();
+
+		try {
+			ServiceContext serviceContext =
+				ServiceContextTestUtil.getServiceContext(
+					_group, user.getUserId());
+
+			serviceContext.setCommand(Constants.ADD);
+			serviceContext.setLayoutFullURL("http://localhost");
+
+			JournalArticle journalArticle1 = JournalTestUtil.addArticle(
+				_group.getGroupId(),
+				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+				JournalArticleConstants.CLASSNAME_ID_DEFAULT,
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(), LocaleUtil.getSiteDefault(),
+				true, true, serviceContext);
+
+			JournalArticle journalArticle2 = JournalTestUtil.addArticle(
+				_group.getGroupId(),
+				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+				JournalArticleConstants.CLASSNAME_ID_DEFAULT,
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(), LocaleUtil.getSiteDefault(),
+				true, false, serviceContext);
+
+			List<Object> foldersAndArticles =
+				_journalFolderService.getFoldersAndArticles(
+					_group.getGroupId(), TestPropsValues.getUserId(),
+					JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+					new int[] {
+						WorkflowConstants.STATUS_APPROVED,
+						WorkflowConstants.STATUS_DRAFT
+					},
+					LocaleUtil.US, 0, 100, null);
+
+			Assert.assertTrue(foldersAndArticles.contains(journalArticle1));
+			Assert.assertTrue(foldersAndArticles.contains(journalArticle2));
+		}
+		finally {
+			UserLocalServiceUtil.deleteUser(user);
+		}
+	}
+
+	@Test
+	public void testGetFoldersAndArticlesWithStatus() throws Exception {
+		User user = UserTestUtil.addUser();
+
+		try {
+			ServiceContext serviceContext =
+				ServiceContextTestUtil.getServiceContext(
+					_group, user.getUserId());
+
+			serviceContext.setCommand(Constants.ADD);
+			serviceContext.setLayoutFullURL("http://localhost");
+
+			JournalArticle journalArticle = JournalTestUtil.addArticle(
+				_group.getGroupId(),
+				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+				JournalArticleConstants.CLASSNAME_ID_DEFAULT,
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(), LocaleUtil.getSiteDefault(),
+				true, true, serviceContext);
+
+			JournalTestUtil.addArticle(
+				_group.getGroupId(),
+				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+				JournalArticleConstants.CLASSNAME_ID_DEFAULT,
+				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(), LocaleUtil.getSiteDefault(),
+				true, false, serviceContext);
+
+			List<Object> foldersAndArticles =
+				_journalFolderService.getFoldersAndArticles(
+					_group.getGroupId(), TestPropsValues.getUserId(),
+					JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+					new int[] {WorkflowConstants.STATUS_APPROVED},
+					LocaleUtil.US, 0, 100, null);
+
+			Assert.assertEquals(
+				foldersAndArticles.toString(), 1, foldersAndArticles.size());
+
+			Assert.assertTrue(foldersAndArticles.contains(journalArticle));
+		}
+		finally {
+			UserLocalServiceUtil.deleteUser(user);
+		}
 	}
 
 	@Test
