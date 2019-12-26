@@ -207,6 +207,14 @@ public class JournalFolderServiceWrapper
 	}
 
 	@Override
+	public int getFoldersAndArticlesCount(
+		long groupId, long userId, long folderId, int[] statuses) {
+
+		return _journalFolderService.getFoldersAndArticlesCount(
+			groupId, userId, folderId, statuses);
+	}
+
+	@Override
 	public int getFoldersCount(long groupId, long parentFolderId) {
 		return _journalFolderService.getFoldersCount(groupId, parentFolderId);
 	}

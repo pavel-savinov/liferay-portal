@@ -345,6 +345,24 @@ public class JournalFolderServiceSoap {
 		}
 	}
 
+	public static int getFoldersAndArticlesCount(
+			long groupId, long userId, long folderId, int[] statuses)
+		throws RemoteException {
+
+		try {
+			int returnValue =
+				JournalFolderServiceUtil.getFoldersAndArticlesCount(
+					groupId, userId, folderId, statuses);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static int getFoldersCount(long groupId, long parentFolderId)
 		throws RemoteException {
 
