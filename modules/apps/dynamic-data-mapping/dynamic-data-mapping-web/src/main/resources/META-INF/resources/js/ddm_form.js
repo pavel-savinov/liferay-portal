@@ -1639,7 +1639,8 @@ AUI.add(
 
 					var criterionJSON = {
 						desiredItemSelectorReturnTypes:
-							'com.liferay.item.selector.criteria.JournalArticleItemSelectorReturnType'
+							'com.liferay.item.selector.criteria.JournalArticleItemSelectorReturnType',
+						statuses: [0,2,7]
 					};
 
 					var webContentParameters = {
