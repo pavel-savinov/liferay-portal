@@ -193,6 +193,13 @@ public class JournalFolderServiceUtil {
 			groupId, userId, folderId, status);
 	}
 
+	public static int getFoldersAndArticlesCount(
+		long groupId, long userId, long folderId, int[] statuses) {
+
+		return getService().getFoldersAndArticlesCount(
+			groupId, userId, folderId, statuses);
+	}
+
 	public static int getFoldersCount(long groupId, long parentFolderId) {
 		return getService().getFoldersCount(groupId, parentFolderId);
 	}
