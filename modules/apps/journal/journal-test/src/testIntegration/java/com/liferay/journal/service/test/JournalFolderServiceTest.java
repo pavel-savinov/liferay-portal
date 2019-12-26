@@ -25,8 +25,8 @@ import com.liferay.journal.model.JournalArticleConstants;
 import com.liferay.journal.model.JournalFolder;
 import com.liferay.journal.model.JournalFolderConstants;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
-import com.liferay.journal.service.JournalFolderLocalServiceUtil;
-import com.liferay.journal.service.JournalFolderServiceUtil;
+import com.liferay.journal.service.JournalFolderLocalService;
+import com.liferay.journal.service.JournalFolderService;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.service.test.ServiceTestUtil;
+import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.trash.kernel.exception.RestoreEntryException;
 
@@ -97,7 +98,7 @@ public class JournalFolderServiceTest {
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
-		JournalFolderLocalServiceUtil.updateFolder(
+		_journalFolderLocalService.updateFolder(
 			TestPropsValues.getUserId(), serviceContext.getScopeGroupId(),
 			folder.getFolderId(), folder.getParentFolderId(), folder.getName(),
 			folder.getDescription(), ddmStructureIds,
@@ -105,7 +106,7 @@ public class JournalFolderServiceTest {
 			false, serviceContext);
 
 		List<DDMStructure> ddmStructures =
-			JournalFolderLocalServiceUtil.getDDMStructures(
+			_journalFolderLocalService.getDDMStructures(
 				PortalUtil.getCurrentAndAncestorSiteGroupIds(
 					_group.getGroupId()),
 				folder.getFolderId(),
@@ -150,9 +151,9 @@ public class JournalFolderServiceTest {
 		catch (InvalidDDMStructureException iddmse) {
 		}
 
-		JournalFolderLocalServiceUtil.deleteFolder(folder.getFolderId());
+		_journalFolderLocalService.deleteFolder(folder.getFolderId());
 
-		ddmStructures = JournalFolderLocalServiceUtil.getDDMStructures(
+		ddmStructures = _journalFolderLocalService.getDDMStructures(
 			PortalUtil.getCurrentAndAncestorSiteGroupIds(_group.getGroupId()),
 			folder.getFolderId(),
 			JournalFolderConstants.
@@ -166,7 +167,7 @@ public class JournalFolderServiceTest {
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
-		JournalFolderServiceUtil.updateFolder(
+		_journalFolderService.updateFolder(
 			serviceContext.getScopeGroupId(),
 			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, null, null,
@@ -179,7 +180,7 @@ public class JournalFolderServiceTest {
 
 		Assert.assertEquals(
 			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			JournalFolderLocalServiceUtil.getInheritedWorkflowFolderId(
+			_journalFolderLocalService.getInheritedWorkflowFolderId(
 				countriesFolder.getFolderId()));
 
 		JournalFolder germanyFolder = JournalTestUtil.addFolder(
@@ -187,7 +188,7 @@ public class JournalFolderServiceTest {
 
 		Assert.assertEquals(
 			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
-			JournalFolderLocalServiceUtil.getInheritedWorkflowFolderId(
+			_journalFolderLocalService.getInheritedWorkflowFolderId(
 				germanyFolder.getFolderId()));
 
 		JournalFolder spainFolder = JournalTestUtil.addFolder(
@@ -198,7 +199,7 @@ public class JournalFolderServiceTest {
 
 		long[] ddmStructureIds = {ddmStructure1.getStructureId()};
 
-		JournalFolderServiceUtil.updateFolder(
+		_journalFolderService.updateFolder(
 			serviceContext.getScopeGroupId(), spainFolder.getFolderId(),
 			spainFolder.getParentFolderId(), spainFolder.getName(),
 			spainFolder.getDescription(), ddmStructureIds,
@@ -207,7 +208,7 @@ public class JournalFolderServiceTest {
 
 		Assert.assertEquals(
 			spainFolder.getFolderId(),
-			JournalFolderLocalServiceUtil.getInheritedWorkflowFolderId(
+			_journalFolderLocalService.getInheritedWorkflowFolderId(
 				spainFolder.getFolderId()));
 
 		JournalFolder madridFolder = JournalTestUtil.addFolder(
@@ -215,7 +216,7 @@ public class JournalFolderServiceTest {
 
 		Assert.assertEquals(
 			spainFolder.getFolderId(),
-			JournalFolderLocalServiceUtil.getInheritedWorkflowFolderId(
+			_journalFolderLocalService.getInheritedWorkflowFolderId(
 				madridFolder.getFolderId()));
 	}
 
@@ -241,7 +242,7 @@ public class JournalFolderServiceTest {
 			JournalArticleConstants.CLASSNAME_ID_DEFAULT, xml,
 			ddmStructure1.getStructureKey(), ddmTemplate1.getTemplateKey());
 
-		JournalFolderLocalServiceUtil.moveFolderToTrash(
+		_journalFolderLocalService.moveFolderToTrash(
 			TestPropsValues.getUserId(), folder1.getFolderId());
 
 		JournalFolder folder2 = JournalTestUtil.addFolder(
@@ -256,7 +257,7 @@ public class JournalFolderServiceTest {
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
-		JournalFolderLocalServiceUtil.updateFolder(
+		_journalFolderLocalService.updateFolder(
 			TestPropsValues.getUserId(), serviceContext.getScopeGroupId(),
 			folder2.getFolderId(), folder2.getParentFolderId(),
 			folder2.getName(), folder2.getDescription(), ddmStructureIds,
@@ -319,7 +320,7 @@ public class JournalFolderServiceTest {
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
-		JournalFolderLocalServiceUtil.updateFolder(
+		_journalFolderLocalService.updateFolder(
 			TestPropsValues.getUserId(), serviceContext.getScopeGroupId(),
 			folder.getFolderId(), folder.getParentFolderId(), folder.getName(),
 			folder.getDescription(), ddmStructureIds,
@@ -375,7 +376,7 @@ public class JournalFolderServiceTest {
 			JournalArticleConstants.CLASSNAME_ID_DEFAULT, xml,
 			ddmStructure1.getStructureKey(), ddmTemplate1.getTemplateKey());
 
-		JournalFolderLocalServiceUtil.moveFolderToTrash(
+		_journalFolderLocalService.moveFolderToTrash(
 			TestPropsValues.getUserId(), folder1.getFolderId());
 
 		JournalFolder folder3 = JournalTestUtil.addFolder(
@@ -390,7 +391,7 @@ public class JournalFolderServiceTest {
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
-		JournalFolderLocalServiceUtil.updateFolder(
+		_journalFolderLocalService.updateFolder(
 			TestPropsValues.getUserId(), serviceContext.getScopeGroupId(),
 			folder3.getFolderId(), folder3.getParentFolderId(),
 			folder3.getName(), folder3.getDescription(), ddmStructureIds,
@@ -456,7 +457,7 @@ public class JournalFolderServiceTest {
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
-		JournalFolderLocalServiceUtil.updateFolder(
+		_journalFolderLocalService.updateFolder(
 			TestPropsValues.getUserId(), serviceContext.getScopeGroupId(),
 			folder2.getFolderId(), folder2.getParentFolderId(),
 			folder2.getName(), folder2.getDescription(), ddmStructureIds,
@@ -464,7 +465,7 @@ public class JournalFolderServiceTest {
 			false, serviceContext);
 
 		try {
-			JournalFolderLocalServiceUtil.moveFolder(
+			_journalFolderLocalService.moveFolder(
 				folder1.getFolderId(), folder2.getFolderId(), serviceContext);
 
 			Assert.fail();
@@ -476,7 +477,7 @@ public class JournalFolderServiceTest {
 			_group.getGroupId(), folder2.getFolderId(), "Test 2.1");
 
 		try {
-			JournalFolderLocalServiceUtil.moveFolder(
+			_journalFolderLocalService.moveFolder(
 				folder1.getFolderId(), subfolder.getFolderId(), serviceContext);
 
 			Assert.fail();
@@ -537,7 +538,7 @@ public class JournalFolderServiceTest {
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
 		try {
-			JournalFolderLocalServiceUtil.updateFolder(
+			_journalFolderLocalService.updateFolder(
 				TestPropsValues.getUserId(), serviceContext.getScopeGroupId(),
 				folder.getFolderId(), folder.getParentFolderId(),
 				folder.getName(), folder.getDescription(), ddmStructureIds,
@@ -559,7 +560,7 @@ public class JournalFolderServiceTest {
 			ddmStructure1.getStructureKey(), ddmTemplate1.getTemplateKey());
 
 		try {
-			JournalFolderLocalServiceUtil.updateFolder(
+			_journalFolderLocalService.updateFolder(
 				TestPropsValues.getUserId(), serviceContext.getScopeGroupId(),
 				folder.getFolderId(), folder.getParentFolderId(),
 				folder.getName(), folder.getDescription(), ddmStructureIds,
@@ -575,5 +576,11 @@ public class JournalFolderServiceTest {
 
 	@DeleteAfterTestRun
 	private Group _group;
+
+	@Inject
+	private JournalFolderLocalService _journalFolderLocalService;
+
+	@Inject
+	private JournalFolderService _journalFolderService;
 
 }
