@@ -139,6 +139,10 @@ public interface JournalFolderService extends BaseService {
 		long groupId, long userId, long folderId, int status);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getFoldersAndArticlesCount(
+		long groupId, long userId, long folderId, int[] statuses);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getFoldersCount(long groupId, long parentFolderId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
