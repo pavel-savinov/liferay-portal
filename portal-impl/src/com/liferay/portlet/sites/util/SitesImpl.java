@@ -326,6 +326,8 @@ public class SitesImpl implements Sites {
 			targetLayout.getLayoutId(),
 			layoutPrototypeLayout.getTypeSettings());
 
+		copyExpandoBridgeAttributes(layoutPrototypeLayout, targetLayout);
+
 		copyPortletPermissions(targetLayout, layoutPrototypeLayout);
 
 		copyPortletSetups(layoutPrototypeLayout, targetLayout);
