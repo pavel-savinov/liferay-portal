@@ -1975,6 +1975,12 @@ definition {
 			formViewName = "Form View Title",
 			tableViewName = "Table View Title");
 
+		AppBuilderAdmin.gotoCustomAppCP(
+			panel = "Control Panel",
+			portlet = "Test App A");
+
+		AppBuilderAdmin.validateProductMenuApp(appName = "Test App A");
+
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
 			panel = "Site Administration",
