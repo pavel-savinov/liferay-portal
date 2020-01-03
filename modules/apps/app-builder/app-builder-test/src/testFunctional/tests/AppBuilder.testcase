@@ -1994,6 +1994,8 @@ definition {
 			pageName = "App Builder Page",
 			portletName = "Test App B");
 
+		AppBuilderAdmin.validateWidgetApp(appName = "There are no entries yet.");
+
 		ProductMenu.gotoPortlet(
 			category = "App Builder",
 			panel = "Control Panel",
@@ -2022,6 +2024,26 @@ definition {
 
 		AppBuilderAdmin.deployApp(itemName = "Test App A");
 
+		ProductMenu.gotoPortlet(
+			category = "Site Builder",
+			panel = "Site Administration",
+			portlet = "Pages");
+
+		AppBuilderAdmin.gotoCustomAppCP(
+			panel = "Control Panel",
+			portlet = "Test App A");
+
+		AppBuilderAdmin.validateProductMenuApp(appName = "Test App A");
+
+		ProductMenu.gotoPortlet(
+			category = "App Builder",
+			panel = "Control Panel",
+			portlet = "Custom Objects");
+
+		AppBuilderAdmin.openItem(itemName = "my custom object");
+
+		AppBuilderAdmin.switchTab(tabName = "Apps");
+
 		AppBuilderAdmin.undeployApp(itemName = "Test App B");
 
 		ProductMenu.gotoPortlet(
@@ -2032,7 +2054,7 @@ definition {
 		Navigator.gotoPage(pageName = "App Builder Page");
 
 		AppBuilderAdmin.validateUndeployedApp();
-		
+
 		ProductMenu.gotoPortlet(
 			category = "App Builder",
 			panel = "Control Panel",
@@ -2043,6 +2065,24 @@ definition {
 		AppBuilderAdmin.switchTab(tabName = "Apps");
 
 		AppBuilderAdmin.deployApp(itemName = "Test App B");
+
+		ProductMenu.gotoPortlet(
+			category = "Site Builder",
+			panel = "Site Administration",
+			portlet = "Pages");
+
+		Navigator.gotoPage(pageName = "App Builder Page");
+
+		AppBuilderAdmin.validateWidgetApp(appName = "There are no entries yet.");
+
+		ProductMenu.gotoPortlet(
+			category = "App Builder",
+			panel = "Control Panel",
+			portlet = "Custom Objects");
+
+		AppBuilderAdmin.openItem(itemName = "my custom object");
+
+		AppBuilderAdmin.switchTab(tabName = "Apps");
 
 		AppBuilderAdmin.undeployApp(itemName = "Test App C");
 
