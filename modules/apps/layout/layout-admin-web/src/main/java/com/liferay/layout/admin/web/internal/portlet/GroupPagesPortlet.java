@@ -28,6 +28,7 @@ import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.layout.util.LayoutCopyHelper;
 import com.liferay.layout.util.template.LayoutConverterRegistry;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.GroupInheritContentException;
@@ -64,6 +65,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import javax.portlet.ActionRequest;
+import javax.portlet.ActionResponse;
+import javax.portlet.MutableRenderParameters;
 import javax.portlet.Portlet;
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
@@ -102,6 +106,21 @@ import org.osgi.service.component.annotations.Reference;
 	service = Portlet.class
 )
 public class GroupPagesPortlet extends MVCPortlet {
+
+	@Override
+	public void processAction(
+			ActionRequest actionRequest, ActionResponse actionResponse)
+		throws IOException, PortletException {
+
+		super.processAction(actionRequest, actionResponse);
+
+		if (!SessionErrors.isEmpty(actionRequest)) {
+			MutableRenderParameters renderParameters =
+				actionResponse.getRenderParameters();
+
+			renderParameters.setValue("checkboxNames", StringPool.BLANK);
+		}
+	}
 
 	@Activate
 	@Modified
