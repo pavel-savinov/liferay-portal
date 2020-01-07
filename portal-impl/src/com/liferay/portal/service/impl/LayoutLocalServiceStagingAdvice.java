@@ -194,7 +194,8 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 			return layoutLocalService.updateLayout(
 				groupId, privateLayout, layoutId, parentLayoutId, nameMap,
 				titleMap, descriptionMap, keywordsMap, robotsMap, type, hidden,
-				friendlyURLMap, hasIconImage, iconBytes, serviceContext);
+				friendlyURLMap, hasIconImage, iconBytes,
+				layout.getMasterLayoutPlid(), serviceContext);
 		}
 
 		layoutLocalService.updateAsset(
@@ -722,7 +723,7 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 					_invoke(method, arguments), showIncomplete);
 			}
 			else if (methodName.equals("updateLayout") &&
-					 (arguments.length == 15)) {
+					 ((arguments.length == 15) || (arguments.length == 16))) {
 
 				Map<Locale, String> friendlyURLMap = null;
 
@@ -737,6 +738,15 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 					friendlyURLMap = (Map<Locale, String>)arguments[11];
 				}
 
+				ServiceContext serviceContext = null;
+
+				if (arguments.length == 15) {
+					serviceContext = (ServiceContext)arguments[14];
+				}
+				else {
+					serviceContext = (ServiceContext)arguments[15];
+				}
+
 				returnValue = updateLayout(
 					(LayoutLocalService)_targetObject, (Long)arguments[0],
 					(Boolean)arguments[1], (Long)arguments[2],
@@ -747,7 +757,7 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 					(Map<Locale, String>)arguments[8], (String)arguments[9],
 					(Boolean)arguments[10], friendlyURLMap,
 					(Boolean)arguments[12], (byte[])arguments[13],
-					(ServiceContext)arguments[14]);
+					serviceContext);
 			}
 			else {
 				try {
