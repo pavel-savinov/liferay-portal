@@ -88,29 +88,44 @@ class FragmentEditableField extends PortletBase {
 			);
 		}
 
-		onPropertiesChanged(this, ['_active', '_activable'], () => {
-			const eventName = this.type === 'image' ? 'dblclick' : 'click';
+		onPropertiesChanged(
+			this,
+			['_active', '_activable', '_hasUpdatePermissions'],
+			() => {
+				const eventName = this.type === 'image' ? 'dblclick' : 'click';
 
-			if (this._active && this._activable) {
-				this._createFloatingToolbar();
+				if (
+					this._active &&
+					this._activable &&
+					this._hasUpdatePermissions
+				) {
+					this._createFloatingToolbar();
 
-				this.element.addEventListener(eventName, this._createProcessor);
-			} else {
-				this._disposeFloatingToolbar();
-				this._destroyProcessors();
+					this.element.addEventListener(
+						eventName,
+						this._createProcessor
+					);
+				} else {
+					this._disposeFloatingToolbar();
+					this._destroyProcessors();
 
-				this.element.removeEventListener(
-					eventName,
-					this._createProcessor
-				);
+					this.element.removeEventListener(
+						eventName,
+						this._createProcessor
+					);
+				}
 			}
-		});
+		);
 
 		onPropertiesChanged(this, ['editableValues'], () => {
 			this._loadMappedFieldLabel();
 			this._updateMappedFieldValue();
 
-			if (!this._processorEnabled && this._active) {
+			if (
+				!this._processorEnabled &&
+				this._active &&
+				this._hasUpdatePermissions
+			) {
 				this._createFloatingToolbar();
 			}
 		});
@@ -290,7 +305,7 @@ class FragmentEditableField extends PortletBase {
 	_handleProcessorDestroyed() {
 		this._processorEnabled = false;
 
-		if (this._active) {
+		if (this._active && this._hasUpdatePermissions) {
 			this._createFloatingToolbar();
 		}
 	}
@@ -443,6 +458,9 @@ FragmentEditableField.STATE = {
 	_getAssetMappingFieldsURL: Config.internal()
 		.string()
 		.value(''),
+	_hasUpdatePermissions: Config.internal()
+		.bool()
+		.value(false),
 	_highlighted: Config.internal()
 		.bool()
 		.value(false),
@@ -520,6 +538,9 @@ const ConnectedFragmentEditableField = getConnectedComponent(
 		const _getAssetFieldValueURL = state.getAssetFieldValueURL;
 		const _getAssetMappingFieldsURL = state.getAssetMappingFieldsURL;
 
+		const _hasUpdatePermissions =
+			state.hasUpdatePermissions || state.hasUpdateContentPermissions;
+
 		const _highlighted = editableShouldBeHighlighted(
 			state.activeItemId,
 			state.activeItemType,
@@ -578,6 +599,7 @@ const ConnectedFragmentEditableField = getConnectedComponent(
 			_active,
 			_getAssetFieldValueURL,
 			_getAssetMappingFieldsURL,
+			_hasUpdatePermissions,
 			_highlighted,
 			_hovered,
 			_itemId,
