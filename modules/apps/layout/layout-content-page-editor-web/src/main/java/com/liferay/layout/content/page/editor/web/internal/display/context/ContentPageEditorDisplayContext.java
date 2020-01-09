@@ -1329,7 +1329,11 @@ public class ContentPageEditorDisplayContext {
 		lookAndFeelURL.setParameter(
 			"mvcRenderCommandName", "/layout/edit_layout");
 
-		lookAndFeelURL.setParameter("redirect", themeDisplay.getURLCurrent());
+		lookAndFeelURL.setParameter(
+			"redirect",
+			ParamUtil.getString(
+				PortalUtil.getOriginalServletRequest(httpServletRequest),
+				"p_l_back_url"));
 		lookAndFeelURL.setParameter("backURL", themeDisplay.getURLCurrent());
 
 		Layout layout = themeDisplay.getLayout();
