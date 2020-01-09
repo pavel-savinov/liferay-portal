@@ -505,6 +505,23 @@ public class FragmentDisplayContext {
 		return portletURL.toString();
 	}
 
+	public boolean hasDeletePermission() {
+		if (hasUpdatePermission()) {
+			return true;
+		}
+
+		if (FragmentPermission.contains(
+				_themeDisplay.getPermissionChecker(),
+				_themeDisplay.getScopeGroupId(),
+				FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES) &&
+			!isLocked(getFragmentCollection())) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	public boolean hasUpdatePermission() {
 		if (_updatePermission != null) {
 			return _updatePermission;
