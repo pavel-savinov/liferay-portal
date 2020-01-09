@@ -160,7 +160,7 @@ if (layoutPageTemplateEntry == null) {
 
 		Layout masterDraftLayout = LayoutLocalServiceUtil.fetchLayout(PortalUtil.getClassNameId(Layout.class), masterLayout.getPlid());
 
-		String editLayoutURL = HttpUtil.addParameter(PortalUtil.getLayoutFullURL(selLayout, themeDisplay), "p_l_mode", Constants.EDIT);
+		String editLayoutURL = HttpUtil.addParameter(HttpUtil.addParameter(PortalUtil.getLayoutFullURL(selLayout, themeDisplay), "p_l_mode", Constants.EDIT), "p_l_back_url", ParamUtil.getString(request, "redirect"));
 
 		String editMasterLayoutURL = HttpUtil.addParameter(HttpUtil.addParameter(PortalUtil.getLayoutFullURL(masterDraftLayout, themeDisplay), "p_l_mode", Constants.EDIT), "p_l_back_url", editLayoutURL);
 		%>
