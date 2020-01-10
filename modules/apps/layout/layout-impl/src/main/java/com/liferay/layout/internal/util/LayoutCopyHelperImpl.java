@@ -585,11 +585,11 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 
 			_copyAssetCategoryIdsAndAssetTagNames(_sourceLayout, _targetLayout);
 
-			_copyLayoutPageTemplateStructure(_sourceLayout, _targetLayout);
-
 			_copyPortletPermissions(_sourceLayout, _targetLayout);
 
 			_copyPortletPreferences(_sourceLayout, _targetLayout);
+
+			_copyLayoutPageTemplateStructure(_sourceLayout, _targetLayout);
 
 			_layoutLocalService.updateMasterLayoutPlid(
 				_targetLayout.getGroupId(), _targetLayout.isPrivateLayout(),
