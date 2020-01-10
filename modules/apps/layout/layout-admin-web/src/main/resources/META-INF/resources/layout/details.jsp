@@ -38,7 +38,7 @@ String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
 String friendlyURLBase = StringPool.BLANK;
 %>
 
-<c:if test="<%= !group.isLayoutPrototype() && selLayoutType.isURLFriendliable() && !layoutsAdminDisplayContext.isDraft() %>">
+<c:if test="<%= !group.isLayoutPrototype() && selLayoutType.isURLFriendliable() && !layoutsAdminDisplayContext.isDraft() && !selLayout.isSystem() %>">
 
 	<%
 	friendlyURLBase = layoutsAdminDisplayContext.getFriendlyURLBase();
@@ -79,7 +79,7 @@ String friendlyURLBase = StringPool.BLANK;
 
 <c:choose>
 	<c:when test="<%= !group.isLayoutPrototype() %>">
-		<c:if test="<%= !layoutsAdminDisplayContext.isDraft() %>">
+		<c:if test="<%= !layoutsAdminDisplayContext.isDraft() && !selLayout.isSystem() %>">
 			<aui:input name="name" />
 
 			<div class="form-group">
@@ -88,7 +88,7 @@ String friendlyURLBase = StringPool.BLANK;
 		</c:if>
 
 		<c:choose>
-			<c:when test="<%= selLayoutType.isURLFriendliable() && !layoutsAdminDisplayContext.isDraft() %>">
+			<c:when test="<%= selLayoutType.isURLFriendliable() && !layoutsAdminDisplayContext.isDraft() && !selLayout.isSystem() %>">
 				<div class="form-group friendly-url">
 					<label for="<portlet:namespace />friendlyURL"><liferay-ui:message key="friendly-url" /> <liferay-ui:icon-help message='<%= LanguageUtil.format(request, "for-example-x", "<em>/news</em>", false) %>' /></label>
 
