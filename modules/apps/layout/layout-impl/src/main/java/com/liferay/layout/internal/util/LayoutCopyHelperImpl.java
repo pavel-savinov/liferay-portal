@@ -31,16 +31,26 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Image;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.PortletPreferences;
+import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.role.RoleConstants;
+import com.liferay.portal.kernel.portlet.PortletIdCodec;
+import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.service.ImageLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
@@ -313,6 +323,90 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 				segmentsExperienceId, dataJSONObject.toString());
 	}
 
+	private void _copyPortletPermissions(
+			Layout sourceLayout, Layout targetLayout)
+		throws Exception {
+
+		if (Objects.equals(
+				sourceLayout.getType(), LayoutConstants.TYPE_PORTLET)) {
+
+			_sites.copyPortletPermissions(targetLayout, sourceLayout);
+
+			return;
+		}
+
+		if (!(Objects.equals(
+				sourceLayout.getType(), LayoutConstants.TYPE_CONTENT) ||
+			  Objects.equals(
+				  sourceLayout.getType(),
+				  LayoutConstants.TYPE_ASSET_DISPLAY))) {
+
+			return;
+		}
+
+		List<FragmentEntryLink> fragmentEntryLinks =
+			_fragmentEntryLinkLocalService.getFragmentEntryLinks(
+				sourceLayout.getGroupId(),
+				_portal.getClassNameId(Layout.class.getName()),
+				sourceLayout.getPlid());
+
+		for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+				fragmentEntryLink.getEditableValues());
+
+			if (!jsonObject.has("portletId")) {
+				continue;
+			}
+
+			List<Role> roles = _roleLocalService.getGroupRelatedRoles(
+				targetLayout.getGroupId());
+			Group targetGroup = targetLayout.getGroup();
+
+			String sourcePortletId = jsonObject.getString("portletId");
+
+			if (jsonObject.has("instanceId")) {
+				sourcePortletId = PortletIdCodec.encode(
+					sourcePortletId, jsonObject.getString("instanceId"));
+			}
+
+			String resourceName = PortletIdCodec.decodePortletName(
+				sourcePortletId);
+
+			String sourceResourcePrimKey = PortletPermissionUtil.getPrimaryKey(
+				sourceLayout.getPlid(), sourcePortletId);
+
+			String targetResourcePrimKey = PortletPermissionUtil.getPrimaryKey(
+				targetLayout.getPlid(), sourcePortletId);
+
+			List<String> actionIds =
+				ResourceActionsUtil.getPortletResourceActions(resourceName);
+
+			for (Role role : roles) {
+				String roleName = role.getName();
+
+				if (roleName.equals(RoleConstants.ADMINISTRATOR) ||
+					(!targetGroup.isLayoutSetPrototype() &&
+					 targetLayout.isPrivateLayout() &&
+					 roleName.equals(RoleConstants.GUEST))) {
+
+					continue;
+				}
+
+				List<String> actions =
+					_resourcePermissionLocalService.
+						getAvailableResourcePermissionActionIds(
+							targetLayout.getCompanyId(), resourceName,
+							ResourceConstants.SCOPE_INDIVIDUAL,
+							sourceResourcePrimKey, role.getRoleId(), actionIds);
+
+				_resourcePermissionLocalService.setResourcePermissions(
+					targetLayout.getCompanyId(), resourceName,
+					ResourceConstants.SCOPE_INDIVIDUAL, targetResourcePrimKey,
+					role.getRoleId(), actions.toArray(new String[0]));
+			}
+		}
+	}
+
 	private void _copyPortletPreferences(
 		Layout sourceLayout, Layout targetLayout) {
 
@@ -435,6 +529,12 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 	private PortletPreferencesLocalService _portletPreferencesLocalService;
 
 	@Reference
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
+
+	@Reference
+	private RoleLocalService _roleLocalService;
+
+	@Reference
 	private SegmentsExperienceLocalService _segmentsExperienceLocalService;
 
 	@Reference
@@ -447,11 +547,12 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 			_sites.copyExpandoBridgeAttributes(_sourceLayout, _targetLayout);
 			_sites.copyLookAndFeel(_targetLayout, _sourceLayout);
 			_sites.copyPortletSetups(_sourceLayout, _targetLayout);
-			_sites.copyPortletPermissions(_targetLayout, _sourceLayout);
 
 			_copyAssetCategoryIdsAndAssetTagNames(_sourceLayout, _targetLayout);
 
 			_copyLayoutPageTemplateStructure(_sourceLayout, _targetLayout);
+
+			_copyPortletPermissions(_sourceLayout, _targetLayout);
 
 			_copyPortletPreferences(_sourceLayout, _targetLayout);
 
