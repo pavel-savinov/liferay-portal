@@ -344,6 +344,8 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 			return;
 		}
 
+		_deletePortletPermissions(targetLayout);
+
 		List<FragmentEntryLink> fragmentEntryLinks =
 			_fragmentEntryLinkLocalService.getFragmentEntryLinks(
 				sourceLayout.getGroupId(),
@@ -450,6 +452,39 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 						portletPreferences.getPortletId()),
 					portletPreferences.getPreferences());
 			}
+		}
+	}
+
+	private void _deletePortletPermissions(Layout layout) throws Exception {
+		List<FragmentEntryLink> fragmentEntryLinks =
+			_fragmentEntryLinkLocalService.getFragmentEntryLinks(
+				layout.getGroupId(),
+				_portal.getClassNameId(Layout.class.getName()),
+				layout.getPlid());
+
+		for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+				fragmentEntryLink.getEditableValues());
+
+			if (!jsonObject.has("portletId")) {
+				continue;
+			}
+
+			String portletId = jsonObject.getString("portletId");
+
+			if (jsonObject.has("instanceId")) {
+				portletId = PortletIdCodec.encode(
+					portletId, jsonObject.getString("instanceId"));
+			}
+
+			String resourceName = PortletIdCodec.decodePortletName(portletId);
+
+			String resourcePrimKey = PortletPermissionUtil.getPrimaryKey(
+				layout.getPlid(), portletId);
+
+			_resourcePermissionLocalService.deleteResourcePermissions(
+				layout.getCompanyId(), resourceName,
+				ResourceConstants.SCOPE_INDIVIDUAL, resourcePrimKey);
 		}
 	}
 
