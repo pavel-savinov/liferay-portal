@@ -18,6 +18,7 @@ import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.counter.kernel.service.CounterLocalService;
 import com.liferay.fragment.model.FragmentEntryLink;
+import com.liferay.fragment.processor.PortletRegistry;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.layout.model.LayoutClassedModelUsage;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
@@ -353,58 +354,55 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 				sourceLayout.getPlid());
 
 		for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-				fragmentEntryLink.getEditableValues());
+			List<String> portletIds =
+				_portletRegistry.getFragmentEntryLinkPortletIds(
+					fragmentEntryLink);
 
-			if (!jsonObject.has("portletId")) {
-				continue;
-			}
+			for (String portletId : portletIds) {
+				List<Role> roles = _roleLocalService.getGroupRelatedRoles(
+					targetLayout.getGroupId());
 
-			List<Role> roles = _roleLocalService.getGroupRelatedRoles(
-				targetLayout.getGroupId());
-			Group targetGroup = targetLayout.getGroup();
+				Group targetGroup = targetLayout.getGroup();
 
-			String sourcePortletId = jsonObject.getString("portletId");
+				String resourceName = PortletIdCodec.decodePortletName(
+					portletId);
 
-			if (jsonObject.has("instanceId")) {
-				sourcePortletId = PortletIdCodec.encode(
-					sourcePortletId, jsonObject.getString("instanceId"));
-			}
+				String sourceResourcePrimKey =
+					PortletPermissionUtil.getPrimaryKey(
+						sourceLayout.getPlid(), portletId);
 
-			String resourceName = PortletIdCodec.decodePortletName(
-				sourcePortletId);
+				String targetResourcePrimKey =
+					PortletPermissionUtil.getPrimaryKey(
+						targetLayout.getPlid(), portletId);
 
-			String sourceResourcePrimKey = PortletPermissionUtil.getPrimaryKey(
-				sourceLayout.getPlid(), sourcePortletId);
+				List<String> actionIds =
+					ResourceActionsUtil.getPortletResourceActions(resourceName);
 
-			String targetResourcePrimKey = PortletPermissionUtil.getPrimaryKey(
-				targetLayout.getPlid(), sourcePortletId);
+				for (Role role : roles) {
+					String roleName = role.getName();
 
-			List<String> actionIds =
-				ResourceActionsUtil.getPortletResourceActions(resourceName);
+					if (roleName.equals(RoleConstants.ADMINISTRATOR) ||
+						(!targetGroup.isLayoutSetPrototype() &&
+						 targetLayout.isPrivateLayout() &&
+						 roleName.equals(RoleConstants.GUEST))) {
 
-			for (Role role : roles) {
-				String roleName = role.getName();
+						continue;
+					}
 
-				if (roleName.equals(RoleConstants.ADMINISTRATOR) ||
-					(!targetGroup.isLayoutSetPrototype() &&
-					 targetLayout.isPrivateLayout() &&
-					 roleName.equals(RoleConstants.GUEST))) {
+					List<String> actions =
+						_resourcePermissionLocalService.
+							getAvailableResourcePermissionActionIds(
+								targetLayout.getCompanyId(), resourceName,
+								ResourceConstants.SCOPE_INDIVIDUAL,
+								sourceResourcePrimKey, role.getRoleId(),
+								actionIds);
 
-					continue;
+					_resourcePermissionLocalService.setResourcePermissions(
+						targetLayout.getCompanyId(), resourceName,
+						ResourceConstants.SCOPE_INDIVIDUAL,
+						targetResourcePrimKey, role.getRoleId(),
+						actions.toArray(new String[0]));
 				}
-
-				List<String> actions =
-					_resourcePermissionLocalService.
-						getAvailableResourcePermissionActionIds(
-							targetLayout.getCompanyId(), resourceName,
-							ResourceConstants.SCOPE_INDIVIDUAL,
-							sourceResourcePrimKey, role.getRoleId(), actionIds);
-
-				_resourcePermissionLocalService.setResourcePermissions(
-					targetLayout.getCompanyId(), resourceName,
-					ResourceConstants.SCOPE_INDIVIDUAL, targetResourcePrimKey,
-					role.getRoleId(), actions.toArray(new String[0]));
 			}
 		}
 	}
@@ -463,28 +461,21 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 				layout.getPlid());
 
 		for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-				fragmentEntryLink.getEditableValues());
+			List<String> portletIds =
+				_portletRegistry.getFragmentEntryLinkPortletIds(
+					fragmentEntryLink);
 
-			if (!jsonObject.has("portletId")) {
-				continue;
+			for (String portletId : portletIds) {
+				String resourceName = PortletIdCodec.decodePortletName(
+					portletId);
+
+				String resourcePrimKey = PortletPermissionUtil.getPrimaryKey(
+					layout.getPlid(), portletId);
+
+				_resourcePermissionLocalService.deleteResourcePermissions(
+					layout.getCompanyId(), resourceName,
+					ResourceConstants.SCOPE_INDIVIDUAL, resourcePrimKey);
 			}
-
-			String portletId = jsonObject.getString("portletId");
-
-			if (jsonObject.has("instanceId")) {
-				portletId = PortletIdCodec.encode(
-					portletId, jsonObject.getString("instanceId"));
-			}
-
-			String resourceName = PortletIdCodec.decodePortletName(portletId);
-
-			String resourcePrimKey = PortletPermissionUtil.getPrimaryKey(
-				layout.getPlid(), portletId);
-
-			_resourcePermissionLocalService.deleteResourcePermissions(
-				layout.getCompanyId(), resourceName,
-				ResourceConstants.SCOPE_INDIVIDUAL, resourcePrimKey);
 		}
 	}
 
@@ -562,6 +553,9 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 
 	@Reference
 	private PortletPreferencesLocalService _portletPreferencesLocalService;
+
+	@Reference
+	private PortletRegistry _portletRegistry;
 
 	@Reference
 	private ResourcePermissionLocalService _resourcePermissionLocalService;
