@@ -15,6 +15,7 @@
 package com.liferay.layout.admin.web.internal.product.navigation.control.menu;
 
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
+import com.liferay.layout.page.template.admin.constants.LayoutPageTemplateAdminPortletKeys;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
@@ -114,6 +115,12 @@ public class ManageLayoutProductNavigationControlMenuEntry
 		editPageURL.setParameter("selPlid", String.valueOf(layout.getPlid()));
 		editPageURL.setParameter(
 			"privateLayout", String.valueOf(layout.isPrivateLayout()));
+
+		if (layout.isSystem()) {
+			editPageURL.setParameter(
+				"portletResource",
+				LayoutPageTemplateAdminPortletKeys.LAYOUT_PAGE_TEMPLATES);
+		}
 
 		Map<String, String> values = HashMapBuilder.put(
 			"configurePage",

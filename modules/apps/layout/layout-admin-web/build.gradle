@@ -31,6 +31,7 @@ dependencies {
 	compileOnly project(":apps:layout:layout-api")
 	compileOnly project(":apps:layout:layout-content-page-editor-api")
 	compileOnly project(":apps:layout:layout-item-selector-api")
+	compileOnly project(":apps:layout:layout-page-template-admin-api")
 	compileOnly project(":apps:layout:layout-page-template-api")
 	compileOnly project(":apps:layout:layout-page-template-service")
 	compileOnly project(":apps:layout:layout-prototype-api")
