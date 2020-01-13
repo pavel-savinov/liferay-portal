@@ -52,15 +52,19 @@ public class LayoutsTreeDisplayContext {
 			WebKeys.THEME_DISPLAY);
 	}
 
-	public String getAddLayoutURL() {
+	public String getAddLayoutURL() throws Exception {
 		PortletURL addLayoutURL = PortalUtil.getControlPanelPortletURL(
 			_liferayPortletRequest, LayoutAdminPortletKeys.GROUP_PAGES,
 			PortletRequest.RENDER_PHASE);
 
+		Layout layout = _themeDisplay.getLayout();
+
 		addLayoutURL.setParameter(
 			"mvcPath", "/select_layout_page_template_entry.jsp");
-		addLayoutURL.setParameter("redirect", _themeDisplay.getURLCurrent());
-		addLayoutURL.setParameter("backURL", _themeDisplay.getURLCurrent());
+		addLayoutURL.setParameter(
+			"redirect", PortalUtil.getLayoutFullURL(layout, _themeDisplay));
+		addLayoutURL.setParameter(
+			"backURL", PortalUtil.getLayoutFullURL(layout, _themeDisplay));
 		addLayoutURL.setParameter(
 			"groupId", String.valueOf(_themeDisplay.getSiteGroupId()));
 		addLayoutURL.setParameter(
@@ -119,7 +123,7 @@ public class LayoutsTreeDisplayContext {
 		return configureLayoutSetURL.toString();
 	}
 
-	public Map<String, Object> getEventHandlerContext() {
+	public Map<String, Object> getEventHandlerContext() throws Exception {
 		return HashMapBuilder.<String, Object>put(
 			"addLayoutURL", getAddLayoutURL()
 		).put(
@@ -178,7 +182,7 @@ public class LayoutsTreeDisplayContext {
 				PRODUCT_NAVIGATION_PRODUCT_MENU);
 	}
 
-	public Map<String, Object> getPageTypeSelectorData() {
+	public Map<String, Object> getPageTypeSelectorData() throws Exception {
 		return HashMapBuilder.<String, Object>put(
 			"addLayoutURL", getAddLayoutURL()
 		).put(
