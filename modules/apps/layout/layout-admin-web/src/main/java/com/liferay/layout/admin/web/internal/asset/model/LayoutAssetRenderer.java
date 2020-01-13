@@ -19,6 +19,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
@@ -27,6 +28,7 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Locale;
+import java.util.Objects;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -139,6 +141,15 @@ public class LayoutAssetRenderer extends BaseJSPAssetRenderer<Layout> {
 		httpServletRequest.setAttribute(WebKeys.LAYOUT, _layout);
 
 		return super.include(httpServletRequest, httpServletResponse, template);
+	}
+
+	@Override
+	public boolean isPreviewInContext() {
+		if (Objects.equals(_layout.getType(), LayoutConstants.TYPE_CONTENT)) {
+			return true;
+		}
+
+		return super.isPreviewInContext();
 	}
 
 	private final Layout _layout;
