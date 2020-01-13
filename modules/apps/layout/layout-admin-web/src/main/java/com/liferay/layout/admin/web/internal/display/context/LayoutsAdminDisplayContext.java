@@ -89,6 +89,7 @@ import com.liferay.portal.util.RobotsUtil;
 import com.liferay.portlet.layoutsadmin.display.context.GroupDisplayContextHelper;
 import com.liferay.site.navigation.model.SiteNavigationMenu;
 import com.liferay.site.navigation.service.SiteNavigationMenuLocalServiceUtil;
+import com.liferay.staging.StagingGroupHelper;
 import com.liferay.taglib.security.PermissionsURLTag;
 
 import java.util.ArrayList;
@@ -131,6 +132,9 @@ public class LayoutsAdminDisplayContext {
 		_layoutConverterRegistry =
 			(LayoutConverterRegistry)_liferayPortletRequest.getAttribute(
 				LayoutAdminWebKeys.LAYOUT_CONVERTER_REGISTRY);
+		_stagingGroupHelper =
+			(StagingGroupHelper)_liferayPortletRequest.getAttribute(
+				StagingGroupHelper.class.getName());
 		_themeDisplay = (ThemeDisplay)liferayPortletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
@@ -1400,6 +1404,10 @@ public class LayoutsAdminDisplayContext {
 	}
 
 	public boolean isShowConvertLayoutAction(Layout layout) {
+		if (_isLiveGroup()) {
+			return false;
+		}
+
 		if (!_layoutConverterConfiguration.enabled()) {
 			return false;
 		}
@@ -1930,6 +1938,26 @@ public class LayoutsAdminDisplayContext {
 		return false;
 	}
 
+	private boolean _isLiveGroup() {
+		if (_liveGroup != null) {
+			return _liveGroup;
+		}
+
+		Group group = _themeDisplay.getScopeGroup();
+
+		boolean liveGroup = false;
+
+		if (_stagingGroupHelper.isLocalLiveGroup(group) ||
+			_stagingGroupHelper.isRemoteLiveGroup(group)) {
+
+			liveGroup = true;
+		}
+
+		_liveGroup = liveGroup;
+
+		return _liveGroup;
+	}
+
 	private boolean _matchesHostname(
 		StringBuilder friendlyURLBase,
 		TreeMap<String, String> virtualHostnames) {
@@ -1961,6 +1989,7 @@ public class LayoutsAdminDisplayContext {
 	private SearchContainer _layoutsSearchContainer;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
+	private Boolean _liveGroup;
 	private String _orderByCol;
 	private String _orderByType;
 	private Long _parentLayoutId;
@@ -1970,6 +1999,7 @@ public class LayoutsAdminDisplayContext {
 	private Layout _selLayout;
 	private LayoutSet _selLayoutSet;
 	private Long _selPlid;
+	private final StagingGroupHelper _stagingGroupHelper;
 	private String _tabs1;
 	private final ThemeDisplay _themeDisplay;
 
