@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -90,6 +91,12 @@ public class LayoutAssetRenderer extends BaseJSPAssetRenderer<Layout> {
 		sb.append(LanguageUtil.get(locale, "page"));
 		sb.append(":</strong> ");
 		sb.append(_layout.getHTMLTitle(locale));
+
+		if (Objects.equals(_layout.getType(), LayoutConstants.TYPE_CONTENT) &&
+			(_layout.getStatus() == WorkflowConstants.STATUS_PENDING)) {
+
+			return HtmlUtil.stripHtml(sb.toString());
+		}
 
 		return sb.toString();
 	}
