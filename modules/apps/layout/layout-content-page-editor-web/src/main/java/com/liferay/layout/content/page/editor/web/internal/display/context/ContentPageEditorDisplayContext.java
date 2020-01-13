@@ -562,7 +562,7 @@ public class ContentPageEditorDisplayContext {
 		).put(
 			"lastSaveDate", StringPool.BLANK
 		).put(
-			"masterUsed", _isMasterUsed
+			"masterUsed", _isMasterUsed()
 		).put(
 			"pageType", String.valueOf(_getPageType())
 		).put(
