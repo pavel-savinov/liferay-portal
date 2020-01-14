@@ -156,12 +156,14 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 
 		_validateFragmentEntryHTMLDocument(document);
 
-		String widgetHTML = _renderWidgetHTML(
-			fragmentEntryLink.getEditableValues(),
-			fragmentEntryProcessorContext);
+		String editableValues = fragmentEntryLink.getEditableValues();
 
-		if (Validator.isNotNull(widgetHTML)) {
-			return widgetHTML;
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+			editableValues);
+
+		if (Validator.isNotNull(jsonObject.getString("portletId"))) {
+			return _renderWidgetHTML(
+				editableValues, fragmentEntryProcessorContext);
 		}
 
 		FragmentEntryLink originalFragmentEntryLink = null;
