@@ -50,7 +50,7 @@ if (layoutPageTemplateEntry == null) {
 
 boolean editableMasterLayout = false;
 
-if ((Objects.equals(selLayout.getType(), LayoutConstants.TYPE_CONTENT) || Objects.equals(selLayout.getType(), LayoutConstants.TYPE_ASSET_DISPLAY)) && ((layoutPageTemplateEntry == null) || !Objects.equals(layoutPageTemplateEntry.getType(), LayoutPageTemplateEntryTypeConstants.TYPE_MASTER_LAYOUT))) {
+if ((layoutPageTemplateEntry == null) || !Objects.equals(layoutPageTemplateEntry.getType(), LayoutPageTemplateEntryTypeConstants.TYPE_MASTER_LAYOUT)) {
 	editableMasterLayout = true;
 }
 %>
