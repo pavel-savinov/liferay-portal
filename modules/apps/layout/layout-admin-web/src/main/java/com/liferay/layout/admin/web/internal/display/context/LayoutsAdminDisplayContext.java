@@ -114,11 +114,13 @@ public class LayoutsAdminDisplayContext {
 	public LayoutsAdminDisplayContext(
 		LayoutConverterConfiguration layoutConverterConfiguration,
 		LiferayPortletRequest liferayPortletRequest,
-		LiferayPortletResponse liferayPortletResponse) {
+		LiferayPortletResponse liferayPortletResponse,
+		StagingGroupHelper stagingGroupHelper) {
 
 		_layoutConverterConfiguration = layoutConverterConfiguration;
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
+		_stagingGroupHelper = stagingGroupHelper;
 
 		_httpServletRequest = PortalUtil.getHttpServletRequest(
 			_liferayPortletRequest);
@@ -132,9 +134,6 @@ public class LayoutsAdminDisplayContext {
 		_layoutConverterRegistry =
 			(LayoutConverterRegistry)_liferayPortletRequest.getAttribute(
 				LayoutAdminWebKeys.LAYOUT_CONVERTER_REGISTRY);
-		_stagingGroupHelper =
-			(StagingGroupHelper)_liferayPortletRequest.getAttribute(
-				StagingGroupHelper.class.getName());
 		_themeDisplay = (ThemeDisplay)liferayPortletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}

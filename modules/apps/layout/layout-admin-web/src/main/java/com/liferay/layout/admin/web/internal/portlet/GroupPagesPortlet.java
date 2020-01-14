@@ -192,7 +192,8 @@ public class GroupPagesPortlet extends MVCPortlet {
 				new LayoutsAdminDisplayContext(
 					_layoutConverterConfiguration,
 					_portal.getLiferayPortletRequest(renderRequest),
-					_portal.getLiferayPortletResponse(renderResponse)));
+					_portal.getLiferayPortletResponse(renderResponse),
+					_stagingGroupHelper));
 
 			super.doDispatch(renderRequest, renderResponse);
 		}
