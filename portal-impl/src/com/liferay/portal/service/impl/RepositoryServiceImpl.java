@@ -92,6 +92,21 @@ public class RepositoryServiceImpl extends RepositoryServiceBaseImpl {
 	}
 
 	@Override
+	public Repository getRepository(long groupId, String portletId)
+		throws PortalException {
+
+		Repository repository = repositoryPersistence.findByG_N_P(
+			groupId, portletId, portletId);
+
+		ModelResourcePermissionHelper.check(
+			_folderModelResourcePermission, getPermissionChecker(),
+			repository.getGroupId(), repository.getDlFolderId(),
+			ActionKeys.VIEW);
+
+		return repository;
+	}
+
+	@Override
 	public UnicodeProperties getTypeSettingsProperties(long repositoryId)
 		throws PortalException {
 
