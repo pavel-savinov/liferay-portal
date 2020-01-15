@@ -879,10 +879,16 @@ public class PortletContainerImpl implements PortletContainer {
 
 		if (path == null) {
 			path = "/html/portal/render_portlet.jsp";
+
+			httpServletRequest = PortalUtil.getOriginalServletRequest(
+				httpServletRequest);
 		}
 
 		if (headerPhase) {
 			path = "/html/portal/header_portlet.jsp";
+
+			httpServletRequest = PortalUtil.getOriginalServletRequest(
+				httpServletRequest);
 		}
 
 		RequestDispatcher requestDispatcher =
