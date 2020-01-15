@@ -76,6 +76,13 @@ public class RepositoryServiceUtil {
 		return getService().getRepository(repositoryId);
 	}
 
+	public static com.liferay.portal.kernel.model.Repository getRepository(
+			long groupId, String portletId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return getService().getRepository(groupId, portletId);
+	}
+
 	public static com.liferay.portal.kernel.util.UnicodeProperties
 			getTypeSettingsProperties(long repositoryId)
 		throws com.liferay.portal.kernel.exception.PortalException {

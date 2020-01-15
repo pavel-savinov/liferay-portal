@@ -76,6 +76,14 @@ public class RepositoryServiceWrapper
 	}
 
 	@Override
+	public com.liferay.portal.kernel.model.Repository getRepository(
+			long groupId, java.lang.String portletId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _repositoryService.getRepository(groupId, portletId);
+	}
+
+	@Override
 	public com.liferay.portal.kernel.util.UnicodeProperties
 			getTypeSettingsProperties(long repositoryId)
 		throws com.liferay.portal.kernel.exception.PortalException {

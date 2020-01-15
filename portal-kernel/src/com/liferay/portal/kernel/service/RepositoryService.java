@@ -71,6 +71,10 @@ public interface RepositoryService extends BaseService {
 	public Repository getRepository(long repositoryId) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public Repository getRepository(long groupId, String portletId)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public UnicodeProperties getTypeSettingsProperties(long repositoryId)
 		throws PortalException;
 
