@@ -246,6 +246,21 @@ public class LayoutsAdminLookAndFeelDisplayContext {
 		return _editableMasterLayout;
 	}
 
+	public boolean isPageTemplate() {
+		Layout selLayout = getSelLayout();
+
+		Layout draftLayout = LayoutLocalServiceUtil.fetchLayout(
+			PortalUtil.getClassNameId(Layout.class), selLayout.getPlid());
+
+		if (selLayout.isTypeAssetDisplay() ||
+			(selLayout.isTypeContent() && (draftLayout == null))) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	public boolean isPrivateLayout() {
 		if (_privateLayout != null) {
 			return _privateLayout;

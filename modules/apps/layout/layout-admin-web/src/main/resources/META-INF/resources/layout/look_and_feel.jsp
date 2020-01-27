@@ -41,7 +41,15 @@ String rootNodeName = layoutsAdminLookAndFeelDisplayContext.getRootNodeName();
 
 	<%
 	LayoutPageTemplateEntry masterLayoutPageTemplateEntry = layoutsAdminLookAndFeelDisplayContext.getMasterLayoutPageTemplateEntry();
+
+	Locale defaultLocale = LocaleUtil.getDefault();
+
+	String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
 	%>
+
+	<c:if test="<%= layoutsAdminLookAndFeelDisplayContext.isPageTemplate() %>">
+		<aui:input name='<%= "name_" + defaultLanguageId %>' type="hidden" value="<%= selLayout.getName(defaultLocale) %>" />
+	</c:if>
 
 	<div class="sheet-section">
 		<h3 class="sheet-subtitle"><liferay-ui:message key="master" /></h3>
