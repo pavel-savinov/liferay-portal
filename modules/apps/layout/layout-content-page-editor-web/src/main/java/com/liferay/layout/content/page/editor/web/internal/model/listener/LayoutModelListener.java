@@ -36,6 +36,8 @@ import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.List;
 
@@ -124,19 +126,23 @@ public class LayoutModelListener extends BaseModelListener<Layout> {
 					pagetTemplateLayout.getPlid());
 		}
 
+		ServiceContext serviceContext = new ServiceContext();
+
 		draftLayout = _layoutCopyHelper.copyLayout(
 			pagetTemplateLayout, draftLayout);
 
-		_layoutLocalService.updateLayout(
-			draftLayout.getGroupId(), draftLayout.isPrivateLayout(),
-			draftLayout.getLayoutId(), draftLayout.getTypeSettings());
+		draftLayout.setStatus(WorkflowConstants.STATUS_APPROVED);
+
+		UnicodeProperties properties = draftLayout.getTypeSettingsProperties();
+
+		properties.put("published", Boolean.FALSE.toString());
+
+		_layoutLocalService.updateLayout(draftLayout);
 
 		List<LayoutClassedModelUsage> layoutClassedModelUsages =
 			_layoutClassedModelUsageLocalService.
 				getLayoutClassedModelUsagesByPlid(
 					layoutPageTemplateEntry.getPlid());
-
-		ServiceContext serviceContext = new ServiceContext();
 
 		layoutClassedModelUsages.forEach(
 			layoutClassedModelUsage ->
