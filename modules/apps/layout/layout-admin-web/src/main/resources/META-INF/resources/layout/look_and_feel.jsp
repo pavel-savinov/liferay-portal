@@ -17,17 +17,13 @@
 <%@ include file="/init.jsp" %>
 
 <%
-Group group = layoutsAdminDisplayContext.getGroup();
+LayoutsAdminLookAndFeelDisplayContext layoutsAdminLookAndFeelDisplayContext = new LayoutsAdminLookAndFeelDisplayContext(liferayPortletRequest, liferayPortletResponse);
 
-LayoutSet layoutSet = layoutsAdminDisplayContext.getSelLayoutSet();
+Group group = layoutsAdminLookAndFeelDisplayContext.getGroup();
 
-Theme rootTheme = layoutSet.getTheme();
+Layout selLayout = layoutsAdminLookAndFeelDisplayContext.getSelLayout();
 
-Layout selLayout = layoutsAdminDisplayContext.getSelLayout();
-
-String rootNodeName = layoutsAdminDisplayContext.getRootNodeName();
-
-PortletURL redirectURL = layoutsAdminDisplayContext.getRedirectURL();
+String rootNodeName = layoutsAdminLookAndFeelDisplayContext.getRootNodeName();
 %>
 
 <liferay-ui:error-marker
@@ -41,28 +37,10 @@ PortletURL redirectURL = layoutsAdminDisplayContext.getRedirectURL();
 
 <aui:input name="masterLayoutPlid" type="hidden" />
 
-<%
-LayoutPageTemplateEntry layoutPageTemplateEntry = LayoutPageTemplateEntryLocalServiceUtil.fetchLayoutPageTemplateEntryByPlid(selLayout.getPlid());
-
-if (layoutPageTemplateEntry == null) {
-	layoutPageTemplateEntry = LayoutPageTemplateEntryLocalServiceUtil.fetchLayoutPageTemplateEntryByPlid(selLayout.getClassPK());
-}
-
-boolean editableMasterLayout = false;
-
-if ((layoutPageTemplateEntry == null) || !Objects.equals(layoutPageTemplateEntry.getType(), LayoutPageTemplateEntryTypeConstants.TYPE_MASTER_LAYOUT)) {
-	editableMasterLayout = true;
-}
-%>
-
-<c:if test="<%= editableMasterLayout %>">
+<c:if test="<%= layoutsAdminLookAndFeelDisplayContext.isEditableMasterLayout() %>">
 
 	<%
-	LayoutPageTemplateEntry masterLayoutPageTemplateEntry = null;
-
-	if (selLayout.getMasterLayoutPlid() > 0) {
-		masterLayoutPageTemplateEntry = LayoutPageTemplateEntryLocalServiceUtil.fetchLayoutPageTemplateEntryByPlid(selLayout.getMasterLayoutPlid());
-	}
+	LayoutPageTemplateEntry masterLayoutPageTemplateEntry = layoutsAdminLookAndFeelDisplayContext.getMasterLayoutPageTemplateEntry();
 	%>
 
 	<div class="sheet-section">
@@ -100,7 +78,7 @@ if ((layoutPageTemplateEntry == null) || !Objects.equals(layoutPageTemplateEntry
 			<%= HtmlUtil.escape(rootNodeName) %>
 		</c:when>
 		<c:otherwise>
-			<aui:a href="<%= redirectURL.toString() %>"><%= HtmlUtil.escape(rootNodeName) %></aui:a>
+			<aui:a href="<%= layoutsAdminLookAndFeelDisplayContext.getRedirectURL() %>"><%= HtmlUtil.escape(rootNodeName) %></aui:a>
 		</c:otherwise>
 	</c:choose>
 </liferay-util:buffer>
@@ -128,7 +106,7 @@ else {
 			<liferay-util:include page="/look_and_feel_themes.jsp" servletContext="<%= application %>">
 				<liferay-util:param name="companyId" value="<%= String.valueOf(group.getCompanyId()) %>" />
 				<liferay-util:param name="editable" value="<%= Boolean.FALSE.toString() %>" />
-				<liferay-util:param name="themeId" value="<%= rootTheme.getThemeId() %>" />
+				<liferay-util:param name="themeId" value="<%= layoutsAdminLookAndFeelDisplayContext.getRootThemeId() %>" />
 			</liferay-util:include>
 		</div>
 	</c:if>
@@ -151,7 +129,7 @@ else {
 	);
 </aui:script>
 
-<c:if test="<%= editableMasterLayout %>">
+<c:if test="<%= layoutsAdminLookAndFeelDisplayContext.isEditableMasterLayout() %>">
 	<aui:script require="frontend-js-web/liferay/ItemSelectorDialog.es as ItemSelectorDialog">
 		var changeMasterLayoutButton = document.getElementById(
 			'<portlet:namespace />changeMasterLayoutButton'
@@ -215,24 +193,12 @@ else {
 			}
 		);
 
-		<%
-		String editMasterLayoutURL = StringPool.BLANK;
-
-		if (selLayout.getMasterLayoutPlid() > 0) {
-			Layout masterLayout = LayoutLocalServiceUtil.getLayout(selLayout.getMasterLayoutPlid());
-
-			Layout masterDraftLayout = LayoutLocalServiceUtil.fetchLayout(PortalUtil.getClassNameId(Layout.class), masterLayout.getPlid());
-
-			String editLayoutURL = HttpUtil.addParameter(HttpUtil.addParameter(PortalUtil.getLayoutFullURL(selLayout, themeDisplay), "p_l_mode", Constants.EDIT), "p_l_back_url", ParamUtil.getString(request, "redirect"));
-
-			editMasterLayoutURL = HttpUtil.addParameter(HttpUtil.addParameter(PortalUtil.getLayoutFullURL(masterDraftLayout, themeDisplay), "p_l_mode", Constants.EDIT), "p_l_back_url", editLayoutURL);
-		}
-		%>
-
 		var editMasterLayoutButtonEventListener = editMasterLayoutButton.addEventListener(
 			'click',
 			function(event) {
-				Liferay.Util.navigate('<%= editMasterLayoutURL %>');
+				Liferay.Util.navigate(
+					'<%= layoutsAdminLookAndFeelDisplayContext.getEditMasterLayoutURL() %>'
+				);
 			}
 		);
 	</aui:script>
