@@ -135,6 +135,8 @@ public class PublishLayoutMVCActionCommand
 
 			_layoutLocalService.updateLayout(layout);
 
+			draftLayout = _layoutLocalService.getLayout(plid);
+
 			UnicodeProperties typeSettingsProperties =
 				draftLayout.getTypeSettingsProperties();
 
@@ -142,12 +144,6 @@ public class PublishLayoutMVCActionCommand
 				typeSettingsProperties.setProperty(
 					"layoutPrototypeUuid", layoutPrototypeUuid);
 			}
-
-			typeSettingsProperties.setProperty("published", "true");
-
-			draftLayout = _layoutLocalService.updateLayout(
-				draftLayout.getGroupId(), draftLayout.isPrivateLayout(),
-				draftLayout.getLayoutId(), typeSettingsProperties.toString());
 
 			draftLayout.setStatus(WorkflowConstants.STATUS_APPROVED);
 

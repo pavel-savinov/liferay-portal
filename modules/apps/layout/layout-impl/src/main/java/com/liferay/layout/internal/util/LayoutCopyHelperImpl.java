@@ -60,6 +60,7 @@ import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.segments.constants.SegmentsExperienceConstants;
 import com.liferay.segments.model.SegmentsExperience;
@@ -713,9 +714,24 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 			serviceContext.setAttribute(
 				"layout.instanceable.allowed", Boolean.TRUE);
 
+			UnicodeProperties properties = new UnicodeProperties();
+
+			properties.load(_sourceLayout.getTypeSettings());
+
+			if ((_sourceLayout.getClassNameId() == _portal.getClassNameId(
+					Layout.class)) &&
+				(_targetLayout.getPlid() == _sourceLayout.getClassPK())) {
+
+				properties.put("published", Boolean.TRUE.toString());
+
+				_layoutLocalService.updateLayout(
+					_sourceLayout.getGroupId(), _sourceLayout.isPrivateLayout(),
+					_sourceLayout.getLayoutId(), properties.toString());
+			}
+
 			_layoutLocalService.updateLayout(
 				_targetLayout.getGroupId(), _targetLayout.isPrivateLayout(),
-				_targetLayout.getLayoutId(), _sourceLayout.getTypeSettings());
+				_targetLayout.getLayoutId(), properties.toString());
 
 			_targetLayout.setType(_sourceLayout.getType());
 
