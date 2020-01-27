@@ -834,6 +834,8 @@ public class LayoutStagedModelDataHandler
 		importedLayout.setLayoutPrototypeLinkEnabled(
 			layout.isLayoutPrototypeLinkEnabled());
 
+		importedLayout.setStatus(layout.getStatus());
+
 		ServiceContext serviceContext = portletDataContext.createServiceContext(
 			layout);
 
