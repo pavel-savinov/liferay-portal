@@ -70,6 +70,7 @@ import com.liferay.portal.kernel.servlet.taglib.ui.BreadcrumbEntry;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -653,11 +654,16 @@ public class LayoutsAdminDisplayContext {
 				Layout draftLayout = LayoutLocalServiceUtil.fetchLayout(
 					PortalUtil.getClassNameId(Layout.class), layout.getPlid());
 
+				boolean published = GetterUtil.getBoolean(
+					draftLayout.getTypeSettingsProperty("published"));
+
 				layoutJSONObject.put(
 					"conversionPreview", false
 				).put(
 					"draft",
-					draftLayout.getStatus() == WorkflowConstants.STATUS_DRAFT
+					(draftLayout.getStatus() ==
+						WorkflowConstants.STATUS_DRAFT) ||
+					!published
 				);
 			}
 			else {
