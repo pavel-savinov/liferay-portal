@@ -889,6 +889,17 @@ public class PortletPreferencesFactoryImpl
 		int ownerType = 0;
 		long plid = 0;
 
+		long masterLayoutPlid = layout.getMasterLayoutPlid();
+		boolean hasMasterLayoutPreferences = false;
+
+		if ((masterLayoutPlid > 0) &&
+			(PortletPreferencesLocalServiceUtil.getPortletPreferencesCount(
+				PortletKeys.PREFS_OWNER_TYPE_LAYOUT, masterLayoutPlid,
+				portletId) > 0)) {
+
+			hasMasterLayoutPreferences = true;
+		}
+
 		if (modeEditGuest) {
 			PermissionChecker permissionChecker =
 				PermissionThreadLocal.getPermissionChecker();
@@ -909,8 +920,12 @@ public class PortletPreferencesFactoryImpl
 			}
 		}
 
-		if (PortletIdCodec.hasUserId(originalPortletId) &&
-			(PortletIdCodec.decodeUserId(originalPortletId) == userId)) {
+		if (hasMasterLayoutPreferences) {
+			ownerType = PortletKeys.PREFS_OWNER_TYPE_LAYOUT;
+			plid = masterLayoutPlid;
+		}
+		else if (PortletIdCodec.hasUserId(originalPortletId) &&
+				 (PortletIdCodec.decodeUserId(originalPortletId) == userId)) {
 
 			ownerId = userId;
 			ownerType = PortletKeys.PREFS_OWNER_TYPE_USER;
