@@ -419,6 +419,21 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 			_getSegmentsExperienceIdOptional(
 				fragmentEntryProcessorContext.getSegmentsExperienceIds());
 
+		HttpServletRequest httpServletRequest =
+			fragmentEntryProcessorContext.getHttpServletRequest();
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		Layout layout = themeDisplay.getLayout();
+
+		long defaultPlid = layout.getPlid();
+
+		if (layout.getMasterLayoutPlid() > 0) {
+			defaultPlid = layout.getMasterLayoutPlid();
+		}
+
 		if (segmentsExperienceIdOptionalLong.isPresent()) {
 			String preferencesPortletId = portletId;
 
@@ -439,18 +454,11 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 
 			preferencesPortletId = PortletIdCodec.encode(portletId, instanceId);
 
-			HttpServletRequest httpServletRequest =
-				fragmentEntryProcessorContext.getHttpServletRequest();
-
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)httpServletRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
-
 			PortletPreferences defaultExperiencePortletPreferences =
 				_portletPreferencesLocalService.fetchPreferences(
 					themeDisplay.getCompanyId(),
 					PortletKeys.PREFS_OWNER_ID_DEFAULT,
-					PortletKeys.PREFS_OWNER_TYPE_LAYOUT, themeDisplay.getPlid(),
+					PortletKeys.PREFS_OWNER_TYPE_LAYOUT, defaultPlid,
 					defaultPreferencesPortletId);
 
 			if (defaultExperiencePortletPreferences == null) {
