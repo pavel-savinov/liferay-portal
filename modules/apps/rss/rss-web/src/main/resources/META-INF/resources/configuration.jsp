@@ -79,33 +79,17 @@
 
 				<aui:input name="preferences--showFeedItemAuthor--" type="toggle-switch" value="<%= rssPortletInstanceConfiguration.showFeedItemAuthor() %>" />
 
-				<aui:select label="num-of-entries-per-feed" name="preferences--entriesPerFeed--">
+				<aui:input label="num-of-entries-per-feed" name="preferences--entriesPerFeed--" type="text" value="<%= rssPortletInstanceConfiguration.entriesPerFeed() %>">
+					<aui:validator name="digits" />
+					<aui:validator name="max">10</aui:validator>
+					<aui:validator name="min">0</aui:validator>
+				</aui:input>
 
-					<%
-					for (int i = 1; i < 10; i++) {
-					%>
-
-						<aui:option label="<%= i %>" selected="<%= i == rssPortletInstanceConfiguration.entriesPerFeed() %>" />
-
-					<%
-					}
-					%>
-
-				</aui:select>
-
-				<aui:select label="num-of-expanded-entries-per-feed" name="preferences--expandedEntriesPerFeed--">
-
-					<%
-					for (int i = 0; i < 10; i++) {
-					%>
-
-						<aui:option label="<%= i %>" selected="<%= i == rssPortletInstanceConfiguration.expandedEntriesPerFeed() %>" />
-
-					<%
-					}
-					%>
-
-				</aui:select>
+				<aui:input label="num-of-expanded-entries-per-feed" name="preferences--expandedEntriesPerFeed--" type="text" value="<%= rssPortletInstanceConfiguration.expandedEntriesPerFeed() %>">
+					<aui:validator name="digits" />
+					<aui:validator name="max">10</aui:validator>
+					<aui:validator name="min">0</aui:validator>
+				</aui:input>
 
 				<aui:select disabled="<%= !rssPortletInstanceConfiguration.showFeedImage() %>" name="preferences--feedImageAlignment--">
 					<aui:option label="left" selected='<%= rssPortletInstanceConfiguration.feedImageAlignment().equals("left") %>' />
