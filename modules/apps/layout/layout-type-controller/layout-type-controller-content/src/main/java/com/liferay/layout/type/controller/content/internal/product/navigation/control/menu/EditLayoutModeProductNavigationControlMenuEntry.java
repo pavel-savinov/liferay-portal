@@ -172,14 +172,20 @@ public class EditLayoutModeProductNavigationControlMenuEntry
 			return false;
 		}
 
+		Layout layout = themeDisplay.getLayout();
+
+		if (layout.isSystem()) {
+			layout = _layoutLocalService.fetchLayout(layout.getClassPK());
+		}
+
 		if (_layoutPermission.contains(
-				themeDisplay.getPermissionChecker(), themeDisplay.getLayout(),
+				themeDisplay.getPermissionChecker(), layout,
 				ActionKeys.UPDATE) ||
 			_layoutPermission.contains(
-				themeDisplay.getPermissionChecker(), themeDisplay.getLayout(),
+				themeDisplay.getPermissionChecker(), layout,
 				ActionKeys.UPDATE_LAYOUT_CONTENT) ||
 			_modelResourcePermission.contains(
-				themeDisplay.getPermissionChecker(), themeDisplay.getPlid(),
+				themeDisplay.getPermissionChecker(), layout.getPlid(),
 				ActionKeys.UPDATE)) {
 
 			return true;
