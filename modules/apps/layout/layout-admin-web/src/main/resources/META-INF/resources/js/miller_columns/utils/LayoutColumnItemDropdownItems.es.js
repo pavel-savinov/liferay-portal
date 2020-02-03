@@ -19,6 +19,11 @@ const LAYOUT_COLUMN_ITEM_DROPDOWN_ITEMS = [
 	},
 
 	{
+		label: Liferay.Language.get('preview'),
+		name: 'previewLayoutURL'
+	},
+
+	{
 		label: Liferay.Language.get('edit-conversion-draft'),
 		name: 'editConversionLayoutURL'
 	},
@@ -26,11 +31,6 @@ const LAYOUT_COLUMN_ITEM_DROPDOWN_ITEMS = [
 	{
 		label: Liferay.Language.get('edit'),
 		name: 'editLayoutURL'
-	},
-
-	{
-		label: Liferay.Language.get('configure'),
-		name: 'configureURL'
 	},
 
 	{
