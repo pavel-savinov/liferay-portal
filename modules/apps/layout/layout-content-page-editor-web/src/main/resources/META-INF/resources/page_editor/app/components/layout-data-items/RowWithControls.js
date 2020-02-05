@@ -26,7 +26,9 @@
  * details.
  */
 
-import React, {useContext} from 'react';
+import {useModal} from '@clayui/modal';
+import {useIsMounted} from 'frontend-js-react-web';
+import React, {useContext, useState} from 'react';
 
 import {LAYOUT_DATA_FLOATING_TOOLBAR_BUTTONS} from '../../config/constants/layoutDataFloatingToolbarButtons';
 import {LAYOUT_DATA_ITEM_TYPES} from '../../config/constants/layoutDataItemTypes';
@@ -34,6 +36,7 @@ import {ConfigContext} from '../../config/index';
 import selectShowLayoutItemTopper from '../../selectors/selectShowLayoutItemTopper';
 import {useDispatch, useSelector} from '../../store/index';
 import duplicateItem from '../../thunks/duplicateItem';
+import CompositionModal from '../CompositionModal';
 import FloatingToolbar from '../FloatingToolbar';
 import Topper from '../Topper';
 import Row from './Row';
@@ -42,6 +45,16 @@ const RowWithControls = React.forwardRef(
 	({children, item, layoutData}, ref) => {
 		const config = useContext(ConfigContext);
 		const dispatch = useDispatch();
+		const isMounted = useIsMounted();
+		const [openCompositionModal, setOpenCompositionModal] = useState(false);
+		const {observer} = useModal({
+			onClose: () => {
+				if (isMounted()) {
+					setOpenCompositionModal(false);
+				}
+			}
+		});
+
 		const state = useSelector(state => state);
 		const showLayoutItemTopper = useSelector(selectShowLayoutItemTopper);
 
@@ -55,6 +68,10 @@ const RowWithControls = React.forwardRef(
 						store: state
 					})
 				);
+			} else if (
+				id === LAYOUT_DATA_FLOATING_TOOLBAR_BUTTONS.saveComposition.id
+			) {
+				setOpenCompositionModal(true);
 			}
 		};
 
@@ -77,6 +94,14 @@ const RowWithControls = React.forwardRef(
 				/>
 
 				{children}
+
+				{openCompositionModal && (
+					<CompositionModal
+						errorMessage={''}
+						observer={observer}
+						onErrorDismiss={() => true}
+					/>
+				)}
 			</Row>
 		);
 
