@@ -64,6 +64,9 @@ public class LayoutClassedModelUsageLocalServiceImpl
 			layoutClassedModelUsagePersistence.create(
 				layoutClassedModelUsageId);
 
+		layoutClassedModelUsage.setUuid(serviceContext.getUuid());
+		layoutClassedModelUsage.setGroupId(groupId);
+
 		long companyId = serviceContext.getCompanyId();
 
 		Group group = groupLocalService.fetchGroup(groupId);
@@ -72,9 +75,8 @@ public class LayoutClassedModelUsageLocalServiceImpl
 			companyId = group.getCompanyId();
 		}
 
-		layoutClassedModelUsage.setUuid(serviceContext.getUuid());
-		layoutClassedModelUsage.setGroupId(groupId);
 		layoutClassedModelUsage.setCompanyId(companyId);
+
 		layoutClassedModelUsage.setCreateDate(new Date());
 		layoutClassedModelUsage.setModifiedDate(new Date());
 		layoutClassedModelUsage.setClassNameId(classNameId);
