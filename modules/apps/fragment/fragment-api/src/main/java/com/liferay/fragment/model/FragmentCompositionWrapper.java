@@ -223,6 +223,13 @@ public class FragmentCompositionWrapper
 		return model.getData();
 	}
 
+	@Override
+	public com.liferay.portal.kernel.json.JSONObject getDataJSONObject()
+		throws Exception {
+
+		return model.getDataJSONObject();
+	}
+
 	/**
 	 * Returns the description of this fragment composition.
 	 *
