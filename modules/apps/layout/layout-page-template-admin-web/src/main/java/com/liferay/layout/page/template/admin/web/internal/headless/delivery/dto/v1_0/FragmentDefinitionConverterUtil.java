@@ -18,6 +18,7 @@ import com.liferay.fragment.contributor.FragmentCollectionContributor;
 import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.model.FragmentEntry;
+import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererTracker;
 import com.liferay.fragment.renderer.constants.FragmentRendererConstants;
@@ -27,8 +28,12 @@ import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.headless.delivery.dto.v1_0.FragmentDefinition;
 import com.liferay.layout.util.structure.FragmentLayoutStructureItem;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -139,6 +144,42 @@ public class FragmentDefinitionConverterUtil {
 		}
 
 		return null;
+	}
+
+	private static String _getFragmentName(
+		FragmentEntry fragmentEntry, FragmentEntryLink fragmentEntryLink,
+		String rendererKey) {
+
+		if (fragmentEntry != null) {
+			return fragmentEntry.getName();
+		}
+
+		JSONObject editableValuesJSONObject = null;
+
+		try {
+			editableValuesJSONObject = JSONFactoryUtil.createJSONObject(
+				fragmentEntryLink.getEditableValues());
+		}
+		catch (JSONException jsonException) {
+			return null;
+		}
+
+		String portletId = editableValuesJSONObject.getString("portletId");
+
+		if (Validator.isNotNull(portletId)) {
+			return PortalUtil.getPortletTitle(
+				portletId, LocaleUtil.getSiteDefault());
+		}
+
+		if (Validator.isNull(rendererKey)) {
+			rendererKey =
+				FragmentRendererConstants.FRAGMENT_ENTRY_FRAGMENT_RENDERER_KEY;
+		}
+
+		FragmentRenderer fragmentRenderer =
+			_fragmentRendererTracker.getFragmentRenderer(rendererKey);
+
+		return fragmentRenderer.getLabel(LocaleUtil.getSiteDefault());
 	}
 
 	private static FragmentCollectionContributorTracker
