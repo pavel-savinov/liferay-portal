@@ -47,7 +47,7 @@ const RowWithControls = React.forwardRef(
 		const dispatch = useDispatch();
 		const isMounted = useIsMounted();
 		const [openCompositionModal, setOpenCompositionModal] = useState(false);
-		const {observer} = useModal({
+		const {observer, onClose} = useModal({
 			onClose: () => {
 				if (isMounted()) {
 					setOpenCompositionModal(false);
@@ -68,7 +68,8 @@ const RowWithControls = React.forwardRef(
 						store: state
 					})
 				);
-			} else if (
+			}
+			else if (
 				id === LAYOUT_DATA_FLOATING_TOOLBAR_BUTTONS.saveComposition.id
 			) {
 				setOpenCompositionModal(true);
@@ -99,6 +100,7 @@ const RowWithControls = React.forwardRef(
 					<CompositionModal
 						errorMessage={''}
 						observer={observer}
+						onClose={onClose}
 						onErrorDismiss={() => true}
 					/>
 				)}
