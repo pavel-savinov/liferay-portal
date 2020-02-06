@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
@@ -138,11 +139,15 @@ public class FragmentDefinitionConverterUtil {
 			return fragmentCollection.getName();
 		}
 
+		String[] parts = StringUtil.split(rendererKey, StringPool.DASH);
+
+		if (ArrayUtil.isEmpty(parts)) {
+			return null;
+		}
+
 		List<FragmentCollectionContributor> fragmentCollectionContributors =
 			_fragmentCollectionContributorTracker.
 				getFragmentCollectionContributors();
-
-		String[] parts = StringUtil.split(rendererKey, StringPool.DASH);
 
 		for (FragmentCollectionContributor fragmentCollectionContributor :
 				fragmentCollectionContributors) {
