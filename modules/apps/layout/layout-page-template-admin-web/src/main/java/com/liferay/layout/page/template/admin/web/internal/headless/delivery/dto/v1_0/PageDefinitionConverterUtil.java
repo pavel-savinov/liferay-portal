@@ -162,8 +162,14 @@ public class PageDefinitionConverterUtil {
 		}
 
 		if (layoutStructureItem instanceof FragmentLayoutStructureItem) {
+			FragmentLayoutStructureItem fragmentLayoutStructureItem =
+				(FragmentLayoutStructureItem)layoutStructureItem;
+
 			return new PageElement() {
 				{
+					definition =
+						FragmentDefinitionConverterUtil.toFragmentDefinition(
+							fragmentLayoutStructureItem);
 					type = PageElement.Type.FRAGMENT;
 				}
 			};
