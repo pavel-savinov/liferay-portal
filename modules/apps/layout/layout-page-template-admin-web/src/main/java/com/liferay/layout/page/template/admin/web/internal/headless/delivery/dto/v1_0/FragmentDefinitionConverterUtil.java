@@ -14,13 +14,27 @@
 
 package com.liferay.layout.page.template.admin.web.internal.headless.delivery.dto.v1_0;
 
+import com.liferay.fragment.contributor.FragmentCollectionContributor;
 import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
+import com.liferay.fragment.model.FragmentCollection;
+import com.liferay.fragment.model.FragmentEntry;
+import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererTracker;
+import com.liferay.fragment.renderer.constants.FragmentRendererConstants;
 import com.liferay.fragment.service.FragmentCollectionLocalService;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.headless.delivery.dto.v1_0.FragmentDefinition;
 import com.liferay.layout.util.structure.FragmentLayoutStructureItem;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
+
+import java.util.List;
+import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -77,6 +91,54 @@ public class FragmentDefinitionConverterUtil {
 		FragmentRendererTracker fragmentRendererTracker) {
 
 		_fragmentRendererTracker = fragmentRendererTracker;
+	}
+
+	private static String _getFragmentCollectionName(
+		FragmentEntry fragmentEntry, String rendererKey) {
+
+		if (fragmentEntry == null) {
+			if (Validator.isNull(rendererKey)) {
+				rendererKey =
+					FragmentRendererConstants.
+						FRAGMENT_ENTRY_FRAGMENT_RENDERER_KEY;
+			}
+
+			FragmentRenderer fragmentRenderer =
+				_fragmentRendererTracker.getFragmentRenderer(rendererKey);
+
+			return LanguageUtil.get(
+				ResourceBundleUtil.getBundle(
+					LocaleUtil.getSiteDefault(), fragmentRenderer.getClass()),
+				"fragment.collection.label." +
+					fragmentRenderer.getCollectionKey());
+		}
+
+		FragmentCollection fragmentCollection =
+			_fragmentCollectionLocalService.fetchFragmentCollection(
+				fragmentEntry.getFragmentCollectionId());
+
+		if (fragmentCollection != null) {
+			return fragmentCollection.getName();
+		}
+
+		List<FragmentCollectionContributor> fragmentCollectionContributors =
+			_fragmentCollectionContributorTracker.
+				getFragmentCollectionContributors();
+
+		String[] parts = StringUtil.split(rendererKey, StringPool.DASH);
+
+		for (FragmentCollectionContributor fragmentCollectionContributor :
+				fragmentCollectionContributors) {
+
+			if (Objects.equals(
+					fragmentCollectionContributor.getFragmentCollectionKey(),
+					parts[0])) {
+
+				return fragmentCollectionContributor.getName();
+			}
+		}
+
+		return null;
 	}
 
 	private static FragmentCollectionContributorTracker
