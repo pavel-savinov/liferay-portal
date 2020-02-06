@@ -54,10 +54,21 @@ public class FragmentDefinitionConverterUtil {
 	public static FragmentDefinition toFragmentDefinition(
 		FragmentLayoutStructureItem fragmentLayoutStructureItem) {
 
+		FragmentEntryLink fragmentEntryLink =
+			_fragmentEntryLinkLocalService.fetchFragmentEntryLink(
+				fragmentLayoutStructureItem.getFragmentEntryLinkId());
+
+		String rendererKey = fragmentEntryLink.getRendererKey();
+
+		FragmentEntry fragmentEntry = _getFragmentEntry(
+			fragmentEntryLink.getFragmentEntryId(), rendererKey);
+
 		return new FragmentDefinition() {
 			{
-				fragmentCollectionName = null;
-				fragmentName = null;
+				fragmentCollectionName = _getFragmentCollectionName(
+					fragmentEntry, rendererKey);
+				fragmentName = _getFragmentName(
+					fragmentEntry, fragmentEntryLink, rendererKey);
 			}
 		};
 	}
