@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
@@ -144,6 +145,22 @@ public class FragmentDefinitionConverterUtil {
 		}
 
 		return null;
+	}
+
+	private static FragmentEntry _getFragmentEntry(
+		long fragmentEntryId, String rendererKey) {
+
+		FragmentEntry fragmentEntry =
+			_fragmentEntryLocalService.fetchFragmentEntry(fragmentEntryId);
+
+		if (fragmentEntry != null) {
+			return fragmentEntry;
+		}
+
+		Map<String, FragmentEntry> fragmentEntries =
+			_fragmentCollectionContributorTracker.getFragmentEntries();
+
+		return fragmentEntries.get(rendererKey);
 	}
 
 	private static String _getFragmentName(
