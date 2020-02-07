@@ -25,6 +25,7 @@ import com.liferay.fragment.renderer.constants.FragmentRendererConstants;
 import com.liferay.fragment.service.FragmentCollectionLocalServiceUtil;
 import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
 import com.liferay.fragment.service.FragmentEntryLocalServiceUtil;
+import com.liferay.headless.delivery.dto.v1_0.FragmentContentField;
 import com.liferay.headless.delivery.dto.v1_0.FragmentDefinition;
 import com.liferay.layout.util.structure.FragmentLayoutStructureItem;
 import com.liferay.petra.string.StringPool;
@@ -39,6 +40,7 @@ import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -186,6 +188,25 @@ public class FragmentDefinitionConverterUtil {
 			fragmentRendererTracker.getFragmentRenderer(rendererKey);
 
 		return fragmentRenderer.getLabel(LocaleUtil.getSiteDefault());
+	}
+
+	private static List<FragmentContentField> _getTextFragmentContentFields(
+		JSONObject jsonObject) {
+
+		List<FragmentContentField> fragmentContentFields = new ArrayList<>();
+
+		Set<String> textIds = jsonObject.keySet();
+
+		for (String textId : textIds) {
+			fragmentContentFields.add(
+				new FragmentContentField() {
+					{
+						id = textId;
+					}
+				});
+		}
+
+		return fragmentContentFields;
 	}
 
 	private static Map<String, String> _toLocaleMap(JSONObject jsonObject) {
