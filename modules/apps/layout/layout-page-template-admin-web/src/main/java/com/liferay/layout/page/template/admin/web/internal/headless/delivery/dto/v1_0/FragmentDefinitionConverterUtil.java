@@ -27,6 +27,8 @@ import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
 import com.liferay.fragment.service.FragmentEntryLocalServiceUtil;
 import com.liferay.headless.delivery.dto.v1_0.FragmentContentField;
 import com.liferay.headless.delivery.dto.v1_0.FragmentDefinition;
+import com.liferay.headless.delivery.dto.v1_0.FragmentLink;
+import com.liferay.headless.delivery.dto.v1_0.InlineLink;
 import com.liferay.layout.util.structure.FragmentLayoutStructureItem;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONException;
@@ -198,10 +200,49 @@ public class FragmentDefinitionConverterUtil {
 		Set<String> textIds = jsonObject.keySet();
 
 		for (String textId : textIds) {
+			JSONObject textJSONObject = jsonObject.getJSONObject(textId);
+
 			fragmentContentFields.add(
 				new FragmentContentField() {
 					{
 						id = textId;
+
+						setFragmentLink(
+							() -> {
+								JSONObject configJSONObject =
+									textJSONObject.getJSONObject("config");
+
+								if (configJSONObject.isNull("href")) {
+									return null;
+								}
+
+								return new FragmentLink() {
+									{
+										value = new InlineLink() {
+											{
+												href =
+													configJSONObject.getString(
+														"href");
+											}
+										};
+
+										setTarget(
+											() -> {
+												String target =
+													configJSONObject.getString(
+														"target");
+
+												if (Validator.isNull(target)) {
+													return null;
+												}
+
+												return Target.create(
+													StringUtil.upperCase(
+														target.substring(1)));
+											});
+									}
+								};
+							});
 					}
 				});
 		}
