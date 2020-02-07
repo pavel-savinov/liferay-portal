@@ -48,15 +48,17 @@
 	}
 }
 
-.portlet {
-	&:hover,
-	&.focus {
-		> .portlet-content-editable {
-			@extend %display-portlet-content-editable;
-		}
+.controls-visible {
+	.portlet {
+		&:hover,
+		&.focus {
+			> .portlet-content-editable {
+				@extend %display-portlet-content-editable;
+			}
 
-		> .portlet-topper {
-			@extend %display-portlet-topper;
+			> .portlet-topper {
+				@extend %display-portlet-topper;
+			}
 		}
 	}
 }
