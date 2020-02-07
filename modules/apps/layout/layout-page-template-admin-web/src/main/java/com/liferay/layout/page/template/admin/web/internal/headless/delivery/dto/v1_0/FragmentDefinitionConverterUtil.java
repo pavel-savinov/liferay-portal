@@ -88,6 +88,48 @@ public class FragmentDefinitionConverterUtil {
 		};
 	}
 
+	private static List<FragmentContentField>
+		_getBackgroundImageFragmentContentFields(JSONObject jsonObject) {
+
+		List<FragmentContentField> fragmentContentFields = new ArrayList<>();
+
+		Set<String> backgroundImageIds = jsonObject.keySet();
+
+		for (String backgroundImageId : backgroundImageIds) {
+			JSONObject imageJSONObject = jsonObject.getJSONObject(
+				backgroundImageId);
+
+			fragmentContentFields.add(
+				new FragmentContentField() {
+					{
+						id = backgroundImageId;
+						value = new FragmentContentFieldImage() {
+							{
+								fragmentImage = new FragmentImage() {
+									{
+										title = new InlineValue() {
+											{
+												value_i18n = _toMap(
+													imageJSONObject, "title");
+											}
+										};
+										url = new InlineValue() {
+											{
+												value_i18n = _toMap(
+													imageJSONObject, "url");
+											}
+										};
+									}
+								};
+							}
+						};
+					}
+				});
+		}
+
+		return fragmentContentFields;
+	}
+
 	private static String _getFragmentCollectionName(
 		FragmentCollectionContributorTracker
 			fragmentCollectionContributorTracker,
