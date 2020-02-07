@@ -26,9 +26,13 @@ import com.liferay.fragment.service.FragmentCollectionLocalServiceUtil;
 import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
 import com.liferay.fragment.service.FragmentEntryLocalServiceUtil;
 import com.liferay.headless.delivery.dto.v1_0.FragmentContentField;
+import com.liferay.headless.delivery.dto.v1_0.FragmentContentFieldImage;
+import com.liferay.headless.delivery.dto.v1_0.FragmentContentFieldText;
 import com.liferay.headless.delivery.dto.v1_0.FragmentDefinition;
+import com.liferay.headless.delivery.dto.v1_0.FragmentImage;
 import com.liferay.headless.delivery.dto.v1_0.FragmentLink;
 import com.liferay.headless.delivery.dto.v1_0.InlineLink;
+import com.liferay.headless.delivery.dto.v1_0.InlineValue;
 import com.liferay.layout.util.structure.FragmentLayoutStructureItem;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONException;
@@ -36,6 +40,7 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
@@ -243,6 +248,49 @@ public class FragmentDefinitionConverterUtil {
 									}
 								};
 							});
+
+						JSONObject configJSONObject =
+							textJSONObject.getJSONObject("config");
+
+						if (configJSONObject.has("imageSource")) {
+							value = new FragmentContentFieldImage() {
+								{
+									fragmentImage = new FragmentImage() {
+										{
+											title =
+												HashMapBuilder.
+													<String, Object>put(
+														"value_i18n",
+														_toLocaleMap(
+															textJSONObject,
+															"title")
+													).build();
+
+											url =
+												HashMapBuilder.
+													<String, Object>put(
+														"value_i18n",
+														_toLocaleMap(
+															textJSONObject,
+															"url")
+													).build();
+										}
+									};
+								}
+							};
+						}
+						else {
+							value = new FragmentContentFieldText() {
+								{
+									text = new InlineValue() {
+										{
+											value_i18n = _toLocaleMap(
+												textJSONObject);
+										}
+									};
+								}
+							};
+						}
 					}
 				});
 		}
