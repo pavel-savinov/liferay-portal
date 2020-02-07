@@ -463,14 +463,16 @@ class Analytics {
 		// During logout or session expiration, identity object becomes undefined
 		// because the client object is being instantiated on every page navigation,
 		// in such cases, we force a new user ID token.
+
 		if (!storedUserId || (storedIdentityHash && !identity)) {
 			newUserIdRequired = true;
 		}
 
-		// After logout or session expiration, it is not guaranteed a new user id
+		// After logout or session expiration, it is not guaranteed a new user ID
 		// is generated. The login/logout process can redirect the user to page
 		// where the analytics.js is not loaded. In such cases, we must verify
 		// the identity hashes match and generate a new user ID token otherwise.
+
 		if (
 			storedUserId &&
 			identity &&
