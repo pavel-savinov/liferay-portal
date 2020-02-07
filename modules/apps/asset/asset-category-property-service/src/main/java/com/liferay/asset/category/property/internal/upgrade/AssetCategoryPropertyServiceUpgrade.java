@@ -16,7 +16,7 @@ package com.liferay.asset.category.property.internal.upgrade;
 
 import com.liferay.asset.category.property.internal.upgrade.v1_0_0.UpgradeClassNames;
 import com.liferay.asset.category.property.internal.upgrade.v2_0_0.util.AssetCategoryPropertyTable;
-import com.liferay.asset.category.property.internal.upgrade.v2_2_0.UpgradeSchema;
+import com.liferay.asset.category.property.internal.upgrade.v2_2_0.UpgradeAssetCategoryProperty;
 import com.liferay.portal.kernel.upgrade.BaseUpgradeSQLServerDatetime;
 import com.liferay.portal.kernel.upgrade.UpgradeMVCCVersion;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
@@ -50,7 +50,7 @@ public class AssetCategoryPropertyServiceUpgrade
 
 			});
 
-		registry.register("2.1.0", "2.2.0", new UpgradeSchema());
+		registry.register("2.1.0", "2.2.0", new UpgradeAssetCategoryProperty());
 	}
 
 }
