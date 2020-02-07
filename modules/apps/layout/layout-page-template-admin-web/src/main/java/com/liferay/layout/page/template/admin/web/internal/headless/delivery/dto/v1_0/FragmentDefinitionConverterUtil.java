@@ -22,9 +22,9 @@ import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererTracker;
 import com.liferay.fragment.renderer.constants.FragmentRendererConstants;
-import com.liferay.fragment.service.FragmentCollectionLocalService;
-import com.liferay.fragment.service.FragmentEntryLinkLocalService;
-import com.liferay.fragment.service.FragmentEntryLocalService;
+import com.liferay.fragment.service.FragmentCollectionLocalServiceUtil;
+import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
+import com.liferay.fragment.service.FragmentEntryLocalServiceUtil;
 import com.liferay.headless.delivery.dto.v1_0.FragmentDefinition;
 import com.liferay.layout.util.structure.FragmentLayoutStructureItem;
 import com.liferay.petra.string.StringPool;
@@ -43,76 +43,44 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Rubén Pulido
  */
-@Component(immediate = true, service = FragmentDefinitionConverterUtil.class)
 public class FragmentDefinitionConverterUtil {
 
 	public static FragmentDefinition toFragmentDefinition(
-		FragmentLayoutStructureItem fragmentLayoutStructureItem) {
+		FragmentCollectionContributorTracker
+			fragmentCollectionContributorTracker,
+		FragmentLayoutStructureItem fragmentLayoutStructureItem,
+		FragmentRendererTracker fragmentRendererTracker) {
 
 		FragmentEntryLink fragmentEntryLink =
-			_fragmentEntryLinkLocalService.fetchFragmentEntryLink(
+			FragmentEntryLinkLocalServiceUtil.fetchFragmentEntryLink(
 				fragmentLayoutStructureItem.getFragmentEntryLinkId());
 
 		String rendererKey = fragmentEntryLink.getRendererKey();
 
 		FragmentEntry fragmentEntry = _getFragmentEntry(
+			fragmentCollectionContributorTracker,
 			fragmentEntryLink.getFragmentEntryId(), rendererKey);
 
 		return new FragmentDefinition() {
 			{
 				fragmentCollectionName = _getFragmentCollectionName(
-					fragmentEntry, rendererKey);
+					fragmentCollectionContributorTracker, fragmentEntry,
+					fragmentRendererTracker, rendererKey);
 				fragmentName = _getFragmentName(
-					fragmentEntry, fragmentEntryLink, rendererKey);
+					fragmentEntry, fragmentEntryLink, fragmentRendererTracker,
+					rendererKey);
 			}
 		};
 	}
 
-	@Reference(unbind = "-")
-	protected void setFragmentCollectionContributorTracker(
-		FragmentCollectionContributorTracker
-			fragmentCollectionContributorTracker) {
-
-		_fragmentCollectionContributorTracker =
-			fragmentCollectionContributorTracker;
-	}
-
-	@Reference(unbind = "-")
-	protected void setFragmentCollectionLocalService(
-		FragmentCollectionLocalService fragmentCollectionLocalService) {
-
-		_fragmentCollectionLocalService = fragmentCollectionLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setFragmentEntryLinkLocalService(
-		FragmentEntryLinkLocalService fragmentEntryLinkLocalService) {
-
-		_fragmentEntryLinkLocalService = fragmentEntryLinkLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setFragmentEntryLocalService(
-		FragmentEntryLocalService fragmentEntryLocalService) {
-
-		_fragmentEntryLocalService = fragmentEntryLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setFragmentRendererTracker(
-		FragmentRendererTracker fragmentRendererTracker) {
-
-		_fragmentRendererTracker = fragmentRendererTracker;
-	}
-
 	private static String _getFragmentCollectionName(
-		FragmentEntry fragmentEntry, String rendererKey) {
+		FragmentCollectionContributorTracker
+			fragmentCollectionContributorTracker,
+		FragmentEntry fragmentEntry,
+		FragmentRendererTracker fragmentRendererTracker, String rendererKey) {
 
 		if (fragmentEntry == null) {
 			if (Validator.isNull(rendererKey)) {
@@ -122,7 +90,7 @@ public class FragmentDefinitionConverterUtil {
 			}
 
 			FragmentRenderer fragmentRenderer =
-				_fragmentRendererTracker.getFragmentRenderer(rendererKey);
+				fragmentRendererTracker.getFragmentRenderer(rendererKey);
 
 			return LanguageUtil.get(
 				ResourceBundleUtil.getBundle(
@@ -132,7 +100,7 @@ public class FragmentDefinitionConverterUtil {
 		}
 
 		FragmentCollection fragmentCollection =
-			_fragmentCollectionLocalService.fetchFragmentCollection(
+			FragmentCollectionLocalServiceUtil.fetchFragmentCollection(
 				fragmentEntry.getFragmentCollectionId());
 
 		if (fragmentCollection != null) {
@@ -146,7 +114,7 @@ public class FragmentDefinitionConverterUtil {
 		}
 
 		List<FragmentCollectionContributor> fragmentCollectionContributors =
-			_fragmentCollectionContributorTracker.
+			fragmentCollectionContributorTracker.
 				getFragmentCollectionContributors();
 
 		for (FragmentCollectionContributor fragmentCollectionContributor :
@@ -164,24 +132,26 @@ public class FragmentDefinitionConverterUtil {
 	}
 
 	private static FragmentEntry _getFragmentEntry(
+		FragmentCollectionContributorTracker
+			fragmentCollectionContributorTracker,
 		long fragmentEntryId, String rendererKey) {
 
 		FragmentEntry fragmentEntry =
-			_fragmentEntryLocalService.fetchFragmentEntry(fragmentEntryId);
+			FragmentEntryLocalServiceUtil.fetchFragmentEntry(fragmentEntryId);
 
 		if (fragmentEntry != null) {
 			return fragmentEntry;
 		}
 
 		Map<String, FragmentEntry> fragmentEntries =
-			_fragmentCollectionContributorTracker.getFragmentEntries();
+			fragmentCollectionContributorTracker.getFragmentEntries();
 
 		return fragmentEntries.get(rendererKey);
 	}
 
 	private static String _getFragmentName(
 		FragmentEntry fragmentEntry, FragmentEntryLink fragmentEntryLink,
-		String rendererKey) {
+		FragmentRendererTracker fragmentRendererTracker, String rendererKey) {
 
 		if (fragmentEntry != null) {
 			return fragmentEntry.getName();
@@ -210,17 +180,9 @@ public class FragmentDefinitionConverterUtil {
 		}
 
 		FragmentRenderer fragmentRenderer =
-			_fragmentRendererTracker.getFragmentRenderer(rendererKey);
+			fragmentRendererTracker.getFragmentRenderer(rendererKey);
 
 		return fragmentRenderer.getLabel(LocaleUtil.getSiteDefault());
 	}
-
-	private static FragmentCollectionContributorTracker
-		_fragmentCollectionContributorTracker;
-	private static FragmentCollectionLocalService
-		_fragmentCollectionLocalService;
-	private static FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
-	private static FragmentEntryLocalService _fragmentEntryLocalService;
-	private static FragmentRendererTracker _fragmentRendererTracker;
 
 }
