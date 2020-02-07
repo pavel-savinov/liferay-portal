@@ -39,9 +39,12 @@ import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author Rubén Pulido
@@ -183,6 +186,77 @@ public class FragmentDefinitionConverterUtil {
 			fragmentRendererTracker.getFragmentRenderer(rendererKey);
 
 		return fragmentRenderer.getLabel(LocaleUtil.getSiteDefault());
+	}
+
+	private static Map<String, String> _toLocaleMap(JSONObject jsonObject) {
+		return new HashMap<String, String>() {
+			{
+				Set<String> keys = jsonObject.keySet();
+
+				Iterator<String> iterator = keys.iterator();
+
+				while (iterator.hasNext()) {
+					String key = iterator.next();
+
+					if (!key.equals("classNameId") && !key.equals("classPK") &&
+						!key.equals("config") && !key.equals("defaultValue") &&
+						!key.equals("fieldId")) {
+
+						put(key, jsonObject.getString(key));
+					}
+				}
+			}
+		};
+	}
+
+	private static Map<String, String> _toLocaleMap(
+		JSONObject jsonObject, String key) {
+
+		return new HashMap<String, String>() {
+			{
+				Set<String> locales = jsonObject.keySet();
+
+				Iterator<String> iterator = locales.iterator();
+
+				while (iterator.hasNext()) {
+					String locale = iterator.next();
+
+					if (!locale.equals("config") &&
+						!locale.equals("defaultValue")) {
+
+						JSONObject localizedJSONObject =
+							jsonObject.getJSONObject(locale);
+
+						put(locale, localizedJSONObject.getString(key));
+					}
+				}
+			}
+		};
+	}
+
+	private static Map<String, String> _toMap(
+		JSONObject jsonObject, String key) {
+
+		return new HashMap<String, String>() {
+			{
+				Set<String> locales = jsonObject.keySet();
+
+				Iterator<String> iterator = locales.iterator();
+
+				while (iterator.hasNext()) {
+					String locale = iterator.next();
+
+					if (!locale.equals("config") &&
+						!locale.equals("defaultValue")) {
+
+						JSONObject localizedJSONObject =
+							jsonObject.getJSONObject(locale);
+
+						put(key, localizedJSONObject.getString(key));
+					}
+				}
+			}
+		};
 	}
 
 }
