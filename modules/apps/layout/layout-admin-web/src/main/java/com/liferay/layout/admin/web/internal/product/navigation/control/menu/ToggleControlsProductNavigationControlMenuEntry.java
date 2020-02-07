@@ -108,7 +108,9 @@ public class ToggleControlsProductNavigationControlMenuEntry
 
 		Layout layout = themeDisplay.getLayout();
 
-		if (layout.isTypeControlPanel()) {
+		if (layout.isTypeAssetDisplay() || layout.isTypeContent() ||
+			layout.isTypeControlPanel()) {
+
 			return false;
 		}
 
