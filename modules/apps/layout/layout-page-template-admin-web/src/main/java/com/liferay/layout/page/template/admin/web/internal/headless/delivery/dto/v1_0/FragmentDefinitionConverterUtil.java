@@ -185,6 +185,36 @@ public class FragmentDefinitionConverterUtil {
 		return null;
 	}
 
+	private static FragmentContentField[] _getFragmentContentFields(
+		FragmentEntryLink fragmentEntryLink) {
+
+		JSONObject editableValuesJSONObject = null;
+
+		try {
+			editableValuesJSONObject = JSONFactoryUtil.createJSONObject(
+				fragmentEntryLink.getEditableValues());
+		}
+		catch (JSONException jsonException) {
+			return null;
+		}
+
+		List<FragmentContentField> fragmentContentFields = new ArrayList<>();
+
+		fragmentContentFields.addAll(
+			_getBackgroundImageFragmentContentFields(
+				editableValuesJSONObject.getJSONObject(
+					"com.liferay.fragment.entry.processor.background.image." +
+						"BackgroundImageFragmentEntryProcessor")));
+
+		fragmentContentFields.addAll(
+			_getTextFragmentContentFields(
+				editableValuesJSONObject.getJSONObject(
+					"com.liferay.fragment.entry.processor.editable." +
+						"EditableFragmentEntryProcessor")));
+
+		return fragmentContentFields.toArray(new FragmentContentField[0]);
+	}
+
 	private static FragmentEntry _getFragmentEntry(
 		FragmentCollectionContributorTracker
 			fragmentCollectionContributorTracker,
