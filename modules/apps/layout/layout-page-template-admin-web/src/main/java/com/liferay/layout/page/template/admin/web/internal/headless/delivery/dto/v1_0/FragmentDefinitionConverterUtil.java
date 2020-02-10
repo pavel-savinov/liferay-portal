@@ -55,6 +55,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
 /**
  * @author Rubén Pulido
  */
@@ -130,6 +134,20 @@ public class FragmentDefinitionConverterUtil {
 		}
 
 		return fragmentContentFields;
+	}
+
+	private static Map<String, String> _getEditableTypes(String html) {
+		Map<String, String> editableTypes = new HashMap<>();
+
+		Document document = Jsoup.parse(html);
+
+		Elements elements = document.getElementsByTag("lfr-editable");
+
+		elements.forEach(
+			element -> editableTypes.put(
+				element.attr("id"), element.attr("type")));
+
+		return editableTypes;
 	}
 
 	private static String _getFragmentCollectionName(
@@ -208,8 +226,12 @@ public class FragmentDefinitionConverterUtil {
 					"com.liferay.fragment.entry.processor.background.image." +
 						"BackgroundImageFragmentEntryProcessor")));
 
+		Map<String, String> editableTypes = _getEditableTypes(
+			fragmentEntryLink.getHtml());
+
 		fragmentContentFields.addAll(
 			_getTextFragmentContentFields(
+				editableTypes,
 				editableValuesJSONObject.getJSONObject(
 					"com.liferay.fragment.entry.processor.editable." +
 						"EditableFragmentEntryProcessor")));
@@ -272,7 +294,7 @@ public class FragmentDefinitionConverterUtil {
 	}
 
 	private static List<FragmentContentField> _getTextFragmentContentFields(
-		JSONObject jsonObject) {
+		Map<String, String> editableTypes, JSONObject jsonObject) {
 
 		List<FragmentContentField> fragmentContentFields = new ArrayList<>();
 
@@ -323,10 +345,10 @@ public class FragmentDefinitionConverterUtil {
 								};
 							});
 
-						JSONObject configJSONObject =
-							textJSONObject.getJSONObject("config");
+						String type = editableTypes.getOrDefault(
+							textId, "text");
 
-						if (configJSONObject.has("imageSource")) {
+						if (Objects.equals(type, "image")) {
 							value = new FragmentContentFieldImage() {
 								{
 									fragmentImage = new FragmentImage() {
