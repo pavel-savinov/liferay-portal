@@ -25,6 +25,7 @@ import com.liferay.fragment.renderer.constants.FragmentRendererConstants;
 import com.liferay.fragment.service.FragmentCollectionLocalServiceUtil;
 import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
 import com.liferay.fragment.service.FragmentEntryLocalServiceUtil;
+import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
 import com.liferay.headless.delivery.dto.v1_0.FragmentDefinition;
 import com.liferay.layout.util.structure.FragmentLayoutStructureItem;
 import com.liferay.petra.string.StringPool;
@@ -39,9 +40,12 @@ import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author Rubén Pulido
@@ -129,6 +133,37 @@ public class FragmentDefinitionConverterUtil {
 		}
 
 		return null;
+	}
+
+	private static Map<String, Object> _getFragmentConfig(
+		FragmentEntryConfigurationParser fragmentEntryConfigurationParser,
+		FragmentEntryLink fragmentEntryLink) {
+
+		try {
+			return new HashMap<String, Object>() {
+				{
+					JSONObject jsonObject =
+						fragmentEntryConfigurationParser.
+							getConfigurationJSONObject(
+								fragmentEntryLink.getConfiguration(),
+								fragmentEntryLink.getEditableValues(),
+								new long[] {0L});
+
+					Set<String> keys = jsonObject.keySet();
+
+					Iterator<String> iterator = keys.iterator();
+
+					while (iterator.hasNext()) {
+						String key = iterator.next();
+
+						put(key, jsonObject.get(key));
+					}
+				}
+			};
+		}
+		catch (JSONException jsonException) {
+			return null;
+		}
 	}
 
 	private static FragmentEntry _getFragmentEntry(
