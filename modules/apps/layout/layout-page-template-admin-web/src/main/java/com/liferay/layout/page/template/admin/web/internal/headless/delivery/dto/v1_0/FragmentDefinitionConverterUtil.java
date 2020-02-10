@@ -64,6 +64,7 @@ public class FragmentDefinitionConverterUtil {
 	public static FragmentDefinition toFragmentDefinition(
 		FragmentCollectionContributorTracker
 			fragmentCollectionContributorTracker,
+		FragmentEntryConfigurationParser fragmentEntryConfigurationParser,
 		FragmentLayoutStructureItem fragmentLayoutStructureItem,
 		FragmentRendererTracker fragmentRendererTracker) {
 
@@ -82,6 +83,8 @@ public class FragmentDefinitionConverterUtil {
 				fragmentCollectionName = _getFragmentCollectionName(
 					fragmentCollectionContributorTracker, fragmentEntry,
 					fragmentRendererTracker, rendererKey);
+				fragmentConfig = _getFragmentConfig(
+					fragmentEntryConfigurationParser, fragmentEntryLink);
 				fragmentContentFields = _getFragmentContentFields(
 					fragmentEntryLink);
 				fragmentName = _getFragmentName(
