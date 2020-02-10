@@ -25,6 +25,7 @@ import com.liferay.fragment.renderer.constants.FragmentRendererConstants;
 import com.liferay.fragment.service.FragmentCollectionLocalServiceUtil;
 import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
 import com.liferay.fragment.service.FragmentEntryLocalServiceUtil;
+import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
 import com.liferay.headless.delivery.dto.v1_0.FragmentContentField;
 import com.liferay.headless.delivery.dto.v1_0.FragmentContentFieldImage;
 import com.liferay.headless.delivery.dto.v1_0.FragmentContentFieldText;
@@ -203,6 +204,37 @@ public class FragmentDefinitionConverterUtil {
 		}
 
 		return null;
+	}
+
+	private static Map<String, Object> _getFragmentConfig(
+		FragmentEntryConfigurationParser fragmentEntryConfigurationParser,
+		FragmentEntryLink fragmentEntryLink) {
+
+		try {
+			return new HashMap<String, Object>() {
+				{
+					JSONObject jsonObject =
+						fragmentEntryConfigurationParser.
+							getConfigurationJSONObject(
+								fragmentEntryLink.getConfiguration(),
+								fragmentEntryLink.getEditableValues(),
+								new long[] {0L});
+
+					Set<String> keys = jsonObject.keySet();
+
+					Iterator<String> iterator = keys.iterator();
+
+					while (iterator.hasNext()) {
+						String key = iterator.next();
+
+						put(key, jsonObject.get(key));
+					}
+				}
+			};
+		}
+		catch (JSONException jsonException) {
+			return null;
+		}
 	}
 
 	private static FragmentContentField[] _getFragmentContentFields(
