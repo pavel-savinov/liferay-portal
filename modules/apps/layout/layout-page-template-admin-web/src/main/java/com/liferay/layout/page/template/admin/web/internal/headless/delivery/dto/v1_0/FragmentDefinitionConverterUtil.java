@@ -482,6 +482,32 @@ public class FragmentDefinitionConverterUtil {
 		};
 	}
 
+	private static Map<String, String> _toMap(JSONObject jsonObject) {
+		HashMap<String, String> map = new HashMap<String, String>() {
+			{
+				Set<String> keys = jsonObject.keySet();
+
+				Iterator<String> iterator = keys.iterator();
+
+				while (iterator.hasNext()) {
+					String key = iterator.next();
+
+					String value = jsonObject.getString(key);
+
+					if (Validator.isNotNull(value)) {
+						put(key, value);
+					}
+				}
+			}
+		};
+
+		if (map.isEmpty()) {
+			return null;
+		}
+
+		return map;
+	}
+
 	private static Map<String, String> _toMap(
 		JSONObject jsonObject, String key) {
 
