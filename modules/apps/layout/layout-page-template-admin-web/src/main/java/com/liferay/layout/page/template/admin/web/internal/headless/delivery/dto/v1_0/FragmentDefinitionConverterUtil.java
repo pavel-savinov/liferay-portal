@@ -230,7 +230,15 @@ public class FragmentDefinitionConverterUtil {
 					while (iterator.hasNext()) {
 						String key = iterator.next();
 
-						put(key, jsonObject.get(key));
+						Object value = jsonObject.get(key);
+
+						if (value instanceof JSONObject) {
+							JSONObject valueJSONObject = (JSONObject)value;
+
+							value = _toMap(valueJSONObject);
+						}
+
+						put(key, value);
 					}
 				}
 			};
