@@ -15,6 +15,8 @@
 package com.liferay.fragment.internal.renderer;
 
 import com.liferay.fragment.constants.FragmentEntryLinkConstants;
+import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
+import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.DefaultFragmentEntryProcessorContext;
 import com.liferay.fragment.processor.FragmentEntryProcessorRegistry;
@@ -99,6 +101,34 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 		}
 	}
 
+	private FragmentEntry _getContributedFragmentEntry(
+		FragmentEntryLink fragmentEntryLink) {
+
+		Map<String, FragmentEntry> fragmentCollectionContributorEntries =
+			_fragmentCollectionContributorTracker.getFragmentEntries();
+
+		return fragmentCollectionContributorEntries.get(
+			fragmentEntryLink.getRendererKey());
+	}
+
+	private FragmentEntryLink _getFragmentEntryLink(
+		FragmentRendererContext fragmentRendererContext) {
+
+		FragmentEntryLink fragmentEntryLink =
+			fragmentRendererContext.getFragmentEntryLink();
+
+		FragmentEntry fragmentEntry = _getContributedFragmentEntry(
+			fragmentEntryLink);
+
+		if (fragmentEntry != null) {
+			fragmentEntryLink.setCss(fragmentEntry.getCss());
+			fragmentEntryLink.setHtml(fragmentEntry.getHtml());
+			fragmentEntryLink.setJs(fragmentEntry.getJs());
+		}
+
+		return fragmentEntryLink;
+	}
+
 	private String _renderFragmentEntry(
 		long fragmentEntryId, String css, String html, String js,
 		String configuration, String namespace,
@@ -180,8 +210,8 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 			HttpServletResponse httpServletResponse)
 		throws PortalException {
 
-		FragmentEntryLink fragmentEntryLink =
-			fragmentRendererContext.getFragmentEntryLink();
+		FragmentEntryLink fragmentEntryLink = _getFragmentEntryLink(
+			fragmentRendererContext);
 
 		DefaultFragmentEntryProcessorContext
 			defaultFragmentEntryProcessorContext =
@@ -265,6 +295,10 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 
 		return unsyncStringWriter.toString();
 	}
+
+	@Reference
+	private FragmentCollectionContributorTracker
+		_fragmentCollectionContributorTracker;
 
 	@Reference
 	private FragmentEntryConfigurationParser _fragmentEntryConfigurationParser;
