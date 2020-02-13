@@ -18,6 +18,8 @@
 
 <%
 SiteNavigationAdminManagementToolbarDisplayContext siteNavigationAdminManagementToolbarDisplayContext = new SiteNavigationAdminManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, siteNavigationAdminDisplayContext);
+
+Group scopeGroup = themeDisplay.getScopeGroup();
 %>
 
 <clay:management-toolbar
@@ -104,11 +106,13 @@ SiteNavigationAdminManagementToolbarDisplayContext siteNavigationAdminManagement
 						value="<%= HtmlUtil.escape(siteNavigationMenu.getName()) %>"
 					/>
 
-					<liferay-ui:search-container-column-text
-						cssClass="table-cell-expand-smaller"
-						name="add-new-pages"
-						value='<%= siteNavigationMenu.isAuto() ? LanguageUtil.get(request, "yes") : StringPool.BLANK %>'
-					/>
+					<c:if test="<%= !scopeGroup.isCompany() %>">
+						<liferay-ui:search-container-column-text
+							cssClass="table-cell-expand-smaller"
+							name="add-new-pages"
+							value='<%= siteNavigationMenu.isAuto() ? LanguageUtil.get(request, "yes") : StringPool.BLANK %>'
+						/>
+					</c:if>
 
 					<liferay-ui:search-container-column-text
 						cssClass="table-cell-expand-smaller table-cell-minw-150"
