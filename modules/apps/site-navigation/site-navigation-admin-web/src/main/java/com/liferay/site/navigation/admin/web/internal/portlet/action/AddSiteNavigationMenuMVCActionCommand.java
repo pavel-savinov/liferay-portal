@@ -17,6 +17,7 @@ package com.liferay.site.navigation.admin.web.internal.portlet.action;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
@@ -64,10 +65,16 @@ public class AddSiteNavigationMenuMVCActionCommand
 			ServiceContext serviceContext = ServiceContextFactory.getInstance(
 				actionRequest);
 
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+			Group scopeGroup = themeDisplay.getScopeGroup();
+
 			SiteNavigationMenu siteNavigationMenu =
 				_siteNavigationMenuService.addSiteNavigationMenu(
 					serviceContext.getScopeGroupId(), name,
-					SiteNavigationConstants.TYPE_DEFAULT, true, serviceContext);
+					SiteNavigationConstants.TYPE_DEFAULT,
+					!scopeGroup.isCompany(), serviceContext);
 
 			JSONObject jsonObject = JSONUtil.put(
 				"redirectURL",
