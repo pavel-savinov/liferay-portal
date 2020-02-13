@@ -22,7 +22,7 @@ function AddMenu({dropdownItems, portletId}) {
 
 	const handleItemClick = useCallback(
 		event => {
-			event.currentTarget = event.target;
+			event.currentTarget = event.target.element || event.target;
 
 			const uri = event.data
 				? event.data.item.href
