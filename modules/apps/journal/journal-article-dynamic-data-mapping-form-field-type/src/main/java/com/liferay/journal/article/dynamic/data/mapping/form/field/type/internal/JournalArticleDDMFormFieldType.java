@@ -12,13 +12,15 @@
  * details.
  */
 
-package com.liferay.dynamic.data.mapping.form.field.type.internal.journal.article;
+package com.liferay.journal.article.dynamic.data.mapping.form.field.type.internal;
 
 import com.liferay.dynamic.data.mapping.form.field.type.BaseDDMFormFieldType;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeSettings;
+import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Pavel Savinov
@@ -48,13 +50,21 @@ public class JournalArticleDDMFormFieldType extends BaseDDMFormFieldType {
 
 	@Override
 	public String getModuleName() {
-		return "dynamic-data-mapping-form-field-type/JournalArticle" +
-			"/JournalArticleSelector.es";
+		return _npmResolver.getJSPackage().getResolvedId() +
+			"/JournalArticleSelector";
 	}
 
 	@Override
 	public String getName() {
 		return "journal_article";
 	}
+
+	@Override
+	public boolean isCustomDDMFormFieldType() {
+		return true;
+	}
+
+	@Reference
+	private NPMResolver _npmResolver;
 
 }
