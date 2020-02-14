@@ -751,9 +751,7 @@ public class AssetListAssetEntryProviderImpl
 		searchContext.setStart(assetEntryQuery.getStart());
 
 		try {
-			return _assetHelper.searchCount(
-				searchContext, assetEntryQuery, assetEntryQuery.getStart(),
-				assetEntryQuery.getEnd());
+			return _assetHelper.searchCount(searchContext, assetEntryQuery);
 		}
 		catch (Exception exception) {
 			_log.error("Unable to get asset entries", exception);
