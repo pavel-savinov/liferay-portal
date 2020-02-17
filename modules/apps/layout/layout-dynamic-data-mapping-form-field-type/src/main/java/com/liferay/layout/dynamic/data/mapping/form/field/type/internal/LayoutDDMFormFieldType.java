@@ -19,6 +19,7 @@ import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeSettings;
 import com.liferay.frontend.js.loader.modules.extender.npm.JSPackage;
 import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -28,14 +29,13 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	property = {
-		"ddm.form.field.type.data.domain=journal_article",
-		"ddm.form.field.type.description=journal-article-description",
-		"ddm.form.field.type.display.order:Integer=10",
-		"ddm.form.field.type.group=basic",
-		"ddm.form.field.type.icon=web-content",
-		"ddm.form.field.type.label=journal-article",
-		"ddm.form.field.type.name=journal_article",
-		"ddm.form.field.type.scope=journal"
+		"ddm.form.field.type.data.domain=link_to_layout",
+		"ddm.form.field.type.description=link-to-layout-field-description",
+		"ddm.form.field.type.display.order:Integer=11",
+		"ddm.form.field.type.group=basic", "ddm.form.field.type.icon=link",
+		"ddm.form.field.type.label=link-to-layout-field-label",
+		"ddm.form.field.type.name=link_to_layout",
+		"ddm.form.field.type.scope=layout"
 	},
 	service = DDMFormFieldType.class
 )
@@ -45,19 +45,19 @@ public class LayoutDDMFormFieldType extends BaseDDMFormFieldType {
 	public Class<? extends DDMFormFieldTypeSettings>
 		getDDMFormFieldTypeSettings() {
 
-		return JournalArticleDDMFormFieldTypeSettings.class;
+		return LayoutDDMFormFieldTypeSettings.class;
 	}
 
 	@Override
 	public String getModuleName() {
 		JSPackage jsPackage = _npmResolver.getJSPackage();
 
-		return jsPackage.getResolvedId() + "/JournalArticleSelector";
+		return jsPackage.getResolvedId() + "/LayoutSelector";
 	}
 
 	@Override
 	public String getName() {
-		return "journal_article";
+		return "link_to_layout";
 	}
 
 	@Override
