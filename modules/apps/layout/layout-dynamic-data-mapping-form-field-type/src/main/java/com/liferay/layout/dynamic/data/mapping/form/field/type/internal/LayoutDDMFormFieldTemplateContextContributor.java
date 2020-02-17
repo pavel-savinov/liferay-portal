@@ -100,8 +100,7 @@ public class LayoutDDMFormFieldTemplateContextContributor
 
 		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
 			RequestBackedPortletURLFactoryUtil.create(httpServletRequest),
-			ddmFormFieldRenderingContext.getPortletNamespace() +
-				"selectJournalArticle",
+			ddmFormFieldRenderingContext.getPortletNamespace() + "selectLayout",
 			layoutItemSelectorCriterion);
 
 		return itemSelectorURL.toString();
