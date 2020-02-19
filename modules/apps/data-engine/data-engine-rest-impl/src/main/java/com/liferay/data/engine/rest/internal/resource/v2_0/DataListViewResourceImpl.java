@@ -29,6 +29,7 @@ import com.liferay.data.engine.util.comparator.DEDataListViewModifiedDateCompara
 import com.liferay.data.engine.util.comparator.DEDataListViewNameComparator;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -239,8 +240,9 @@ public class DataListViewResourceImpl
 	}
 
 	private void _addDataDefinitionFieldLinks(
-		long dataDefinitionId, long dataListViewId, String[] fieldNames,
-		long groupId) {
+			long dataDefinitionId, long dataListViewId, String[] fieldNames,
+			long groupId)
+		throws PortalException {
 
 		for (String fieldName : fieldNames) {
 			_deDataDefinitionFieldLinkLocalService.addDEDataDefinitionFieldLink(
