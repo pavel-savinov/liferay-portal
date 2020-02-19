@@ -54,12 +54,25 @@ public class DEDataDefinitionFieldLinkLocalServiceUtil {
 	}
 
 	public static com.liferay.data.engine.model.DEDataDefinitionFieldLink
-		addDEDataDefinitionFieldLink(
-			long groupId, long classNameId, long classPK, long ddmStructureId,
-			String fieldName) {
+			addDEDataDefinitionFieldLink(
+				long groupId, long classNameId, long classPK,
+				long ddmStructureId, String fieldName)
+		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return getService().addDEDataDefinitionFieldLink(
 			groupId, classNameId, classPK, ddmStructureId, fieldName);
+	}
+
+	public static com.liferay.data.engine.model.DEDataDefinitionFieldLink
+			addDEDataDefinitionFieldLink(
+				long groupId, long classNameId, long classPK,
+				long ddmStructureId, String fieldName,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return getService().addDEDataDefinitionFieldLink(
+			groupId, classNameId, classPK, ddmStructureId, fieldName,
+			serviceContext);
 	}
 
 	/**
@@ -304,6 +317,13 @@ public class DEDataDefinitionFieldLinkLocalServiceUtil {
 			getDEDataDefinitionFieldLinks(int start, int end) {
 
 		return getService().getDEDataDefinitionFieldLinks(start, end);
+	}
+
+	public static java.util.List
+		<com.liferay.data.engine.model.DEDataDefinitionFieldLink>
+			getDEDataDefinitionFieldLinks(long ddmStructureId) {
+
+		return getService().getDEDataDefinitionFieldLinks(ddmStructureId);
 	}
 
 	public static java.util.List
