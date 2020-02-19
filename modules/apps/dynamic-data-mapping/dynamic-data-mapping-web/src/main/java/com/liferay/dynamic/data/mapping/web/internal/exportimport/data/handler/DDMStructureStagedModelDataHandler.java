@@ -14,6 +14,8 @@
 
 package com.liferay.dynamic.data.mapping.web.internal.exportimport.data.handler;
 
+import com.liferay.data.engine.model.DEDataDefinitionFieldLink;
+import com.liferay.data.engine.service.DEDataDefinitionFieldLinkLocalService;
 import com.liferay.dynamic.data.mapping.constants.DDMPortletKeys;
 import com.liferay.dynamic.data.mapping.io.DDMFormDeserializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerDeserializeRequest;
@@ -219,6 +221,18 @@ public class DDMStructureStagedModelDataHandler
 				PortletDataContext.REFERENCE_TYPE_PARENT);
 		}
 
+		List<DEDataDefinitionFieldLink> deDataDefinitionFieldLinks =
+			_deDataDefinitionFieldLinkLocalService.
+				getDEDataDefinitionFieldLinks(structure.getStructureId());
+
+		for (DEDataDefinitionFieldLink deDataDefinitionFieldLink :
+				deDataDefinitionFieldLinks) {
+
+			StagedModelDataHandlerUtil.exportReferenceStagedModel(
+				portletDataContext, structure, deDataDefinitionFieldLink,
+				PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
+		}
+
 		long defaultUserId = _userLocalService.getDefaultUserId(
 			structure.getCompanyId());
 
@@ -411,6 +425,9 @@ public class DDMStructureStagedModelDataHandler
 				structure.getType(), serviceContext);
 		}
 
+		importDEDataDefinitionFieldLinks(
+			portletDataContext, structure, importedStructure);
+
 		portletDataContext.importClassedModel(structure, importedStructure);
 
 		portletDataContext.importPermissions(
@@ -600,6 +617,11 @@ public class DDMStructureStagedModelDataHandler
 			structure.getClassName());
 	}
 
+	@Override
+	protected String[] getSkipImportReferenceStagedModelNames() {
+		return new String[] {DEDataDefinitionFieldLink.class.getName()};
+	}
+
 	protected void importDDMDataProviderInstances(
 			PortletDataContext portletDataContext, Element structureElement,
 			DDMForm ddmForm)
@@ -648,6 +670,37 @@ public class DDMStructureStagedModelDataHandler
 
 			ddmFormField.setProperty(
 				"ddmDataProviderInstanceId", newDDMDataProviderInstanceId);
+		}
+	}
+
+	protected void importDEDataDefinitionFieldLinks(
+			PortletDataContext portletDataContext, DDMStructure structure,
+			DDMStructure importedStructure)
+		throws PortalException {
+
+		List<Element> deDataDefinitionFieldLinkElements =
+			portletDataContext.getReferenceDataElements(
+				structure, DEDataDefinitionFieldLink.class);
+
+		Map<Long, Long> structureNewPrimaryKeys =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				DDMStructure.class);
+
+		structureNewPrimaryKeys.put(
+			structure.getStructureId(), importedStructure.getStructureId());
+
+		for (Element deDataDefinitionFieldLinkElement :
+				deDataDefinitionFieldLinkElements) {
+
+			String path = deDataDefinitionFieldLinkElement.attributeValue(
+				"path");
+
+			DEDataDefinitionFieldLink deDataDefinitionFieldLink =
+				(DEDataDefinitionFieldLink)
+					portletDataContext.getZipEntryAsObject(path);
+
+			StagedModelDataHandlerUtil.importStagedModel(
+				portletDataContext, deDataDefinitionFieldLink);
 		}
 	}
 
@@ -775,6 +828,10 @@ public class DDMStructureStagedModelDataHandler
 	private DDMStructureLayoutLocalService _ddmStructureLayoutLocalService;
 	private DDMStructureLocalService _ddmStructureLocalService;
 	private DDMStructureVersionLocalService _ddmStructureVersionLocalService;
+
+	@Reference
+	private DEDataDefinitionFieldLinkLocalService
+		_deDataDefinitionFieldLinkLocalService;
 
 	@Reference
 	private GroupLocalService _groupLocalService;
