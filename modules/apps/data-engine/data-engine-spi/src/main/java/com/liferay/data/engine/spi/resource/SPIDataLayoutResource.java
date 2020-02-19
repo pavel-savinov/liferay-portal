@@ -246,8 +246,9 @@ public class SPIDataLayoutResource<T> {
 	}
 
 	private void _addDataDefinitionFieldLinks(
-		long classNameId, long dataDefinitionId, long dataLayoutId,
-		List<String> fieldNames, long siteId) {
+			long classNameId, long dataDefinitionId, long dataLayoutId,
+			List<String> fieldNames, long siteId)
+		throws PortalException {
 
 		for (String fieldName : fieldNames) {
 			_deDataDefinitionFieldLinkLocalService.addDEDataDefinitionFieldLink(
