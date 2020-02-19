@@ -77,7 +77,11 @@ public class SiteParamConverterProvider
 					GetterUtil.getLong(siteId));
 			}
 
-			if ((group != null) && group.isSite()) {
+			Group liveGroup = group.getLiveGroup();
+
+			if (((group != null) && group.isSite()) ||
+				((liveGroup != null) && liveGroup.isSite())) {
+
 				return group.getGroupId();
 			}
 		}
