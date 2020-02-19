@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -74,8 +75,14 @@ public interface DEDataDefinitionFieldLinkLocalService
 		DEDataDefinitionFieldLink deDataDefinitionFieldLink);
 
 	public DEDataDefinitionFieldLink addDEDataDefinitionFieldLink(
-		long groupId, long classNameId, long classPK, long ddmStructureId,
-		String fieldName);
+			long groupId, long classNameId, long classPK, long ddmStructureId,
+			String fieldName)
+		throws PortalException;
+
+	public DEDataDefinitionFieldLink addDEDataDefinitionFieldLink(
+			long groupId, long classNameId, long classPK, long ddmStructureId,
+			String fieldName, ServiceContext serviceContext)
+		throws PortalException;
 
 	/**
 	 * Creates a new de data definition field link with the primary key. Does not add the de data definition field link to the database.
@@ -255,6 +262,10 @@ public interface DEDataDefinitionFieldLinkLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<DEDataDefinitionFieldLink> getDEDataDefinitionFieldLinks(
 		int start, int end);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<DEDataDefinitionFieldLink> getDEDataDefinitionFieldLinks(
+		long ddmStructureId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<DEDataDefinitionFieldLink> getDEDataDefinitionFieldLinks(
