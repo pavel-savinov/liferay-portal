@@ -33,6 +33,8 @@ import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -45,6 +47,7 @@ import java.io.Serializable;
 
 import java.lang.reflect.InvocationHandler;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -3908,6 +3911,31 @@ public class DEDataDefinitionFieldLinkPersistenceImpl
 			String uuid = PortalUUIDUtil.generate();
 
 			deDataDefinitionFieldLink.setUuid(uuid);
+		}
+
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
+		Date now = new Date();
+
+		if (isNew && (deDataDefinitionFieldLink.getCreateDate() == null)) {
+			if (serviceContext == null) {
+				deDataDefinitionFieldLink.setCreateDate(now);
+			}
+			else {
+				deDataDefinitionFieldLink.setCreateDate(
+					serviceContext.getCreateDate(now));
+			}
+		}
+
+		if (!deDataDefinitionFieldLinkModelImpl.hasSetModifiedDate()) {
+			if (serviceContext == null) {
+				deDataDefinitionFieldLink.setModifiedDate(now);
+			}
+			else {
+				deDataDefinitionFieldLink.setModifiedDate(
+					serviceContext.getModifiedDate(now));
+			}
 		}
 
 		Session session = null;
