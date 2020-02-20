@@ -123,11 +123,11 @@ export default function getAlloyEditorProcessor(
 			if (_editor) {
 				const lastValue = _editor.get('nativeEditor').getData();
 
-				_editor.destroy();
-
 				_eventHandlers.forEach(handler => {
 					handler.removeListener();
 				});
+
+				_editor.destroy();
 
 				render(_element, lastValue, editableConfig);
 
@@ -144,7 +144,7 @@ export default function getAlloyEditorProcessor(
 		 * @param {Object} editableConfig
 		 */
 		render: (element, value, editableConfig) => {
-			if (element !== _element) {
+			if (!_element || element.id !== _element.id) {
 				render(element, value, editableConfig);
 			}
 		}
