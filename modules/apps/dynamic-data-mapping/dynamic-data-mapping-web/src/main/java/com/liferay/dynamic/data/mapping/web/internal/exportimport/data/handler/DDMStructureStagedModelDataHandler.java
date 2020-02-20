@@ -426,7 +426,7 @@ public class DDMStructureStagedModelDataHandler
 		}
 
 		importDEDataDefinitionFieldLinks(
-			portletDataContext, structure, importedStructure);
+			importedStructure, portletDataContext, structure);
 
 		portletDataContext.importClassedModel(structure, importedStructure);
 
@@ -674,13 +674,12 @@ public class DDMStructureStagedModelDataHandler
 	}
 
 	protected void importDEDataDefinitionFieldLinks(
-			PortletDataContext portletDataContext, DDMStructure structure,
-			DDMStructure importedStructure)
+			DDMStructure importedStructure,
+			PortletDataContext portletDataContext, DDMStructure structure)
 		throws PortalException {
 
-		List<Element> deDataDefinitionFieldLinkElements =
-			portletDataContext.getReferenceDataElements(
-				structure, DEDataDefinitionFieldLink.class);
+		List<Element> elements = portletDataContext.getReferenceDataElements(
+			structure, DEDataDefinitionFieldLink.class);
 
 		Map<Long, Long> structureNewPrimaryKeys =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
@@ -689,11 +688,8 @@ public class DDMStructureStagedModelDataHandler
 		structureNewPrimaryKeys.put(
 			structure.getStructureId(), importedStructure.getStructureId());
 
-		for (Element deDataDefinitionFieldLinkElement :
-				deDataDefinitionFieldLinkElements) {
-
-			String path = deDataDefinitionFieldLinkElement.attributeValue(
-				"path");
+		for (Element element : elements) {
+			String path = element.attributeValue("path");
 
 			DEDataDefinitionFieldLink deDataDefinitionFieldLink =
 				(DEDataDefinitionFieldLink)
