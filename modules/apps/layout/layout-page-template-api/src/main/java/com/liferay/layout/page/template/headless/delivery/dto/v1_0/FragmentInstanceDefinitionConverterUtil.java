@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.layout.page.template.admin.web.internal.headless.delivery.dto.v1_0;
+package com.liferay.layout.page.template.headless.delivery.dto.v1_0;
 
 import com.liferay.fragment.contributor.FragmentCollectionContributor;
 import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
@@ -76,6 +76,10 @@ public class FragmentInstanceDefinitionConverterUtil {
 		FragmentEntryLink fragmentEntryLink =
 			FragmentEntryLinkLocalServiceUtil.fetchFragmentEntryLink(
 				fragmentLayoutStructureItem.getFragmentEntryLinkId());
+
+		if (fragmentEntryLink == null) {
+			return null;
+		}
 
 		String rendererKey = fragmentEntryLink.getRendererKey();
 
