@@ -114,7 +114,8 @@ export default function LinkPanel({item}) {
 					[editableId]: {
 						...editableProcessorValues[editableId],
 						config: {
-							...newConfig
+							...newConfig,
+							mapperType: 'link'
 						}
 					}
 				}
@@ -188,7 +189,6 @@ export default function LinkPanel({item}) {
 					onMappingSelect={mappedItem => {
 						updateRowConfig({
 							...mappedItem,
-							mapperType: 'link',
 							target: editableConfig.target
 						});
 
