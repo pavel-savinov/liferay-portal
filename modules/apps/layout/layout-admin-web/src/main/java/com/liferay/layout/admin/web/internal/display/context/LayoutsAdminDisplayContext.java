@@ -1452,6 +1452,11 @@ public class LayoutsAdminDisplayContext {
 			return false;
 		}
 
+		if (layout.isTypeContent()) {
+			return GetterUtil.getBoolean(
+				layout.getTypeSettingsProperty("published"));
+		}
+
 		return true;
 	}
 
@@ -1732,10 +1737,13 @@ public class LayoutsAdminDisplayContext {
 			jsonObject.put("permissionsURL", getPermissionsURL(layout));
 		}
 
+		boolean published = GetterUtil.getBoolean(
+			layout.getTypeSettingsProperty("published"));
+
 		if (layout.isPending()) {
 			jsonObject.put("previewLayoutURL", getViewLayoutURL(layout));
 		}
-		else {
+		else if (published) {
 			jsonObject.put("viewLayoutURL", getViewLayoutURL(layout));
 		}
 
