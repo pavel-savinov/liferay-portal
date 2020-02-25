@@ -20,7 +20,7 @@
 	{@param? value: string}
 	{@param? visible: bool}
 
-	{let $inputValue: $value ?: $predefinedValue /}
+	{let $inputValue: ($value and $value != '') ? $value : $predefinedValue /}
 
 	{call FieldBase.render}
 		{param contentRenderer kind="html"}
