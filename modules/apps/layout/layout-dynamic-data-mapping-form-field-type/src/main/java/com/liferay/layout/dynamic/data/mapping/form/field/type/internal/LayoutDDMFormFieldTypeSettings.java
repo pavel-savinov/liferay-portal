@@ -65,6 +65,10 @@ import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 public interface LayoutDDMFormFieldTypeSettings
 	extends DefaultDDMFormFieldTypeSettings {
 
+	@DDMFormField(predefinedValue = "link-to-page")
+	@Override
+	public String dataType();
+
 	@DDMFormField(
 		dataType = "string", label = "%predefined-value",
 		type = "link_to_layout"
