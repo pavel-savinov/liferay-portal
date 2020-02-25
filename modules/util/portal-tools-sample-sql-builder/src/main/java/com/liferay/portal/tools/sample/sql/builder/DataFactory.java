@@ -1569,10 +1569,16 @@ public class DataFactory {
 			"<?xml version=\"1.0\"?><root><name>" + name + "</name></root>");
 		layoutModel.setType(LayoutConstants.TYPE_CONTENT);
 		layoutModel.setFriendlyURL(StringPool.FORWARD_SLASH + name);
+		layoutModel.setStatus(WorkflowConstants.STATUS_APPROVED);
+		layoutModel.setStatusByUserId(_sampleUserId);
+		layoutModel.setStatusByUserName(_SAMPLE_USER_NAME);
+		layoutModel.setStatusDate(new Date());
 
 		UnicodeProperties typeSettingsProperties = new UnicodeProperties(true);
 
 		typeSettingsProperties.setProperty("fragmentEntries", fragmentEntries);
+		typeSettingsProperties.setProperty(
+			"published", Boolean.TRUE.toString());
 
 		layoutModel.setTypeSettings(
 			StringUtil.replace(typeSettingsProperties.toString(), '\n', "\\n"));
