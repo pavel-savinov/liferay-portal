@@ -882,6 +882,9 @@ public class LayoutStagedModelDataHandler
 
 		importLayoutClassedModelUsages(portletDataContext, layout);
 
+		importedLayout = _layoutLocalService.getLayout(
+			importedLayout.getPlid());
+
 		importedLayout.setStatus(layout.getStatus());
 
 		importedLayout = _layoutLocalService.updateLayout(importedLayout);
