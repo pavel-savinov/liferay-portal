@@ -21,6 +21,7 @@ import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.processor.FragmentEntryProcessorRegistry;
 import com.liferay.fragment.service.FragmentCollectionLocalServiceUtil;
+import com.liferay.fragment.service.FragmentCollectionServiceUtil;
 import com.liferay.fragment.service.FragmentEntryLocalServiceUtil;
 import com.liferay.fragment.web.internal.constants.FragmentWebKeys;
 import com.liferay.petra.string.StringBundler;
@@ -28,6 +29,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.template.StringTemplateResource;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateConstants;
@@ -148,6 +150,21 @@ public class EditFragmentEntryDisplayContext {
 
 		freeMarkerVariables.add("configuration");
 
+		FragmentCollection fragmentCollection =
+			FragmentCollectionServiceUtil.fetchFragmentCollection(
+				getFragmentCollectionId());
+
+		List<String> resources = new ArrayList<>();
+
+		if (fragmentCollection != null) {
+			List<FileEntry> resourceFileEntries =
+				fragmentCollection.getResources();
+
+			for (FileEntry fileEntry : resourceFileEntries) {
+				resources.add(fileEntry.getFileName());
+			}
+		}
+
 		soyContext.put(
 			"allowedStatus", allowedStatusSoyContext
 		).put(
@@ -180,6 +197,8 @@ public class EditFragmentEntryDisplayContext {
 			fragmentServiceConfiguration.propagateChanges()
 		).put(
 			"readOnly", _isReadOnlyFragmentEntry()
+		).put(
+			"resources", resources
 		).put(
 			"spritemap",
 			_themeDisplay.getPathThemeImages() + "/lexicon/icons.svg"
