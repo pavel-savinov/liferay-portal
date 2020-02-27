@@ -15,6 +15,9 @@
 package com.liferay.site.navigation.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.expando.kernel.model.ExpandoBridge;
+import com.liferay.expando.kernel.model.ExpandoColumnConstants;
+import com.liferay.expando.kernel.util.ExpandoBridgeFactoryUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
@@ -43,7 +46,10 @@ import com.liferay.site.navigation.service.persistence.SiteNavigationMenuItemPer
 import com.liferay.site.navigation.util.SiteNavigationMenuItemTestUtil;
 import com.liferay.site.navigation.util.SiteNavigationMenuTestUtil;
 
+import java.io.Serializable;
+
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -72,6 +78,15 @@ public class SiteNavigationMenuItemLocalServiceTest {
 
 		_siteNavigationMenu = SiteNavigationMenuTestUtil.addSiteNavigationMenu(
 			_group);
+
+		_expandoBridge = ExpandoBridgeFactoryUtil.getExpandoBridge(
+			_group.getCompanyId(), SiteNavigationMenuItem.class.getName());
+
+		if (!_expandoBridge.hasAttribute(StringPool.CONTENT)) {
+			_expandoBridge.addAttribute(
+				StringPool.CONTENT, ExpandoColumnConstants.STRING,
+				StringPool.BLANK);
+		}
 	}
 
 	@Test
@@ -393,6 +408,44 @@ public class SiteNavigationMenuItemLocalServiceTest {
 	}
 
 	@Test
+	public void testSiteNavigationMenuItemValidCustomAttribute()
+		throws PortalException {
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
+		SiteNavigationMenuItem siteNavigationMenuItem =
+			_siteNavigationMenuItemLocalService.addSiteNavigationMenuItem(
+				TestPropsValues.getUserId(), _group.getGroupId(),
+				_siteNavigationMenu.getSiteNavigationMenuId(), 0,
+				SiteNavigationMenuItemTypeConstants.LAYOUT, StringPool.BLANK,
+				serviceContext);
+
+		_expandoBridge.setClassPK(
+			siteNavigationMenuItem.getSiteNavigationMenuItemId());
+
+		Serializable attributeValue = _expandoBridge.getAttribute(
+			StringPool.CONTENT);
+
+		Assert.assertEquals(StringPool.BLANK, attributeValue);
+
+		Map<String, Serializable> expandoAttributes =
+			serviceContext.getExpandoBridgeAttributes();
+
+		expandoAttributes.put(StringPool.CONTENT, StringPool.CONTENT);
+
+		_siteNavigationMenuItemLocalService.updateSiteNavigationMenuItem(
+			TestPropsValues.getUserId(),
+			siteNavigationMenuItem.getSiteNavigationMenuItemId(),
+			siteNavigationMenuItem.getTypeSettings(), serviceContext);
+
+		attributeValue = _expandoBridge.getAttribute(StringPool.CONTENT);
+
+		Assert.assertEquals(StringPool.CONTENT, attributeValue);
+	}
+
+	@Test
 	public void testUpdateSiteNavigationMenuItemOrder() throws PortalException {
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
@@ -494,6 +547,8 @@ public class SiteNavigationMenuItemLocalServiceTest {
 
 		Assert.assertEquals(0, childSiteNavigationMenuItem12.getOrder());
 	}
+
+	private ExpandoBridge _expandoBridge;
 
 	@DeleteAfterTestRun
 	private Group _group;
