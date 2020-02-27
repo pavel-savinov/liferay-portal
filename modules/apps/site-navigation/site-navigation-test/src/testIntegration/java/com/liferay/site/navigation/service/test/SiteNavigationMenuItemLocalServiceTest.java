@@ -385,6 +385,27 @@ public class SiteNavigationMenuItemLocalServiceTest {
 			"invalidMenuItemType", StringPool.BLANK, serviceContext);
 	}
 
+	@Test(expected = RuntimeException.class)
+	public void testSiteNavigationMenuItemInvalidCustomAttribute()
+		throws PortalException {
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
+		SiteNavigationMenuItem siteNavigationMenuItem =
+			_siteNavigationMenuItemLocalService.addSiteNavigationMenuItem(
+				TestPropsValues.getUserId(), _group.getGroupId(),
+				_siteNavigationMenu.getSiteNavigationMenuId(), 0,
+				SiteNavigationMenuItemTypeConstants.LAYOUT, StringPool.BLANK,
+				serviceContext);
+
+		_expandoBridge.setClassPK(
+			siteNavigationMenuItem.getSiteNavigationMenuItemId());
+
+		_expandoBridge.getAttribute("invalid");
+	}
+
 	@Test
 	public void testSiteNavigationMenuItemOrder() throws PortalException {
 		ServiceContext serviceContext =
