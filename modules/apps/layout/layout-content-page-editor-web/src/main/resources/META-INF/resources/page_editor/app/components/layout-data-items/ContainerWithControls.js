@@ -22,6 +22,7 @@ import {
 	getLayoutDataItemPropTypes,
 } from '../../../prop-types/index';
 import {LAYOUT_DATA_FLOATING_TOOLBAR_BUTTONS} from '../../config/constants/layoutDataFloatingToolbarButtons';
+import {config} from '../../config/index';
 import selectShowLayoutItemTopper from '../../selectors/selectShowLayoutItemTopper';
 import {useDispatch, useSelector} from '../../store/index';
 import duplicateItem from '../../thunks/duplicateItem';
@@ -75,10 +76,13 @@ const ContainerWithControls = React.forwardRef(
 		const buttons = [];
 
 		if (!hasDropZoneChild(item, layoutData)) {
-			buttons.push(
-				LAYOUT_DATA_FLOATING_TOOLBAR_BUTTONS.duplicateItem,
-				LAYOUT_DATA_FLOATING_TOOLBAR_BUTTONS.saveFragmentComposition
-			);
+			buttons.push(LAYOUT_DATA_FLOATING_TOOLBAR_BUTTONS.duplicateItem);
+
+			if (config.fragmentCompositionsEnabled) {
+				buttons.push(
+					LAYOUT_DATA_FLOATING_TOOLBAR_BUTTONS.saveFragmentComposition
+				);
+			}
 		}
 
 		buttons.push(
