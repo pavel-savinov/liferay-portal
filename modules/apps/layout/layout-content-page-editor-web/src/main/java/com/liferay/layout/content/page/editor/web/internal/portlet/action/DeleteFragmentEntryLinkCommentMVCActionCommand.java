@@ -69,8 +69,12 @@ public class DeleteFragmentEntryLinkCommentMVCActionCommand
 
 		Comment comment = _commentManager.fetchComment(commentId);
 
-		if (comment.getUserId() != themeDisplay.getUserId()) {
-			throw new PrincipalException();
+		if ((comment == null) ||
+			(comment.getUserId() != themeDisplay.getUserId())) {
+
+			throw new PrincipalException.MustHavePermission(
+				themeDisplay.getPermissionChecker(), Comment.class.getName(),
+				commentId, ActionKeys.DELETE);
 		}
 
 		WorkflowUtil.withoutWorkflow(() -> _deleteComment(commentId));
