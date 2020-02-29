@@ -30,13 +30,17 @@ import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.trash.constants.TrashPortletKeys;
 import com.liferay.trash.model.TrashEntry;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
+import javax.portlet.ActionRequest;
 import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
@@ -68,6 +72,13 @@ public class TrashManagementToolbarDisplayContext
 				dropdownItem.setLabel(LanguageUtil.get(request, "delete"));
 				dropdownItem.setQuickAction(true);
 			}
+		).add(
+			dropdownItem -> {
+				dropdownItem.putData("action", "restoreSelectedEntries");
+				dropdownItem.setIcon("restore");
+				dropdownItem.setLabel(LanguageUtil.get(request, "restore"));
+				dropdownItem.setQuickAction(true);
+			}
 		).build();
 	}
 
@@ -75,7 +86,7 @@ public class TrashManagementToolbarDisplayContext
 		throws PortalException {
 
 		if (_isDeletable(trashEntry)) {
-			return "deleteSelectedEntries";
+			return "deleteSelectedEntries,restoreSelectedEntries";
 		}
 
 		return StringPool.BLANK;
@@ -89,6 +100,18 @@ public class TrashManagementToolbarDisplayContext
 		clearResultsURL.setParameter("keywords", StringPool.BLANK);
 
 		return clearResultsURL.toString();
+	}
+
+	public Map<String, Object> getComponentContext() {
+		PortletURL restoreEntriesURL = liferayPortletResponse.createActionURL(
+			TrashPortletKeys.TRASH);
+
+		restoreEntriesURL.setParameter(
+			ActionRequest.ACTION_NAME, "restoreEntries");
+
+		return HashMapBuilder.<String, Object>put(
+			"restoreEntriesURL", restoreEntriesURL.toString()
+		).build();
 	}
 
 	@Override
