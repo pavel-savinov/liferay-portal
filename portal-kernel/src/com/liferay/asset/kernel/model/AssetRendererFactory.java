@@ -60,6 +60,10 @@ public interface AssetRendererFactory<T> {
 
 	public long getClassNameId();
 
+	public default String getClassSimpleName() {
+		return getClass().getSimpleName();
+	}
+
 	public ClassTypeReader getClassTypeReader();
 
 	public String getIconCssClass();
