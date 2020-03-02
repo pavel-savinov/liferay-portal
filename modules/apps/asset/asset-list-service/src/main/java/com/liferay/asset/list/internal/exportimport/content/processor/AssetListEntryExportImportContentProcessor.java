@@ -111,13 +111,11 @@ public class AssetListEntryExportImportContentProcessor
 		for (AssetRendererFactory assetRendererFactory :
 				assetRendererFactories) {
 
-			Class<?> clazz = assetRendererFactory.getClass();
-
-			String className = clazz.getSimpleName();
-
 			long[] classTypeIds = GetterUtil.getLongValues(
 				StringUtil.split(
-					unicodeProperties.getProperty("classTypeIds" + className)));
+					unicodeProperties.getProperty(
+						"classTypeIds" +
+							assetRendererFactory.getClassSimpleName())));
 
 			if (ArrayUtil.isEmpty(classTypeIds)) {
 				continue;
@@ -245,13 +243,12 @@ public class AssetListEntryExportImportContentProcessor
 		for (AssetRendererFactory assetRendererFactory :
 				assetRendererFactories) {
 
-			Class<?> clazz = assetRendererFactory.getClass();
-
-			String className = clazz.getSimpleName();
+			String classSimpleName = assetRendererFactory.getClassSimpleName();
 
 			long[] classTypeIds = GetterUtil.getLongValues(
 				StringUtil.split(
-					unicodeProperties.getProperty("classTypeIds" + className)));
+					unicodeProperties.getProperty(
+						"classTypeIds" + classSimpleName)));
 
 			if (ArrayUtil.isEmpty(classTypeIds)) {
 				continue;
@@ -285,7 +282,8 @@ public class AssetListEntryExportImportContentProcessor
 			).toArray();
 
 			unicodeProperties.setProperty(
-				"classTypeIds" + className, StringUtil.merge(newClassTypeIds));
+				"classTypeIds" + classSimpleName,
+				StringUtil.merge(newClassTypeIds));
 		}
 
 		for (Map.Entry<String, String> entry : unicodeProperties.entrySet()) {

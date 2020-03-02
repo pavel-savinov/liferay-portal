@@ -498,30 +498,25 @@ public class AssetListAssetEntryProviderImpl
 			}
 		}
 
-		Class<?> clazz = assetRendererFactory.getClass();
+		String classSimpleName = assetRendererFactory.getClassSimpleName();
 
 		boolean anyAssetType = GetterUtil.getBoolean(
 			properties.getProperty(
-				"anyClassType" + clazz.getSimpleName(),
-				Boolean.TRUE.toString()));
+				"anyClassType" + classSimpleName, Boolean.TRUE.toString()));
 
 		if (anyAssetType) {
 			return availableClassTypeIds;
 		}
 
 		long anyClassTypeId = GetterUtil.getLong(
-			properties.getProperty(
-				"anyClassType" + clazz.getSimpleName(), null),
-			-1);
+			properties.getProperty("anyClassType" + classSimpleName, null), -1);
 
 		if (anyClassTypeId > -1) {
 			return new long[] {anyClassTypeId};
 		}
 
 		long[] classTypeIds = StringUtil.split(
-			properties.getProperty(
-				"classTypeIds" + clazz.getSimpleName(), null),
-			0L);
+			properties.getProperty("classTypeIds" + classSimpleName, null), 0L);
 
 		if (classTypeIds != null) {
 			return classTypeIds;
