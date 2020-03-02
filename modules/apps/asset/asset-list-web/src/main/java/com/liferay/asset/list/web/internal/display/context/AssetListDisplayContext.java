@@ -241,9 +241,7 @@ public class AssetListDisplayContext {
 	}
 
 	public String getClassName(AssetRendererFactory<?> assetRendererFactory) {
-		Class<?> clazz = assetRendererFactory.getClass();
-
-		String className = clazz.getName();
+		String className = assetRendererFactory.getClassName();
 
 		int pos = className.lastIndexOf(StringPool.PERIOD);
 
