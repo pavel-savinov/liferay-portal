@@ -173,6 +173,7 @@ class AceEditor extends Component {
 
 				match = {
 					content: matchContent.substring(index),
+					index,
 					type: MATCH_TAG,
 				};
 			}
@@ -262,7 +263,7 @@ class AceEditor extends Component {
 		);
 
 		if (result) {
-			result = result.content.substring(1);
+			result = result.content.substring(match.index);
 		}
 
 		if (!result) {
