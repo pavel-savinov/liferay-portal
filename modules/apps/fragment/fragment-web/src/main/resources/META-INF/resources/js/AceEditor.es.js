@@ -157,7 +157,7 @@ class AceEditor extends Component {
 			matchContent = matchContent.trim();
 
 			if (/.*?\[resources:[^\]]*$/.test(matchContent)) {
-				const start = "[resources:";
+				const start = '[resources:';
 
 				const index = matchContent.indexOf(start) + start.length;
 
@@ -167,7 +167,7 @@ class AceEditor extends Component {
 				};
 			}
 			else if (/<lfr[\w]*[^<lfr]*$/.test(matchContent)) {
-				const start = "<lfr";
+				const start = '<lfr';
 
 				const index = matchContent.indexOf(start) + start.length;
 
@@ -177,7 +177,7 @@ class AceEditor extends Component {
 				};
 			}
 			else if (/\[@[^\]]*$/.test(matchContent)) {
-				const start = "[@";
+				const start = '[@';
 
 				const index = matchContent.indexOf(start) + start.length;
 
@@ -187,7 +187,7 @@ class AceEditor extends Component {
 				};
 			}
 			else if (/.*?\${[^}]*$/.test(matchContent)) {
-				const start = "${";
+				const start = '${';
 
 				const index = matchContent.indexOf(start) + start.length;
 
