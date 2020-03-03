@@ -157,7 +157,9 @@ class AceEditor extends Component {
 			matchContent = matchContent.trim();
 
 			if (/.*?\[resources:[^\]]*$/.test(matchContent)) {
-				const index = matchContent.indexOf('[resources:') + 11;
+				const start = "[resources:";
+
+				const index = matchContent.indexOf(start) + start.length;
 
 				match = {
 					content: matchContent.substring(index),
@@ -165,19 +167,29 @@ class AceEditor extends Component {
 				};
 			}
 			else if (/<lfr[\w]*[^<lfr]*$/.test(matchContent)) {
+				const start = "<lfr";
+
+				const index = matchContent.indexOf(start) + start.length;
+
 				match = {
-					content: matchContent.substring(1),
+					content: matchContent.substring(index),
 					type: MATCH_TAG,
 				};
 			}
 			else if (/\[@[^\]]*$/.test(matchContent)) {
+				const start = "[@";
+
+				const index = matchContent.indexOf(start) + start.length;
+
 				match = {
-					content: matchContent.substring(2),
+					content: matchContent.substring(index),
 					type: MATCH_TAGLIB,
 				};
 			}
 			else if (/.*?\${[^}]*$/.test(matchContent)) {
-				const index = matchContent.indexOf('${') + 2;
+				const start = "${";
+
+				const index = matchContent.indexOf(start) + start.length;
 
 				match = {
 					content: matchContent.substring(index),
