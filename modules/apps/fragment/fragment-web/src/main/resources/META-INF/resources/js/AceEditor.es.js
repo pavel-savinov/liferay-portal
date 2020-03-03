@@ -165,14 +165,18 @@ class AceEditor extends Component {
 				};
 			}
 			else if (/<lfr[\w]*[^<lfr]*$/.test(matchContent)) {
+				const index = matchContent.indexOf('<lfr') + 4;
+
 				match = {
-					content: matchContent.substring(1),
+					content: matchContent.substring(index),
 					type: MATCH_TAG,
 				};
 			}
 			else if (/\[@[^\]]*$/.test(matchContent)) {
+				const index = matchContent.indexOf('[@') + 2;
+
 				match = {
-					content: matchContent.substring(2),
+					content: matchContent.substring(index),
 					type: MATCH_TAGLIB,
 				};
 			}
