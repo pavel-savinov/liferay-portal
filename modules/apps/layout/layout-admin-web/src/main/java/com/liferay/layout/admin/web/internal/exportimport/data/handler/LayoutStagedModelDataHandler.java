@@ -312,13 +312,12 @@ public class LayoutStagedModelDataHandler
 			PortletDataContext portletDataContext, Layout layout)
 		throws Exception {
 
-		Layout draftLayout = _layoutLocalService.fetchLayout(
-			_portal.getClassNameId(Layout.class), layout.getPlid());
-
 		boolean published = GetterUtil.getBoolean(
 			layout.getTypeSettingsProperty("published"));
 
-		if ((draftLayout != null) && (layout.isDraft() || !published)) {
+		if (Objects.equals(layout.getType(), LayoutConstants.TYPE_CONTENT) &&
+			!published) {
+
 			return;
 		}
 
