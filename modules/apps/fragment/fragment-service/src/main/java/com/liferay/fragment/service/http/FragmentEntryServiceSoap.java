@@ -202,6 +202,44 @@ public class FragmentEntryServiceSoap {
 		}
 	}
 
+	public static int getFragmentCompositionsAndEntriesCountByNameAndStatus(
+			long groupId, long fragmentCollectionId, String name, int status)
+		throws RemoteException {
+
+		try {
+			int returnValue =
+				FragmentEntryServiceUtil.
+					getFragmentCompositionsAndEntriesCountByNameAndStatus(
+						groupId, fragmentCollectionId, name, status);
+
+			return returnValue;
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static int getFragmentCompositionsAndEntriesCountByStatus(
+			long groupId, long fragmentCollectionId, int status)
+		throws RemoteException {
+
+		try {
+			int returnValue =
+				FragmentEntryServiceUtil.
+					getFragmentCompositionsAndEntriesCountByStatus(
+						groupId, fragmentCollectionId, status);
+
+			return returnValue;
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
 	public static com.liferay.fragment.model.FragmentEntrySoap[]
 			getFragmentEntries(long fragmentCollectionId)
 		throws RemoteException {
