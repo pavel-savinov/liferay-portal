@@ -106,6 +106,48 @@ public class FragmentEntryServiceWrapper
 	}
 
 	@Override
+	public java.util.List<Object>
+		getFragmentCompositionsAndEntriesByNameAndStatus(
+			long groupId, long fragmentCollectionId, String name, int status,
+			int start, int end,
+			com.liferay.portal.kernel.util.OrderByComparator<?>
+				orderByComparator) {
+
+		return _fragmentEntryService.
+			getFragmentCompositionsAndEntriesByNameAndStatus(
+				groupId, fragmentCollectionId, name, status, start, end,
+				orderByComparator);
+	}
+
+	@Override
+	public java.util.List<Object> getFragmentCompositionsAndEntriesByStatus(
+		long groupId, long fragmentCollectionId, int status, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<?> orderByComparator) {
+
+		return _fragmentEntryService.getFragmentCompositionsAndEntriesByStatus(
+			groupId, fragmentCollectionId, status, start, end,
+			orderByComparator);
+	}
+
+	@Override
+	public int getFragmentCompositionsAndEntriesCountByNameAndStatus(
+		long groupId, long fragmentCollectionId, String name, int status) {
+
+		return _fragmentEntryService.
+			getFragmentCompositionsAndEntriesCountByNameAndStatus(
+				groupId, fragmentCollectionId, name, status);
+	}
+
+	@Override
+	public int getFragmentCompositionsAndEntriesCountByStatus(
+		long groupId, long fragmentCollectionId, int status) {
+
+		return _fragmentEntryService.
+			getFragmentCompositionsAndEntriesCountByStatus(
+				groupId, fragmentCollectionId, status);
+	}
+
+	@Override
 	public java.util.List<com.liferay.fragment.model.FragmentEntry>
 		getFragmentEntries(long fragmentCollectionId) {
 
