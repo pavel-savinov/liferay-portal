@@ -219,8 +219,6 @@ public class ContentPageEditorDisplayContext {
 			).put(
 				"availableLanguages", _getAvailableLanguages()
 			).put(
-				"collections", _getFragmentCollections(true, false)
-			).put(
 				"defaultEditorConfigurations", _getDefaultConfigurations()
 			).put(
 				"defaultLanguageId",
@@ -366,6 +364,8 @@ public class ContentPageEditorDisplayContext {
 		).put(
 			"state",
 			HashMapBuilder.<String, Object>put(
+				"collections", _getFragmentCollections(true, false)
+			).put(
 				"fragmentEntryLinks", _getFragmentEntryLinks()
 			).put(
 				"fragments", _getFragmentCollections(false, true)
