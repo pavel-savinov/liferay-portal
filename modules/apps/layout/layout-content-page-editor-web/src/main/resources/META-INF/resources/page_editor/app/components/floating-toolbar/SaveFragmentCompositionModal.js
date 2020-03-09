@@ -40,7 +40,7 @@ const SaveFragmentCompositionModal = ({
 	const dispatch = useDispatch();
 	const store = useSelector(state => state);
 
-	const [collections] = useState(config.collections);
+	const collections = useSelector(state => state.collections);
 
 	const [name, setName] = useState('');
 	const [description, setDescription] = useState('');
