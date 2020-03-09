@@ -13,6 +13,7 @@
  */
 
 import baseReducer from './baseReducer';
+import collectionsReducer from './collectionsReducer';
 import fragmentEntryLinksReducer from './fragmentEntryLinksReducer';
 import fragmentsReducer from './fragmentsReducer';
 import languageReducer from './languageReducer';
@@ -40,6 +41,7 @@ export function reducer(state, action) {
 
 const combinedReducer = (state, action) =>
 	Object.entries({
+		collections: collectionsReducer,
 		fragmentEntryLinks: fragmentEntryLinksReducer,
 		fragments: fragmentsReducer,
 		languageId: languageReducer,
