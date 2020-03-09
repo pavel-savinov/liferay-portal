@@ -22,11 +22,6 @@ export interface Config {
 		};
 	};
 
-	collections: Array<{
-		fragmentCollectionId: number;
-		name: string;
-	}>;
-
 	defaultEditorConfigurations: {
 		[key: 'comment' | 'rich-text' | 'text']: {
 			editorConfig: object;
