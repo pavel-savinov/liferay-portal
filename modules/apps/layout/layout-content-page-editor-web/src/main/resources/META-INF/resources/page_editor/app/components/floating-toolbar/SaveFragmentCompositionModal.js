@@ -40,12 +40,12 @@ const SaveFragmentCompositionModal = ({
 	const dispatch = useDispatch();
 	const store = useSelector(state => state);
 
+	const [collections] = useState(config.collections);
+
 	const [name, setName] = useState('');
 	const [description, setDescription] = useState('');
 	const [fragmentCollectionId, setFragmentCollectionId] = useState(
-		config.collections.length > 0
-			? config.collections[0].fragmentCollectionId
-			: -1
+		collections.length > 0 ? collections[0].fragmentCollectionId : -1
 	);
 
 	const [saveInlineContent, setSaveInlineContent] = useState(false);
@@ -228,7 +228,7 @@ const SaveFragmentCompositionModal = ({
 							</ClayInput.Group>
 						</ClayForm.Group>
 						<ClayForm.Group>
-							{config.collections.length > 0 ? (
+							{collections.length > 0 ? (
 								<>
 									<p className="sheet-tertiary-title">
 										{Liferay.Language.get(
@@ -237,7 +237,7 @@ const SaveFragmentCompositionModal = ({
 									</p>
 
 									<div className="row">
-										{config.collections.map(collection => (
+										{collections.map(collection => (
 											<div
 												className="col-md-4"
 												key={
