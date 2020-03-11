@@ -23,6 +23,8 @@ import {config} from '../config/index';
  * @return {string}
  */
 export default function selectSegmentsExperienceId(state) {
-	return `${state.segmentsExperienceId ||
-		config.defaultSegmentsExperienceId}`;
+	const segmentsExperienceId =
+		state.segmentsExperienceId || config.defaultSegmentsExperienceId;
+
+	return segmentsExperienceId ? `${segmentsExperienceId}` : null;
 }
