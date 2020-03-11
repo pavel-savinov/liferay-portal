@@ -14,6 +14,7 @@
 
 package com.liferay.layout.internal.service;
 
+import com.liferay.fragment.contributor.FragmentCollectionContributor;
 import com.liferay.layout.internal.util.DefaultLayoutDefinitionImportUtil;
 import com.liferay.layout.util.LayoutCopyHelper;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -112,6 +113,11 @@ public class DefaultLayoutLayoutSetPrototypeLocalServiceWrapper
 	@Reference
 	private DefaultLayoutDefinitionImportUtil
 		_defaultLayoutDefinitionImportUtil;
+
+	@Reference(
+		target = "(fragment.collection.key=BASIC_COMPONENT)", unbind = "-"
+	)
+	private FragmentCollectionContributor _fragmentCollectionContributor;
 
 	@Reference
 	private LayoutCopyHelper _layoutCopyHelper;
