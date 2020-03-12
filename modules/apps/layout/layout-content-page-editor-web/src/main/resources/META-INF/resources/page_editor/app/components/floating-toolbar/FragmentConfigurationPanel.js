@@ -122,9 +122,9 @@ export const FragmentConfigurationPanel = ({item}) => {
 				return (
 					<FieldSet
 						configurationValues={getConfigurationValues(
-							segmentsExperienceId,
 							defaultConfigurationValues,
-							fragmentEntryLink
+							fragmentEntryLink,
+							segmentsExperienceId
 						)}
 						fields={fieldSet.fields}
 						key={index}
