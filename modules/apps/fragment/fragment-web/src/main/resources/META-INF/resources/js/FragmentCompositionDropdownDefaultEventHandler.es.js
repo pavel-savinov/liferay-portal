@@ -29,6 +29,14 @@ class FragmentCompositionDropdownDefaultEventHandler extends DefaultEventHandler
 		}
 	}
 
+	moveFragmentComposition(itemData) {
+		this._selectFragmentCollection(
+			itemData.fragmentCompositionId,
+			itemData.selectFragmentCollectionURL,
+			itemData.moveFragmentCompositionURL
+		);
+	}
+
 	renameFragmentComposition(itemData) {
 		openSimpleInputModal({
 			dialogTitle: Liferay.Language.get('rename-fragment'),
@@ -68,6 +76,41 @@ class FragmentCompositionDropdownDefaultEventHandler extends DefaultEventHandler
 				submitForm(this.one('#fragmentCompositionPreviewFm'));
 			}
 		});
+	}
+
+	_selectFragmentCollection(
+		fragmentCompositionId,
+		selectFragmentCollectionURL,
+		targetFragmentCompositionURL
+	) {
+		Liferay.Util.selectEntity(
+			{
+				dialog: {
+					constrain: true,
+					destroyOnHide: true,
+					modal: true,
+				},
+				eventName: this.ns('selectFragmentCollection'),
+				id: this.ns('selectFragmentCollection'),
+				title: Liferay.Language.get('select-collection'),
+				uri: selectFragmentCollectionURL,
+			},
+			selectedItem => {
+				if (selectedItem) {
+					const form = this.one('#fragmentCompositionFm');
+
+					form.querySelector(
+						`#${this.namespace}fragmentCollectionId`
+					).value = selectedItem.id;
+
+					form.querySelector(
+						`#${this.namespace}fragmentCompositionId`
+					).value = fragmentCompositionId;
+
+					submitForm(form, targetFragmentCompositionURL);
+				}
+			}
+		);
 	}
 
 	_send(url) {
