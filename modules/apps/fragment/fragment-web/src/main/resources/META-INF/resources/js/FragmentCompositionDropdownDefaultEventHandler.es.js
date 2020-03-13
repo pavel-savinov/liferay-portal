@@ -12,7 +12,11 @@
  * details.
  */
 
-import {DefaultEventHandler, ItemSelectorDialog} from 'frontend-js-web';
+import {
+	DefaultEventHandler,
+	ItemSelectorDialog,
+	openSimpleInputModal,
+} from 'frontend-js-web';
 
 class FragmentCompositionDropdownDefaultEventHandler extends DefaultEventHandler {
 	deleteFragmentComposition(itemData) {
@@ -23,6 +27,21 @@ class FragmentCompositionDropdownDefaultEventHandler extends DefaultEventHandler
 		) {
 			this._send(itemData.deleteFragmentCompositionURL);
 		}
+	}
+
+	renameFragmentComposition(itemData) {
+		openSimpleInputModal({
+			dialogTitle: Liferay.Language.get('rename-fragment'),
+			formSubmitURL: itemData.renameFragmentCompositionURL,
+			idFieldName: 'id',
+			idFieldValue: itemData.fragmentCompositionId,
+			mainFieldLabel: Liferay.Language.get('name'),
+			mainFieldName: 'name',
+			mainFieldPlaceholder: Liferay.Language.get('name'),
+			mainFieldValue: itemData.fragmentCompositionName,
+			namespace: this.namespace,
+			spritemap: this.spritemap,
+		});
 	}
 
 	updateFragmentCompositionPreview(itemData) {
