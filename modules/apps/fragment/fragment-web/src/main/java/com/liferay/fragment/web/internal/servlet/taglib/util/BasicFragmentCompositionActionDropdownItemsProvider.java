@@ -28,6 +28,7 @@ import com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType;
 import com.liferay.item.selector.criteria.upload.criterion.UploadItemSelectorCriterion;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upload.UploadServletRequestConfigurationHelperUtil;
@@ -66,7 +67,7 @@ public class BasicFragmentCompositionActionDropdownItemsProvider {
 			WebKeys.THEME_DISPLAY);
 	}
 
-	public List<DropdownItem> getActionDropdownItems() {
+	public List<DropdownItem> getActionDropdownItems() throws Exception {
 		return new DropdownItemList() {
 			{
 				if (FragmentPermission.contains(
@@ -75,6 +76,7 @@ public class BasicFragmentCompositionActionDropdownItemsProvider {
 						FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES)) {
 
 					add(_getRenameFragmentCompositionActionUnsafeConsumer());
+					add(_getMoveFragmentCompositionActionUnsafeConsumer());
 					add(
 						_getUpdateFragmentCompositionPreviewActionUnsafeConsumer());
 					add(_getDeleteFragmentCompositionActionUnsafeConsumer());
@@ -135,6 +137,43 @@ public class BasicFragmentCompositionActionDropdownItemsProvider {
 			String.valueOf(_fragmentComposition.getFragmentCompositionId()));
 
 		return itemSelectorURL.toString();
+	}
+
+	private UnsafeConsumer<DropdownItem, Exception>
+			_getMoveFragmentCompositionActionUnsafeConsumer()
+		throws Exception {
+
+		PortletURL selectFragmentCollectionURL =
+			_renderResponse.createRenderURL();
+
+		selectFragmentCollectionURL.setParameter(
+			"mvcRenderCommandName", "/fragment/select_fragment_collection");
+
+		selectFragmentCollectionURL.setWindowState(LiferayWindowState.POP_UP);
+
+		PortletURL moveFragmentCompositionURL =
+			_renderResponse.createActionURL();
+
+		moveFragmentCompositionURL.setParameter(
+			ActionRequest.ACTION_NAME, "/fragment/move_fragment_composition");
+		moveFragmentCompositionURL.setParameter(
+			"redirect", _themeDisplay.getURLCurrent());
+
+		return dropdownItem -> {
+			dropdownItem.putData("action", "moveFragmentComposition");
+			dropdownItem.putData(
+				"fragmentCompositionId",
+				String.valueOf(
+					_fragmentComposition.getFragmentCompositionId()));
+			dropdownItem.putData(
+				"moveFragmentCompositionURL",
+				moveFragmentCompositionURL.toString());
+			dropdownItem.putData(
+				"selectFragmentCollectionURL",
+				selectFragmentCollectionURL.toString());
+			dropdownItem.setLabel(
+				LanguageUtil.get(_httpServletRequest, "move"));
+		};
 	}
 
 	private UnsafeConsumer<DropdownItem, Exception>
