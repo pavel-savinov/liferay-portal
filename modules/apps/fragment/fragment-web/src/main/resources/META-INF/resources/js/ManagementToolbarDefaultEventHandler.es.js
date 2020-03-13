@@ -76,13 +76,16 @@ class ManagementToolbarDefaultEventHandler extends DefaultEventHandler {
 		);
 	}
 
-	deleteEntries() {
+	deleteFragmentCompositionsAndFragmentEntries() {
 		if (
 			confirm(
 				Liferay.Language.get('are-you-sure-you-want-to-delete-this')
 			)
 		) {
-			submitForm(this.one('#fm'), this.deleteEntriesURL);
+			submitForm(
+				this.one('#fm'),
+				this.deleteFragmentCompositionsAndFragmentEntriesURL
+			);
 		}
 	}
 
@@ -90,14 +93,23 @@ class ManagementToolbarDefaultEventHandler extends DefaultEventHandler {
 		submitForm(this.one('#fm'), this.exportFragmentEntriesURL);
 	}
 
-	moveSelectedFragmentEntries() {
-		this._selectFragmentCollection(this.moveFragmentEntryURL);
+	moveFragmentCompositionsAndFragmentEntries() {
+		this._selectFragmentCollection(
+			this.moveFragmentCompositionsAndFragmentEntriesURL
+		);
 	}
 
 	_selectFragmentCollection(targetFragmentEntryURL) {
+		const fragmentCompositionIds = Liferay.Util.listCheckedExcept(
+			this.one('#fm'),
+			this.ns('allRowIds'),
+			this.ns('rowIdsFragmentComposition')
+		);
+
 		const fragmentEntryIds = Liferay.Util.listCheckedExcept(
 			this.one('#fm'),
-			this.ns('allRowIds')
+			this.ns('allRowIds'),
+			this.ns('rowIdsFragmentEntry')
 		);
 
 		Liferay.Util.selectEntity(
@@ -114,13 +126,17 @@ class ManagementToolbarDefaultEventHandler extends DefaultEventHandler {
 			},
 			selectedItem => {
 				if (selectedItem) {
-					this.one('#fragmentCollectionId').value = selectedItem.id;
+					const form = this.one('#fragmentEntryFm');
+
+					form.querySelector(
+						`#${this.ns('fragmentCollectionId')}`
+					).value = selectedItem.id;
+					this.one(
+						'#fragmentCompositionIds'
+					).value = fragmentCompositionIds;
 					this.one('#fragmentEntryIds').value = fragmentEntryIds;
 
-					submitForm(
-						this.one('#fragmentEntryFm'),
-						targetFragmentEntryURL
-					);
+					submitForm(form, targetFragmentEntryURL);
 				}
 			}
 		);
@@ -130,10 +146,10 @@ class ManagementToolbarDefaultEventHandler extends DefaultEventHandler {
 ManagementToolbarDefaultEventHandler.STATE = {
 	copyContributedFragmentEntryURL: Config.string(),
 	copyFragmentEntryURL: Config.string(),
-	deleteEntriesURL: Config.string(),
+	deleteFragmentCompositionsAndFragmentEntriesURL: Config.string(),
 	exportFragmentEntriesURL: Config.string(),
 	fragmentCollectionId: Config.string(),
-	moveFragmentEntryURL: Config.string(),
+	moveFragmentCompositionsAndFragmentEntriesURL: Config.string(),
 	selectFragmentCollectionURL: Config.string(),
 	spritemap: Config.string(),
 };

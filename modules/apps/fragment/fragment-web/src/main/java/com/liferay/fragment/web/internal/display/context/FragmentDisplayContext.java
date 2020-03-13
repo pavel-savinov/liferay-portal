@@ -109,27 +109,32 @@ public class FragmentDisplayContext {
 	}
 
 	public String getAvailableActions(Object object) {
+		List<String> availableActions = new ArrayList<>();
+
 		if ((object instanceof FragmentComposition) &&
 			FragmentPermission.contains(
 				_themeDisplay.getPermissionChecker(),
 				_themeDisplay.getScopeGroupId(),
 				FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES)) {
 
-			return "deleteEntries";
+			availableActions.add(
+				"deleteFragmentCompositionsAndFragmentEntries");
+			availableActions.add("moveFragmentCompositionsAndFragmentEntries");
 		}
+		else {
+			availableActions.add("exportSelectedFragmentEntries");
 
-		List<String> availableActions = new ArrayList<>();
+			if (FragmentPermission.contains(
+					_themeDisplay.getPermissionChecker(),
+					_themeDisplay.getScopeGroupId(),
+					FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES)) {
 
-		availableActions.add("exportSelectedFragmentEntries");
-
-		if (FragmentPermission.contains(
-				_themeDisplay.getPermissionChecker(),
-				_themeDisplay.getScopeGroupId(),
-				FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES)) {
-
-			availableActions.add("deleteEntries");
-			availableActions.add("copySelectedFragmentEntries");
-			availableActions.add("moveSelectedFragmentEntries");
+				availableActions.add(
+					"deleteFragmentCompositionsAndFragmentEntries");
+				availableActions.add("copySelectedFragmentEntries");
+				availableActions.add(
+					"moveFragmentCompositionsAndFragmentEntries");
+			}
 		}
 
 		return StringUtil.merge(availableActions, StringPool.COMMA);

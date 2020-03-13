@@ -97,8 +97,9 @@ FragmentManagementToolbarDisplayContext fragmentManagementToolbarDisplayContext 
 </aui:form>
 
 <aui:form name="fragmentEntryFm">
-	<aui:input name="fragmentEntryIds" type="hidden" />
 	<aui:input name="fragmentCollectionId" type="hidden" />
+	<aui:input name="fragmentCompositionIds" type="hidden" />
+	<aui:input name="fragmentEntryIds" type="hidden" />
 </aui:form>
 
 <liferay-frontend:component

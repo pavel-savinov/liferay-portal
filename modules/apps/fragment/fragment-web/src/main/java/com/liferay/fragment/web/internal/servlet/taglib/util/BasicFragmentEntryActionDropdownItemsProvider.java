@@ -288,7 +288,8 @@ public class BasicFragmentEntryActionDropdownItemsProvider {
 		PortletURL moveFragmentEntryURL = _renderResponse.createActionURL();
 
 		moveFragmentEntryURL.setParameter(
-			ActionRequest.ACTION_NAME, "/fragment/move_fragment_entry");
+			ActionRequest.ACTION_NAME,
+			"/fragment/move_fragment_compositions_and_fragment_entries");
 		moveFragmentEntryURL.setParameter(
 			"redirect", _themeDisplay.getURLCurrent());
 

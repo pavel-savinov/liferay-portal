@@ -82,7 +82,8 @@ public class BasicFragmentManagementToolbarDisplayContext
 					add(
 						dropdownItem -> {
 							dropdownItem.putData(
-								"action", "moveSelectedFragmentEntries");
+								"action",
+								"moveFragmentCompositionsAndFragmentEntries");
 							dropdownItem.setIcon("move-folder");
 							dropdownItem.setLabel(
 								LanguageUtil.get(request, "move"));
@@ -99,7 +100,9 @@ public class BasicFragmentManagementToolbarDisplayContext
 						});
 					add(
 						dropdownItem -> {
-							dropdownItem.putData("action", "deleteEntries");
+							dropdownItem.putData(
+								"action",
+								"deleteFragmentCompositionsAndFragmentEntries");
 							dropdownItem.setIcon("times-circle");
 							dropdownItem.setLabel(
 								LanguageUtil.get(request, "delete"));
@@ -129,19 +132,20 @@ public class BasicFragmentManagementToolbarDisplayContext
 				return copyFragmentEntryURL.toString();
 			}
 		).put(
-			"deleteEntriesURL",
+			"deleteFragmentCompositionsAndFragmentEntriesURL",
 			() -> {
-				PortletURL deleteEntriesURL =
+				PortletURL deleteFragmentCompositionsAndFragmentEntriesURL =
 					liferayPortletResponse.createActionURL();
 
-				deleteEntriesURL.setParameter(
+				deleteFragmentCompositionsAndFragmentEntriesURL.setParameter(
 					ActionRequest.ACTION_NAME,
 					"/fragment/delete_fragment_compositions_and_fragment_" +
 						"entries");
-				deleteEntriesURL.setParameter(
+				deleteFragmentCompositionsAndFragmentEntriesURL.setParameter(
 					"redirect", themeDisplay.getURLCurrent());
 
-				return deleteEntriesURL.toString();
+				return deleteFragmentCompositionsAndFragmentEntriesURL.
+					toString();
 			}
 		).put(
 			"exportFragmentEntriesURL",
@@ -158,17 +162,19 @@ public class BasicFragmentManagementToolbarDisplayContext
 			"fragmentCollectionId",
 			ParamUtil.getLong(liferayPortletRequest, "fragmentCollectionId")
 		).put(
-			"moveFragmentEntryURL",
+			"moveFragmentCompositionsAndFragmentEntriesURL",
 			() -> {
-				PortletURL moveFragmentEntryURL =
+				PortletURL moveFragmentCompositionsAndFragmentEntriesURL =
 					liferayPortletResponse.createActionURL();
 
-				moveFragmentEntryURL.setParameter(
-					ActionRequest.ACTION_NAME, "/fragment/move_fragment_entry");
-				moveFragmentEntryURL.setParameter(
+				moveFragmentCompositionsAndFragmentEntriesURL.setParameter(
+					ActionRequest.ACTION_NAME,
+					"/fragment/move_fragment_compositions_and_fragment_" +
+						"entries");
+				moveFragmentCompositionsAndFragmentEntriesURL.setParameter(
 					"redirect", themeDisplay.getURLCurrent());
 
-				return moveFragmentEntryURL.toString();
+				return moveFragmentCompositionsAndFragmentEntriesURL.toString();
 			}
 		).put(
 			"selectFragmentCollectionURL",

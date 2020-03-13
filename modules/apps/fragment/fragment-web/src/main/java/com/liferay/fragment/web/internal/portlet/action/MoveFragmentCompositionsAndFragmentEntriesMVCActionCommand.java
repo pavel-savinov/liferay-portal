@@ -15,6 +15,7 @@
 package com.liferay.fragment.web.internal.portlet.action;
 
 import com.liferay.fragment.constants.FragmentPortletKeys;
+import com.liferay.fragment.service.FragmentCompositionService;
 import com.liferay.fragment.service.FragmentEntryService;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
@@ -37,22 +38,31 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + FragmentPortletKeys.FRAGMENT,
-		"mvc.command.name=/fragment/move_fragment_entry"
+		"mvc.command.name=/fragment/move_fragment_compositions_and_fragment_entries"
 	},
 	service = MVCActionCommand.class
 )
-public class MoveFragmentEntryMVCActionCommand extends BaseMVCActionCommand {
+public class MoveFragmentCompositionsAndFragmentEntriesMVCActionCommand
+	extends BaseMVCActionCommand {
 
 	@Override
 	protected void doProcessAction(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
+		long[] fragmentCompositionIds = StringUtil.split(
+			ParamUtil.getString(actionRequest, "fragmentCompositionIds"), 0L);
+
 		long[] fragmentEntryIds = StringUtil.split(
 			ParamUtil.getString(actionRequest, "fragmentEntryIds"), 0L);
 
 		long fragmentCollectionId = ParamUtil.getLong(
 			actionRequest, "fragmentCollectionId");
+
+		for (long fragmentCompositionId : fragmentCompositionIds) {
+			_fragmentCompositionService.moveFragmentComposition(
+				fragmentCompositionId, fragmentCollectionId);
+		}
 
 		for (long fragmentEntryId : fragmentEntryIds) {
 			_fragmentEntryService.moveFragmentEntry(
@@ -69,6 +79,9 @@ public class MoveFragmentEntryMVCActionCommand extends BaseMVCActionCommand {
 
 		sendRedirect(actionRequest, actionResponse, redirectURL.toString());
 	}
+
+	@Reference
+	private FragmentCompositionService _fragmentCompositionService;
 
 	@Reference
 	private FragmentEntryService _fragmentEntryService;
