@@ -12,7 +12,7 @@
  * details.
  */
 
-import {DefaultEventHandler} from 'frontend-js-web';
+import {DefaultEventHandler, ItemSelectorDialog} from 'frontend-js-web';
 
 class FragmentCompositionDropdownDefaultEventHandler extends DefaultEventHandler {
 	deleteFragmentComposition(itemData) {
@@ -23,6 +23,32 @@ class FragmentCompositionDropdownDefaultEventHandler extends DefaultEventHandler
 		) {
 			this._send(itemData.deleteFragmentCompositionURL);
 		}
+	}
+
+	updateFragmentCompositionPreview(itemData) {
+		const itemSelectorDialog = new ItemSelectorDialog({
+			eventName: this.ns('changePreview'),
+			singleSelect: true,
+			title: Liferay.Language.get('fragment-thumbnail'),
+			url: itemData.itemSelectorURL,
+		});
+
+		itemSelectorDialog.open();
+
+		itemSelectorDialog.on('selectedItemChange', event => {
+			const selectedItem = event.selectedItem;
+
+			if (selectedItem) {
+				const itemValue = JSON.parse(selectedItem.value);
+
+				this.one('#fragmentCompositionId').value =
+					itemData.fragmentCompositionId;
+				this.one('#fragmentCompositionFileEntryId').value =
+					itemValue.fileEntryId;
+
+				submitForm(this.one('#fragmentCompositionPreviewFm'));
+			}
+		});
 	}
 
 	_send(url) {
