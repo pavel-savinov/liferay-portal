@@ -74,6 +74,7 @@ public class BasicFragmentCompositionActionDropdownItemsProvider {
 						_themeDisplay.getScopeGroupId(),
 						FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES)) {
 
+					add(_getRenameFragmentCompositionActionUnsafeConsumer());
 					add(
 						_getUpdateFragmentCompositionPreviewActionUnsafeConsumer());
 					add(_getDeleteFragmentCompositionActionUnsafeConsumer());
@@ -134,6 +135,35 @@ public class BasicFragmentCompositionActionDropdownItemsProvider {
 			String.valueOf(_fragmentComposition.getFragmentCompositionId()));
 
 		return itemSelectorURL.toString();
+	}
+
+	private UnsafeConsumer<DropdownItem, Exception>
+		_getRenameFragmentCompositionActionUnsafeConsumer() {
+
+		PortletURL renameFragmentCompositionURL =
+			_renderResponse.createActionURL();
+
+		renameFragmentCompositionURL.setParameter(
+			ActionRequest.ACTION_NAME, "/fragment/rename_fragment_composition");
+
+		renameFragmentCompositionURL.setParameter(
+			"fragmentCompositionId",
+			String.valueOf(_fragmentComposition.getFragmentCompositionId()));
+
+		return dropdownItem -> {
+			dropdownItem.putData("action", "renameFragmentComposition");
+			dropdownItem.putData(
+				"renameFragmentCompositionURL",
+				renameFragmentCompositionURL.toString());
+			dropdownItem.putData(
+				"fragmentCompositionId",
+				String.valueOf(
+					_fragmentComposition.getFragmentCompositionId()));
+			dropdownItem.putData(
+				"fragmentCompositionName", _fragmentComposition.getName());
+			dropdownItem.setLabel(
+				LanguageUtil.get(_httpServletRequest, "rename"));
+		};
 	}
 
 	private UnsafeConsumer<DropdownItem, Exception>
