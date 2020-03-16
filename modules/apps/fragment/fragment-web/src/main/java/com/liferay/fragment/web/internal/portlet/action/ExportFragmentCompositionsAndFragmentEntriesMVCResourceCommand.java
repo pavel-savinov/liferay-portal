@@ -15,7 +15,9 @@
 package com.liferay.fragment.web.internal.portlet.action;
 
 import com.liferay.fragment.constants.FragmentPortletKeys;
+import com.liferay.fragment.model.FragmentComposition;
 import com.liferay.fragment.model.FragmentEntry;
+import com.liferay.fragment.service.FragmentCompositionService;
 import com.liferay.fragment.service.FragmentEntryService;
 import com.liferay.fragment.web.internal.portlet.helper.ExportHelper;
 import com.liferay.portal.kernel.portlet.PortletResponseUtil;
@@ -44,11 +46,11 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + FragmentPortletKeys.FRAGMENT,
-		"mvc.command.name=/fragment/export_fragment_entries"
+		"mvc.command.name=/fragment/export_fragment_compositions_and_fragment_entries"
 	},
 	service = MVCResourceCommand.class
 )
-public class ExportFragmentEntriesMVCResourceCommand
+public class ExportFragmentCompositionsAndFragmentEntriesMVCResourceCommand
 	implements MVCResourceCommand {
 
 	@Override
@@ -56,6 +58,7 @@ public class ExportFragmentEntriesMVCResourceCommand
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws PortletException {
 
+		long[] exportFragmentCompositionIds = null;
 		long[] exportFragmentEntryIds = null;
 
 		long fragmentEntryId = ParamUtil.getLong(
@@ -65,11 +68,25 @@ public class ExportFragmentEntriesMVCResourceCommand
 			exportFragmentEntryIds = new long[] {fragmentEntryId};
 		}
 		else {
+			exportFragmentCompositionIds = ParamUtil.getLongValues(
+				resourceRequest, "rowIdsFragmentComposition");
 			exportFragmentEntryIds = ParamUtil.getLongValues(
 				resourceRequest, "rowIdsFragmentEntry");
 		}
 
 		try {
+			List<FragmentComposition> fragmetnCompositions = new ArrayList<>();
+
+			for (long exportFragmentCompositionId :
+					exportFragmentCompositionIds) {
+
+				FragmentComposition fragmentComposition =
+					_fragmentCompositionService.fetchFragmentComposition(
+						exportFragmentCompositionId);
+
+				fragmetnCompositions.add(fragmentComposition);
+			}
+
 			List<FragmentEntry> fragmentEntries = new ArrayList<>();
 
 			for (long exportFragmentEntryId : exportFragmentEntryIds) {
@@ -80,7 +97,9 @@ public class ExportFragmentEntriesMVCResourceCommand
 				fragmentEntries.add(fragmentEntry);
 			}
 
-			File file = _exportHelper.exportFragmentEntries(fragmentEntries);
+			File file =
+				_exportHelper.exportFragmentCompositionsAndFragmentEntries(
+					fragmetnCompositions, fragmentEntries);
 
 			PortletResponseUtil.sendFile(
 				resourceRequest, resourceResponse,
@@ -96,6 +115,9 @@ public class ExportFragmentEntriesMVCResourceCommand
 
 	@Reference
 	private ExportHelper _exportHelper;
+
+	@Reference
+	private FragmentCompositionService _fragmentCompositionService;
 
 	@Reference
 	private FragmentEntryService _fragmentEntryService;

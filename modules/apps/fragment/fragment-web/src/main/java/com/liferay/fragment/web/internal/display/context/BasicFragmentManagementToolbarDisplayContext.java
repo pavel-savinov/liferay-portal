@@ -154,7 +154,8 @@ public class BasicFragmentManagementToolbarDisplayContext
 					liferayPortletResponse.createResourceURL();
 
 				exportFragmentEntriesURL.setResourceID(
-					"/fragment/export_fragment_entries");
+					"/fragment/export_fragment_compositions_and_fragment_" +
+						"entries");
 
 				return exportFragmentEntriesURL.toString();
 			}
