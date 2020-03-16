@@ -120,9 +120,12 @@ public class FragmentDisplayContext {
 			availableActions.add(
 				"deleteFragmentCompositionsAndFragmentEntries");
 			availableActions.add("moveFragmentCompositionsAndFragmentEntries");
+			availableActions.add(
+				"exportFragmentCompositionsAndFragmentEntries");
 		}
 		else {
-			availableActions.add("exportSelectedFragmentEntries");
+			availableActions.add(
+				"exportFragmentCompositionsAndFragmentEntries");
 
 			if (FragmentPermission.contains(
 					_themeDisplay.getPermissionChecker(),

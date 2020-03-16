@@ -89,8 +89,11 @@ class ManagementToolbarDefaultEventHandler extends DefaultEventHandler {
 		}
 	}
 
-	exportSelectedFragmentEntries() {
-		submitForm(this.one('#fm'), this.exportFragmentEntriesURL);
+	exportFragmentCompositionsAndFragmentEntries() {
+		submitForm(
+			this.one('#fm'),
+			this.exportFragmentCompositionsAndFragmentEntriesURL
+		);
 	}
 
 	moveFragmentCompositionsAndFragmentEntries() {
@@ -147,7 +150,7 @@ ManagementToolbarDefaultEventHandler.STATE = {
 	copyContributedFragmentEntryURL: Config.string(),
 	copyFragmentEntryURL: Config.string(),
 	deleteFragmentCompositionsAndFragmentEntriesURL: Config.string(),
-	exportFragmentEntriesURL: Config.string(),
+	exportFragmentCompositionsAndFragmentEntriesURL: Config.string(),
 	fragmentCollectionId: Config.string(),
 	moveFragmentCompositionsAndFragmentEntriesURL: Config.string(),
 	selectFragmentCollectionURL: Config.string(),
