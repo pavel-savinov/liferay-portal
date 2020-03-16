@@ -67,7 +67,8 @@ public class BasicFragmentManagementToolbarDisplayContext
 				add(
 					dropdownItem -> {
 						dropdownItem.putData(
-							"action", "exportSelectedFragmentEntries");
+							"action",
+							"exportFragmentCompositionsAndFragmentEntries");
 						dropdownItem.setIcon("import-export");
 						dropdownItem.setLabel(
 							LanguageUtil.get(request, "export"));
@@ -148,16 +149,17 @@ public class BasicFragmentManagementToolbarDisplayContext
 					toString();
 			}
 		).put(
-			"exportFragmentEntriesURL",
+			"exportFragmentCompositionsAndFragmentEntriesURL",
 			() -> {
-				ResourceURL exportFragmentEntriesURL =
+				ResourceURL exportFragmentCompositionsAndFragmentEntriesURL =
 					liferayPortletResponse.createResourceURL();
 
-				exportFragmentEntriesURL.setResourceID(
+				exportFragmentCompositionsAndFragmentEntriesURL.setResourceID(
 					"/fragment/export_fragment_compositions_and_fragment_" +
 						"entries");
 
-				return exportFragmentEntriesURL.toString();
+				return exportFragmentCompositionsAndFragmentEntriesURL.
+					toString();
 			}
 		).put(
 			"fragmentCollectionId",

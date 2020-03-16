@@ -64,7 +64,8 @@ public class InheritedFragmentManagementToolbarDisplayContext
 				add(
 					dropdownItem -> {
 						dropdownItem.putData(
-							"action", "exportSelectedFragmentEntries");
+							"action",
+							"exportFragmentCompositionsAndFragmentEntries");
 						dropdownItem.setIcon("import-export");
 						dropdownItem.setLabel(
 							LanguageUtil.get(request, "export"));
