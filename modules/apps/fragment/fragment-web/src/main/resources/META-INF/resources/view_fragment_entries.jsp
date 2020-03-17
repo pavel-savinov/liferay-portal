@@ -81,24 +81,24 @@ FragmentManagementToolbarDisplayContext fragmentManagementToolbarDisplayContext 
 	<portlet:param name="redirect" value="<%= currentURL %>" />
 </portlet:actionURL>
 
-<aui:form action="<%= updateFragmentCompositionPreviewURL %>" name="fragmentCompositionPreviewFm">
-	<aui:input name="fragmentCompositionId" type="hidden" />
-	<aui:input id="fragmentCompositionFileEntryId" name="fileEntryId" type="hidden" />
-</aui:form>
-
-<aui:form action="<%= updateFragmentEntryPreviewURL %>" name="fragmentEntryPreviewFm">
-	<aui:input name="fragmentEntryId" type="hidden" />
-	<aui:input name="fileEntryId" type="hidden" />
-</aui:form>
-
 <aui:form name="fragmentCompositionFm">
 	<aui:input name="fragmentCompositionId" type="hidden" />
 	<aui:input name="fragmentCollectionId" type="hidden" />
 </aui:form>
 
+<aui:form action="<%= updateFragmentCompositionPreviewURL %>" name="fragmentCompositionPreviewFm">
+	<aui:input name="fragmentCompositionId" type="hidden" />
+	<aui:input id="fragmentCompositionFileEntryId" name="fileEntryId" type="hidden" />
+</aui:form>
+
 <aui:form name="fragmentEntryFm">
 	<aui:input name="fragmentEntryIds" type="hidden" />
 	<aui:input name="fragmentCollectionId" type="hidden" />
+</aui:form>
+
+<aui:form action="<%= updateFragmentEntryPreviewURL %>" name="fragmentEntryPreviewFm">
+	<aui:input name="fragmentEntryId" type="hidden" />
+	<aui:input name="fileEntryId" type="hidden" />
 </aui:form>
 
 <liferay-frontend:component
