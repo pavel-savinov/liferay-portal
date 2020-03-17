@@ -77,14 +77,14 @@ FragmentManagementToolbarDisplayContext fragmentManagementToolbarDisplayContext 
 	<portlet:param name="redirect" value="<%= currentURL %>" />
 </portlet:actionURL>
 
-<portlet:actionURL name="/fragment/update_fragment_entry_preview" var="updateFragmentEntryPreviewURL">
-	<portlet:param name="redirect" value="<%= currentURL %>" />
-</portlet:actionURL>
-
 <aui:form action="<%= updateFragmentCompositionPreviewURL %>" name="fragmentCompositionPreviewFm">
 	<aui:input name="fragmentCompositionId" type="hidden" />
 	<aui:input id="fragmentCompositionFileEntryId" name="fileEntryId" type="hidden" />
 </aui:form>
+
+<portlet:actionURL name="/fragment/update_fragment_entry_preview" var="updateFragmentEntryPreviewURL">
+	<portlet:param name="redirect" value="<%= currentURL %>" />
+</portlet:actionURL>
 
 <aui:form action="<%= updateFragmentEntryPreviewURL %>" name="fragmentEntryPreviewFm">
 	<aui:input name="fragmentEntryId" type="hidden" />
