@@ -1042,36 +1042,31 @@ public class JournalFolderLocalServiceImpl
 
 		// Merge folders
 
-		if (restrictionType !=
+		if ((restrictionType !=
 				JournalFolderConstants.
-					RESTRICTION_TYPE_DDM_STRUCTURES_AND_WORKFLOW) {
+					RESTRICTION_TYPE_DDM_STRUCTURES_AND_WORKFLOW) &&
+			(parentFolderId !=
+				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID)) {
 
-			ddmStructureIds = new long[0];
+			JournalFolder ancestorWithRestriction = _getAncestorWithRestriction(
+				getFolder(parentFolderId));
 
-			if (parentFolderId !=
-					JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+			if (ancestorWithRestriction != null) {
+				List<DDMStructureLink> ancestorDDMStructureLinks =
+					_ddmStructureLinkLocalService.getStructureLinks(
+						_classNameLocalService.getClassNameId(
+							JournalFolder.class),
+						ancestorWithRestriction.getFolderId());
 
-				JournalFolder ancestorWithRestriction =
-					_getAncestorWithRestriction(getFolder(parentFolderId));
+				Stream<DDMStructureLink> ancestorDDMStructureLinksStream =
+					ancestorDDMStructureLinks.stream();
 
-				if (ancestorWithRestriction != null) {
-					List<DDMStructureLink> ancestorDDMStructureLinks =
-						_ddmStructureLinkLocalService.getStructureLinks(
-							_classNameLocalService.getClassNameId(
-								JournalFolder.class),
-							ancestorWithRestriction.getFolderId());
+				long[] ancestorDDMStructureIds =
+					ancestorDDMStructureLinksStream.mapToLong(
+						DDMStructureLink::getStructureId
+					).toArray();
 
-					Stream<DDMStructureLink> ancestorDDMStructureLinksStream =
-						ancestorDDMStructureLinks.stream();
-
-					long[] ancestorDDMStructureIds =
-						ancestorDDMStructureLinksStream.mapToLong(
-							DDMStructureLink::getStructureId
-						).toArray();
-
-					validateArticleDDMStructures(
-						folderId, ancestorDDMStructureIds);
-				}
+				validateArticleDDMStructures(folderId, ancestorDDMStructureIds);
 			}
 		}
 
