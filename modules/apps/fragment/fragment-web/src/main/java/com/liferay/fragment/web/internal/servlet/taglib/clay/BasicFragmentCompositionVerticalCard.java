@@ -77,7 +77,7 @@ public class BasicFragmentCompositionVerticalCard
 
 	@Override
 	public String getIcon() {
-		return "code";
+		return "edit-layout";
 	}
 
 	@Override
