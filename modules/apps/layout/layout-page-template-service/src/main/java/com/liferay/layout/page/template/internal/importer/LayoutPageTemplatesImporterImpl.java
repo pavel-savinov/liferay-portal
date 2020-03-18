@@ -714,9 +714,7 @@ public class LayoutPageTemplatesImporterImpl
 
 		if (layoutPageTemplateStructure != null) {
 			_layoutPageTemplateStructureLocalService.
-				deleteLayoutPageTemplateStructure(
-					layoutPageTemplateStructure.
-						getLayoutPageTemplateStructureId());
+				deleteLayoutPageTemplateStructure(layoutPageTemplateStructure);
 		}
 
 		_layoutPageTemplateStructureLocalService.addLayoutPageTemplateStructure(
