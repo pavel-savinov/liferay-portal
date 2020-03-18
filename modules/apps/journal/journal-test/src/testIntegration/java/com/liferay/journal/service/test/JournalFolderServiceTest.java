@@ -619,9 +619,9 @@ public class JournalFolderServiceTest {
 		childFolder = JournalFolderLocalServiceUtil.updateFolder(
 			TestPropsValues.getUserId(), serviceContext.getScopeGroupId(),
 			childFolder.getFolderId(), childFolder.getParentFolderId(),
-			childFolder.getName(), childFolder.getDescription(),
-			new long[0], JournalFolderConstants.RESTRICTION_TYPE_INHERIT,
-			false, serviceContext);
+			childFolder.getName(), childFolder.getDescription(), new long[0],
+			JournalFolderConstants.RESTRICTION_TYPE_INHERIT, false,
+			serviceContext);
 
 		Assert.assertEquals(
 			JournalFolderConstants.RESTRICTION_TYPE_INHERIT,
