@@ -104,6 +104,16 @@ public class BasicFragmentCompositionVerticalCard
 	}
 
 	@Override
+	public String getStickerCssClass() {
+		return "fragment-composition-sticker";
+	}
+
+	@Override
+	public String getStickerIcon() {
+		return getIcon();
+	}
+
+	@Override
 	public String getSubtitle() {
 		Date statusDate = _fragmentComposition.getStatusDate();
 
