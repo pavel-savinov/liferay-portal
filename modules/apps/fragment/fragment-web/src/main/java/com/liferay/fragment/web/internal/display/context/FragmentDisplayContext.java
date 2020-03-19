@@ -18,7 +18,6 @@ import com.liferay.fragment.constants.FragmentActionKeys;
 import com.liferay.fragment.contributor.FragmentCollectionContributor;
 import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.model.FragmentCollection;
-import com.liferay.fragment.model.FragmentComposition;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.service.FragmentCollectionLocalServiceUtil;
 import com.liferay.fragment.service.FragmentEntryServiceUtil;
@@ -109,39 +108,24 @@ public class FragmentDisplayContext {
 	}
 
 	public String getAvailableActions(Object object) {
+		if (!FragmentPermission.contains(
+				_themeDisplay.getPermissionChecker(),
+				_themeDisplay.getScopeGroupId(),
+				FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES)) {
+
+			return "exportFragmentCompositionsAndFragmentEntries";
+		}
+
 		List<String> availableActions = new ArrayList<>();
 
-		if (object instanceof FragmentComposition) {
-			availableActions.add(
-				"exportFragmentCompositionsAndFragmentEntries");
+		availableActions.add("exportFragmentCompositionsAndFragmentEntries");
 
-			if (FragmentPermission.contains(
-					_themeDisplay.getPermissionChecker(),
-					_themeDisplay.getScopeGroupId(),
-					FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES)) {
-
-				availableActions.add(
-					"deleteFragmentCompositionsAndFragmentEntries");
-				availableActions.add(
-					"moveFragmentCompositionsAndFragmentEntries");
-			}
+		if (object instanceof FragmentEntry) {
+			availableActions.add("copySelectedFragmentEntries");
 		}
-		else {
-			availableActions.add(
-				"exportFragmentCompositionsAndFragmentEntries");
 
-			if (FragmentPermission.contains(
-					_themeDisplay.getPermissionChecker(),
-					_themeDisplay.getScopeGroupId(),
-					FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES)) {
-
-				availableActions.add(
-					"deleteFragmentCompositionsAndFragmentEntries");
-				availableActions.add("copySelectedFragmentEntries");
-				availableActions.add(
-					"moveFragmentCompositionsAndFragmentEntries");
-			}
-		}
+		availableActions.add("deleteFragmentCompositionsAndFragmentEntries");
+		availableActions.add("moveFragmentCompositionsAndFragmentEntries");
 
 		return StringUtil.merge(availableActions, StringPool.COMMA);
 	}
