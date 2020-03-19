@@ -157,7 +157,7 @@ public class FragmentCollectionImpl extends FragmentCollectionBaseImpl {
 
 		for (FragmentComposition fragmentComposition : fragmentCompositions) {
 			fragmentComposition.populateZipWriter(
-				zipWriter, path + "/compositions");
+				zipWriter, path + "/fragments");
 		}
 
 		List<FragmentEntry> fragmentEntries =
