@@ -149,12 +149,12 @@ public class FragmentsImporterImpl implements FragmentsImporter {
 					fragmentCollectionFolder.getFragmentEntries(), overwrite);
 			}
 
-			FragmentCollection fragmentCollection =
-				_fragmentCollectionLocalService.fetchFragmentCollection(
-					groupId, _DEFAULT_FRAGMENT_COLLECTION_KEY);
-
 			if (MapUtil.isNotEmpty(orphanFragmentCompositions) ||
 				MapUtil.isNotEmpty(orphanFragmentEntries)) {
+
+				FragmentCollection fragmentCollection =
+					_fragmentCollectionLocalService.fetchFragmentCollection(
+						groupId, _DEFAULT_FRAGMENT_COLLECTION_KEY);
 
 				if (fragmentCollection == null) {
 					Locale locale = _portal.getSiteDefaultLocale(groupId);
