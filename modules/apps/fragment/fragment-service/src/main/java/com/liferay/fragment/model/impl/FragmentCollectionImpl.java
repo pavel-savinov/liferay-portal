@@ -151,15 +151,6 @@ public class FragmentCollectionImpl extends FragmentCollectionBaseImpl {
 				FragmentExportImportConstants.FILE_NAME_COLLECTION,
 			jsonObject.toString());
 
-		List<FragmentEntry> fragmentEntries =
-			FragmentEntryLocalServiceUtil.getFragmentEntries(
-				getFragmentCollectionId(), QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS);
-
-		for (FragmentEntry fragmentEntry : fragmentEntries) {
-			fragmentEntry.populateZipWriter(zipWriter, path + "/fragments");
-		}
-
 		List<FragmentComposition> fragmentCompositions =
 			FragmentCompositionLocalServiceUtil.getFragmentCompositions(
 				getFragmentCollectionId());
@@ -167,6 +158,15 @@ public class FragmentCollectionImpl extends FragmentCollectionBaseImpl {
 		for (FragmentComposition fragmentComposition : fragmentCompositions) {
 			fragmentComposition.populateZipWriter(
 				zipWriter, path + "/compositions");
+		}
+
+		List<FragmentEntry> fragmentEntries =
+			FragmentEntryLocalServiceUtil.getFragmentEntries(
+				getFragmentCollectionId(), QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS);
+
+		for (FragmentEntry fragmentEntry : fragmentEntries) {
+			fragmentEntry.populateZipWriter(zipWriter, path + "/fragments");
 		}
 
 		if (!hasResources()) {
