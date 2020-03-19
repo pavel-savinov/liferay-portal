@@ -573,64 +573,62 @@ public class FragmentsImporterImpl implements FragmentsImporter {
 		for (Map.Entry<String, String> entry :
 				fragmentCompositions.entrySet()) {
 
-			String name = entry.getKey();
-			String description = StringPool.BLANK;
-			String definitionData = StringPool.BLANK;
-
 			String compositionJSON = _getContent(zipFile, entry.getValue());
 
-			if (Validator.isNotNull(compositionJSON)) {
-				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-					compositionJSON);
+			if (Validator.isNull(compositionJSON)) {
+				continue;
+			}
 
-				name = jsonObject.getString("name", name);
-				description = jsonObject.getString("description");
-				definitionData = _getFragmentEntryContent(
-					zipFile, entry.getValue(),
-					jsonObject.getString("definitionDataPath"));
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+				compositionJSON);
 
-				FragmentComposition fragmentComposition =
-					_fragmentCompositionService.fetchFragmentComposition(
-						groupId, entry.getKey());
+			String name = jsonObject.getString("name", entry.getKey());
+			String description = jsonObject.getString("description");
+			String definitionData = _getFragmentEntryContent(
+				zipFile, entry.getValue(),
+				jsonObject.getString("definitionDataPath"));
 
-				if (fragmentComposition == null) {
-					fragmentComposition =
-						_fragmentCompositionService.addFragmentComposition(
-							groupId, fragmentCollectionId, entry.getKey(), name,
-							description, definitionData, 0L,
-							WorkflowConstants.STATUS_APPROVED,
-							ServiceContextThreadLocal.getServiceContext());
-				}
-				else if (!overwrite) {
-					throw new DuplicateFragmentCompositionKeyException();
-				}
-				else {
-					fragmentComposition =
-						_fragmentCompositionService.updateFragmentComposition(
-							fragmentComposition.getFragmentCompositionId(),
-							name, description, definitionData,
-							fragmentComposition.getPreviewFileEntryId(),
-							fragmentComposition.getStatus());
-				}
+			FragmentComposition fragmentComposition =
+				_fragmentCompositionService.fetchFragmentComposition(
+					groupId, entry.getKey());
 
-				if (fragmentComposition.getPreviewFileEntryId() > 0) {
-					PortletFileRepositoryUtil.deletePortletFileEntry(
-						fragmentComposition.getPreviewFileEntryId());
-				}
-
-				String thumbnailPath = jsonObject.getString("thumbnailPath");
-
-				if (Validator.isNotNull(thumbnailPath)) {
-					long previewFileEntryId = _getPreviewFileEntryId(
-						userId, groupId, zipFile,
-						FragmentComposition.class.getName(),
-						fragmentComposition.getFragmentCompositionId(),
-						entry.getValue(), thumbnailPath);
-
+			if (fragmentComposition == null) {
+				fragmentComposition =
+					_fragmentCompositionService.addFragmentComposition(
+						groupId, fragmentCollectionId, entry.getKey(), name,
+						description, definitionData, 0L,
+						WorkflowConstants.STATUS_APPROVED,
+						ServiceContextThreadLocal.getServiceContext());
+			}
+			else if (!overwrite) {
+				throw new DuplicateFragmentCompositionKeyException();
+			}
+			else {
+				fragmentComposition =
 					_fragmentCompositionService.updateFragmentComposition(
-						fragmentComposition.getFragmentCompositionId(),
-						previewFileEntryId);
-				}
+						fragmentComposition.getFragmentCompositionId(), name,
+						description, definitionData,
+						fragmentComposition.getPreviewFileEntryId(),
+						fragmentComposition.getStatus());
+			}
+
+			if (fragmentComposition.getPreviewFileEntryId() > 0) {
+				PortletFileRepositoryUtil.deletePortletFileEntry(
+					fragmentComposition.getPreviewFileEntryId());
+			}
+
+			String thumbnailPath = jsonObject.getString("thumbnailPath");
+
+			if (Validator.isNotNull(thumbnailPath)) {
+				long previewFileEntryId = _getPreviewFileEntryId(
+					userId, groupId, zipFile,
+					FragmentComposition.class.getName(),
+					fragmentComposition.getFragmentCompositionId(),
+					entry.getValue(), thumbnailPath);
+
+				_fragmentCompositionService.updateFragmentComposition(
+					fragmentComposition.getFragmentCompositionId(),
+					previewFileEntryId);
 			}
 		}
 	}
