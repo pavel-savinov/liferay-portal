@@ -75,7 +75,7 @@ public class ExportFragmentCompositionsAndFragmentEntriesMVCResourceCommand
 		}
 
 		try {
-			List<FragmentComposition> fragmetnCompositions = new ArrayList<>();
+			List<FragmentComposition> fragmentCompositions = new ArrayList<>();
 
 			for (long exportFragmentCompositionId :
 					exportFragmentCompositionIds) {
@@ -84,7 +84,7 @@ public class ExportFragmentCompositionsAndFragmentEntriesMVCResourceCommand
 					_fragmentCompositionService.fetchFragmentComposition(
 						exportFragmentCompositionId);
 
-				fragmetnCompositions.add(fragmentComposition);
+				fragmentCompositions.add(fragmentComposition);
 			}
 
 			List<FragmentEntry> fragmentEntries = new ArrayList<>();
@@ -99,7 +99,7 @@ public class ExportFragmentCompositionsAndFragmentEntriesMVCResourceCommand
 
 			File file =
 				_exportHelper.exportFragmentCompositionsAndFragmentEntries(
-					fragmetnCompositions, fragmentEntries);
+					fragmentCompositions, fragmentEntries);
 
 			PortletResponseUtil.sendFile(
 				resourceRequest, resourceResponse,
