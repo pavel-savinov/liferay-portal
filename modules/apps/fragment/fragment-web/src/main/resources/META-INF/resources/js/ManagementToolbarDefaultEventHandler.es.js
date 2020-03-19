@@ -134,9 +134,11 @@ class ManagementToolbarDefaultEventHandler extends DefaultEventHandler {
 					form.querySelector(
 						`#${this.ns('fragmentCollectionId')}`
 					).value = selectedItem.id;
+
 					this.one(
 						'#fragmentCompositionIds'
 					).value = fragmentCompositionIds;
+
 					this.one('#fragmentEntryIds').value = fragmentEntryIds;
 
 					submitForm(form, targetFragmentEntryURL);
