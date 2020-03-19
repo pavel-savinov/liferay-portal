@@ -111,17 +111,20 @@ public class FragmentDisplayContext {
 	public String getAvailableActions(Object object) {
 		List<String> availableActions = new ArrayList<>();
 
-		if ((object instanceof FragmentComposition) &&
-			FragmentPermission.contains(
-				_themeDisplay.getPermissionChecker(),
-				_themeDisplay.getScopeGroupId(),
-				FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES)) {
-
-			availableActions.add(
-				"deleteFragmentCompositionsAndFragmentEntries");
-			availableActions.add("moveFragmentCompositionsAndFragmentEntries");
+		if (object instanceof FragmentComposition) {
 			availableActions.add(
 				"exportFragmentCompositionsAndFragmentEntries");
+
+			if (FragmentPermission.contains(
+					_themeDisplay.getPermissionChecker(),
+					_themeDisplay.getScopeGroupId(),
+					FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES)) {
+
+				availableActions.add(
+					"deleteFragmentCompositionsAndFragmentEntries");
+				availableActions.add(
+					"moveFragmentCompositionsAndFragmentEntries");
+			}
 		}
 		else {
 			availableActions.add(
