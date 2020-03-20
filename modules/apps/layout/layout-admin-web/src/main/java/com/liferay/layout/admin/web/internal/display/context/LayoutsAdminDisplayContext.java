@@ -701,8 +701,7 @@ public class LayoutsAdminDisplayContext {
 			layoutJSONObject.put(
 				"parentable", layoutType.isParentable()
 			).put(
-				"pending",
-				layout.getStatus() == WorkflowConstants.STATUS_PENDING
+				"pending", layout.isDenied() || layout.isPending()
 			).put(
 				"plid", layout.getPlid()
 			);
