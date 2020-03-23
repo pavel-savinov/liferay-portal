@@ -101,7 +101,7 @@ class FragmentCompositionDropdownDefaultEventHandler extends DefaultEventHandler
 			},
 			selectedItem => {
 				if (selectedItem) {
-					const form = this.one('#fragmentCompositionFm');
+					const form = this.one('#fragmentEntryFm');
 
 					form.querySelector(
 						`#${this.namespace}fragmentCollectionId`
