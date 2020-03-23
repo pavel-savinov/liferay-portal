@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
@@ -76,7 +77,9 @@ public class LayoutEditorToolbarControlMenuJSPDynamicInclude
 
 		Layout layout = themeDisplay.getLayout();
 
-		if (layout.isSystem() && layout.isTypeContent()) {
+		if (layout.isSystem() && layout.isTypeContent() &&
+			!_isConversionLayout(layout)) {
+
 			layout = _layoutLocalService.getLayout(layout.getClassPK());
 		}
 
@@ -130,6 +133,20 @@ public class LayoutEditorToolbarControlMenuJSPDynamicInclude
 	)
 	protected void setServletContext(ServletContext servletContext) {
 		super.setServletContext(servletContext);
+	}
+
+	private boolean _isConversionLayout(Layout layout) throws PortalException {
+		Layout publishedLayout = _layoutLocalService.getLayout(
+			layout.getClassPK());
+
+		if (layout.isTypeContent() &&
+			Objects.equals(
+				publishedLayout.getType(), LayoutConstants.TYPE_PORTLET)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
