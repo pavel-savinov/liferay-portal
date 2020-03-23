@@ -342,7 +342,8 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 				_stagedModelRepository.fetchStagedModelByUuidAndGroupId(
 					uuid, groupId);
 		}
-		else if (plid > 0) {
+
+		if ((existingTemplate == null) && (plid > 0)){
 			existingTemplate =
 				_layoutPageTemplateEntryLocalService.
 					fetchLayoutPageTemplateEntryByPlid(plid);
@@ -413,13 +414,10 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 			return;
 		}
 
-		Layout draftLayout = _layoutLocalService.fetchLayout(
-			_portal.getClassNameId(Layout.class), layout.getPlid());
+		String path = ExportImportPathUtil.getModelPath(layout);
 
-		if (draftLayout != null) {
-			StagedModelDataHandlerUtil.exportReferenceStagedModel(
-				portletDataContext, layoutPageTemplateEntry, draftLayout,
-				PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
+		if (portletDataContext.isPathProcessed(path)) {
+			return;
 		}
 
 		StagedModelDataHandlerUtil.exportReferenceStagedModel(

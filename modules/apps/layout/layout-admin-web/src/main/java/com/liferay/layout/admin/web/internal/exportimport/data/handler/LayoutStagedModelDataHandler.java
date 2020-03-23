@@ -2186,6 +2186,13 @@ public class LayoutStagedModelDataHandler
 			Element layoutElement)
 		throws PortletDataException {
 
+		String draftLayoutUuid = layoutElement.attributeValue(
+			"draft-layout-uuid");
+
+		if (Validator.isNotNull(draftLayoutUuid)) {
+			return;
+		}
+
 		Layout draftLayout = _layoutLocalService.fetchLayout(
 			_portal.getClassNameId(Layout.class), layout.getPlid());
 
