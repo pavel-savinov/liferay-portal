@@ -73,11 +73,6 @@ FragmentManagementToolbarDisplayContext fragmentManagementToolbarDisplayContext 
 	</liferay-ui:search-container>
 </aui:form>
 
-<aui:form name="fragmentCompositionFm">
-	<aui:input name="fragmentCompositionId" type="hidden" />
-	<aui:input name="fragmentCollectionId" type="hidden" />
-</aui:form>
-
 <portlet:actionURL name="/fragment/update_fragment_composition_preview" var="updateFragmentCompositionPreviewURL">
 	<portlet:param name="redirect" value="<%= currentURL %>" />
 </portlet:actionURL>
@@ -89,6 +84,7 @@ FragmentManagementToolbarDisplayContext fragmentManagementToolbarDisplayContext 
 
 <aui:form name="fragmentEntryFm">
 	<aui:input name="fragmentCollectionId" type="hidden" />
+	<aui:input name="fragmentCompositionId" type="hidden" />
 	<aui:input name="fragmentCompositionIds" type="hidden" />
 	<aui:input name="fragmentEntryIds" type="hidden" />
 </aui:form>
