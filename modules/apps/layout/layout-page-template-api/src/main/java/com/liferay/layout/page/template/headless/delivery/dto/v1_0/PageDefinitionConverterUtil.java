@@ -45,12 +45,14 @@ import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
 import com.liferay.layout.util.structure.RootLayoutStructureItem;
 import com.liferay.layout.util.structure.RowLayoutStructureItem;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ColorScheme;
 import com.liferay.portal.kernel.model.Theme;
+import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -597,14 +599,54 @@ public class PageDefinitionConverterUtil {
 						UnicodeProperties themeSettingsUnicodeProperties =
 							new UnicodeProperties();
 
+						boolean useDefaultThemeSettings = false;
+
+						Theme defaultTheme = null;
+
+						if (Validator.isNull(layout.getThemeId())) {
+							com.liferay.portal.kernel.model.Layout
+								masterLayout =
+									LayoutLocalServiceUtil.fetchLayout(
+										layout.getMasterLayoutPlid());
+
+							if (masterLayout != null) {
+								defaultTheme = masterLayout.getTheme();
+							}
+							else {
+								defaultTheme = layout.getTheme();
+							}
+
+							useDefaultThemeSettings = true;
+						}
+
 						for (Map.Entry<String, String> entry :
 								unicodeProperties.entrySet()) {
 
 							String key = entry.getKey();
 
-							if (key.startsWith("lfr-theme:")) {
+							if (!key.startsWith("lfr-theme:")) {
+								continue;
+							}
+
+							String[] propertyNameParts = key.split(
+								StringPool.COLON);
+
+							if (propertyNameParts.length != 3) {
+								continue;
+							}
+
+							if (useDefaultThemeSettings) {
 								themeSettingsUnicodeProperties.setProperty(
-									key, entry.getValue());
+									key,
+									defaultTheme.getSetting(
+										propertyNameParts[2]));
+							}
+							else {
+								themeSettingsUnicodeProperties.setProperty(
+									key,
+									layout.getThemeSetting(
+										propertyNameParts[2],
+										propertyNameParts[1]));
 							}
 						}
 
