@@ -31,6 +31,7 @@ import com.liferay.headless.delivery.dto.v1_0.FragmentField;
 import com.liferay.headless.delivery.dto.v1_0.FragmentFieldBackgroundImage;
 import com.liferay.headless.delivery.dto.v1_0.FragmentFieldHTML;
 import com.liferay.headless.delivery.dto.v1_0.FragmentFieldImage;
+import com.liferay.headless.delivery.dto.v1_0.FragmentFieldMappingConfiguration;
 import com.liferay.headless.delivery.dto.v1_0.FragmentFieldText;
 import com.liferay.headless.delivery.dto.v1_0.FragmentImage;
 import com.liferay.headless.delivery.dto.v1_0.FragmentInstanceDefinition;
@@ -38,6 +39,7 @@ import com.liferay.headless.delivery.dto.v1_0.FragmentLink;
 import com.liferay.headless.delivery.dto.v1_0.InlineLink;
 import com.liferay.headless.delivery.dto.v1_0.InlineValue;
 import com.liferay.layout.util.structure.FragmentLayoutStructureItem;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -137,7 +139,8 @@ public class FragmentInstanceDefinitionConverterUtil {
 				fragmentConfig = _getFragmentConfig(
 					fragmentEntryConfigurationParser, fragmentEntryLink);
 				fragmentFields = _getFragmentFields(
-					fragmentEntryLink, saveInlineContent, segmentsExperienceId);
+					fragmentEntryLink, saveInlineContent,
+					saveMappingConfiguration, segmentsExperienceId);
 			}
 		};
 	}
@@ -155,7 +158,8 @@ public class FragmentInstanceDefinitionConverterUtil {
 	}
 
 	private static List<FragmentField> _getBackgroundImageFragmentFields(
-		JSONObject jsonObject, long segmentsExperienceId) {
+		JSONObject jsonObject, boolean saveMappingConfiguration,
+		long segmentsExperienceId) {
 
 		List<FragmentField> fragmentFields = new ArrayList<>();
 
@@ -172,21 +176,34 @@ public class FragmentInstanceDefinitionConverterUtil {
 				new FragmentField() {
 					{
 						id = backgroundImageId;
-						value = new FragmentFieldBackgroundImage() {
-							{
-								backgroundImage = new FragmentImage() {
+
+						setValue(
+							() -> {
+								if (imageJSONObject.has("classNameId") &&
+									imageJSONObject.has("classPK") &&
+									imageJSONObject.has("fieldId") &&
+									saveMappingConfiguration) {
+
+									return _toFragmentFieldMappingConfiguration(
+										imageJSONObject);
+								}
+
+								return new FragmentFieldBackgroundImage() {
 									{
-										title = _toTitleInlineValue(
-											imageJSONObject, localeMap);
-										url = new InlineValue() {
+										backgroundImage = new FragmentImage() {
 											{
-												value_i18n = localeMap;
+												title = _toTitleInlineValue(
+													imageJSONObject, localeMap);
+												url = new InlineValue() {
+													{
+														value_i18n = localeMap;
+													}
+												};
 											}
 										};
 									}
 								};
-							}
-						};
+							});
 					}
 				});
 		}
@@ -322,9 +339,9 @@ public class FragmentInstanceDefinitionConverterUtil {
 
 	private static FragmentField[] _getFragmentFields(
 		FragmentEntryLink fragmentEntryLink, boolean saveInlineContent,
-		long segmentsExperienceId) {
+		boolean saveMappingConfiguration, long segmentsExperienceId) {
 
-		if (!saveInlineContent) {
+		if (!saveInlineContent && !saveMappingConfiguration) {
 			return new FragmentField[0];
 		}
 
@@ -345,7 +362,7 @@ public class FragmentInstanceDefinitionConverterUtil {
 				editableValuesJSONObject.getJSONObject(
 					"com.liferay.fragment.entry.processor.background.image." +
 						"BackgroundImageFragmentEntryProcessor"),
-				segmentsExperienceId));
+				saveMappingConfiguration, segmentsExperienceId));
 
 		Map<String, String> editableTypes = _getEditableTypes(
 			fragmentEntryLink.getHtml());
@@ -356,7 +373,7 @@ public class FragmentInstanceDefinitionConverterUtil {
 				editableValuesJSONObject.getJSONObject(
 					"com.liferay.fragment.entry.processor.editable." +
 						"EditableFragmentEntryProcessor"),
-				segmentsExperienceId));
+				saveMappingConfiguration, segmentsExperienceId));
 
 		return fragmentFields.toArray(new FragmentField[0]);
 	}
@@ -409,7 +426,7 @@ public class FragmentInstanceDefinitionConverterUtil {
 
 	private static List<FragmentField> _getTextFragmentFields(
 		Map<String, String> editableTypes, JSONObject jsonObject,
-		long segmentsExperienceId) {
+		boolean saveMappingConfiguration, long segmentsExperienceId) {
 
 		List<FragmentField> fragmentFields = new ArrayList<>();
 
@@ -418,7 +435,8 @@ public class FragmentInstanceDefinitionConverterUtil {
 		for (String textId : textIds) {
 			fragmentFields.add(
 				_toFragmentField(
-					editableTypes, jsonObject, segmentsExperienceId, textId));
+					editableTypes, jsonObject, saveMappingConfiguration,
+					segmentsExperienceId, textId));
 		}
 
 		return fragmentFields;
@@ -448,7 +466,8 @@ public class FragmentInstanceDefinitionConverterUtil {
 
 	private static FragmentField _toFragmentField(
 		Map<String, String> editableTypes, JSONObject jsonObject,
-		long segmentsExperienceId, String textId) {
+		boolean saveMappingConfiguration, long segmentsExperienceId,
+		String textId) {
 
 		JSONObject textJSONObject = jsonObject.getJSONObject(textId);
 
@@ -458,6 +477,15 @@ public class FragmentInstanceDefinitionConverterUtil {
 
 				setValue(
 					() -> {
+						if (saveMappingConfiguration &&
+							textJSONObject.has("classNameId") &&
+							textJSONObject.has("classPK") &&
+							textJSONObject.has("fieldId")) {
+
+							return _toFragmentFieldMappingConfiguration(
+								textJSONObject);
+						}
+
 						String type = editableTypes.getOrDefault(
 							textId, "text");
 
@@ -513,6 +541,19 @@ public class FragmentInstanceDefinitionConverterUtil {
 					}
 				};
 				fragmentLink = _toFragmentLink(jsonObject);
+			}
+		};
+	}
+
+	private static FragmentFieldMappingConfiguration
+		_toFragmentFieldMappingConfiguration(JSONObject jsonObject) {
+
+		return new FragmentFieldMappingConfiguration() {
+			{
+				mappedEntryField = jsonObject.getString("fieldId");
+				mappedEntryKey = StringBundler.concat(
+					jsonObject.getString("classNameId"), StringPool.POUND,
+					jsonObject.getString("classPK"));
 			}
 		};
 	}
