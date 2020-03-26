@@ -989,6 +989,7 @@ components:
                         - $ref: "#/components/schemas/FragmentFieldHTML"
                         - $ref: "#/components/schemas/FragmentFieldImage"
                         - $ref: "#/components/schemas/FragmentFieldText"
+                        - $ref: "#/components/schemas/FragmentFieldMappingConfiguration"
             type: object
         FragmentFieldBackgroundImage:
             properties:
@@ -1008,6 +1009,12 @@ components:
                 fragmentLink:
                     $ref: "#/components/schemas/FragmentLink"
             type: object
+        FragmentFieldMappingConfiguration:
+            properties:
+                mappedEntryField:
+                    type: string
+                mappedEntryKey:
+                    type: string
         FragmentFieldText:
             properties:
                 fragmentLink:
