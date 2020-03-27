@@ -24,6 +24,7 @@ import pageContentsReducer from './pageContentsReducer';
 import permissionsReducer from './permissionsReducer';
 import resolvedCommentsReducer from './resolvedCommentsReducer';
 import sidebarReducer from './sidebarReducer';
+import viewportReducer from './viewportReducer';
 import widgetsReducer from './widgetsReducer';
 
 /**
@@ -51,6 +52,7 @@ const combinedReducer = (state, action) =>
 		pageContents: pageContentsReducer,
 		permissions: permissionsReducer,
 		reducers: baseReducer,
+		selectedViewportSize: viewportReducer,
 		showResolvedComments: resolvedCommentsReducer,
 		sidebar: sidebarReducer,
 		widgets: widgetsReducer,
