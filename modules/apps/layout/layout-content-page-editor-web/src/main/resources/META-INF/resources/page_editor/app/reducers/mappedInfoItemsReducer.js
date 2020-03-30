@@ -12,19 +12,27 @@
  * details.
  */
 
-import {TOGGLE_SHOW_RESOLVED_COMMENTS} from '../actions/types';
+import {ADD_MAPPED_INFO_ITEM} from '../actions/types';
 
-export const INITIAL_STATE = false;
+export const INITIAL_STATE = [];
 
-export default function resolvedCommentsReducer(
-	toggleResolvedComments = INITIAL_STATE,
+export default function mappedInfoItemsReducer(
+	mappedInfoItems = INITIAL_STATE,
 	action
 ) {
 	switch (action.type) {
-		case TOGGLE_SHOW_RESOLVED_COMMENTS:
-			return action.showResolvedComments;
+		case ADD_MAPPED_INFO_ITEM:
+			return [
+				...mappedInfoItems,
+				{
+					className: action.className,
+					classNameId: action.classNameId,
+					classPK: action.classPK,
+					title: action.title,
+				},
+			];
 
 		default:
-			return toggleResolvedComments;
+			return mappedInfoItems;
 	}
 }

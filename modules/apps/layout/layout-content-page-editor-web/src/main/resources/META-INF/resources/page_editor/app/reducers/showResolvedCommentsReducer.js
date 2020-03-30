@@ -12,17 +12,19 @@
  * details.
  */
 
-import {SWITCH_VIEWPORT_SIZE} from '../actions/types';
+import {TOGGLE_SHOW_RESOLVED_COMMENTS} from '../actions/types';
 
-export const INITIAL_STATE = 'desktop';
+export const INITIAL_STATE = false;
 
-export default function viewportReducer(
-	viewportStatus = INITIAL_STATE,
+export default function showResolvedCommentsReducer(
+	toggleResolvedComments = INITIAL_STATE,
 	action
 ) {
-	if (action.type === SWITCH_VIEWPORT_SIZE) {
-		return action.size;
-	}
+	switch (action.type) {
+		case TOGGLE_SHOW_RESOLVED_COMMENTS:
+			return action.showResolvedComments;
 
-	return viewportStatus;
+		default:
+			return toggleResolvedComments;
+	}
 }

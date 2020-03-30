@@ -12,27 +12,16 @@
  * details.
  */
 
-import {ADD_MAPPED_INFO_ITEM} from '../actions/types';
+import * as TYPES from '../actions/types';
 
-export const INITIAL_STATE = [];
+export const INITIAL_STATE = 'en-US';
 
-export default function mappingReducer(
-	mappedInfoItems = INITIAL_STATE,
-	action
-) {
+export default function languageIdReducer(languageId = INITIAL_STATE, action) {
 	switch (action.type) {
-		case ADD_MAPPED_INFO_ITEM:
-			return [
-				...mappedInfoItems,
-				{
-					className: action.className,
-					classNameId: action.classNameId,
-					classPK: action.classPK,
-					title: action.title,
-				},
-			];
+		case TYPES.UPDATE_LANGUAGE_ID:
+			return action.languageId;
 
 		default:
-			return mappedInfoItems;
+			return languageId;
 	}
 }
