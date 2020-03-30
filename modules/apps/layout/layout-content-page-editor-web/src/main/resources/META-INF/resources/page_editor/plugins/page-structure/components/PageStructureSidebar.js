@@ -133,6 +133,7 @@ function visit(item, items, {activeItemId, isMasterPage, state}) {
 			const childId = `${item.config.fragmentEntryLinkId}-${editableId}`;
 
 			children.push({
+				activable: true,
 				children: [],
 				disabled: !isMasterPage && itemInMasterLayout,
 				expanded: childId === activeItemId,
