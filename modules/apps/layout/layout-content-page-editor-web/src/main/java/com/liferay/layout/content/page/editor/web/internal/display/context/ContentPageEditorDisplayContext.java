@@ -52,6 +52,7 @@ import com.liferay.layout.content.page.editor.web.internal.comment.CommentUtil;
 import com.liferay.layout.content.page.editor.web.internal.configuration.LayoutContentPageEditorConfiguration;
 import com.liferay.layout.content.page.editor.web.internal.constants.ContentPageEditorActionKeys;
 import com.liferay.layout.content.page.editor.web.internal.constants.ContentPageEditorConstants;
+import com.liferay.layout.content.page.editor.web.internal.constants.ViewportSize;
 import com.liferay.layout.content.page.editor.web.internal.util.ContentUtil;
 import com.liferay.layout.content.page.editor.web.internal.util.FragmentEntryLinkItemSelectorUtil;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
@@ -122,6 +123,7 @@ import com.liferay.segments.constants.SegmentsExperienceConstants;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -218,6 +220,8 @@ public class ContentPageEditorDisplayContext {
 				getFragmentEntryActionURL("/content_layout/add_portlet")
 			).put(
 				"availableLanguages", _getAvailableLanguages()
+			).put(
+				"availableViewportSizes", _getAvailableViewportSizes()
 			).put(
 				"defaultEditorConfigurations", _getDefaultConfigurations()
 			).put(
@@ -572,6 +576,31 @@ public class ContentPageEditorDisplayContext {
 		}
 
 		return availableLanguages;
+	}
+
+	private Map<String, Map<String, Object>> _getAvailableViewportSizes() {
+		Map<String, Map<String, Object>> availableViewportSizesMap =
+			new HashMap<>();
+
+		for (ViewportSize viewportSize : EnumSet.allOf(ViewportSize.class)) {
+			availableViewportSizesMap.put(
+				viewportSize.getViewportSizeId(),
+				HashMapBuilder.<String, Object>put(
+					"icon", viewportSize.getIcon()
+				).put(
+					"label",
+					LanguageUtil.get(
+						httpServletRequest, viewportSize.getLabel())
+				).put(
+					"maxWidth", viewportSize.getMaxWidth()
+				).put(
+					"minWidth", viewportSize.getMinWidth()
+				).put(
+					"sizeId", viewportSize.getViewportSizeId()
+				).build());
+		}
+
+		return availableViewportSizesMap;
 	}
 
 	private Map<String, Object> _getContributedFragmentEntry(
