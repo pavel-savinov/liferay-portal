@@ -63,6 +63,7 @@ import java.util.stream.Stream;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 /**
@@ -199,13 +200,30 @@ public class FragmentInstanceDefinitionConverterUtil {
 
 		Document document = Jsoup.parse(html);
 
-		Elements elements = document.getElementsByTag("lfr-editable");
+		Elements elements = document.select(
+			"lfr-editable,*[data-lfr-editable-id]");
 
 		elements.forEach(
 			element -> editableTypes.put(
-				element.attr("id"), element.attr("type")));
+				_getElementId(element), _getElementType(element)));
 
 		return editableTypes;
+	}
+
+	private static String _getElementId(Element element) {
+		if (Objects.equals(element.tagName(), "lfr-editable")) {
+			return element.attr("id");
+		}
+
+		return element.attr("data-lfr-editable-id");
+	}
+
+	private static String _getElementType(Element element) {
+		if (Objects.equals(element.tagName(), "lfr-editable")) {
+			return element.attr("type");
+		}
+
+		return element.attr("data-lfr-editable-type");
 	}
 
 	private static String _getFragmentCollectionName(

@@ -54,6 +54,7 @@ import java.util.regex.Pattern;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 /**
@@ -83,51 +84,6 @@ public class FragmentLayoutStructureItemHelper
 
 		return layoutStructure.addFragmentLayoutStructureItem(
 			fragmentEntryLink.getFragmentEntryLinkId(), parentItemId, position);
-	}
-
-	private static Map<String, String> _getConfigurationTypes(
-			String configuration)
-		throws JSONException {
-
-		Map<String, String> configurationTypes = new HashMap<>();
-
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(configuration);
-
-		JSONArray fieldSetsJSONArray = jsonObject.getJSONArray("fieldSets");
-
-		if (fieldSetsJSONArray == null) {
-			return configurationTypes;
-		}
-
-		for (int i = 0; i < fieldSetsJSONArray.length(); i++) {
-			JSONObject fieldsJSONObject = fieldSetsJSONArray.getJSONObject(i);
-
-			JSONArray fieldsJSONArray = fieldsJSONObject.getJSONArray("fields");
-
-			for (int j = 0; j < fieldsJSONArray.length(); j++) {
-				JSONObject fieldJSONObject = fieldsJSONArray.getJSONObject(j);
-
-				configurationTypes.put(
-					fieldJSONObject.getString("name"),
-					fieldJSONObject.getString("type"));
-			}
-		}
-
-		return configurationTypes;
-	}
-
-	private static Map<String, String> _getEditableTypes(String html) {
-		Map<String, String> editableTypes = new HashMap<>();
-
-		Document document = Jsoup.parse(html);
-
-		Elements elements = document.getElementsByTag("lfr-editable");
-
-		elements.forEach(
-			element -> editableTypes.put(
-				element.attr("id"), element.attr("type")));
-
-		return editableTypes;
 	}
 
 	private FragmentEntryLink _addFragmentEntryLink(
@@ -371,6 +327,67 @@ public class FragmentLayoutStructureItemHelper
 		}
 
 		return jsonObject;
+	}
+
+	private Map<String, String> _getConfigurationTypes(String configuration)
+		throws JSONException {
+
+		Map<String, String> configurationTypes = new HashMap<>();
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(configuration);
+
+		JSONArray fieldSetsJSONArray = jsonObject.getJSONArray("fieldSets");
+
+		if (fieldSetsJSONArray == null) {
+			return configurationTypes;
+		}
+
+		for (int i = 0; i < fieldSetsJSONArray.length(); i++) {
+			JSONObject fieldsJSONObject = fieldSetsJSONArray.getJSONObject(i);
+
+			JSONArray fieldsJSONArray = fieldsJSONObject.getJSONArray("fields");
+
+			for (int j = 0; j < fieldsJSONArray.length(); j++) {
+				JSONObject fieldJSONObject = fieldsJSONArray.getJSONObject(j);
+
+				configurationTypes.put(
+					fieldJSONObject.getString("name"),
+					fieldJSONObject.getString("type"));
+			}
+		}
+
+		return configurationTypes;
+	}
+
+	private Map<String, String> _getEditableTypes(String html) {
+		Map<String, String> editableTypes = new HashMap<>();
+
+		Document document = Jsoup.parse(html);
+
+		Elements elements = document.select(
+			"lfr-editable,*[data-lfr-editable-id]");
+
+		elements.forEach(
+			element -> editableTypes.put(
+				_getElementId(element), _getElementType(element)));
+
+		return editableTypes;
+	}
+
+	private String _getElementId(Element element) {
+		if (Objects.equals(element.tagName(), "lfr-editable")) {
+			return element.attr("id");
+		}
+
+		return element.attr("data-lfr-editable-id");
+	}
+
+	private String _getElementType(Element element) {
+		if (Objects.equals(element.tagName(), "lfr-editable")) {
+			return element.attr("type");
+		}
+
+		return element.attr("data-lfr-editable-type");
 	}
 
 	private FragmentEntry _getFragmentEntry(
