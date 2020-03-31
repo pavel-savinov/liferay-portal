@@ -16,6 +16,7 @@ package com.liferay.layout.page.template.internal.importer.helper;
 
 import com.liferay.document.library.util.DLURLHelperUtil;
 import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
+import com.liferay.fragment.entry.processor.util.EditableFragmentEntryProcessorUtil;
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
@@ -54,7 +55,6 @@ import java.util.regex.Pattern;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 /**
@@ -369,25 +369,10 @@ public class FragmentLayoutStructureItemHelper
 
 		elements.forEach(
 			element -> editableTypes.put(
-				_getElementId(element), _getElementType(element)));
+				EditableFragmentEntryProcessorUtil.getElementId(element),
+				EditableFragmentEntryProcessorUtil.getElementType(element)));
 
 		return editableTypes;
-	}
-
-	private String _getElementId(Element element) {
-		if (Objects.equals(element.tagName(), "lfr-editable")) {
-			return element.attr("id");
-		}
-
-		return element.attr("data-lfr-editable-id");
-	}
-
-	private String _getElementType(Element element) {
-		if (Objects.equals(element.tagName(), "lfr-editable")) {
-			return element.attr("type");
-		}
-
-		return element.attr("data-lfr-editable-type");
 	}
 
 	private FragmentEntry _getFragmentEntry(

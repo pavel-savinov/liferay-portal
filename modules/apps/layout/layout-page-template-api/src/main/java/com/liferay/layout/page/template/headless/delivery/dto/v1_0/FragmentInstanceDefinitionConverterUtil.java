@@ -16,6 +16,7 @@ package com.liferay.layout.page.template.headless.delivery.dto.v1_0;
 
 import com.liferay.fragment.contributor.FragmentCollectionContributor;
 import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
+import com.liferay.fragment.entry.processor.util.EditableFragmentEntryProcessorUtil;
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
@@ -63,7 +64,6 @@ import java.util.stream.Stream;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 /**
@@ -205,25 +205,10 @@ public class FragmentInstanceDefinitionConverterUtil {
 
 		elements.forEach(
 			element -> editableTypes.put(
-				_getElementId(element), _getElementType(element)));
+				EditableFragmentEntryProcessorUtil.getElementId(element),
+				EditableFragmentEntryProcessorUtil.getElementType(element)));
 
 		return editableTypes;
-	}
-
-	private static String _getElementId(Element element) {
-		if (Objects.equals(element.tagName(), "lfr-editable")) {
-			return element.attr("id");
-		}
-
-		return element.attr("data-lfr-editable-id");
-	}
-
-	private static String _getElementType(Element element) {
-		if (Objects.equals(element.tagName(), "lfr-editable")) {
-			return element.attr("type");
-		}
-
-		return element.attr("data-lfr-editable-type");
 	}
 
 	private static String _getFragmentCollectionName(

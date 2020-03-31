@@ -18,6 +18,7 @@ import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.entry.processor.editable.mapper.EditableElementMapper;
 import com.liferay.fragment.entry.processor.editable.parser.EditableElementParser;
 import com.liferay.fragment.entry.processor.helper.FragmentEntryProcessorHelper;
+import com.liferay.fragment.entry.processor.util.EditableFragmentEntryProcessorUtil;
 import com.liferay.fragment.exception.FragmentEntryContentException;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.FragmentEntryProcessor;
@@ -143,7 +144,8 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 				continue;
 			}
 
-			String id = _getElementId(element);
+			String id = EditableFragmentEntryProcessorUtil.getElementId(
+				element);
 
 			Class<?> clazz = getClass();
 
@@ -351,7 +353,8 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 			);
 
 			defaultEditableValuesJSONObject.put(
-				_getElementId(element), defaultValueJSONObject);
+				EditableFragmentEntryProcessorUtil.getElementId(element),
+				defaultValueJSONObject);
 		}
 
 		return defaultEditableValuesJSONObject;
@@ -370,20 +373,10 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 	}
 
 	private EditableElementParser _getEditableElementParser(Element element) {
-		if (Objects.equals(element.tagName(), "lfr-editable")) {
-			return _editableElementParsers.get(element.attr("type"));
-		}
+		String type = EditableFragmentEntryProcessorUtil.getElementType(
+			element);
 
-		return _editableElementParsers.get(
-			element.attr("data-lfr-editable-type"));
-	}
-
-	private String _getElementId(Element element) {
-		if (Objects.equals(element.tagName(), "lfr-editable")) {
-			return element.attr("id");
-		}
-
-		return element.attr("data-lfr-editable-id");
+		return _editableElementParsers.get(type);
 	}
 
 	private void _validateAttribute(Element element, String attributeName)
@@ -438,7 +431,9 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 
 		Map<String, Long> idsMap = uniqueNodesStream.collect(
 			Collectors.groupingBy(
-				element -> _getElementId(element), Collectors.counting()));
+				element -> EditableFragmentEntryProcessorUtil.getElementId(
+					element),
+				Collectors.counting()));
 
 		Collection<String> ids = idsMap.keySet();
 
