@@ -62,10 +62,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
-
 /**
  * @author Rubén Pulido
  */
@@ -193,22 +189,6 @@ public class FragmentInstanceDefinitionConverterUtil {
 		}
 
 		return fragmentFields;
-	}
-
-	private static Map<String, String> _getEditableTypes(String html) {
-		Map<String, String> editableTypes = new HashMap<>();
-
-		Document document = Jsoup.parse(html);
-
-		Elements elements = document.select(
-			"lfr-editable,*[data-lfr-editable-id]");
-
-		elements.forEach(
-			element -> editableTypes.put(
-				EditableFragmentEntryProcessorUtil.getElementId(element),
-				EditableFragmentEntryProcessorUtil.getElementType(element)));
-
-		return editableTypes;
 	}
 
 	private static String _getFragmentCollectionName(
@@ -350,8 +330,9 @@ public class FragmentInstanceDefinitionConverterUtil {
 						"BackgroundImageFragmentEntryProcessor"),
 				segmentsExperienceId));
 
-		Map<String, String> editableTypes = _getEditableTypes(
-			fragmentEntryLink.getHtml());
+		Map<String, String> editableTypes =
+			EditableFragmentEntryProcessorUtil.getEditableTypes(
+				fragmentEntryLink.getHtml());
 
 		fragmentFields.addAll(
 			_getTextFragmentFields(

@@ -53,10 +53,6 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
-
 /**
  * @author Jürgen Kappler
  */
@@ -131,7 +127,8 @@ public class FragmentLayoutStructureItemHelper
 			fragmentEntryProcessorRegistry.getDefaultEditableValuesJSONObject(
 				_replaceResources(fragmentCollection, html), configuration);
 
-		Map<String, String> editableTypes = _getEditableTypes(html);
+		Map<String, String> editableTypes =
+			EditableFragmentEntryProcessorUtil.getEditableTypes(html);
 
 		JSONObject fragmentEntryProcessorValuesJSONObject = JSONUtil.put(
 			"com.liferay.fragment.entry.processor.background.image." +
@@ -357,22 +354,6 @@ public class FragmentLayoutStructureItemHelper
 		}
 
 		return configurationTypes;
-	}
-
-	private Map<String, String> _getEditableTypes(String html) {
-		Map<String, String> editableTypes = new HashMap<>();
-
-		Document document = Jsoup.parse(html);
-
-		Elements elements = document.select(
-			"lfr-editable,*[data-lfr-editable-id]");
-
-		elements.forEach(
-			element -> editableTypes.put(
-				EditableFragmentEntryProcessorUtil.getElementId(element),
-				EditableFragmentEntryProcessorUtil.getElementType(element)));
-
-		return editableTypes;
 	}
 
 	private FragmentEntry _getFragmentEntry(
