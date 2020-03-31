@@ -583,6 +583,7 @@ public class ContentPageEditorDisplayContext {
 	private Map<String, Map<String, Object>> _getAvailableViewportSizes() {
 		Map<String, Map<String, Object>> availableViewportSizesMap =
 			new LinkedHashMap<>();
+
 		EnumSet<ViewportSize> viewportSizes = EnumSet.allOf(ViewportSize.class);
 
 		Stream<ViewportSize> stream = viewportSizes.stream();
