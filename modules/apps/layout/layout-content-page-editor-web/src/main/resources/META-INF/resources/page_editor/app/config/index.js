@@ -12,8 +12,6 @@
  * details.
  */
 
-import {AVAILABLE_VIEWPORT_SIZES} from './constants/availableViewportSizes';
-
 const DEFAULT_CONFIG = {
 	toolbarId: 'pageEditorToolbar',
 };
@@ -45,7 +43,6 @@ export function initializeConfig(backendConfig) {
 		...DEFAULT_CONFIG,
 		...backendConfig,
 		...syntheticItems,
-		...AVAILABLE_VIEWPORT_SIZES,
 	};
 
 	return config;
