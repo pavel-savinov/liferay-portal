@@ -123,9 +123,11 @@ import com.liferay.segments.constants.SegmentsExperienceConstants;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -580,9 +582,18 @@ public class ContentPageEditorDisplayContext {
 
 	private Map<String, Map<String, Object>> _getAvailableViewportSizes() {
 		Map<String, Map<String, Object>> availableViewportSizesMap =
-			new HashMap<>();
+			new LinkedHashMap<>();
+		EnumSet<ViewportSize> viewportSizes = EnumSet.allOf(ViewportSize.class);
 
-		for (ViewportSize viewportSize : EnumSet.allOf(ViewportSize.class)) {
+		Stream<ViewportSize> stream = viewportSizes.stream();
+
+		List<ViewportSize> viewportSizesList = stream.sorted(
+			Comparator.comparingInt(ViewportSize::getOrder)
+		).collect(
+			Collectors.toList()
+		);
+
+		for (ViewportSize viewportSize : viewportSizesList) {
 			availableViewportSizesMap.put(
 				viewportSize.getViewportSizeId(),
 				HashMapBuilder.<String, Object>put(
