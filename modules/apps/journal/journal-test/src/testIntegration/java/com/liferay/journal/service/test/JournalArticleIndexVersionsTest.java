@@ -82,6 +82,8 @@ public class JournalArticleIndexVersionsTest {
 
 		_group = GroupTestUtil.addGroup();
 
+		_indexer = IndexerRegistryUtil.getIndexer(JournalArticle.class);
+
 		User user = TestPropsValues.getUser();
 
 		user.setCompanyId(TestPropsValues.getCompanyId());
@@ -272,6 +274,8 @@ public class JournalArticleIndexVersionsTest {
 			searchContext.setAttribute("head", Boolean.FALSE);
 		}
 
+		_indexer.reindex(new String[] {String.valueOf(_group.getCompanyId())});
+
 		searchContext.setGroupIds(new long[] {_group.getGroupId()});
 
 		SearchResponse searchResponse = _searcher.search(
@@ -305,6 +309,8 @@ public class JournalArticleIndexVersionsTest {
 
 	@DeleteAfterTestRun
 	private Group _group;
+
+	private Indexer<JournalArticle> _indexer;
 
 	@Inject
 	private JournalHelper _journalHelper;
