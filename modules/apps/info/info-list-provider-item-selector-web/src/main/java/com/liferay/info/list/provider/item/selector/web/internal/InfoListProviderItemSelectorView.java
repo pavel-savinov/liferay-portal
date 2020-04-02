@@ -80,7 +80,7 @@ public class InfoListProviderItemSelectorView
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return _language.get(resourceBundle, "content-set-providers");
+		return _language.get(resourceBundle, "collection-providers");
 	}
 
 	@Override
@@ -208,7 +208,7 @@ public class InfoListProviderItemSelectorView
 			SearchContainer searchContainer = new SearchContainer<>(
 				portletRequest, _portletURL, null,
 				_language.get(
-					resourceBundle, "there-are-no-content-set-providers"));
+					resourceBundle, "there-are-no-collection-providers"));
 
 			List<InfoListProvider> infoListProviders = null;
 
