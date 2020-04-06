@@ -1,5 +1,15 @@
 @import 'atlas-variables';
 
+.card-page li:last-child {
+	@media (max-width: 1453px) {
+		flex-basis: 66.6%;
+	}
+
+	@media (min-width: 1454px) {
+		flex-basis: 25%;
+	}
+}
+
 .card-page-item-asset {
 	max-width: 50%;
 }
