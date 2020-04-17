@@ -15,6 +15,7 @@
 package com.liferay.layout.taglib.internal.display.context;
 
 import com.liferay.asset.display.page.constants.AssetDisplayPageWebKeys;
+import com.liferay.fragment.renderer.FragmentRendererTracker;
 import com.liferay.info.display.contributor.InfoDisplayContributor;
 import com.liferay.info.display.contributor.InfoDisplayContributorTracker;
 import com.liferay.info.display.contributor.InfoDisplayObjectProvider;
@@ -59,12 +60,14 @@ public class RenderFragmentLayoutDisplayContext {
 	public RenderFragmentLayoutDisplayContext(
 		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse,
+		FragmentRendererTracker fragmentRendererTracker,
 		InfoDisplayContributorTracker infoDisplayContributorTracker,
 		LayoutListRetrieverTracker layoutListRetrieverTracker,
 		ListObjectReferenceFactoryTracker listObjectReferenceFactoryTracker) {
 
 		_httpServletRequest = httpServletRequest;
 		_httpServletResponse = httpServletResponse;
+		_fragmentRendererTracker = fragmentRendererTracker;
 		_infoDisplayContributorTracker = infoDisplayContributorTracker;
 		_layoutListRetrieverTracker = layoutListRetrieverTracker;
 		_listObjectReferenceFactoryTracker = listObjectReferenceFactoryTracker;
@@ -238,6 +241,7 @@ public class RenderFragmentLayoutDisplayContext {
 
 	private final HttpServletRequest _httpServletRequest;
 	private final HttpServletResponse _httpServletResponse;
+	private final FragmentRendererTracker _fragmentRendererTracker;
 	private final InfoDisplayContributorTracker _infoDisplayContributorTracker;
 	private final LayoutListRetrieverTracker _layoutListRetrieverTracker;
 	private final ListObjectReferenceFactoryTracker
