@@ -17,6 +17,7 @@ package com.liferay.fragment.internal.renderer;
 import com.liferay.asset.display.page.constants.AssetDisplayPageWebKeys;
 import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererContext;
+import com.liferay.fragment.renderer.constants.FragmentRendererConstants;
 import com.liferay.info.display.contributor.InfoDisplayObjectProvider;
 import com.liferay.info.item.renderer.InfoItemRenderer;
 import com.liferay.info.item.renderer.InfoItemRendererTracker;
@@ -44,6 +45,12 @@ public class LayoutDisplayObjectFragmentRenderer implements FragmentRenderer {
 	@Override
 	public String getCollectionKey() {
 		return "content-display";
+	}
+
+	@Override
+	public String getKey() {
+		return FragmentRendererConstants.
+			LAYOUT_DISPLAY_OBJECT_FRAGMENT_RENDERER_KEY;
 	}
 
 	@Override
