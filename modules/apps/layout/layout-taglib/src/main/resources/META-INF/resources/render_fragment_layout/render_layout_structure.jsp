@@ -66,10 +66,12 @@ for (String childrenItemId : childrenItemIds) {
 		<c:when test="<%= layoutStructureItem instanceof CollectionItemLayoutStructureItem %>">
 
 			<%
-			request.setAttribute("render_layout_structure.jsp-childrenItemIds", layoutStructureItem.getChildrenItemIds());
+			Object collectionObject = request.getAttribute("render_layout_structure.jsp-collectionObject");
 			%>
 
-			<liferay-util:include page="/render_fragment_layout/render_layout_structure.jsp" servletContext="<%= application %>" />
+			<c:if test="<%= collectionObject != null %>">
+				<%= renderFragmentLayoutDisplayContext.renderCollectionObject(collectionObject) %>
+			</c:if>
 		</c:when>
 		<c:when test="<%= layoutStructureItem instanceof ColumnLayoutStructureItem %>">
 

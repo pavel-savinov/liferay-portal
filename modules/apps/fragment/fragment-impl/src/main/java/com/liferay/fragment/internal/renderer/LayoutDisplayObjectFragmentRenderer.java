@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
@@ -78,7 +79,8 @@ public class LayoutDisplayObjectFragmentRenderer implements FragmentRenderer {
 		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse) {
 
-		Object displayObject = _getDisplayObject(httpServletRequest);
+		Object displayObject = _getDisplayObject(
+			fragmentRendererContext, httpServletRequest);
 
 		if (displayObject == null) {
 			if (FragmentRendererUtil.isEditMode(httpServletRequest)) {
@@ -108,7 +110,17 @@ public class LayoutDisplayObjectFragmentRenderer implements FragmentRenderer {
 			displayObject, httpServletRequest, httpServletResponse);
 	}
 
-	private Object _getDisplayObject(HttpServletRequest httpServletRequest) {
+	private Object _getDisplayObject(
+		FragmentRendererContext fragmentRendererContext,
+		HttpServletRequest httpServletRequest) {
+
+		Optional<Object> displayObjectOptional =
+			fragmentRendererContext.getDisplayObjectOptional();
+
+		if (displayObjectOptional.isPresent()) {
+			return displayObjectOptional.get();
+		}
+
 		InfoDisplayObjectProvider infoDisplayObjectProvider =
 			(InfoDisplayObjectProvider)httpServletRequest.getAttribute(
 				AssetDisplayPageWebKeys.INFO_DISPLAY_OBJECT_PROVIDER);

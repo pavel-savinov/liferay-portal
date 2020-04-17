@@ -15,7 +15,10 @@
 package com.liferay.layout.taglib.internal.display.context;
 
 import com.liferay.asset.display.page.constants.AssetDisplayPageWebKeys;
+import com.liferay.fragment.renderer.DefaultFragmentRendererContext;
+import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererTracker;
+import com.liferay.fragment.renderer.constants.FragmentRendererConstants;
 import com.liferay.info.display.contributor.InfoDisplayContributor;
 import com.liferay.info.display.contributor.InfoDisplayContributorTracker;
 import com.liferay.info.display.contributor.InfoDisplayObjectProvider;
@@ -236,12 +239,48 @@ public class RenderFragmentLayoutDisplayContext {
 		return unsyncStringWriter.toString();
 	}
 
+	public String renderCollectionObject(Object collectionObject)
+		throws Exception {
+
+		FragmentRenderer fragmentRenderer =
+			_fragmentRendererTracker.getFragmentRenderer(
+				FragmentRendererConstants.
+					LAYOUT_DISPLAY_OBJECT_FRAGMENT_RENDERER_KEY);
+
+		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
+
+		PipingServletResponse pipingServletResponse = new PipingServletResponse(
+			_httpServletResponse, unsyncStringWriter);
+
+		DefaultFragmentRendererContext defaultFragmentRendererContext =
+			new DefaultFragmentRendererContext(null);
+
+		defaultFragmentRendererContext.setDisplayObject(collectionObject);
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		long[] segmentsExperienceIds = (long[])_httpServletRequest.getAttribute(
+			"liferay-layout:render-fragment-layout:segmentsExperienceIds");
+
+		defaultFragmentRendererContext.setLocale(themeDisplay.getLocale());
+		defaultFragmentRendererContext.setSegmentsExperienceIds(
+			segmentsExperienceIds);
+
+		fragmentRenderer.render(
+			defaultFragmentRendererContext, _httpServletRequest,
+			pipingServletResponse);
+
+		return unsyncStringWriter.toString();
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		RenderFragmentLayoutDisplayContext.class);
 
+	private final FragmentRendererTracker _fragmentRendererTracker;
 	private final HttpServletRequest _httpServletRequest;
 	private final HttpServletResponse _httpServletResponse;
-	private final FragmentRendererTracker _fragmentRendererTracker;
 	private final InfoDisplayContributorTracker _infoDisplayContributorTracker;
 	private final LayoutListRetrieverTracker _layoutListRetrieverTracker;
 	private final ListObjectReferenceFactoryTracker
