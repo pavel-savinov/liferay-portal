@@ -23,6 +23,7 @@ import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.layout.util.structure.LayoutStructure;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Company;
@@ -44,6 +45,7 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -137,6 +139,63 @@ public class AddFragmentCompositionMVCActionCommandTest {
 
 		Assert.assertEquals(
 			"saved-fragments", fragmentCollection.getFragmentCollectionKey());
+	}
+
+	@Test
+	public void testAddFragmentCompositionExistingCollection()
+		throws Exception {
+
+		MockLiferayPortletActionRequest actionRequest = _getMockActionRequest();
+		MockLiferayPortletActionResponse actionResponse =
+			new MockLiferayPortletActionResponse();
+
+		LayoutPageTemplateStructure layoutPageTemplateStructure =
+			_layoutPageTemplateStructureLocalService.
+				fetchLayoutPageTemplateStructure(
+					_group.getGroupId(),
+					PortalUtil.getClassNameId(Layout.class.getName()),
+					_layout.getPlid(), true);
+
+		LayoutStructure layoutStructure = LayoutStructure.of(
+			layoutPageTemplateStructure.getData(
+				SegmentsExperienceConstants.ID_DEFAULT));
+
+		FragmentCollection newFragmentCollection =
+			_fragmentCollectionLocalService.addFragmentCollection(
+				TestPropsValues.getUserId(), _group.getGroupId(),
+				StringUtil.randomString(), StringPool.BLANK,
+				ServiceContextThreadLocal.getServiceContext());
+
+		actionRequest.addParameter(
+			"fragmentCollectionId",
+			String.valueOf(newFragmentCollection.getFragmentCollectionId()));
+
+		actionRequest.addParameter("name", "test name");
+		actionRequest.addParameter("description", "test description");
+		actionRequest.addParameter("itemId", layoutStructure.getMainItemId());
+
+		JSONObject jsonObject = ReflectionTestUtil.invoke(
+			_mvcActionCommand, "doTransactionalCommand",
+			new Class<?>[] {ActionRequest.class, ActionResponse.class},
+			actionRequest, actionResponse);
+
+		Assert.assertNotNull(jsonObject);
+
+		FragmentComposition fragmentComposition =
+			_fragmentCompositionLocalService.fetchFragmentComposition(
+				_group.getGroupId(), jsonObject.getString("fragmentEntryKey"));
+
+		Assert.assertNotNull(fragmentComposition);
+
+		FragmentCollection fragmentCollection =
+			_fragmentCollectionLocalService.getFragmentCollection(
+				fragmentComposition.getFragmentCollectionId());
+
+		Assert.assertNotNull(fragmentCollection);
+
+		Assert.assertEquals(
+			newFragmentCollection.getFragmentCollectionKey(),
+			fragmentCollection.getFragmentCollectionKey());
 	}
 
 	private MockActionRequest _getMockActionRequest() throws PortalException {
