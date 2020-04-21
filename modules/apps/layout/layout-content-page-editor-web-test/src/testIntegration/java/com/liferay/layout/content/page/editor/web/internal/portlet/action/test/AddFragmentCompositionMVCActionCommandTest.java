@@ -198,6 +198,53 @@ public class AddFragmentCompositionMVCActionCommandTest {
 			fragmentCollection.getFragmentCollectionKey());
 	}
 
+	@Test
+	public void testAddFragmentCompositionWithThumbnail() throws Exception {
+		MockLiferayPortletActionRequest actionRequest = _getMockActionRequest();
+		MockLiferayPortletActionResponse actionResponse =
+			new MockLiferayPortletActionResponse();
+
+		LayoutPageTemplateStructure layoutPageTemplateStructure =
+			_layoutPageTemplateStructureLocalService.
+				fetchLayoutPageTemplateStructure(
+					_group.getGroupId(),
+					PortalUtil.getClassNameId(Layout.class.getName()),
+					_layout.getPlid(), true);
+
+		LayoutStructure layoutStructure = LayoutStructure.of(
+			layoutPageTemplateStructure.getData(
+				SegmentsExperienceConstants.ID_DEFAULT));
+
+		FragmentCollection newFragmentCollection =
+			_fragmentCollectionLocalService.addFragmentCollection(
+				TestPropsValues.getUserId(), _group.getGroupId(),
+				StringUtil.randomString(), StringPool.BLANK,
+				ServiceContextThreadLocal.getServiceContext());
+
+		actionRequest.addParameter(
+			"fragmentCollectionId",
+			String.valueOf(newFragmentCollection.getFragmentCollectionId()));
+
+		actionRequest.addParameter("name", "test name");
+		actionRequest.addParameter("description", "test description");
+		actionRequest.addParameter("itemId", layoutStructure.getMainItemId());
+		actionRequest.addParameter("previewImageURL", _THUMBNAIL_DATA);
+
+		JSONObject jsonObject = ReflectionTestUtil.invoke(
+			_mvcActionCommand, "doTransactionalCommand",
+			new Class<?>[] {ActionRequest.class, ActionResponse.class},
+			actionRequest, actionResponse);
+
+		Assert.assertNotNull(jsonObject);
+
+		FragmentComposition fragmentComposition =
+			_fragmentCompositionLocalService.fetchFragmentComposition(
+				_group.getGroupId(), jsonObject.getString("fragmentEntryKey"));
+
+		Assert.assertNotNull(fragmentComposition);
+		Assert.assertTrue(fragmentComposition.getPreviewFileEntryId() > 0);
+	}
+
 	private MockActionRequest _getMockActionRequest() throws PortalException {
 		MockActionRequest mockActionRequest = new MockActionRequest();
 
@@ -225,6 +272,10 @@ public class AddFragmentCompositionMVCActionCommandTest {
 
 		return themeDisplay;
 	}
+
+	private static final String _THUMBNAIL_DATA =
+		"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAA" +
+			"AADUlEQVQYV2M4c+bMfwAIMANkq3cY2wAAAABJRU5ErkJggg==";
 
 	private Company _company;
 
