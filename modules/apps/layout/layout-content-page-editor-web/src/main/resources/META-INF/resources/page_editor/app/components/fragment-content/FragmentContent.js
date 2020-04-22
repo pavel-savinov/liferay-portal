@@ -16,7 +16,13 @@ import classNames from 'classnames';
 import {useIsMounted} from 'frontend-js-react-web';
 import {debounce} from 'frontend-js-web';
 import PropTypes from 'prop-types';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
+} from 'react';
 
 import {updateFragmentEntryLinkContent} from '../../actions/index';
 import {DROP_ZONE_FRAGMENT_ENTRY_PROCESSOR} from '../../config/constants/dropZoneFragmentEntryProcessor';
@@ -26,7 +32,10 @@ import selectPrefixedSegmentsExperienceId from '../../selectors/selectPrefixedSe
 import selectSegmentsExperienceId from '../../selectors/selectSegmentsExperienceId';
 import FragmentService from '../../services/FragmentService';
 import {useDispatch, useSelector} from '../../store/index';
-import {useGetFieldValue} from '../CollectionItemContext';
+import {
+	CollectionItemContext,
+	useGetFieldValue,
+} from '../CollectionItemContext';
 import Layout from '../Layout';
 import UnsafeHTML from '../UnsafeHTML';
 import {
@@ -95,8 +104,20 @@ const FragmentContent = React.forwardRef(
 
 		const [content, setContent] = useState(defaultContent);
 
+		const collectionItemContext = useContext(CollectionItemContext);
+
+		const collectionItemClassName = collectionItemContext.collectionItem
+			? collectionItemContext.collectionItem.className
+			: '';
+
+		const collectionItemClassPK = collectionItemContext.collectionItem
+			? collectionItemContext.collectionItem.classPK
+			: '';
+
 		useEffect(() => {
 			FragmentService.renderFragmentEntryLinkContent({
+				collectionItemClassName,
+				collectionItemClassPK,
 				fragmentEntryLinkId,
 				onNetworkStatus: dispatch,
 				segmentsExperienceId,
@@ -110,6 +131,8 @@ const FragmentContent = React.forwardRef(
 				)
 			);
 		}, [
+			collectionItemClassName,
+			collectionItemClassPK,
 			dispatch,
 			editableValues,
 			fragmentEntryLinkId,
