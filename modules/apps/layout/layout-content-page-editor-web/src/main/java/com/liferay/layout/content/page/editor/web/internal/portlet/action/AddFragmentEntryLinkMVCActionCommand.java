@@ -72,12 +72,13 @@ public class AddFragmentEntryLinkMVCActionCommand
 		String fragmentEntryKey = ParamUtil.getString(
 			actionRequest, "fragmentEntryKey");
 
+		long groupId = ParamUtil.getLong(actionRequest, "groupId");
+
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			actionRequest);
 
 		FragmentEntry fragmentEntry = FragmentEntryLinkUtil.getFragmentEntry(
-			serviceContext.getScopeGroupId(),
-			_fragmentCollectionContributorTracker, fragmentEntryKey,
+			groupId, _fragmentCollectionContributorTracker, fragmentEntryKey,
 			serviceContext.getLocale());
 
 		FragmentRenderer fragmentRenderer =
