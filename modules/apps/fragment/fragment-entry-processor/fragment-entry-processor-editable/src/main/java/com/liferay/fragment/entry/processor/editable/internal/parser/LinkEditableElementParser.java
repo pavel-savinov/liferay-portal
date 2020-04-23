@@ -22,7 +22,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -152,20 +151,7 @@ public class LinkEditableElementParser implements EditableElementParser {
 					"each-editable-image-element-must-contain-an-a-tag",
 					new Object[] {"<em>", "</em>"}, false));
 		}
-
-		if (!ArrayUtil.contains(_TAGS_WHITELIST, element.tagName())) {
-			ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
-				"content.Language", getClass());
-
-			throw new FragmentEntryContentException(
-				LanguageUtil.format(
-					resourceBundle,
-					"an-editable-of-type-x-cannot-be-used-in-a-tag-of-type-x",
-					new Object[] {"link", element.tagName()}, false));
-		}
 	}
-
-	private static final String[] _TAGS_WHITELIST = {"a", "lfr-editable"};
 
 	private static final String _TMPL_LINK_FIELD_TEMPLATE = StringUtil.read(
 		EditableFragmentEntryProcessor.class,
