@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Html;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -178,7 +179,20 @@ public class ImageEditableElementParser implements EditableElementParser {
 					"each-editable-image-element-must-contain-an-img-tag",
 					new Object[] {"<em>", "</em>"}, false));
 		}
+
+		if (!ArrayUtil.contains(_TAGS_WHITELIST, element.tagName())) {
+			ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+				"content.Language", getClass());
+
+			throw new FragmentEntryContentException(
+				LanguageUtil.format(
+					resourceBundle,
+					"an-editable-of-type-x-cannot-be-used-in-a-tag-of-type-x",
+					new Object[] {"image", element.tagName()}, false));
+		}
 	}
+
+	private static final String[] _TAGS_WHITELIST = {"img", "lfr-editable"};
 
 	private static final String _TMPL_IMAGE_FIELD_ALT_TEMPLATE =
 		StringUtil.read(
