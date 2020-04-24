@@ -27,6 +27,7 @@
  */
 
 import {useModal} from '@clayui/modal';
+import classNames from 'classnames';
 import {useIsMounted} from 'frontend-js-react-web';
 import PropTypes from 'prop-types';
 import React, {useEffect, useRef, useState} from 'react';
@@ -54,6 +55,7 @@ export const ResizingContext = React.createContext();
 
 const RowWithControls = React.forwardRef(
 	({children, item, layoutData}, ref) => {
+		const {config} = layoutData.items[item.itemId];
 		const dispatch = useDispatch();
 		const {gutters} = {
 			...LAYOUT_DATA_ITEM_DEFAULT_CONFIGURATIONS[
@@ -75,6 +77,9 @@ const RowWithControls = React.forwardRef(
 		});
 
 		const state = useSelector((state) => state);
+		const {selectedViewportSize} = state;
+		const selectedViewportSizeConfig =
+			config[selectedViewportSize] || config;
 
 		const rowRef = useRef(null);
 		const rowRect = getRect(rowRef.current);
@@ -186,7 +191,14 @@ const RowWithControls = React.forwardRef(
 		return (
 			<Topper item={item} itemRef={ref} layoutData={layoutData}>
 				<Row
-					className="page-editor__row"
+					className={classNames('page-editor__row', {
+						'align-bottom':
+							selectedViewportSizeConfig.verticalAlignment ===
+							'bottom',
+						'align-middle':
+							selectedViewportSizeConfig.verticalAlignment ===
+							'middle',
+					})}
 					item={item}
 					layoutData={layoutData}
 					ref={(node) => {
