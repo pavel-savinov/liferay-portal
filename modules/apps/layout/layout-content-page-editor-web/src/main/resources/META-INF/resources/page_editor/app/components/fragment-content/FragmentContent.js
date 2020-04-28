@@ -84,12 +84,12 @@ const FragmentContent = React.forwardRef(
 		const segmentsExperienceId = useSelector(selectSegmentsExperienceId);
 
 		const fragmentEntryLink = useSelector(
-			state => state.fragmentEntryLinks[fragmentEntryLinkId]
+			(state) => state.fragmentEntryLinks[fragmentEntryLinkId]
 		);
 
 		const defaultContent = getContent(fragmentEntryLink);
 
-		const editableValues = useSelector(state =>
+		const editableValues = useSelector((state) =>
 			state.fragmentEntryLinks[fragmentEntryLinkId]
 				? state.fragmentEntryLinks[fragmentEntryLinkId].editableValues
 				: {}
@@ -102,7 +102,7 @@ const FragmentContent = React.forwardRef(
 				fragmentEntryLinkId,
 				onNetworkStatus: dispatch,
 				segmentsExperienceId,
-			}).then(action => {
+			}).then((action) => {
 				dispatch(
 					updateFragmentEntryLinkContent({
 						...action,

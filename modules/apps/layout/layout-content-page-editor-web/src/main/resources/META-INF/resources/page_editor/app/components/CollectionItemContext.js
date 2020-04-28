@@ -62,7 +62,7 @@ const useGetContent = () => {
 	const context = useContext(CollectionItemContext);
 
 	return useCallback(
-		fragmentEntryLink => {
+		(fragmentEntryLink) => {
 			if (context.collectionItemIndex != null) {
 				const collectionContent =
 					fragmentEntryLink.collectionContent || [];

@@ -71,7 +71,7 @@ export default function ItemSelector({
 							}
 						>
 							<ClayDropDown.ItemList>
-								{mappedInfoItems.map(item => (
+								{mappedInfoItems.map((item) => (
 									<ClayDropDown.Item
 										key={item.classNameId}
 										onClick={() => {

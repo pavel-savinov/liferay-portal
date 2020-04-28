@@ -67,7 +67,7 @@ export const ItemSelectorField = ({field, onValueSelect, value}) => {
 					<TemplateSelector
 						className={className}
 						classPK={classPK}
-						onTemplateSelect={template => {
+						onTemplateSelect={(template) => {
 							onValueSelect(field.name, {...value, template});
 						}}
 						selectedTemplate={value.template}
