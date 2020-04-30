@@ -55,9 +55,7 @@ import com.liferay.taglib.servlet.PipingServletResponse;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import java.util.Map;
-
 import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
@@ -221,7 +219,7 @@ public class RenderFragmentLayoutDisplayContext {
 			className);
 	}
 
-	public String getColumnSizeClass(
+	public String getColumnClass(
 		RowLayoutStructureItem rowLayoutStructureItem,
 		ColumnLayoutStructureItem columnLayoutStructureItem) {
 
@@ -234,6 +232,10 @@ public class RenderFragmentLayoutDisplayContext {
 
 		sb.append("col-lg-");
 		sb.append(columnSize);
+
+		if (!rowLayoutStructureItem.isGutters()) {
+			sb.append("pl-lg-0 pr-lg-0");
+		}
 
 		Map<String, JSONObject> viewportSizeConfigurations =
 			rowLayoutStructureItem.getViewportSizeConfigurations();
@@ -256,8 +258,23 @@ public class RenderFragmentLayoutDisplayContext {
 					rowLayoutStructureItem.getNumberOfColumns() / modulesPerRow;
 
 			sb.append(StringPool.SPACE);
+			sb.append("col");
 			sb.append(viewportSize.getCssClassPrefix());
 			sb.append(columnSize);
+
+			boolean gutters = viewportSizeConfigurationJSONObject.getBoolean(
+				"gutters", rowLayoutStructureItem.isGutters());
+
+			if (!gutters) {
+				sb.append(StringPool.SPACE);
+				sb.append("pl");
+				sb.append(viewportSize.getCssClassPrefix());
+				sb.append("0");
+				sb.append(StringPool.SPACE);
+				sb.append("pr");
+				sb.append(viewportSize.getCssClassPrefix());
+				sb.append("0");
+			}
 		}
 
 		return sb.toString();
@@ -317,6 +334,85 @@ public class RenderFragmentLayoutDisplayContext {
 		return unsyncStringWriter.toString();
 	}
 
+	public String getRowClass(RowLayoutStructureItem rowLayoutStructureItem) {
+		StringBundler sb = new StringBundler();
+
+		sb.append("align-items-lg-");
+		sb.append(
+			_getVerticalAlignmentClass(
+				rowLayoutStructureItem.getVerticalAlignment()));
+
+		Map<String, JSONObject> viewportSizeConfigurations =
+			rowLayoutStructureItem.getViewportSizeConfigurations();
+
+		for (ViewportSize viewportSize : ViewportSize.values()) {
+			if (Objects.equals(viewportSize, ViewportSize.DESKTOP)) {
+				continue;
+			}
+
+			JSONObject viewportSizeConfigurationJSONObject =
+				viewportSizeConfigurations.getOrDefault(
+					viewportSize.getViewportSizeId(),
+					JSONFactoryUtil.createJSONObject());
+
+			String verticalAlignment =
+				viewportSizeConfigurationJSONObject.getString(
+					"verticalAlignment",
+					rowLayoutStructureItem.getVerticalAlignment());
+
+			sb.append(StringPool.SPACE);
+			sb.append("align-items");
+			sb.append(viewportSize.getCssClassPrefix());
+			sb.append(_getVerticalAlignmentClass(verticalAlignment));
+		}
+
+		if (rowLayoutStructureItem.isReverseOrder() &&
+			(rowLayoutStructureItem.getModulesPerRow() > 1)) {
+
+			sb.append(StringPool.SPACE);
+			sb.append("flex-lg-row-reverse");
+		}
+		else if (rowLayoutStructureItem.isReverseOrder() &&
+				 (rowLayoutStructureItem.getModulesPerRow() == 1)) {
+
+			sb.append(StringPool.SPACE);
+			sb.append("flex-lg-column-reverse");
+		}
+
+		for (ViewportSize viewportSize : ViewportSize.values()) {
+			if (Objects.equals(viewportSize, ViewportSize.DESKTOP)) {
+				continue;
+			}
+
+			JSONObject viewportSizeConfigurationJSONObject =
+				viewportSizeConfigurations.getOrDefault(
+					viewportSize.getViewportSizeId(),
+					JSONFactoryUtil.createJSONObject());
+
+			boolean reverseOrder =
+				viewportSizeConfigurationJSONObject.getBoolean(
+					"reverseOrder", rowLayoutStructureItem.isReverseOrder());
+
+			int modulesPerRow = viewportSizeConfigurationJSONObject.getInt(
+				"modulesPerRow", rowLayoutStructureItem.getModulesPerRow());
+
+			if (reverseOrder) {
+				sb.append(StringPool.SPACE);
+				sb.append("flex");
+				sb.append(viewportSize.getCssClassPrefix());
+
+				if (modulesPerRow > 1) {
+					sb.append("row-reverse");
+				}
+				else if (modulesPerRow == 1) {
+					sb.append("column-reverse");
+				}
+			}
+		}
+
+		return sb.toString();
+	}
+
 	private ListObjectReference _getListObjectReference(
 		JSONObject collectionJSONObject) {
 
@@ -364,6 +460,17 @@ public class RenderFragmentLayoutDisplayContext {
 		}
 
 		return _portlets;
+	}
+
+	private String _getVerticalAlignmentClass(String verticalAlignment) {
+		if (Objects.equals(verticalAlignment, "bottom")) {
+			return "end";
+		}
+		else if (Objects.equals(verticalAlignment, "middle")) {
+			return "center";
+		}
+
+		return "start";
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
