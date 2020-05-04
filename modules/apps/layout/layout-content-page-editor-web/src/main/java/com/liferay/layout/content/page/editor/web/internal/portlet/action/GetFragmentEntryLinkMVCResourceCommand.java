@@ -99,6 +99,10 @@ public class GetFragmentEntryLinkMVCResourceCommand
 			HttpServletRequest httpServletRequest =
 				_portal.getHttpServletRequest(resourceRequest);
 
+			InfoDisplayContributor currentInfoDisplayContributor =
+				(InfoDisplayContributor)httpServletRequest.getAttribute(
+					InfoDisplayWebKeys.INFO_DISPLAY_CONTRIBUTOR);
+
 			if (Validator.isNotNull(collectionItemClassName) &&
 				(collectionItemClassPK > 0)) {
 
@@ -113,6 +117,10 @@ public class GetFragmentEntryLinkMVCResourceCommand
 
 					defaultFragmentRendererContext.setDisplayObject(
 						infoDisplayObjectProvider.getDisplayObject());
+
+					httpServletRequest.setAttribute(
+						InfoDisplayWebKeys.INFO_DISPLAY_CONTRIBUTOR,
+						infoDisplayContributor);
 
 					httpServletRequest.setAttribute(
 						InfoDisplayWebKeys.INFO_LIST_DISPLAY_OBJECT,
@@ -134,6 +142,10 @@ public class GetFragmentEntryLinkMVCResourceCommand
 				);
 			}
 			finally {
+				httpServletRequest.setAttribute(
+					InfoDisplayWebKeys.INFO_DISPLAY_CONTRIBUTOR,
+					currentInfoDisplayContributor);
+
 				httpServletRequest.removeAttribute(
 					InfoDisplayWebKeys.INFO_LIST_DISPLAY_OBJECT);
 			}

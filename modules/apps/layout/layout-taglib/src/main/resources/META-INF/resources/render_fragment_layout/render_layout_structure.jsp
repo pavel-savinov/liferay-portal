@@ -44,8 +44,12 @@ for (String childrenItemId : childrenItemIds) {
 			<div class="row">
 
 				<%
-				for (Object collectionObject : renderFragmentLayoutDisplayContext.getCollection(collectionLayoutStructureItem, segmentsExperienceIds)) {
-					try {
+				InfoDisplayContributor currentInfoDisplayContributor = (InfoDisplayContributor)request.getAttribute(InfoDisplayWebKeys.INFO_DISPLAY_CONTRIBUTOR);
+
+				try {
+					request.setAttribute(InfoDisplayWebKeys.INFO_DISPLAY_CONTRIBUTOR, renderFragmentLayoutDisplayContext.getCollectionInfoDisplayContributor(collectionLayoutStructureItem));
+
+					for (Object collectionObject : renderFragmentLayoutDisplayContext.getCollection(collectionLayoutStructureItem, segmentsExperienceIds)) {
 						request.setAttribute(InfoDisplayWebKeys.INFO_LIST_DISPLAY_OBJECT, collectionObject);
 				%>
 
@@ -55,9 +59,10 @@ for (String childrenItemId : childrenItemIds) {
 
 				<%
 					}
-					finally {
-						request.removeAttribute(InfoDisplayWebKeys.INFO_LIST_DISPLAY_OBJECT);
-					}
+				}
+				finally {
+					request.setAttribute(InfoDisplayWebKeys.INFO_DISPLAY_CONTRIBUTOR, currentInfoDisplayContributor);
+					request.removeAttribute(InfoDisplayWebKeys.INFO_LIST_DISPLAY_OBJECT);
 				}
 				%>
 
