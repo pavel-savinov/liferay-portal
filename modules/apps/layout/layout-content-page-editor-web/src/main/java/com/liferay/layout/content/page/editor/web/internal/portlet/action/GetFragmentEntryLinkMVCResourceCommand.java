@@ -20,6 +20,8 @@ import com.liferay.fragment.renderer.DefaultFragmentRendererContext;
 import com.liferay.fragment.renderer.FragmentRendererController;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.info.constants.InfoDisplayWebKeys;
+import com.liferay.info.display.breadcrumb.InfoDisplayBreadcrumbEntriesProvider;
+import com.liferay.info.display.breadcrumb.InfoDisplayBreadcrumbEntriesProviderTracker;
 import com.liferay.info.display.contributor.InfoDisplayContributor;
 import com.liferay.info.display.contributor.InfoDisplayContributorTracker;
 import com.liferay.info.display.contributor.InfoDisplayObjectProvider;
@@ -30,11 +32,14 @@ import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.servlet.taglib.ui.BreadcrumbEntry;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+
+import java.util.List;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
@@ -103,6 +108,10 @@ public class GetFragmentEntryLinkMVCResourceCommand
 				(InfoDisplayContributor)httpServletRequest.getAttribute(
 					InfoDisplayWebKeys.INFO_DISPLAY_CONTRIBUTOR);
 
+			List<BreadcrumbEntry> currentBreadcrumbEntries =
+				(List<BreadcrumbEntry>)httpServletRequest.getAttribute(
+					WebKeys.PORTLET_BREADCRUMBS);
+
 			if (Validator.isNotNull(collectionItemClassName) &&
 				(collectionItemClassPK > 0)) {
 
@@ -110,13 +119,18 @@ public class GetFragmentEntryLinkMVCResourceCommand
 					_infoDisplayContributorTracker.getInfoDisplayContributor(
 						collectionItemClassName);
 
+				Object displayObject = null;
+
 				if (infoDisplayContributor != null) {
 					InfoDisplayObjectProvider infoDisplayObjectProvider =
 						infoDisplayContributor.getInfoDisplayObjectProvider(
 							collectionItemClassPK);
 
+					displayObject =
+						infoDisplayObjectProvider.getDisplayObject();
+
 					defaultFragmentRendererContext.setDisplayObject(
-						infoDisplayObjectProvider.getDisplayObject());
+						displayObject);
 
 					httpServletRequest.setAttribute(
 						InfoDisplayWebKeys.INFO_DISPLAY_CONTRIBUTOR,
@@ -124,6 +138,22 @@ public class GetFragmentEntryLinkMVCResourceCommand
 					httpServletRequest.setAttribute(
 						InfoDisplayWebKeys.INFO_LIST_DISPLAY_OBJECT,
 						infoDisplayObjectProvider.getDisplayObject());
+				}
+
+				InfoDisplayBreadcrumbEntriesProvider
+					infoDisplayBreadcrumbEntriesProvider =
+						_infoDisplayBreadcrumbEntriesProviderTracker.
+							getInfoDisplayBreadcrumbEntriesProvider(
+								collectionItemClassName);
+
+				if ((displayObject != null) &&
+					(infoDisplayBreadcrumbEntriesProvider != null)) {
+
+					httpServletRequest.setAttribute(
+						WebKeys.PORTLET_BREADCRUMBS,
+						infoDisplayBreadcrumbEntriesProvider.
+							getInfoDisplayObjectBreadcrumbEntries(
+								displayObject, themeDisplay.getLocale()));
 				}
 			}
 
@@ -147,6 +177,9 @@ public class GetFragmentEntryLinkMVCResourceCommand
 				httpServletRequest.setAttribute(
 					InfoDisplayWebKeys.INFO_DISPLAY_CONTRIBUTOR,
 					currentInfoDisplayContributor);
+
+				httpServletRequest.setAttribute(
+					WebKeys.PORTLET_BREADCRUMBS, currentBreadcrumbEntries);
 			}
 
 			if (SessionErrors.contains(
@@ -167,6 +200,10 @@ public class GetFragmentEntryLinkMVCResourceCommand
 
 	@Reference
 	private FragmentRendererController _fragmentRendererController;
+
+	@Reference
+	private InfoDisplayBreadcrumbEntriesProviderTracker
+		_infoDisplayBreadcrumbEntriesProviderTracker;
 
 	@Reference
 	private InfoDisplayContributorTracker _infoDisplayContributorTracker;

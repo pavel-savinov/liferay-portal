@@ -16,6 +16,7 @@ package com.liferay.layout.taglib.internal.servlet;
 
 import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.renderer.FragmentRendererTracker;
+import com.liferay.info.display.breadcrumb.InfoDisplayBreadcrumbEntriesProviderTracker;
 import com.liferay.info.display.contributor.InfoDisplayContributorTracker;
 import com.liferay.layout.list.retriever.LayoutListRetrieverTracker;
 import com.liferay.layout.list.retriever.ListObjectReferenceFactoryTracker;
@@ -52,6 +53,12 @@ public class ServletContextUtil {
 
 	public static final FragmentRendererTracker getFragmentRendererTracker() {
 		return _fragmentRendererTracker;
+	}
+
+	public static final InfoDisplayBreadcrumbEntriesProviderTracker
+		getInfoDisplayBreadcrumbEntriesProviderTracker() {
+
+		return _infoDisplayBreadcrumbEntriesProviderTracker;
 	}
 
 	public static final InfoDisplayContributorTracker
@@ -133,6 +140,15 @@ public class ServletContextUtil {
 	}
 
 	@Reference(unbind = "-")
+	protected void setInfoDisplayBreadcrumbEntriesProviderTracker(
+		InfoDisplayBreadcrumbEntriesProviderTracker
+			infoDisplayBreadcrumbEntriesProviderTracker) {
+
+		_infoDisplayBreadcrumbEntriesProviderTracker =
+			infoDisplayBreadcrumbEntriesProviderTracker;
+	}
+
+	@Reference(unbind = "-")
 	protected void setInfoDisplayContributorTracker(
 		InfoDisplayContributorTracker infoDisplayContributorTracker) {
 
@@ -164,6 +180,8 @@ public class ServletContextUtil {
 	private static FragmentCollectionContributorTracker
 		_fragmentCollectionContributorTracker;
 	private static FragmentRendererTracker _fragmentRendererTracker;
+	private static InfoDisplayBreadcrumbEntriesProviderTracker
+		_infoDisplayBreadcrumbEntriesProviderTracker;
 	private static InfoDisplayContributorTracker _infoDisplayContributorTracker;
 	private static final Map<String, LayoutClassedModelUsageRecorder>
 		_layoutClassedModelUsageRecorders = new ConcurrentHashMap<>();

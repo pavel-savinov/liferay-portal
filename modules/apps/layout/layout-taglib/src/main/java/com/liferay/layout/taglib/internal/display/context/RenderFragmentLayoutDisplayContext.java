@@ -16,6 +16,8 @@ package com.liferay.layout.taglib.internal.display.context;
 
 import com.liferay.asset.display.page.constants.AssetDisplayPageWebKeys;
 import com.liferay.document.library.kernel.model.DLFileEntry;
+import com.liferay.info.display.breadcrumb.InfoDisplayBreadcrumbEntriesProvider;
+import com.liferay.info.display.breadcrumb.InfoDisplayBreadcrumbEntriesProviderTracker;
 import com.liferay.info.display.contributor.InfoDisplayContributor;
 import com.liferay.info.display.contributor.InfoDisplayContributorTracker;
 import com.liferay.info.display.contributor.InfoDisplayObjectProvider;
@@ -40,6 +42,7 @@ import com.liferay.portal.kernel.portlet.PortletJSONUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalServiceUtil;
+import com.liferay.portal.kernel.servlet.taglib.ui.BreadcrumbEntry;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -51,6 +54,7 @@ import com.liferay.taglib.servlet.PipingServletResponse;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
@@ -64,12 +68,16 @@ public class RenderFragmentLayoutDisplayContext {
 	public RenderFragmentLayoutDisplayContext(
 		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse,
+		InfoDisplayBreadcrumbEntriesProviderTracker
+			infoDisplayBreadcrumbEntriesProviderTracker,
 		InfoDisplayContributorTracker infoDisplayContributorTracker,
 		LayoutListRetrieverTracker layoutListRetrieverTracker,
 		ListObjectReferenceFactoryTracker listObjectReferenceFactoryTracker) {
 
 		_httpServletRequest = httpServletRequest;
 		_httpServletResponse = httpServletResponse;
+		_infoDisplayBreadcrumbEntriesProviderTracker =
+			infoDisplayBreadcrumbEntriesProviderTracker;
 		_infoDisplayContributorTracker = infoDisplayContributorTracker;
 		_layoutListRetrieverTracker = layoutListRetrieverTracker;
 		_listObjectReferenceFactoryTracker = listObjectReferenceFactoryTracker;
@@ -214,6 +222,22 @@ public class RenderFragmentLayoutDisplayContext {
 			className);
 	}
 
+	public List<BreadcrumbEntry> getInfoDisplayBreadcrumbEntries(
+		String className, Object displayObject, Locale locale) {
+
+		InfoDisplayBreadcrumbEntriesProvider
+			infoDisplayBreadcrumbEntriesProvider =
+				_infoDisplayBreadcrumbEntriesProviderTracker.
+					getInfoDisplayBreadcrumbEntriesProvider(className);
+
+		if (infoDisplayBreadcrumbEntriesProvider == null) {
+			return Collections.emptyList();
+		}
+
+		return infoDisplayBreadcrumbEntriesProvider.
+			getInfoDisplayObjectBreadcrumbEntries(displayObject, locale);
+	}
+
 	public String getPortletFooterPaths() {
 		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
 
@@ -322,6 +346,8 @@ public class RenderFragmentLayoutDisplayContext {
 
 	private final HttpServletRequest _httpServletRequest;
 	private final HttpServletResponse _httpServletResponse;
+	private final InfoDisplayBreadcrumbEntriesProviderTracker
+		_infoDisplayBreadcrumbEntriesProviderTracker;
 	private final InfoDisplayContributorTracker _infoDisplayContributorTracker;
 	private final LayoutListRetrieverTracker _layoutListRetrieverTracker;
 	private final ListObjectReferenceFactoryTracker

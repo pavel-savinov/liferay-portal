@@ -46,11 +46,18 @@ for (String childrenItemId : childrenItemIds) {
 				<%
 				InfoDisplayContributor currentInfoDisplayContributor = (InfoDisplayContributor)request.getAttribute(InfoDisplayWebKeys.INFO_DISPLAY_CONTRIBUTOR);
 
+				List<BreadcrumbEntry> currentBreadcrumbEntries = (List<BreadcrumbEntry>)request.getAttribute(WebKeys.PORTLET_BREADCRUMBS);
+
 				try {
-					request.setAttribute(InfoDisplayWebKeys.INFO_DISPLAY_CONTRIBUTOR, renderFragmentLayoutDisplayContext.getCollectionInfoDisplayContributor(collectionLayoutStructureItem));
+					InfoDisplayContributor infoDisplayContributor = renderFragmentLayoutDisplayContext.getCollectionInfoDisplayContributor(collectionLayoutStructureItem);
+
+					request.setAttribute(InfoDisplayWebKeys.INFO_DISPLAY_CONTRIBUTOR, infoDisplayContributor);
 
 					for (Object collectionObject : renderFragmentLayoutDisplayContext.getCollection(collectionLayoutStructureItem, segmentsExperienceIds)) {
+						List<BreadcrumbEntry> breadcrumbEntries = renderFragmentLayoutDisplayContext.getInfoDisplayBreadcrumbEntries(infoDisplayContributor.getClassName(), collectionObject, locale);
+
 						request.setAttribute(InfoDisplayWebKeys.INFO_LIST_DISPLAY_OBJECT, collectionObject);
+						request.setAttribute(WebKeys.PORTLET_BREADCRUMBS, breadcrumbEntries);
 				%>
 
 						<div class="col-md-<%= 12 / collectionLayoutStructureItem.getNumberOfColumns() %>">
@@ -64,6 +71,8 @@ for (String childrenItemId : childrenItemIds) {
 					request.removeAttribute(InfoDisplayWebKeys.INFO_LIST_DISPLAY_OBJECT);
 
 					request.setAttribute(InfoDisplayWebKeys.INFO_DISPLAY_CONTRIBUTOR, currentInfoDisplayContributor);
+
+					request.setAttribute(WebKeys.PORTLET_BREADCRUMBS, currentBreadcrumbEntries);
 				}
 				%>
 
