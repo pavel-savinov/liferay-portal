@@ -52,6 +52,7 @@ const Column = React.forwardRef(
 				{...props}
 				className={classNames(className, 'col', {
 					[`col-${columnSize}`]: columnSize,
+					['pl-0 pr-0']: parentItemConfig.gutters,
 				})}
 				ref={ref}
 			>

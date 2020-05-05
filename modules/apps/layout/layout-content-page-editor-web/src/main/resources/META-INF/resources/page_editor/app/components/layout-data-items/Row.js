@@ -20,7 +20,6 @@ import {
 	LayoutDataPropTypes,
 	getLayoutDataItemPropTypes,
 } from '../../../prop-types/index';
-import {LAYOUT_DATA_ITEM_DEFAULT_CONFIGURATIONS} from '../../config/constants/layoutDataItemDefaultConfigurations';
 import {LAYOUT_DATA_ITEM_TYPES} from '../../config/constants/layoutDataItemTypes';
 import {useSelector} from '../../store/index';
 
@@ -42,13 +41,16 @@ const Row = React.forwardRef(({children, className, item, layoutData}, ref) => {
 				empty: !item.children.some(
 					(childId) => layoutData.items[childId].children.length
 				),
-				'flex-row-reverse': !(typeof itemConfig.reverseOrder ===
-				'boolean'
-					? !itemConfig.reverseOrder
-					: LAYOUT_DATA_ITEM_DEFAULT_CONFIGURATIONS[item.type]),
-				'no-gutters': !(typeof itemConfig.gutters === 'boolean'
-					? itemConfig.gutters
-					: LAYOUT_DATA_ITEM_DEFAULT_CONFIGURATIONS[item.type]),
+				'flex-column-reverse':
+					typeof itemConfig.reverseOrder === 'boolean'
+						? itemConfig.reverseOrder &&
+						  itemConfig.modulesPerRow === 1
+						: false,
+				'flex-row-reverse':
+					typeof itemConfig.reverseOrder === 'boolean'
+						? itemConfig.reverseOrder &&
+						  itemConfig.modulesPerRow > 1
+						: false,
 			})}
 			ref={ref}
 		>
