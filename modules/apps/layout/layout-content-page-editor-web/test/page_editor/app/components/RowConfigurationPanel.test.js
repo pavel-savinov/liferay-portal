@@ -78,7 +78,7 @@ describe('RowConfigurationPanel', () => {
 
 	it('allows changing the gutter', async () => {
 		const {getByLabelText} = renderComponent();
-		const input = getByLabelText('columns-gutter');
+		const input = getByLabelText('show-gutter');
 
 		await fireEvent.click(input);
 
