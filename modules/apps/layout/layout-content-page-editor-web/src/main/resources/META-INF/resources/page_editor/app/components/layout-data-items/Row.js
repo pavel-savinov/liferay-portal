@@ -28,29 +28,21 @@ const Row = React.forwardRef(({children, className, item, layoutData}, ref) => {
 		(state) => state.selectedViewportSize
 	);
 
-	const itemConfig = item.config[selectedViewportSize]
-		? item.config[selectedViewportSize]
-		: item.config;
-
+	const itemConfig = item.config[selectedViewportSize] || item.config;
 	const rowContent = (
 		<div
 			className={classNames(className, 'row', {
-				'align-items-center': itemConfig.verticalAlignment === 'middle',
-				'align-items-end': itemConfig.verticalAlignment === 'bottom',
-				'align-items-start': itemConfig.verticalAlignment === 'top',
-				empty: !item.children.some(
-					(childId) => layoutData.items[childId].children.length
-				),
+				empty:
+					itemConfig.numberOfColumns === itemConfig.modulesPerRow &&
+					!item.children.some(
+						(childId) => layoutData.items[childId].children.length
+					),
 				'flex-column-reverse':
-					typeof itemConfig.reverseOrder === 'boolean'
-						? itemConfig.reverseOrder &&
-						  itemConfig.modulesPerRow === 1
-						: false,
-				'flex-row-reverse':
-					typeof itemConfig.reverseOrder === 'boolean'
-						? itemConfig.reverseOrder &&
-						  itemConfig.modulesPerRow > 1
-						: false,
+					itemConfig.numberOfColumns === 2 &&
+					itemConfig.modulesPerRow === 1 &&
+					itemConfig.reverseOrder,
+
+				'no-gutters': !itemConfig.gutters,
 			})}
 			ref={ref}
 		>
