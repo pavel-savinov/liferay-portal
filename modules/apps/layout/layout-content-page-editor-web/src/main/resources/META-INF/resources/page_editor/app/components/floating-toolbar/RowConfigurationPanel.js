@@ -25,6 +25,7 @@ import selectSegmentsExperienceId from '../../selectors/selectSegmentsExperience
 import {useDispatch, useSelector} from '../../store/index';
 import updateItemConfig from '../../thunks/updateItemConfig';
 import updateRowColumns from '../../thunks/updateRowColumns';
+import {getViewportSize} from '../../utils/getViewportSize';
 import {RowConfigurationCheckboxField} from './RowConfigurationCheckboxField';
 import {RowConfigurationSelectField} from './RowConfigurationSelectField';
 
@@ -63,7 +64,10 @@ export const RowConfigurationPanel = ({item}) => {
 		...LAYOUT_DATA_ITEM_DEFAULT_CONFIGURATIONS[LAYOUT_DATA_ITEM_TYPES.row],
 		...item.config,
 	};
-	const viewportSizeConfig = rowConfig[selectedViewportSize] || rowConfig;
+
+	const getConfigViewportSize = (option) =>
+		(rowConfig[getViewportSize(rowConfig, selectedViewportSize, option)] ||
+			rowConfig)[option];
 
 	const handleConfigurationValueChanged = (identifier, value) => {
 		let itemConfig = {[identifier]: value};
@@ -119,14 +123,14 @@ export const RowConfigurationPanel = ({item}) => {
 	return (
 		<>
 			<RowConfigurationSelectField
-				config={viewportSizeConfig.numberOfColumns}
+				config={getConfigViewportSize('numberOfColumns')}
 				id="rowNumberOfColumns"
 				identifier={ROW_CONFIGURATION_IDENTIFIERS.numberOfColumns}
 				label={Liferay.Language.get('number-of-columns')}
 				onValueChange={handleConfigurationValueChanged}
 				options={NUMBER_OF_COLUMNS_OPTIONS}
 			/>
-			{viewportSizeConfig.numberOfColumns > 1 && (
+			{getConfigViewportSize('numberOfColumns') > 1 && (
 				<RowConfigurationCheckboxField
 					config={rowConfig.gutters}
 					identifier={ROW_CONFIGURATION_IDENTIFIERS.gutters}
@@ -155,7 +159,7 @@ export const RowConfigurationPanel = ({item}) => {
 						</p>
 					</div>
 					<RowConfigurationSelectField
-						config={viewportSizeConfig.modulesPerRow}
+						config={getConfigViewportSize('modulesPerRow')}
 						getOptionLabel={getModulesPerRowOptionLabel}
 						id="rowModulesPerRow"
 						identifier={ROW_CONFIGURATION_IDENTIFIERS.modulesPerRow}
@@ -167,10 +171,10 @@ export const RowConfigurationPanel = ({item}) => {
 							]
 						}
 					/>
-					{viewportSizeConfig.numberOfColumns === 2 &&
-						viewportSizeConfig.modulesPerRow === 1 && (
+					{getConfigViewportSize('numberOfColumns') === 2 &&
+						getConfigViewportSize('modulesPerRow') === 1 && (
 							<RowConfigurationCheckboxField
-								config={viewportSizeConfig.reverseOrder}
+								config={getConfigViewportSize('reverseOrder')}
 								identifier={
 									ROW_CONFIGURATION_IDENTIFIERS.reverseOrder
 								}
@@ -179,7 +183,7 @@ export const RowConfigurationPanel = ({item}) => {
 							/>
 						)}
 					<RowConfigurationSelectField
-						config={viewportSizeConfig.verticalAlignment}
+						config={getConfigViewportSize('verticalAlignment')}
 						id="rowVerticalAlignment"
 						identifier={
 							ROW_CONFIGURATION_IDENTIFIERS.verticalAlignment
