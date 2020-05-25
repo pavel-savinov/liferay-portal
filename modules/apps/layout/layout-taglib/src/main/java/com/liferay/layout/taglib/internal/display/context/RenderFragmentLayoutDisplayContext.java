@@ -81,18 +81,6 @@ public class RenderFragmentLayoutDisplayContext {
 		_listObjectReferenceFactoryTracker = listObjectReferenceFactoryTracker;
 	}
 
-	public InfoListRendererContext getInfoListRendererContext(
-		String listItemStyle) {
-
-		DefaultInfoListRendererContext defaultInfoListRendererContext =
-			new DefaultInfoListRendererContext(
-				_httpServletRequest, _httpServletResponse);
-
-		defaultInfoListRendererContext.setListItemStyleKey(listItemStyle);
-
-		return defaultInfoListRendererContext;
-	}
-
 	public String getBackgroundImage(JSONObject rowConfigJSONObject)
 		throws PortalException {
 
@@ -241,6 +229,18 @@ public class RenderFragmentLayoutDisplayContext {
 
 		return _infoListRendererTracker.getInfoListRenderer(
 			collectionLayoutStructureItem.getListStyle());
+	}
+
+	public InfoListRendererContext getInfoListRendererContext(
+		String listItemStyle) {
+
+		DefaultInfoListRendererContext defaultInfoListRendererContext =
+			new DefaultInfoListRendererContext(
+				_httpServletRequest, _httpServletResponse);
+
+		defaultInfoListRendererContext.setListItemStyleKey(listItemStyle);
+
+		return defaultInfoListRendererContext;
 	}
 
 	public String getPortletFooterPaths() {

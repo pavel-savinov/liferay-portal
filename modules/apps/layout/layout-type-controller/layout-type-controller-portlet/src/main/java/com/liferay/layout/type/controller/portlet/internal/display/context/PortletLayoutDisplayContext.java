@@ -18,7 +18,9 @@ import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.info.display.contributor.InfoDisplayContributor;
 import com.liferay.info.display.contributor.InfoDisplayContributorTracker;
 import com.liferay.info.display.contributor.InfoDisplayObjectProvider;
+import com.liferay.info.list.renderer.DefaultInfoListRendererContext;
 import com.liferay.info.list.renderer.InfoListRenderer;
+import com.liferay.info.list.renderer.InfoListRendererContext;
 import com.liferay.info.list.renderer.InfoListRendererTracker;
 import com.liferay.info.pagination.Pagination;
 import com.liferay.layout.list.retriever.DefaultLayoutListRetrieverContext;
@@ -54,6 +56,7 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Eudaldo Alonso
@@ -62,12 +65,14 @@ public class PortletLayoutDisplayContext {
 
 	public PortletLayoutDisplayContext(
 		HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse,
 		InfoDisplayContributorTracker infoDisplayContributorTracker,
 		InfoListRendererTracker infoListRendererTracker,
 		LayoutListRetrieverTracker layoutListRetrieverTracker,
 		ListObjectReferenceFactoryTracker listObjectReferenceFactoryTracker) {
 
 		_httpServletRequest = httpServletRequest;
+		_httpServletResponse = httpServletResponse;
 		_infoDisplayContributorTracker = infoDisplayContributorTracker;
 		_infoListRendererTracker = infoListRendererTracker;
 		_layoutListRetrieverTracker = layoutListRetrieverTracker;
@@ -233,6 +238,18 @@ public class PortletLayoutDisplayContext {
 			collectionLayoutStructureItem.getListStyle());
 	}
 
+	public InfoListRendererContext getInfoListRendererContext(
+		String listItemStyle) {
+
+		DefaultInfoListRendererContext defaultInfoListRendererContext =
+			new DefaultInfoListRendererContext(
+				_httpServletRequest, _httpServletResponse);
+
+		defaultInfoListRendererContext.setListItemStyleKey(listItemStyle);
+
+		return defaultInfoListRendererContext;
+	}
+
 	public LayoutStructure getLayoutStructure() {
 		if (_layoutStructure != null) {
 			return _layoutStructure;
@@ -320,6 +337,7 @@ public class PortletLayoutDisplayContext {
 	}
 
 	private final HttpServletRequest _httpServletRequest;
+	private final HttpServletResponse _httpServletResponse;
 	private final InfoDisplayContributorTracker _infoDisplayContributorTracker;
 	private final InfoListRendererTracker _infoListRendererTracker;
 	private final LayoutListRetrieverTracker _layoutListRetrieverTracker;
