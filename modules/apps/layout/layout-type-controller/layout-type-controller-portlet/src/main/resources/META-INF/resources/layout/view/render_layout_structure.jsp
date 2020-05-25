@@ -44,7 +44,7 @@ for (String childrenItemId : childrenItemIds) {
 				<c:when test="<%= infoListRenderer != null %>">
 
 					<%
-					infoListRenderer.render(portletLayoutDisplayContext.getCollection(collectionLayoutStructureItem), request, response);
+					infoListRenderer.render(portletLayoutDisplayContext.getCollection(collectionLayoutStructureItem), portletLayoutDisplayContext.getInfoListRendererContext(collectionLayoutStructureItem.getListItemStyle()));
 					%>
 
 				</c:when>
