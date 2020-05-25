@@ -118,13 +118,13 @@ const RowWithControls = React.forwardRef(
 
 				const columnSizes = getColumnAccumulationSizes(
 					item.children,
-					layoutData
+					layoutData,
+					selectedViewportSize
 				);
 
 				const {
 					colIndex,
 					currentColumn,
-					currentColumnConfig,
 					nextColumn,
 					nextColumnIndex,
 				} = columnInfo;
@@ -134,8 +134,13 @@ const RowWithControls = React.forwardRef(
 
 				const addedIndex = index + 1;
 
+				const responsiveConfig = getResponsiveConfig(
+					columnInfo.currentColumnConfig,
+					selectedViewportSize
+				);
+
 				const newCurrentSize =
-					currentColumnConfig.size + (addedIndex - currentRange);
+					responsiveConfig.size + (addedIndex - currentRange);
 
 				const newNextSize = nextRange - addedIndex;
 
@@ -145,6 +150,7 @@ const RowWithControls = React.forwardRef(
 							itemId: currentColumn.itemId,
 							nextColumnItemId: nextColumn.itemId,
 							nextColumnSize: newNextSize,
+							selectedViewportSize,
 							size: newCurrentSize,
 						})
 					);
@@ -280,22 +286,34 @@ function getGridRanges(colWidth) {
  *
  * @param {!Array<String>} A rowChildren array, that contains the related itemId of each Row child.
  * @param {!Object} The current value of layoutData from store.
+ * @param {String} Selected viewport size.
  *
  * @returns {!Array<number>}
  */
-function getColumnAccumulationSizes(rowChildren, layoutData) {
+function getColumnAccumulationSizes(
+	rowChildren,
+	layoutData,
+	selectedViewportSize
+) {
+	const initialConfig = getResponsiveConfig(
+		layoutData.items[rowChildren[0]].config,
+		selectedViewportSize
+	);
+
 	return rowChildren.reduce(
 		(acc, currentId, index) => {
 			if (index === 0) {
 				return acc;
 			}
 
-			return [
-				...acc,
-				acc[index - 1] + layoutData.items[currentId].config.size,
-			];
+			const currentConfig = getResponsiveConfig(
+				layoutData.items[currentId].config,
+				selectedViewportSize
+			);
+
+			return [...acc, acc[index - 1] + currentConfig.size];
 		},
-		[layoutData.items[rowChildren[0]].config.size]
+		[initialConfig.size]
 	);
 }
 

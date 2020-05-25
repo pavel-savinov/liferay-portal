@@ -23,6 +23,7 @@ import {
 	UPDATE_ITEM_CONFIG,
 	UPDATE_LAYOUT_DATA,
 } from '../actions/types';
+import {VIEWPORT_SIZES} from '../config/constants/viewportSizes';
 
 export const INITIAL_STATE = {
 	items: {},
@@ -33,27 +34,55 @@ export default function layoutDataReducer(layoutData = INITIAL_STATE, action) {
 		case UPDATE_COL_SIZE: {
 			let items = layoutData.items;
 
+			let columnConfig = items[action.itemId].config;
+
+			if (action.selectedViewportSize !== VIEWPORT_SIZES.desktop) {
+				columnConfig = {
+					...columnConfig,
+					[action.selectedViewportSize]: {
+						size: action.size,
+					},
+				};
+			}
+			else {
+				columnConfig = {
+					...columnConfig,
+					size: action.size,
+				};
+			}
+
 			if (action.itemId in items) {
 				items = {
 					...items,
 					[action.itemId]: {
 						...items[action.itemId],
-						config: {
-							...items[action.itemId].config,
-							size: action.size,
-						},
+						config: columnConfig,
 					},
 				};
+
+				let nextColumnConfig = items[action.nextColumnItemId].config;
+
+				if (action.selectedViewportSize !== VIEWPORT_SIZES.desktop) {
+					nextColumnConfig = {
+						...nextColumnConfig,
+						[action.selectedViewportSize]: {
+							size: action.nextColumnSize,
+						},
+					};
+				}
+				else {
+					nextColumnConfig = {
+						...nextColumnConfig,
+						size: action.nextColumnSize,
+					};
+				}
 
 				if (action.nextColumnItemId in items) {
 					items = {
 						...items,
 						[action.nextColumnItemId]: {
 							...items[action.nextColumnItemId],
-							config: {
-								...items[action.nextColumnItemId].config,
-								size: action.nextColumnSize,
-							},
+							config: nextColumnConfig,
 						},
 					};
 				}

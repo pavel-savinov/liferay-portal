@@ -18,12 +18,14 @@ export default function updateColSize({
 	itemId,
 	nextColumnItemId,
 	nextColumnSize,
+	selectedViewportSize,
 	size,
 }) {
 	return {
 		itemId,
 		nextColumnItemId,
 		nextColumnSize,
+		selectedViewportSize,
 		size,
 		type: UPDATE_COL_SIZE,
 	};

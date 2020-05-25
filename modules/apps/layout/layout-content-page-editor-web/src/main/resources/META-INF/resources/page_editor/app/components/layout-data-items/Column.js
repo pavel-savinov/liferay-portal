@@ -35,17 +35,13 @@ const Column = React.forwardRef(
 
 		const {modulesPerRow, numberOfColumns} = parentItemConfig;
 
-		let columnSize = (item.config.size * numberOfColumns) / modulesPerRow;
-
-		if (numberOfColumns === 5 && modulesPerRow !== numberOfColumns) {
-			columnSize = parentItem.children.indexOf(item.itemId) > 2 ? 6 : 4;
-		}
+		const config = getResponsiveConfig(item.config, selectedViewportSize);
 
 		return (
 			<div
 				{...props}
 				className={classNames(className, 'col', {
-					[`col-${columnSize}`]: columnSize,
+					[`col-${config.size}`]: config.size,
 					empty:
 						modulesPerRow !== numberOfColumns &&
 						!item.children.length,
