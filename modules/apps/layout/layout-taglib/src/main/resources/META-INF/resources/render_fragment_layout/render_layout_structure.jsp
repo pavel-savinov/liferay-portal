@@ -47,7 +47,7 @@ for (String childrenItemId : childrenItemIds) {
 				<c:when test="<%= infoListRenderer != null %>">
 
 					<%
-					infoListRenderer.render(renderFragmentLayoutDisplayContext.getCollection(collectionLayoutStructureItem, segmentsExperienceIds), renderFragmentLayoutDisplayContext.geetInfoListRendererContext(collectionLayoutStructureItem.getListItemStyle()));
+					infoListRenderer.render(renderFragmentLayoutDisplayContext.getCollection(collectionLayoutStructureItem, segmentsExperienceIds), renderFragmentLayoutDisplayContext.getInfoListRendererContext(collectionLayoutStructureItem.getListItemStyle()));
 					%>
 
 				</c:when>
