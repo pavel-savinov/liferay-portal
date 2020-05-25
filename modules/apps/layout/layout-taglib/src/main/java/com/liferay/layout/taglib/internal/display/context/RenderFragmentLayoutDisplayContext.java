@@ -81,7 +81,7 @@ public class RenderFragmentLayoutDisplayContext {
 		_listObjectReferenceFactoryTracker = listObjectReferenceFactoryTracker;
 	}
 
-	public InfoListRendererContext geetInfoListRendererContext(
+	public InfoListRendererContext getInfoListRendererContext(
 		String listItemStyle) {
 
 		DefaultInfoListRendererContext defaultInfoListRendererContext =
