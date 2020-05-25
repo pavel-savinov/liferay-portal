@@ -483,6 +483,44 @@ public class LayoutStructure {
 
 		layoutStructureItem.updateItemConfig(itemConfigJSONObject);
 
+		if (layoutStructureItem instanceof RowLayoutStructureItem) {
+			RowLayoutStructureItem rowLayoutStructureItem =
+				(RowLayoutStructureItem)layoutStructureItem;
+
+			int modulesPerRow = itemConfigJSONObject.getInt("modulesPerRow");
+
+			if (modulesPerRow > 0) {
+				_updateColumnSizes(
+					rowLayoutStructureItem,
+					ViewportSize.DESKTOP.getViewportSizeId(), modulesPerRow,
+					true);
+			}
+
+			for (ViewportSize viewportSize : ViewportSize.values()) {
+				if (viewportSize.equals(ViewportSize.DESKTOP) ||
+					!itemConfigJSONObject.has(
+						viewportSize.getViewportSizeId())) {
+
+					continue;
+				}
+
+				JSONObject viewportItemConfigJSONObject =
+					itemConfigJSONObject.getJSONObject(
+						viewportSize.getViewportSizeId());
+
+				modulesPerRow = viewportItemConfigJSONObject.getInt(
+					"modulesPerRow");
+
+				if (modulesPerRow == 0) {
+					continue;
+				}
+
+				_updateColumnSizes(
+					rowLayoutStructureItem, viewportSize.getViewportSizeId(),
+					modulesPerRow, true);
+			}
+		}
+
 		return layoutStructureItem;
 	}
 
@@ -496,12 +534,6 @@ public class LayoutStructure {
 		RowLayoutStructureItem rowLayoutStructureItem =
 			(RowLayoutStructureItem)_layoutStructureItems.get(itemId);
 
-		for (ViewportSize viewportSize : ViewportSize.values()) {
-			_updateNumberOfColumns(
-				rowLayoutStructureItem, viewportSize.getViewportSizeId(),
-				numberOfColumns);
-		}
-
 		int oldNumberOfColumns = rowLayoutStructureItem.getNumberOfColumns();
 
 		if (oldNumberOfColumns == numberOfColumns) {
@@ -510,6 +542,16 @@ public class LayoutStructure {
 
 		rowLayoutStructureItem.setModulesPerRow(numberOfColumns);
 		rowLayoutStructureItem.setNumberOfColumns(numberOfColumns);
+
+		for (ViewportSize viewportSize : ViewportSize.values()) {
+			if (viewportSize.equals(ViewportSize.DESKTOP)) {
+				continue;
+			}
+
+			_updateNumberOfColumns(
+				rowLayoutStructureItem, viewportSize.getViewportSizeId(),
+				numberOfColumns);
+		}
 
 		List<String> childrenItemIds = new ArrayList<>(
 			rowLayoutStructureItem.getChildrenItemIds());
@@ -612,6 +654,75 @@ public class LayoutStructure {
 		return duplicatedLayoutStructureItems;
 	}
 
+	private void _updateColumnSizes(
+		RowLayoutStructureItem rowLayoutStructureItem, String viewportSizeId,
+		int modulesPerRow, boolean updateEmpty) {
+
+		int sizeIndex = rowLayoutStructureItem.getNumberOfColumns() - 1;
+
+		if ((rowLayoutStructureItem.getNumberOfColumns() != modulesPerRow) &&
+			(rowLayoutStructureItem.getNumberOfColumns() != 5)) {
+
+			sizeIndex =
+				(rowLayoutStructureItem.getNumberOfColumns() / modulesPerRow) -
+					1;
+		}
+		else if ((rowLayoutStructureItem.getNumberOfColumns() !=
+					modulesPerRow) &&
+				 (rowLayoutStructureItem.getNumberOfColumns() == 5)) {
+
+			sizeIndex = _COLUMN_SIZES.length - 1;
+		}
+
+		int[] defaultSizes = _COLUMN_SIZES[sizeIndex];
+
+		int position = 0;
+
+		for (String childItemId : rowLayoutStructureItem.getChildrenItemIds()) {
+			LayoutStructureItem layoutStructureItem = getLayoutStructureItem(
+				childItemId);
+
+			if (!(layoutStructureItem instanceof ColumnLayoutStructureItem)) {
+				continue;
+			}
+
+			ColumnLayoutStructureItem columnLayoutStructureItem =
+				(ColumnLayoutStructureItem)layoutStructureItem;
+
+			if (position > (defaultSizes.length - 1)) {
+				position = 0;
+			}
+
+			int columnSize = defaultSizes[position++];
+
+			if (Objects.equals(
+					viewportSizeId, ViewportSize.DESKTOP.getViewportSizeId())) {
+
+				columnLayoutStructureItem.setSize(columnSize);
+
+				continue;
+			}
+
+			Map<String, JSONObject> columnViewportConfigurations =
+				columnLayoutStructureItem.getViewportSizeConfigurations();
+
+			if (!columnViewportConfigurations.containsKey(viewportSizeId)) {
+				continue;
+			}
+
+			JSONObject columnViewportConfigurationJSONObject =
+				columnViewportConfigurations.get(viewportSizeId);
+
+			if (!columnViewportConfigurationJSONObject.has("size") &&
+				!updateEmpty) {
+
+				continue;
+			}
+
+			columnViewportConfigurationJSONObject.put("size", columnSize);
+		}
+	}
+
 	private void _updateLayoutStructure(
 		LayoutStructureItem layoutStructureItem, int position) {
 
@@ -652,6 +763,9 @@ public class LayoutStructure {
 		if (viewportSizeConfigurationJSONObject.has("modulesPerRow")) {
 			viewportSizeConfigurationJSONObject.put(
 				"modulesPerRow", numberOfColumns);
+
+			_updateColumnSizes(
+				rowLayoutStructureItem, viewportSizeId, numberOfColumns, false);
 		}
 	}
 
@@ -659,7 +773,8 @@ public class LayoutStructure {
 		{12}, {6, 6}, {4, 4, 4}, {3, 3, 3, 3}, {2, 2, 4, 2, 2},
 		{2, 2, 2, 2, 2, 2}, {1, 1, 1, 6, 1, 1, 1}, {1, 1, 1, 3, 3, 1, 1, 1},
 		{1, 1, 1, 1, 4, 1, 1, 1, 1}, {1, 1, 1, 1, 2, 2, 1, 1, 1, 1},
-		{1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+		{1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{6, 6, 4, 4, 4}
 	};
 
 	private static final int _MAX_COLUMNS = 12;
