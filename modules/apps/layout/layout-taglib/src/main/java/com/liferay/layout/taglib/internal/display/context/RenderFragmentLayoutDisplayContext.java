@@ -19,7 +19,9 @@ import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.info.display.contributor.InfoDisplayContributor;
 import com.liferay.info.display.contributor.InfoDisplayContributorTracker;
 import com.liferay.info.display.contributor.InfoDisplayObjectProvider;
+import com.liferay.info.list.renderer.DefaultInfoListRendererContext;
 import com.liferay.info.list.renderer.InfoListRenderer;
+import com.liferay.info.list.renderer.InfoListRendererContext;
 import com.liferay.info.list.renderer.InfoListRendererTracker;
 import com.liferay.info.pagination.Pagination;
 import com.liferay.layout.list.retriever.DefaultLayoutListRetrieverContext;
@@ -77,6 +79,18 @@ public class RenderFragmentLayoutDisplayContext {
 		_infoListRendererTracker = infoListRendererTracker;
 		_layoutListRetrieverTracker = layoutListRetrieverTracker;
 		_listObjectReferenceFactoryTracker = listObjectReferenceFactoryTracker;
+	}
+
+	public InfoListRendererContext geetInfoListRendererContext(
+		String listItemStyle) {
+
+		DefaultInfoListRendererContext defaultInfoListRendererContext =
+			new DefaultInfoListRendererContext(
+				_httpServletRequest, _httpServletResponse);
+
+		defaultInfoListRendererContext.setListItemStyleKey(listItemStyle);
+
+		return defaultInfoListRendererContext;
 	}
 
 	public String getBackgroundImage(JSONObject rowConfigJSONObject)
