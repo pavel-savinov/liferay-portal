@@ -113,6 +113,7 @@ export const CollectionConfigurationPanel = ({item}) => {
 					onCollectionSelect={(collection) =>
 						handleConfigurationChanged({
 							collection,
+							listItemStyle: null,
 							listStyle: LIST_STYLE_GRID,
 						})
 					}
