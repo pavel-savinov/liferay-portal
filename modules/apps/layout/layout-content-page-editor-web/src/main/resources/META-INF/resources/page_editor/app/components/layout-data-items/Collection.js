@@ -147,7 +147,7 @@ const Collection = React.forwardRef(({children, item}, ref) => {
 		if (collectionConfig.collection) {
 			CollectionService.getCollectionField({
 				collection: collectionConfig.collection,
-				listItemStyle: collectionConfig.listItemStyle,
+				listItemStyle: collectionConfig.listItemStyle || null,
 				listStyle: collectionConfig.listStyle,
 				onNetworkStatus: dispatch,
 				segmentsExperienceId,
