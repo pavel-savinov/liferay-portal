@@ -17,6 +17,8 @@ package com.liferay.info.taglib.servlet.taglib;
 import com.liferay.info.item.renderer.InfoItemRenderer;
 import com.liferay.info.item.renderer.InfoItemRendererTracker;
 import com.liferay.info.taglib.internal.servlet.ServletContextUtil;
+import com.liferay.info.taglib.list.renderer.BasicListInfoListItemStyle;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.taglib.util.IncludeTag;
 
 import java.util.List;
@@ -51,7 +53,12 @@ public class InfoListBasicListTag extends IncludeTag {
 	}
 
 	public void setListItemStyleKey(String listItemStyleKey) {
-		_listItemStyleKey = listItemStyleKey;
+		if (Validator.isNull(listItemStyleKey)) {
+			_listItemStyleKey = BasicListInfoListItemStyle.BORDERED.getKey();
+		}
+		else {
+			_listItemStyleKey = listItemStyleKey;
+		}
 	}
 
 	@Override
