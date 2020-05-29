@@ -77,6 +77,8 @@ public class CollectionLayoutStructureItem extends LayoutStructureItem {
 			"numberOfColumns", _numberOfColumns
 		).put(
 			"numberOfItems", _numberOfItems
+		).put(
+			"templateKey", _templateKey
 		);
 	}
 
