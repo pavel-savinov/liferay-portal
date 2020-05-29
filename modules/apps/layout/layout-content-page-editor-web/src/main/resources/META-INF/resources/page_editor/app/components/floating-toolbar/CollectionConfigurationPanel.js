@@ -121,6 +121,7 @@ export const CollectionConfigurationPanel = ({item}) => {
 							collection,
 							listItemStyle: null,
 							listStyle: LIST_STYLE_GRID,
+							templateKey: null,
 						})
 					}
 				/>
