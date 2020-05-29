@@ -209,7 +209,7 @@ export const CollectionConfigurationPanel = ({item}) => {
 																		template.templateKey
 																	}
 																	key={
-																		template.label
+																		template.key
 																	}
 																	label={
 																		template.label
