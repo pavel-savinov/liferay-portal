@@ -12,7 +12,11 @@
  * details.
  */
 
-import ClayForm, {ClayInput, ClaySelectWithOption} from '@clayui/form';
+import ClayForm, {
+	ClayInput,
+	ClaySelect,
+	ClaySelectWithOption,
+} from '@clayui/form';
 import React, {useEffect, useState} from 'react';
 
 import {config} from '../../../app/config/index';
@@ -165,11 +169,10 @@ export const CollectionConfigurationPanel = ({item}) => {
 								<label htmlFor={collectionListItemStyleId}>
 									{Liferay.Language.get('list-item-style')}
 								</label>
-								<select
+								<ClaySelect
 									aria-label={Liferay.Language.get(
 										'list-item-style'
 									)}
-									className="form-control"
 									id={collectionListItemStyleId}
 									onChange={({target}) =>
 										handleConfigurationChanged({
@@ -187,13 +190,13 @@ export const CollectionConfigurationPanel = ({item}) => {
 									{availableListItemStyles.map((entry) => {
 										if (entry.templates) {
 											return (
-												<optgroup
+												<ClaySelect.OptGroup
 													key={entry.label}
 													label={entry.label}
 												>
 													{entry.templates.map(
 														(template) => (
-															<option
+															<ClaySelect.Option
 																data-key={
 																	template.key
 																}
@@ -201,6 +204,9 @@ export const CollectionConfigurationPanel = ({item}) => {
 																	template.templateKey
 																}
 																key={
+																	template.label
+																}
+																label={
 																	template.label
 																}
 																selected={
@@ -215,31 +221,28 @@ export const CollectionConfigurationPanel = ({item}) => {
 																			.templateKey ===
 																			template.templateKey)
 																}
-															>
-																{template.label}
-															</option>
+															/>
 														)
 													)}
-												</optgroup>
+												</ClaySelect.OptGroup>
 											);
 										}
 										else {
 											return (
-												<option
+												<ClaySelect.Option
 													data-key={entry.key}
 													key={entry.label}
+													label={entry.label}
 													selected={
 														item.config
 															.listItemStyle ===
 														entry.key
 													}
-												>
-													{entry.label}
-												</option>
+												/>
 											);
 										}
 									})}
-								</select>
+								</ClaySelect>
 							</ClayForm.Group>
 						)}
 
