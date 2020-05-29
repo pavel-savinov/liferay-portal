@@ -187,61 +187,74 @@ export const CollectionConfigurationPanel = ({item}) => {
 										})
 									}
 								>
-									{availableListItemStyles.map((entry) => {
-										if (entry.templates) {
-											return (
-												<ClaySelect.OptGroup
-													key={entry.label}
-													label={entry.label}
-												>
-													{entry.templates.map(
-														(template) => (
-															<ClaySelect.Option
-																data-key={
-																	template.key
-																}
-																data-template-key={
-																	template.templateKey
-																}
-																key={
-																	template.label
-																}
-																label={
-																	template.label
-																}
-																selected={
-																	item.config
-																		.listItemStyle ===
-																		template.key &&
-																	(!item
-																		.config
-																		.templateKey ||
+									{availableListItemStyles.map(
+										(listItemStyle) => {
+											if (listItemStyle.templates) {
+												return (
+													<ClaySelect.OptGroup
+														key={
+															listItemStyle.label
+														}
+														label={
+															listItemStyle.label
+														}
+													>
+														{listItemStyle.templates.map(
+															(template) => (
+																<ClaySelect.Option
+																	data-key={
+																		template.key
+																	}
+																	data-template-key={
+																		template.templateKey
+																	}
+																	key={
+																		template.label
+																	}
+																	label={
+																		template.label
+																	}
+																	selected={
 																		item
 																			.config
-																			.templateKey ===
-																			template.templateKey)
-																}
-															/>
-														)
-													)}
-												</ClaySelect.OptGroup>
-											);
+																			.listItemStyle ===
+																			template.key &&
+																		(!item
+																			.config
+																			.templateKey ||
+																			item
+																				.config
+																				.templateKey ===
+																				template.templateKey)
+																	}
+																/>
+															)
+														)}
+													</ClaySelect.OptGroup>
+												);
+											}
+											else {
+												return (
+													<ClaySelect.Option
+														data-key={
+															listItemStyle.key
+														}
+														key={
+															listItemStyle.label
+														}
+														label={
+															listItemStyle.label
+														}
+														selected={
+															item.config
+																.listItemStyle ===
+															listItemStyle.key
+														}
+													/>
+												);
+											}
 										}
-										else {
-											return (
-												<ClaySelect.Option
-													data-key={entry.key}
-													key={entry.label}
-													label={entry.label}
-													selected={
-														item.config
-															.listItemStyle ===
-														entry.key
-													}
-												/>
-											);
-										}
-									})}
+									)}
 								</ClaySelect>
 							</ClayForm.Group>
 						)}
