@@ -13,6 +13,7 @@
  */
 
 import ClayButton from '@clayui/button';
+import {useModal} from '@clayui/modal';
 import classNames from 'classnames';
 import {useIsMounted} from 'frontend-js-react-web';
 import React, {useEffect, useState} from 'react';
@@ -30,6 +31,7 @@ import {useDropClear} from '../utils/useDragAndDrop';
 import {useSelectItem} from './Controls';
 import ExperimentsLabel from './ExperimentsLabel';
 import NetworkStatusBar from './NetworkStatusBar';
+import PreviewModal from './PreviewModal';
 import Translation from './Translation';
 import UnsafeHTML from './UnsafeHTML';
 import ViewportSizeSelector from './ViewportSizeSelector';
@@ -54,6 +56,16 @@ function ToolbarBody() {
 	} = store;
 
 	const [enableDiscard, setEnableDiscard] = useState(false);
+
+	const [openPreviewModal, setOpenPreviewModal] = useState(false);
+
+	const {observer} = useModal({
+		onClose: () => {
+			if (isMounted()) {
+				setOpenPreviewModal(false);
+			}
+		},
+	});
 
 	useEffect(() => {
 		const isConversionPage = config.pageType === PAGE_TYPES.conversion;
@@ -126,6 +138,10 @@ function ToolbarBody() {
 		) {
 			event.preventDefault();
 		}
+	};
+
+	const handlePreviewPage = () => {
+		setOpenPreviewModal(true);
 	};
 
 	const handleSubmit = (event) => {
@@ -239,6 +255,17 @@ function ToolbarBody() {
 				{config.undoEnabled && <Undo onUndo={onUndo} />}
 
 				<li className="nav-item">
+					<ClayButton
+						className="btn btn-secondary mr-3"
+						displayType="secondary"
+						onClick={handlePreviewPage}
+						small
+						type="button"
+					>
+						{Liferay.Language.get('preview')}
+					</ClayButton>
+				</li>
+				<li className="nav-item">
 					<form action={config.discardDraftURL} method="POST">
 						<input
 							name={`${config.portletNamespace}redirect`}
@@ -279,6 +306,8 @@ function ToolbarBody() {
 					</form>
 				</li>
 			</ul>
+
+			{openPreviewModal && <PreviewModal observer={observer} />}
 		</div>
 	);
 }
