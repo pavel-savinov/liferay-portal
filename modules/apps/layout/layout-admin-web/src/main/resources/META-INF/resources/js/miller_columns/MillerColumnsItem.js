@@ -81,6 +81,12 @@ const getDropZone = (ref, monitor) => {
 	return dropZone;
 };
 
+const isDraggingSelection = (items, sourceId) => {
+	const sourceItem = items.get(sourceId);
+
+	return sourceItem?.checked;
+};
+
 const noop = () => {};
 
 const MillerColumnsItem = ({
@@ -88,6 +94,7 @@ const MillerColumnsItem = ({
 		actions = [],
 		active,
 		bulkActions = [],
+		checked,
 		columnIndex,
 		description,
 		draggable,
@@ -102,6 +109,7 @@ const MillerColumnsItem = ({
 		url,
 		viewUrl,
 	},
+	items,
 	actionHandlers = {},
 	namespace,
 	onItemDrop = noop,
@@ -152,6 +160,13 @@ const MillerColumnsItem = ({
 		collect: (monitor) => ({
 			isDragging: !!monitor.isDragging(),
 		}),
+		isDragging: (monitor) => {
+			const source = monitor.getItem();
+
+			return isDraggingSelection(items, source.id)
+				? checked
+				: source.id === itemId;
+		},
 		item: {
 			active,
 			columnIndex,

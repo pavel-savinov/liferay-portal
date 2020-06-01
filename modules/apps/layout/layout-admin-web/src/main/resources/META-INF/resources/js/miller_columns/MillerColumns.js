@@ -284,7 +284,8 @@ const MillerColumns = ({
 				{columns.map((column, index) => (
 					<MillerColumnsColumn
 						actionHandlers={actionHandlers}
-						items={column.items}
+						columnItems={column.items}
+						items={items}
 						key={index}
 						namespace={namespace}
 						onItemDrop={onItemDrop}
