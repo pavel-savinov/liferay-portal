@@ -138,6 +138,24 @@ const MillerColumns = ({
 		}
 	}, []);
 
+	const getMovedItems = (movedItemId, newIndex) => {
+		const movedItem = Array.from(items.values()).find(
+			(item) => item.id === movedItemId
+		);
+
+		if (movedItem.checked) {
+			let position = newIndex;
+
+			return Array.from(items.values())
+				.filter((item) => item.checked)
+				.map((item) => {
+					return {plid: item.id, position: position++};
+				});
+		}
+
+		return [{plid: movedItemId, position: newIndex}];
+	};
+
 	const onItemDrop = (sourceId, newParentId, newIndex) => {
 		const newItems = new Map();
 
@@ -239,7 +257,8 @@ const MillerColumns = ({
 		}
 
 		setItems(newItems);
-		onItemMove(sourceId, newParentId, newIndex);
+
+		onItemMove(getMovedItems(sourceId, newIndex), newParentId);
 	};
 
 	return (
