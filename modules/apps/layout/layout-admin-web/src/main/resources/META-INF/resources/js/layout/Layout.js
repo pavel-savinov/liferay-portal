@@ -116,7 +116,7 @@ const Layout = ({
 	const saveData = (movedItems, parentItemId) => {
 		const formData = new FormData();
 
-		formData.append(`${namespace}plids`, movedItems);
+		formData.append(`${namespace}plids`, JSON.stringify(movedItems));
 		formData.append(`${namespace}parentPlid`, parentItemId);
 
 		fetch(moveItemURL, {
