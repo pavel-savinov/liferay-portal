@@ -13,7 +13,7 @@
  */
 
 import {usePrevious} from 'frontend-js-react-web';
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {DndProvider} from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 
@@ -71,6 +71,17 @@ const MillerColumns = ({
 	const ref = useRef();
 
 	const [items, setItems] = useState(() => getItemsMap(initialColumns));
+
+	const onItemSelectChange = useCallback(
+		(itemId, selected) => {
+			const newItems = new Map(items);
+
+			newItems.set(itemId, {...newItems.get(itemId), checked: selected});
+
+			setItems(newItems);
+		},
+		[items]
+	);
 
 	// Transform items map into a columns-like array.
 
@@ -241,6 +252,7 @@ const MillerColumns = ({
 						key={index}
 						namespace={namespace}
 						onItemDrop={onItemDrop}
+						onItemSelectChange={onItemSelectChange}
 						onItemStayHover={onItemStayHover}
 						parent={column.parent}
 					/>

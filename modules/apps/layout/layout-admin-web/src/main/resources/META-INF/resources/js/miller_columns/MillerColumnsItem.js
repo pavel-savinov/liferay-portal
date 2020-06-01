@@ -88,7 +88,7 @@ const MillerColumnsItem = ({
 		actions = [],
 		active,
 		bulkActions = [],
-		checked,
+		checked = false,
 		columnIndex,
 		description,
 		draggable,
@@ -106,6 +106,7 @@ const MillerColumnsItem = ({
 	actionHandlers = {},
 	namespace,
 	onItemDrop = noop,
+	onItemSelectChange,
 	onItemStayHover = noop,
 }) => {
 	const ref = useRef();
@@ -257,7 +258,12 @@ const MillerColumnsItem = ({
 					<ClayCheckbox
 						checked={checked}
 						name={`${namespace}rowIds`}
-						value={itemId}
+						onChange={(event) =>
+							onItemSelectChange(
+								itemId,
+								event.currentTarget.checked
+							)
+						}
 					/>
 				</div>
 			)}

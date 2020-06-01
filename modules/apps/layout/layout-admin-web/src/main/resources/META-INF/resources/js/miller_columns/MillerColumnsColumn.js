@@ -36,6 +36,7 @@ const MillerColumnsColumn = ({
 	items = [],
 	namespace,
 	onItemDrop,
+	onItemSelectChange,
 	onItemStayHover,
 	parent,
 }) => {
@@ -79,6 +80,7 @@ const MillerColumnsColumn = ({
 					key={item.key}
 					namespace={namespace}
 					onItemDrop={onItemDrop}
+					onItemSelectChange={onItemSelectChange}
 					onItemStayHover={onItemStayHover}
 				/>
 			))}
