@@ -88,7 +88,6 @@ const MillerColumnsItem = ({
 		actions = [],
 		active,
 		bulkActions = [],
-		checked,
 		columnIndex,
 		description,
 		draggable,
@@ -260,7 +259,7 @@ const MillerColumnsItem = ({
 			{selectable && (
 				<div className="autofit-col">
 					<ClayCheckbox
-						checked={checked}
+						defaultChecked={checked}
 						name={`${namespace}rowIds`}
 						value={itemId}
 					/>
