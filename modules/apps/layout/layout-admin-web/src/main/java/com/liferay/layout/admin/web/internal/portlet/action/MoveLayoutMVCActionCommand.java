@@ -15,10 +15,15 @@
 package com.liferay.layout.admin.web.internal.portlet.action;
 
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.LayoutService;
 import com.liferay.portal.kernel.util.ParamUtil;
+
+import java.util.Iterator;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -44,22 +49,30 @@ public class MoveLayoutMVCActionCommand extends BaseAddLayoutMVCActionCommand {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		long plid = ParamUtil.getLong(actionRequest, "plid");
+		JSONArray plidsJSONArray = JSONFactoryUtil.createJSONArray(
+			ParamUtil.getString(actionRequest, "plids"));
 
 		long parentPlid = ParamUtil.getLong(actionRequest, "parentPlid");
-		int priority = ParamUtil.getInteger(
-			actionRequest, "priority", Integer.MAX_VALUE);
 
-		Layout layout = layoutLocalService.fetchLayout(plid);
+		Iterator<JSONObject> iterator = plidsJSONArray.iterator();
 
-		if (layout.getParentPlid() == parentPlid) {
-			_layoutService.updatePriority(plid, priority);
-		}
-		else {
-			_layoutService.updatePriority(plid, Integer.MAX_VALUE);
+		while (iterator.hasNext()) {
+			JSONObject jsonObject = iterator.next();
 
-			_layoutService.updateParentLayoutIdAndPriority(
-				plid, parentPlid, priority);
+			long plid = jsonObject.getLong("plid");
+			int priority = jsonObject.getInt("priority");
+
+			Layout layout = layoutLocalService.fetchLayout(plid);
+
+			if (layout.getParentPlid() == parentPlid) {
+				_layoutService.updatePriority(plid, priority);
+			}
+			else {
+				_layoutService.updatePriority(plid, Integer.MAX_VALUE);
+
+				_layoutService.updateParentLayoutIdAndPriority(
+					plid, parentPlid, priority);
+			}
 		}
 	}
 
