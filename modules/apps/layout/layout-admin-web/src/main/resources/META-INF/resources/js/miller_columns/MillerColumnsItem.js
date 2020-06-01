@@ -38,21 +38,23 @@ const ITEM_STATES_COLORS = {
 	pending: 'info',
 };
 
-const isValidTarget = (source, target, dropZone) => {
+const isValidTarget = (draggedItem, sourceIds, target, dropZone) => {
 	return !!(
-		source.id !== target.id &&
-		((target.parentId && target.columnIndex <= source.columnIndex) ||
-			(target.columnIndex > source.columnIndex && !source.active)) &&
+		!sourceIds.includes(target.id) &&
+		draggedItem.id !== target.id &&
+		((target.parentId && target.columnIndex <= draggedItem.columnIndex) ||
+			(target.columnIndex > draggedItem.columnIndex &&
+				!draggedItem.active)) &&
 		((dropZone === DROP_ZONES.TOP &&
-			(target.columnIndex !== source.columnIndex ||
-				target.itemIndex < source.itemIndex ||
-				target.itemIndex > source.itemIndex + 1)) ||
+			(target.columnIndex !== draggedItem.columnIndex ||
+				target.itemIndex < draggedItem.itemIndex ||
+				target.itemIndex > draggedItem.itemIndex + 1)) ||
 			(dropZone === DROP_ZONES.BOTTOM &&
-				(target.columnIndex !== source.columnIndex ||
-					target.itemIndex > source.itemIndex ||
-					target.itemIndex < source.itemIndex - 1)) ||
+				(target.columnIndex !== draggedItem.columnIndex ||
+					target.itemIndex > draggedItem.itemIndex ||
+					target.itemIndex < draggedItem.itemIndex - 1)) ||
 			(dropZone === DROP_ZONES.ELEMENT &&
-				target.id !== source.parentId &&
+				target.id !== draggedItem.parentId &&
 				target.parentable))
 	);
 };
@@ -182,8 +184,15 @@ const MillerColumnsItem = ({
 		canDrop(source, monitor) {
 			const dropZone = getDropZone(ref, monitor);
 
+			const sourceIds = isDraggingSelection(items, source.id)
+				? Array.from(items.values())
+						.filter((item) => item.checked)
+						.map((item) => item.id)
+				: [source.id];
+
 			return isValidTarget(
 				source,
+				sourceIds,
 				{columnIndex, id: itemId, itemIndex, parentId, parentable},
 				dropZone
 			);
