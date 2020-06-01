@@ -22,6 +22,7 @@ import ReactDOM from 'react-dom';
 import useLazy from '../../core/hooks/useLazy';
 import useLoad from '../../core/hooks/useLoad';
 import usePlugins from '../../core/hooks/usePlugins';
+import selectExperience from '../../plugins/experience/actions/selectExperience';
 import * as Actions from '../actions/index';
 import {PAGE_TYPES} from '../config/constants/pageTypes';
 import {config} from '../config/index';
@@ -59,10 +60,40 @@ function ToolbarBody() {
 
 	const [openPreviewModal, setOpenPreviewModal] = useState(false);
 
+	const [currentLanguageId, setCurrentLanguageId] = useState('');
+	const [
+		currentSegmentsExperienceId,
+		setCurrentSegmentsExperienceId,
+	] = useState('');
+	const [
+		currentSelectedViewportSize,
+		setCurrentSelectedViewportSize,
+	] = useState('');
+
 	const {observer} = useModal({
 		onClose: () => {
 			if (isMounted()) {
 				setOpenPreviewModal(false);
+
+				dispatch(
+					Actions.updateLanguageId({
+						languageId: currentLanguageId,
+					})
+				);
+
+				dispatch(
+					selectExperience({
+						segmentsExperienceId: currentSegmentsExperienceId,
+					})
+				);
+
+				if (config.responsiveEnabled) {
+					dispatch(
+						Actions.switchViewportSize({
+							size: currentSelectedViewportSize,
+						})
+					);
+				}
 			}
 		},
 	});
@@ -141,6 +172,10 @@ function ToolbarBody() {
 	};
 
 	const handlePreviewPage = () => {
+		setCurrentLanguageId(store.languageId);
+		setCurrentSegmentsExperienceId(segmentsExperienceId);
+		setCurrentSelectedViewportSize(selectedViewportSize);
+
 		setOpenPreviewModal(true);
 	};
 
