@@ -1,0 +1,13 @@
+@import 'atlas-variables';
+
+@import './variables';
+
+.page-editor__preview__modal {
+	.modal-body {
+		border-left: 1px dashed lightgray;
+		border-right: 1px dashed lightgray;
+		margin: 0 auto;
+		padding: 0;
+		width: 100%;
+	}
+}
