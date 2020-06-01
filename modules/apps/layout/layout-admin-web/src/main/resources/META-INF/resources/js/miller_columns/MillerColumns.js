@@ -156,13 +156,18 @@ const MillerColumns = ({
 		}
 	}, [searchContainer]);
 
-	const onItemDrop = (sourceId, newParentId, newIndex) => {
-		const newItems = new Map();
+	const onItemDrop = (sources, newParentId, newIndex) => {
+		const parent = Array.from(items.values()).find(
+			(item) => item.id === newParentId
+		);
 
-		const itemsArray = Array.from(items.values());
-
-		const source = itemsArray.find((item) => item.id === sourceId);
-		const parent = itemsArray.find((item) => item.id === newParentId);
+		const newSources = sources.map((source) => ({
+			...source,
+			active: newParentId === source.parentId && source.active,
+			checked: source.checked && parent.active,
+			columnIndex: parent.columnIndex + 1,
+			parentId: newParentId,
+		}));
 
 		// If no newIndex is provided set it as the last of the siblings.
 
@@ -170,13 +175,7 @@ const MillerColumns = ({
 			newIndex = parent.childrenCount || 0;
 		}
 
-		const newSource = {
-			...source,
-			active: newParentId === source.parentId && source.active,
-			columnIndex: parent.columnIndex + 1,
-			parentId: newParentId,
-		};
-
+		const newItems = new Map();
 		let prevColumnIndex;
 		let itemIndex = 0;
 
@@ -184,16 +183,22 @@ const MillerColumns = ({
 		for (let item of items.values()) {
 			const columnIndex = item.columnIndex;
 
-			if (item.columnIndex > prevColumnIndex) {
+			if (columnIndex > prevColumnIndex) {
 
-				// Exit if source was active but not anymore and we are on the
-				// next column to where source used to live to avoid saving its
-				// children (which must not be shown anymore)
+				// Exit if one of the sources was active but not anymore and we
+				// are on the next column to where that source used to live to
+				// avoid saving its children (which must not be shown anymore)
+
+				const activeSource = sources.find((source) => source.active);
+				const newActiveSource =
+					activeSource &&
+					newSources.find(
+						(newSource) => newSource.id === activeSource.id
+					);
 
 				if (
-					source.active &&
-					!newSource.active &&
-					columnIndex > newSource.columnIndex + 1
+					!newActiveSource?.active &&
+					columnIndex > activeSource?.columnIndex
 				) {
 					break;
 				}
@@ -203,20 +208,24 @@ const MillerColumns = ({
 				itemIndex = 0;
 			}
 
-			// Skip the source item iteration
+			// Skip sources item iteration
 
-			if (item.id === sourceId) {
+			if (sources.some((source) => item.id === source.id)) {
 				itemIndex++;
-				prevColumnIndex = item.columnIndex;
+				prevColumnIndex = columnIndex;
 				continue;
 			}
+
+			// Iterating on new parent
 
 			if (item.id === newParentId) {
 				let newChildrenCount = item.childrenCount;
 
-				if (newParentId !== source.parentId) {
-					newChildrenCount++;
-				}
+				sources.forEach((source) => {
+					if (newParentId !== source.parentId) {
+						newChildrenCount++;
+					}
+				});
 
 				item = {
 					...item,
@@ -224,8 +233,17 @@ const MillerColumns = ({
 					hasChild: true,
 				};
 			}
-			else if (item.id === source.parentId) {
-				const newChildrenCount = item.childrenCount - 1;
+
+			// Iterating on old parent
+
+			else if (sources.some((source) => item.id === source.parentId)) {
+				let newChildrenCount = item.childrenCount;
+
+				sources.forEach((source) => {
+					if (item.id === source.parentId) {
+						newChildrenCount--;
+					}
+				});
 
 				item = {
 					...item,
@@ -234,30 +252,47 @@ const MillerColumns = ({
 				};
 			}
 
+			// Insert sources on new position
+
+			const [firstNewSource] = newSources;
+
 			if (
 				itemIndex === newIndex &&
-				columnIndex === newSource.columnIndex &&
+				columnIndex === firstNewSource.columnIndex &&
 				parent.active
 			) {
-				newItems.set(newSource.key, newSource);
+				newSources.forEach((newSource) =>
+					newItems.set(newSource.key, newSource)
+				);
 			}
 
 			newItems.set(item.key, {...item});
 
 			itemIndex++;
-			prevColumnIndex = item.columnIndex;
+			prevColumnIndex = columnIndex;
 		}
 
-		// If source parent is active (children are visible) set (again or not)
-		// the newSource in the map in case it's being placed as the last
-		// element (so won't reach that position in the loop).
+		// If some source parent is active (children are visible) set
+		// (again or not) new sources in the map in case they're being placed
+		// as last elements (so won't reach that position in the loop).
 
 		if (parent.active) {
-			newItems.set(newSource.id, newSource);
+			newSources.forEach((newSource) =>
+				newItems.set(newSource.key, newSource)
+			);
 		}
 
 		setItems(newItems);
-		onItemMove(sourceId, newParentId, newIndex);
+
+		let position = newIndex;
+
+		onItemMove(
+			sources.map((item) => ({
+				plid: item.id,
+				position: position++,
+			})),
+			newParentId
+		);
 	};
 
 	return (
@@ -266,7 +301,8 @@ const MillerColumns = ({
 				{columns.map((column, index) => (
 					<MillerColumnsColumn
 						actionHandlers={actionHandlers}
-						items={column.items}
+						columnItems={column.items}
+						items={items}
 						key={index}
 						namespace={namespace}
 						onItemDrop={onItemDrop}

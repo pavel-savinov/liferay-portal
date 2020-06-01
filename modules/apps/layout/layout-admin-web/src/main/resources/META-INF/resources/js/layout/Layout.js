@@ -116,15 +116,11 @@ const Layout = ({
 			.catch();
 	};
 
-	const saveData = (sourceItemId, parentItemId, position) => {
+	const saveData = (movedItems, parentItemId) => {
 		const formData = new FormData();
 
-		formData.append(`${namespace}plid`, sourceItemId);
+		formData.append(`${namespace}plids`, JSON.stringify(movedItems));
 		formData.append(`${namespace}parentPlid`, parentItemId);
-
-		if (Number.isInteger(position)) {
-			formData.append(`${namespace}priority`, position);
-		}
 
 		fetch(moveItemURL, {
 			body: formData,
