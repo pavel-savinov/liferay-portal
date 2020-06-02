@@ -12,16 +12,15 @@
  * details.
  */
 
+import {ClaySelect} from '@clayui/form';
 import ClayModal from '@clayui/modal';
 import classNames from 'classnames';
 import {addParams} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useMemo, useState} from 'react';
 
-import ExperienceToolbarSection from '../../plugins/experience/components/ExperienceToolbarSection';
 import {VIEWPORT_SIZES} from '../config/constants/viewportSizes';
 import {config} from '../config/index';
-import selectSegmentsExperienceId from '../selectors/selectSegmentsExperienceId';
 import {useSelector} from '../store/index';
 import {useId} from '../utils/useId';
 import Translation from './Translation';
@@ -37,8 +36,13 @@ const PreviewModal = ({observer}) => {
 	);
 
 	const fragmentEntryLinks = useSelector((state) => state.fragmentEntryLinks);
-	const segmentsExperienceId = useSelector(selectSegmentsExperienceId);
+	const [segmentsExperienceId, setSegmentsExperienceId] = useState(
+		config.defaultSegmentsExperienceId
+	);
 
+	const availableSegmentsExperiences = useSelector(
+		(state) => state.availableSegmentsExperiences
+	);
 	const experienceSelectId = useId();
 
 	const previewURL = useMemo(
@@ -81,10 +85,44 @@ const PreviewModal = ({observer}) => {
 						)}
 					>
 						<ul className="navbar-nav page-editor__preview-modal__part">
-							<li className="nav-item">
-								<ExperienceToolbarSection
-									selectId={experienceSelectId}
-								/>
+							<li className="mr-2 nav-item">
+								<div className="d-inline-flex">
+									<label
+										className="mr-2"
+										htmlFor={experienceSelectId}
+									>
+										{Liferay.Language.get('experience')}
+									</label>
+
+									<ClaySelect
+										aria-label="Experience"
+										className="form-control-sm"
+										id={experienceSelectId}
+										onChange={(event) => {
+											setSegmentsExperienceId(
+												event.target.options[
+													event.target.selectedIndex
+												].value
+											);
+										}}
+										value={segmentsExperienceId}
+									>
+										{availableSegmentsExperiences &&
+											Object.keys(
+												availableSegmentsExperiences
+											).map((segmentsExperienceId) => (
+												<ClaySelect.Option
+													key={segmentsExperienceId}
+													label={
+														availableSegmentsExperiences[
+															segmentsExperienceId
+														].name
+													}
+													value={segmentsExperienceId}
+												/>
+											))}
+									</ClaySelect>
+								</div>
 							</li>
 
 							<li className="nav-item">
