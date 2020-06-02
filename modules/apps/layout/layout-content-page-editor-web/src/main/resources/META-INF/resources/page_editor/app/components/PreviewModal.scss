@@ -2,12 +2,18 @@
 
 @import './variables';
 
-.page-editor__preview__modal {
+.page-editor__preview-modal {
 	.modal-body {
+		display: flex;
+		justify-content: center;
+
+		& > iframe {
+			margin: 0 auto;
+		}
+	}
+
+	&--with-border .modal-body > iframe {
 		border-left: 1px dashed lightgray;
 		border-right: 1px dashed lightgray;
-		margin: 0 auto;
-		padding: 0;
-		width: 100%;
 	}
 }
