@@ -64,10 +64,6 @@ function ToolbarBody() {
 		currentSegmentsExperienceId,
 		setCurrentSegmentsExperienceId,
 	] = useState('');
-	const [
-		currentSelectedViewportSize,
-		setCurrentSelectedViewportSize,
-	] = useState('');
 
 	const {observer} = useModal({
 		onClose: () => {
@@ -79,14 +75,6 @@ function ToolbarBody() {
 						segmentsExperienceId: currentSegmentsExperienceId,
 					})
 				);
-
-				if (config.responsiveEnabled) {
-					dispatch(
-						Actions.switchViewportSize({
-							size: currentSelectedViewportSize,
-						})
-					);
-				}
 			}
 		},
 	});
@@ -166,7 +154,6 @@ function ToolbarBody() {
 
 	const handlePreviewPage = () => {
 		setCurrentSegmentsExperienceId(segmentsExperienceId);
-		setCurrentSelectedViewportSize(selectedViewportSize);
 
 		setOpenPreviewModal(true);
 	};
@@ -262,6 +249,9 @@ function ToolbarBody() {
 				{config.responsiveEnabled && (
 					<li className="nav-item">
 						<ViewportSizeSelector
+							onSizeSelected={(size) =>
+								dispatch(Actions.switchViewportSize({size}))
+							}
 							selectedSize={selectedViewportSize}
 						/>
 					</li>

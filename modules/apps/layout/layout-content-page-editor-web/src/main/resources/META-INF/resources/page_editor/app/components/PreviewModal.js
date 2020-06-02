@@ -32,11 +32,12 @@ const PreviewModal = ({observer}) => {
 		useSelector((state) => state.languageId)
 	);
 
+	const [viewportSize, setViewportSize] = useState(
+		useSelector((state) => state.selectedViewportSize)
+	);
+
 	const fragmentEntryLinks = useSelector((state) => state.fragmentEntryLinks);
 	const segmentsExperienceId = useSelector(selectSegmentsExperienceId);
-	const selectedViewportSize = useSelector(
-		(state) => state.selectedViewportSize
-	);
 
 	const experienceSelectId = useId();
 
@@ -59,10 +60,10 @@ const PreviewModal = ({observer}) => {
 
 		if (modalBody) {
 			const {maxWidth, minWidth} = config.availableViewportSizes[
-				selectedViewportSize
+				viewportSize
 			];
 
-			if (selectedViewportSize === VIEWPORT_SIZES.desktop) {
+			if (viewportSize === VIEWPORT_SIZES.desktop) {
 				modalBody.style.width = '100%';
 			}
 			else {
@@ -71,7 +72,7 @@ const PreviewModal = ({observer}) => {
 				modalBody.style.width = `${width}px`;
 			}
 		}
-	}, [selectedViewportSize]);
+	}, [viewportSize]);
 
 	return (
 		<ClayModal
@@ -121,7 +122,8 @@ const PreviewModal = ({observer}) => {
 						{config.responsiveEnabled && (
 							<div className="mr-8">
 								<ViewportSizeSelector
-									selectedSize={selectedViewportSize}
+									onSizeSelected={setViewportSize}
+									selectedSize={viewportSize}
 								/>
 							</div>
 						)}
