@@ -65,10 +65,7 @@ const PreviewModal = ({observer}) => {
 
 	return (
 		<ClayModal
-			className={classNames('page-editor__preview-modal', {
-				'page-editor__preview-modal--with-border':
-					viewportSize !== VIEWPORT_SIZES.desktop,
-			})}
+			className="page-editor__preview-modal"
 			observer={observer}
 			size="full-screen"
 		>

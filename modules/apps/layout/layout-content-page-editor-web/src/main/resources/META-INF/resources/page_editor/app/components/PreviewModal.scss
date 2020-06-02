@@ -18,16 +18,13 @@
 	}
 
 	.modal-body {
+		background-color: $gray-400;
 		display: flex;
 		justify-content: center;
 
 		& > iframe {
+			background-color: white;
 			margin: 0 auto;
 		}
-	}
-
-	&--with-border .modal-body > iframe {
-		border-left: 1px dashed lightgray;
-		border-right: 1px dashed lightgray;
 	}
 }
