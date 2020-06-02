@@ -16,7 +16,7 @@ import ClayModal from '@clayui/modal';
 import classNames from 'classnames';
 import {addParams} from 'frontend-js-web';
 import PropTypes from 'prop-types';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 
 import ExperienceToolbarSection from '../../plugins/experience/components/ExperienceToolbarSection';
 import {VIEWPORT_SIZES} from '../config/constants/viewportSizes';
@@ -41,19 +41,17 @@ const PreviewModal = ({observer}) => {
 
 	const experienceSelectId = useId();
 
-	const [previewURL, setPreviewURL] = useState('');
-
-	useEffect(() => {
-		setPreviewURL(
+	const previewURL = useMemo(
+		() =>
 			addParams(
 				{
 					[`${config.portletNamespace}languageId`]: languageId,
 					[`${config.portletNamespace}segmentsExperienceId`]: segmentsExperienceId,
 				},
 				config.previewPageURL
-			)
-		);
-	}, [languageId, segmentsExperienceId]);
+			),
+		[languageId, segmentsExperienceId]
+	);
 
 	useEffect(() => {
 		const modalBody = document.querySelector('.modal-body');
