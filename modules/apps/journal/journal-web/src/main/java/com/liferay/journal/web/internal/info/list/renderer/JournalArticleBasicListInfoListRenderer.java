@@ -80,6 +80,15 @@ public abstract class JournalArticleBasicListInfoListRenderer
 				JournalArticleTitleInfoItemRenderer.class.getName());
 		}
 
+		Optional<String> templateKeyOptional =
+			infoListRendererContext.getTemplateKeyOptional();
+
+		if (templateKeyOptional.isPresent() &&
+			Validator.isNotNull(templateKeyOptional.get())) {
+
+			infoListBasicListTag.setTemplateKey(templateKeyOptional.get());
+		}
+
 		infoListBasicListTag.setListStyleKey(getListStyle());
 
 		try {
