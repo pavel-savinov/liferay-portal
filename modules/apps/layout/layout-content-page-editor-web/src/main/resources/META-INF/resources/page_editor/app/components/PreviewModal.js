@@ -83,44 +83,39 @@ const PreviewModal = ({observer}) => {
 							}
 						)}
 					>
-						<div key={experienceSelectId}>
-							<ul className="navbar-nav">
-								<li className="nav-item">
-									<ExperienceToolbarSection
-										selectId={experienceSelectId}
-									/>
-								</li>
-								<li className="nav-item">
-									<Translation
-										availableLanguages={
-											config.availableLanguages
-										}
-										defaultLanguageId={
-											config.defaultLanguageId
-										}
-										dispatch={({
-											languageId: nextLanguageId,
-										}) => setLanguageId(nextLanguageId)}
-										fragmentEntryLinks={fragmentEntryLinks}
-										languageId={languageId}
-										segmentsExperienceId={
-											segmentsExperienceId
-										}
-									/>
-								</li>
-							</ul>
-						</div>
+						<ul className="navbar-nav page-editor__preview-modal__part">
+							<li className="nav-item">
+								<ExperienceToolbarSection
+									selectId={experienceSelectId}
+								/>
+							</li>
 
-						{config.responsiveEnabled && (
-							<div className="mr-8">
+							<li className="nav-item">
+								<Translation
+									availableLanguages={
+										config.availableLanguages
+									}
+									defaultLanguageId={config.defaultLanguageId}
+									dispatch={({languageId: nextLanguageId}) =>
+										setLanguageId(nextLanguageId)
+									}
+									fragmentEntryLinks={fragmentEntryLinks}
+									languageId={languageId}
+									segmentsExperienceId={segmentsExperienceId}
+								/>
+							</li>
+						</ul>
+
+						<div className="page-editor__preview-modal__part">
+							{config.responsiveEnabled && (
 								<ViewportSizeSelector
 									onSizeSelected={setViewportSize}
 									selectedSize={viewportSize}
 								/>
-							</div>
-						)}
+							)}
+						</div>
 
-						<div></div>
+						<div className="page-editor__preview-modal__part"></div>
 					</div>
 				</ClayModal.Title>
 			</ClayModal.Header>
