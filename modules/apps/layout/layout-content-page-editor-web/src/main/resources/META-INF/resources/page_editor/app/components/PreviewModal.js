@@ -16,7 +16,7 @@ import ClayModal from '@clayui/modal';
 import classNames from 'classnames';
 import {addParams} from 'frontend-js-web';
 import PropTypes from 'prop-types';
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 
 import ExperienceToolbarSection from '../../plugins/experience/components/ExperienceToolbarSection';
 import {VIEWPORT_SIZES} from '../config/constants/viewportSizes';
@@ -53,28 +53,22 @@ const PreviewModal = ({observer}) => {
 		[languageId, segmentsExperienceId]
 	);
 
-	useEffect(() => {
-		const modalBody = document.querySelector('.modal-body');
+	const modalBodyWidth = useMemo(() => {
+		const {maxWidth, minWidth} = config.availableViewportSizes[
+			viewportSize
+		];
 
-		if (modalBody) {
-			const {maxWidth, minWidth} = config.availableViewportSizes[
-				viewportSize
-			];
-
-			if (viewportSize === VIEWPORT_SIZES.desktop) {
-				modalBody.style.width = '100%';
-			}
-			else {
-				const width = (maxWidth + minWidth) / 2;
-
-				modalBody.style.width = `${width}px`;
-			}
-		}
+		return viewportSize === VIEWPORT_SIZES.desktop
+			? '100%'
+			: (maxWidth + minWidth) / 2;
 	}, [viewportSize]);
 
 	return (
 		<ClayModal
-			className="page-editor__preview__modal"
+			className={classNames('page-editor__preview-modal', {
+				'page-editor__preview-modal--with-border':
+					viewportSize !== VIEWPORT_SIZES.desktop,
+			})}
 			observer={observer}
 			size="full-screen"
 		>
@@ -131,7 +125,12 @@ const PreviewModal = ({observer}) => {
 				</ClayModal.Title>
 			</ClayModal.Header>
 
-			<ClayModal.Body url={previewURL}></ClayModal.Body>
+			<ClayModal.Body
+				iFrameProps={{
+					style: {maxWidth: modalBodyWidth},
+				}}
+				url={previewURL}
+			/>
 		</ClayModal>
 	);
 };
