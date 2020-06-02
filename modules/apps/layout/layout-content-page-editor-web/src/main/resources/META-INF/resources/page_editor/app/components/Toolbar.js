@@ -60,7 +60,6 @@ function ToolbarBody() {
 
 	const [openPreviewModal, setOpenPreviewModal] = useState(false);
 
-	const [currentLanguageId, setCurrentLanguageId] = useState('');
 	const [
 		currentSegmentsExperienceId,
 		setCurrentSegmentsExperienceId,
@@ -74,12 +73,6 @@ function ToolbarBody() {
 		onClose: () => {
 			if (isMounted()) {
 				setOpenPreviewModal(false);
-
-				dispatch(
-					Actions.updateLanguageId({
-						languageId: currentLanguageId,
-					})
-				);
 
 				dispatch(
 					selectExperience({
@@ -172,7 +165,6 @@ function ToolbarBody() {
 	};
 
 	const handlePreviewPage = () => {
-		setCurrentLanguageId(store.languageId);
 		setCurrentSegmentsExperienceId(segmentsExperienceId);
 		setCurrentSelectedViewportSize(selectedViewportSize);
 

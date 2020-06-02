@@ -22,16 +22,17 @@ import ExperienceToolbarSection from '../../plugins/experience/components/Experi
 import {VIEWPORT_SIZES} from '../config/constants/viewportSizes';
 import {config} from '../config/index';
 import selectSegmentsExperienceId from '../selectors/selectSegmentsExperienceId';
-import {useDispatch, useSelector} from '../store/index';
+import {useSelector} from '../store/index';
 import {useId} from '../utils/useId';
 import Translation from './Translation';
 import ViewportSizeSelector from './ViewportSizeSelector';
 
 const PreviewModal = ({observer}) => {
-	const dispatch = useDispatch();
+	const [languageId, setLanguageId] = useState(
+		useSelector((state) => state.languageId)
+	);
 
 	const fragmentEntryLinks = useSelector((state) => state.fragmentEntryLinks);
-	const languageId = useSelector((state) => state.languageId);
 	const segmentsExperienceId = useSelector(selectSegmentsExperienceId);
 	const selectedViewportSize = useSelector(
 		(state) => state.selectedViewportSize
@@ -104,7 +105,9 @@ const PreviewModal = ({observer}) => {
 										defaultLanguageId={
 											config.defaultLanguageId
 										}
-										dispatch={dispatch}
+										dispatch={({
+											languageId: nextLanguageId,
+										}) => setLanguageId(nextLanguageId)}
 										fragmentEntryLinks={fragmentEntryLinks}
 										languageId={languageId}
 										segmentsExperienceId={
