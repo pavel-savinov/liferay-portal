@@ -129,6 +129,10 @@ public class JournalArticleInfoItemFormProvider
 
 		InfoForm infoForm = getInfoForm();
 
+		if (ddmStructureId == 0) {
+			return infoForm;
+		}
+
 		try {
 			infoForm.add(
 				_ddmStructureInfoItemFieldSetProvider.getInfoItemFieldSet(
