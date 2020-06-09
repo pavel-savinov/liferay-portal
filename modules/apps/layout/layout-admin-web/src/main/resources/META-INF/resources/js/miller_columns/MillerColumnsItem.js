@@ -277,7 +277,11 @@ const MillerColumnsItem = ({
 
 			{selectable && (
 				<div className="autofit-col">
-					<ClayCheckbox name={`${namespace}rowIds`} value={itemId} />
+					<ClayCheckbox
+						defaultChecked={checked}
+						name={`${namespace}rowIds`}
+						value={itemId}
+					/>
 				</div>
 			)}
 

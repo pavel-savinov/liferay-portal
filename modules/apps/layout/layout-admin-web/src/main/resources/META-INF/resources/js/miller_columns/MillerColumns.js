@@ -190,6 +190,7 @@ const MillerColumns = ({
 		const newSource = {
 			...source,
 			active: newParentId === source.parentId && source.active,
+			checked: source.checked && parent.active,
 			columnIndex: parent.columnIndex + 1,
 			parentId: newParentId,
 		};
