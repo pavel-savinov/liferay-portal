@@ -174,12 +174,23 @@ const MillerColumns = ({
 	};
 
 	const onItemDrop = (sourceId, newParentId, newIndex) => {
-		const newItems = new Map();
+		const draggedItem = items.get(sourceId);
 
-		const itemsArray = Array.from(items.values());
+		const parent = Array.from(items.values()).find(
+			(item) => item.id === newParentId
+		);
 
-		const source = itemsArray.find((item) => item.id === sourceId);
-		const parent = itemsArray.find((item) => item.id === newParentId);
+		const sources = draggedItem.checked
+			? Array.from(items.values()).filter((item) => item.checked)
+			: [draggedItem];
+
+		const newSources = sources.map((source) => ({
+			...source,
+			active: newParentId === source.parentId && source.active,
+			checked: source.checked && parent.active,
+			columnIndex: parent.columnIndex + 1,
+			parentId: newParentId,
+		}));
 
 		// If no newIndex is provided set it as the last of the siblings.
 
@@ -187,14 +198,7 @@ const MillerColumns = ({
 			newIndex = parent.childrenCount || 0;
 		}
 
-		const newSource = {
-			...source,
-			active: newParentId === source.parentId && source.active,
-			checked: source.checked && parent.active,
-			columnIndex: parent.columnIndex + 1,
-			parentId: newParentId,
-		};
-
+		const newItems = new Map();
 		let prevColumnIndex;
 		let itemIndex = 0;
 
@@ -202,16 +206,22 @@ const MillerColumns = ({
 		for (let item of items.values()) {
 			const columnIndex = item.columnIndex;
 
-			if (item.columnIndex > prevColumnIndex) {
+			if (columnIndex > prevColumnIndex) {
 
 				// Exit if source was active but not anymore and we are on the
 				// next column to where source used to live to avoid saving its
 				// children (which must not be shown anymore)
 
+				const activeSource = sources.find((source) => source.active);
+				const newActiveSource =
+					activeSource &&
+					newSources.find(
+						(newSource) => newSource.id === activeSource.id
+					);
+
 				if (
-					source.active &&
-					!newSource.active &&
-					columnIndex > newSource.columnIndex + 1
+					!newActiveSource?.active &&
+					columnIndex > activeSource?.columnIndex
 				) {
 					break;
 				}
@@ -223,18 +233,20 @@ const MillerColumns = ({
 
 			// Skip the source item iteration
 
-			if (item.id === sourceId) {
+			if (sources.some((source) => item.id === source.id)) {
 				itemIndex++;
-				prevColumnIndex = item.columnIndex;
+				prevColumnIndex = columnIndex;
 				continue;
 			}
 
 			if (item.id === newParentId) {
 				let newChildrenCount = item.childrenCount;
 
-				if (newParentId !== source.parentId) {
-					newChildrenCount++;
-				}
+				sources.forEach((source) => {
+					if (newParentId !== source.parentId) {
+						newChildrenCount++;
+					}
+				});
 
 				item = {
 					...item,
@@ -242,8 +254,14 @@ const MillerColumns = ({
 					hasChild: true,
 				};
 			}
-			else if (item.id === source.parentId) {
-				const newChildrenCount = item.childrenCount - 1;
+			else if (sources.some((source) => item.id === source.parentId)) {
+				let newChildrenCount = item.childrenCount;
+
+				sources.forEach((source) => {
+					if (item.id === source.parentId) {
+						newChildrenCount--;
+					}
+				});
 
 				item = {
 					...item,
@@ -254,16 +272,18 @@ const MillerColumns = ({
 
 			if (
 				itemIndex === newIndex &&
-				columnIndex === newSource.columnIndex &&
+				columnIndex === draggedItem.columnIndex &&
 				parent.active
 			) {
-				newItems.set(newSource.key, newSource);
+				newSources.forEach((newSource) =>
+					newItems.set(newSource.key, newSource)
+				);
 			}
 
 			newItems.set(item.key, {...item});
 
 			itemIndex++;
-			prevColumnIndex = item.columnIndex;
+			prevColumnIndex = columnIndex;
 		}
 
 		// If source parent is active (children are visible) set (again or not)
@@ -271,7 +291,9 @@ const MillerColumns = ({
 		// element (so won't reach that position in the loop).
 
 		if (parent.active) {
-			newItems.set(newSource.id, newSource);
+			newSources.forEach((newSource) =>
+				newItems.set(newSource.key, newSource)
+			);
 		}
 
 		setItems(newItems);
