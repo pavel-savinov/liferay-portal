@@ -24,7 +24,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Pavel Savinov
  */
 @Component(immediate = true, service = InfoListRenderer.class)
-public class InlineJournalArticleBasicListInfoListRenderer
+public class InlineAssetEntryBasicListInfoListRenderer
 	extends AssetEntryBasicListInfoListRenderer
 	implements InlineBasicInfoListRenderer<AssetEntry> {
 }

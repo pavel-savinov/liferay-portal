@@ -16,7 +16,7 @@ package com.liferay.asset.info.internal.list.renderer;
 
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.info.list.renderer.InfoListRenderer;
-import com.liferay.info.taglib.list.renderer.UnstyledBasicInfoListRenderer;
+import com.liferay.info.taglib.list.renderer.NumberedBasicInfoListRenderer;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -24,7 +24,7 @@ import org.osgi.service.component.annotations.Component;
  * @author Pavel Savinov
  */
 @Component(immediate = true, service = InfoListRenderer.class)
-public class UnstyledJournalArticleBasicListInfoListRenderer
+public class NumberedAssetEntryBasicListInfoListRenderer
 	extends AssetEntryBasicListInfoListRenderer
-	implements UnstyledBasicInfoListRenderer<AssetEntry> {
+	implements NumberedBasicInfoListRenderer<AssetEntry> {
 }
