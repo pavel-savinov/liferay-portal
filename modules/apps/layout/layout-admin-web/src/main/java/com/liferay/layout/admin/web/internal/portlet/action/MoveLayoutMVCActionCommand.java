@@ -74,10 +74,10 @@ public class MoveLayoutMVCActionCommand extends BaseAddLayoutMVCActionCommand {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
+		long parentPlid = ParamUtil.getLong(actionRequest, "parentPlid");
+
 		JSONArray plidsJSONArray = JSONFactoryUtil.createJSONArray(
 			ParamUtil.getString(actionRequest, "plids"));
-
-		long parentPlid = ParamUtil.getLong(actionRequest, "parentPlid");
 
 		Iterator<JSONObject> iterator = plidsJSONArray.iterator();
 
@@ -103,7 +103,6 @@ public class MoveLayoutMVCActionCommand extends BaseAddLayoutMVCActionCommand {
 
 			LiferayPortletRequest liferayPortletRequest =
 				_portal.getLiferayPortletRequest(actionRequest);
-
 			LiferayPortletResponse liferayPortletResponse =
 				_portal.getLiferayPortletResponse(actionResponse);
 
