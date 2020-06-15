@@ -174,12 +174,10 @@ const MillerColumns = ({
 
 		setItems(newItems);
 
-		let position = newIndex;
-
 		onItemMove(
-			sources.map((item) => ({
+			sources.map((item, index) => ({
 				plid: item.id,
-				position: position++,
+				position: newIndex + index,
 			})),
 			newParentId
 		);
