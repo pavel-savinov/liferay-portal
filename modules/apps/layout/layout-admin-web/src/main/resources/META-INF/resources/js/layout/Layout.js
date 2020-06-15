@@ -23,6 +23,8 @@ const Layout = ({
 	getItemChildrenURL,
 	initialBreadcrumbEntries,
 	initialLayoutColumns,
+	languageDirection,
+	languageId,
 	moveItemURL,
 	namespace,
 	searchContainerId,
@@ -166,6 +168,8 @@ export default function ({
 	props: {
 		breadcrumbEntries,
 		getItemChildrenURL,
+		languageDirection,
+		languageId,
 		layoutColumns,
 		moveItemURL,
 		searchContainerId,
@@ -176,6 +180,8 @@ export default function ({
 			getItemChildrenURL={getItemChildrenURL}
 			initialBreadcrumbEntries={breadcrumbEntries}
 			initialLayoutColumns={layoutColumns}
+			languageDirection={languageDirection}
+			languageId={languageId}
 			moveItemURL={moveItemURL}
 			namespace={namespace}
 			searchContainerId={searchContainerId}
