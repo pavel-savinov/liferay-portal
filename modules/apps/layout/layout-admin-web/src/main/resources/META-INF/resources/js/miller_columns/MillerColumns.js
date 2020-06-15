@@ -73,6 +73,7 @@ const MillerColumns = ({
 	onColumnsChange = noop,
 	onItemMove = noop,
 	onItemStayHover,
+	rtl,
 	searchContainer,
 }) => {
 	const ref = useRef();
@@ -185,7 +186,7 @@ const MillerColumns = ({
 
 	return (
 		<DndProvider backend={HTML5Backend}>
-			<DragPreview />
+			<DragPreview rtl={rtl} />
 			<div className="bg-white miller-columns-row" ref={ref}>
 				{columns.map((column, index) => (
 					<MillerColumnsColumn
@@ -197,6 +198,7 @@ const MillerColumns = ({
 						onItemDrop={onItemDrop}
 						onItemStayHover={onItemStayHover}
 						parent={column.parent}
+						rtl={rtl}
 					/>
 				))}
 			</div>

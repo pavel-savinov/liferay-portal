@@ -168,6 +168,7 @@ const Layout = ({
 				onColumnsChange={updateBreadcrumbs}
 				onItemMove={saveData}
 				onItemStayHover={getItemChildren}
+				rtl={languageDirection[languageId] === 'rtl'}
 				searchContainer={searchContainerElement}
 			/>
 		</div>

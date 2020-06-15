@@ -15,7 +15,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {useDragLayer} from 'react-dnd';
 
-const getItemStyles = (currentOffset, ref) => {
+const getItemStyles = (currentOffset, ref, rtl) => {
 	if (!currentOffset || !ref.current) {
 		return {
 			display: 'none',
@@ -23,7 +23,9 @@ const getItemStyles = (currentOffset, ref) => {
 	}
 
 	const rect = ref.current.getBoundingClientRect();
-	const x = currentOffset.x - rect.width * 0.5;
+	const x = rtl
+		? currentOffset.x + rect.width * 0.5 - window.innerWidth
+		: currentOffset.x - rect.width * 0.5;
 	const y = currentOffset.y - rect.height * 0.5;
 
 	const transform = `translate(${x}px, ${y}px)`;
@@ -34,7 +36,7 @@ const getItemStyles = (currentOffset, ref) => {
 	};
 };
 
-export default function DragPreview() {
+export default function DragPreview({rtl}) {
 	const ref = useRef();
 
 	const {currentOffset, isDragging, items} = useDragLayer((monitor) => ({
@@ -72,7 +74,7 @@ export default function DragPreview() {
 			<div
 				className="miller-columns__drag-preview__content"
 				ref={ref}
-				style={getItemStyles(currentOffset, ref)}
+				style={getItemStyles(currentOffset, ref, rtl)}
 			>
 				{label}
 			</div>

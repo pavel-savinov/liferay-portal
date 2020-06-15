@@ -41,6 +41,7 @@ const MillerColumnsColumn = ({
 	onItemDrop,
 	onItemStayHover,
 	parent,
+	rtl,
 }) => {
 	const ref = useRef();
 
@@ -85,6 +86,7 @@ const MillerColumnsColumn = ({
 					namespace={namespace}
 					onItemDrop={onItemDrop}
 					onItemStayHover={onItemStayHover}
+					rtl={rtl}
 				/>
 			))}
 		</ul>

@@ -143,6 +143,7 @@ const MillerColumnsItem = ({
 	namespace,
 	onItemDrop = noop,
 	onItemStayHover = noop,
+	rtl,
 }) => {
 	const ref = useRef();
 	const timeoutRef = useRef();
@@ -432,7 +433,7 @@ const MillerColumnsItem = ({
 
 			{hasChild && (
 				<div className="autofit-col miller-columns-item-child-indicator">
-					<ClayIcon symbol="caret-right" />
+					<ClayIcon symbol={rtl ? 'caret-left' : 'caret-right'} />
 				</div>
 			)}
 		</li>
