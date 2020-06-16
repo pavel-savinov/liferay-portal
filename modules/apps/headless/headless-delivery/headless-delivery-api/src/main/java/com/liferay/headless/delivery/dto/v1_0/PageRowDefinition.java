@@ -33,6 +33,8 @@ import java.util.Set;
 
 import javax.annotation.Generated;
 
+import javax.validation.Valid;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -189,6 +191,36 @@ public class PageRowDefinition {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String verticalAlignment;
 
+	@Schema
+	@Valid
+	public ViewportRowConfig getViewportRowConfig() {
+		return viewportRowConfig;
+	}
+
+	public void setViewportRowConfig(ViewportRowConfig viewportRowConfig) {
+		this.viewportRowConfig = viewportRowConfig;
+	}
+
+	@JsonIgnore
+	public void setViewportRowConfig(
+		UnsafeSupplier<ViewportRowConfig, Exception>
+			viewportRowConfigUnsafeSupplier) {
+
+		try {
+			viewportRowConfig = viewportRowConfigUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected ViewportRowConfig viewportRowConfig;
+
 	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
@@ -268,6 +300,16 @@ public class PageRowDefinition {
 			sb.append(_escape(verticalAlignment));
 
 			sb.append("\"");
+		}
+
+		if (viewportRowConfig != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"viewportRowConfig\": ");
+
+			sb.append(String.valueOf(viewportRowConfig));
 		}
 
 		sb.append("}");
