@@ -33,10 +33,6 @@ import java.util.Set;
 
 import javax.annotation.Generated;
 
-import javax.validation.Valid;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
-
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -44,30 +40,31 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @generated
  */
 @Generated("")
-@GraphQLName("PageColumnDefinition")
+@GraphQLName("ViewportRowConfigDefinition")
 @JsonFilter("Liferay.Vulcan")
-@XmlRootElement(name = "PageColumnDefinition")
-public class PageColumnDefinition {
+@XmlRootElement(name = "ViewportRowConfigDefinition")
+public class ViewportRowConfigDefinition {
 
-	public static PageColumnDefinition toDTO(String json) {
-		return ObjectMapperUtil.readValue(PageColumnDefinition.class, json);
+	public static ViewportRowConfigDefinition toDTO(String json) {
+		return ObjectMapperUtil.readValue(
+			ViewportRowConfigDefinition.class, json);
 	}
 
-	@DecimalMax("12")
-	@DecimalMin("1")
 	@Schema
-	public Integer getSize() {
-		return size;
+	public Integer getModulesPerRow() {
+		return modulesPerRow;
 	}
 
-	public void setSize(Integer size) {
-		this.size = size;
+	public void setModulesPerRow(Integer modulesPerRow) {
+		this.modulesPerRow = modulesPerRow;
 	}
 
 	@JsonIgnore
-	public void setSize(UnsafeSupplier<Integer, Exception> sizeUnsafeSupplier) {
+	public void setModulesPerRow(
+		UnsafeSupplier<Integer, Exception> modulesPerRowUnsafeSupplier) {
+
 		try {
-			size = sizeUnsafeSupplier.get();
+			modulesPerRow = modulesPerRowUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -79,27 +76,23 @@ public class PageColumnDefinition {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Integer size;
+	protected Integer modulesPerRow;
 
 	@Schema
-	@Valid
-	public ViewportColumnConfig getViewportColumnConfig() {
-		return viewportColumnConfig;
+	public Boolean getReverseOrder() {
+		return reverseOrder;
 	}
 
-	public void setViewportColumnConfig(
-		ViewportColumnConfig viewportColumnConfig) {
-
-		this.viewportColumnConfig = viewportColumnConfig;
+	public void setReverseOrder(Boolean reverseOrder) {
+		this.reverseOrder = reverseOrder;
 	}
 
 	@JsonIgnore
-	public void setViewportColumnConfig(
-		UnsafeSupplier<ViewportColumnConfig, Exception>
-			viewportColumnConfigUnsafeSupplier) {
+	public void setReverseOrder(
+		UnsafeSupplier<Boolean, Exception> reverseOrderUnsafeSupplier) {
 
 		try {
-			viewportColumnConfig = viewportColumnConfigUnsafeSupplier.get();
+			reverseOrder = reverseOrderUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -111,7 +104,35 @@ public class PageColumnDefinition {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected ViewportColumnConfig viewportColumnConfig;
+	protected Boolean reverseOrder;
+
+	@Schema
+	public String getVerticalAlignment() {
+		return verticalAlignment;
+	}
+
+	public void setVerticalAlignment(String verticalAlignment) {
+		this.verticalAlignment = verticalAlignment;
+	}
+
+	@JsonIgnore
+	public void setVerticalAlignment(
+		UnsafeSupplier<String, Exception> verticalAlignmentUnsafeSupplier) {
+
+		try {
+			verticalAlignment = verticalAlignmentUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String verticalAlignment;
 
 	@Override
 	public boolean equals(Object object) {
@@ -119,14 +140,15 @@ public class PageColumnDefinition {
 			return true;
 		}
 
-		if (!(object instanceof PageColumnDefinition)) {
+		if (!(object instanceof ViewportRowConfigDefinition)) {
 			return false;
 		}
 
-		PageColumnDefinition pageColumnDefinition =
-			(PageColumnDefinition)object;
+		ViewportRowConfigDefinition viewportRowConfigDefinition =
+			(ViewportRowConfigDefinition)object;
 
-		return Objects.equals(toString(), pageColumnDefinition.toString());
+		return Objects.equals(
+			toString(), viewportRowConfigDefinition.toString());
 	}
 
 	@Override
@@ -141,24 +163,38 @@ public class PageColumnDefinition {
 
 		sb.append("{");
 
-		if (size != null) {
+		if (modulesPerRow != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"size\": ");
+			sb.append("\"modulesPerRow\": ");
 
-			sb.append(size);
+			sb.append(modulesPerRow);
 		}
 
-		if (viewportColumnConfig != null) {
+		if (reverseOrder != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"viewportColumnConfig\": ");
+			sb.append("\"reverseOrder\": ");
 
-			sb.append(String.valueOf(viewportColumnConfig));
+			sb.append(reverseOrder);
+		}
+
+		if (verticalAlignment != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"verticalAlignment\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(verticalAlignment));
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -167,7 +203,7 @@ public class PageColumnDefinition {
 	}
 
 	@Schema(
-		defaultValue = "com.liferay.headless.delivery.dto.v1_0.PageColumnDefinition",
+		defaultValue = "com.liferay.headless.delivery.dto.v1_0.ViewportRowConfigDefinition",
 		name = "x-class-name"
 	)
 	public String xClassName;

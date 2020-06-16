@@ -33,7 +33,6 @@ import java.util.Set;
 
 import javax.annotation.Generated;
 
-import javax.validation.Valid;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 
@@ -44,13 +43,14 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @generated
  */
 @Generated("")
-@GraphQLName("PageColumnDefinition")
+@GraphQLName("ViewportColumnConfigDefinition")
 @JsonFilter("Liferay.Vulcan")
-@XmlRootElement(name = "PageColumnDefinition")
-public class PageColumnDefinition {
+@XmlRootElement(name = "ViewportColumnConfigDefinition")
+public class ViewportColumnConfigDefinition {
 
-	public static PageColumnDefinition toDTO(String json) {
-		return ObjectMapperUtil.readValue(PageColumnDefinition.class, json);
+	public static ViewportColumnConfigDefinition toDTO(String json) {
+		return ObjectMapperUtil.readValue(
+			ViewportColumnConfigDefinition.class, json);
 	}
 
 	@DecimalMax("12")
@@ -81,52 +81,21 @@ public class PageColumnDefinition {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Integer size;
 
-	@Schema
-	@Valid
-	public ViewportColumnConfig getViewportColumnConfig() {
-		return viewportColumnConfig;
-	}
-
-	public void setViewportColumnConfig(
-		ViewportColumnConfig viewportColumnConfig) {
-
-		this.viewportColumnConfig = viewportColumnConfig;
-	}
-
-	@JsonIgnore
-	public void setViewportColumnConfig(
-		UnsafeSupplier<ViewportColumnConfig, Exception>
-			viewportColumnConfigUnsafeSupplier) {
-
-		try {
-			viewportColumnConfig = viewportColumnConfigUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected ViewportColumnConfig viewportColumnConfig;
-
 	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
 			return true;
 		}
 
-		if (!(object instanceof PageColumnDefinition)) {
+		if (!(object instanceof ViewportColumnConfigDefinition)) {
 			return false;
 		}
 
-		PageColumnDefinition pageColumnDefinition =
-			(PageColumnDefinition)object;
+		ViewportColumnConfigDefinition viewportColumnConfigDefinition =
+			(ViewportColumnConfigDefinition)object;
 
-		return Objects.equals(toString(), pageColumnDefinition.toString());
+		return Objects.equals(
+			toString(), viewportColumnConfigDefinition.toString());
 	}
 
 	@Override
@@ -151,23 +120,13 @@ public class PageColumnDefinition {
 			sb.append(size);
 		}
 
-		if (viewportColumnConfig != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"viewportColumnConfig\": ");
-
-			sb.append(String.valueOf(viewportColumnConfig));
-		}
-
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	@Schema(
-		defaultValue = "com.liferay.headless.delivery.dto.v1_0.PageColumnDefinition",
+		defaultValue = "com.liferay.headless.delivery.dto.v1_0.ViewportColumnConfigDefinition",
 		name = "x-class-name"
 	)
 	public String xClassName;

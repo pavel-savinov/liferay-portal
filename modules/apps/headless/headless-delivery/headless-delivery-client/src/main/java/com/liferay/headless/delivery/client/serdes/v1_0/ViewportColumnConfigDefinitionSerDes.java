@@ -14,7 +14,7 @@
 
 package com.liferay.headless.delivery.client.serdes.v1_0;
 
-import com.liferay.headless.delivery.client.dto.v1_0.PageColumnDefinition;
+import com.liferay.headless.delivery.client.dto.v1_0.ViewportColumnConfigDefinition;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
 import java.util.Iterator;
@@ -30,24 +30,28 @@ import javax.annotation.Generated;
  * @generated
  */
 @Generated("")
-public class PageColumnDefinitionSerDes {
+public class ViewportColumnConfigDefinitionSerDes {
 
-	public static PageColumnDefinition toDTO(String json) {
-		PageColumnDefinitionJSONParser pageColumnDefinitionJSONParser =
-			new PageColumnDefinitionJSONParser();
+	public static ViewportColumnConfigDefinition toDTO(String json) {
+		ViewportColumnConfigDefinitionJSONParser
+			viewportColumnConfigDefinitionJSONParser =
+				new ViewportColumnConfigDefinitionJSONParser();
 
-		return pageColumnDefinitionJSONParser.parseToDTO(json);
+		return viewportColumnConfigDefinitionJSONParser.parseToDTO(json);
 	}
 
-	public static PageColumnDefinition[] toDTOs(String json) {
-		PageColumnDefinitionJSONParser pageColumnDefinitionJSONParser =
-			new PageColumnDefinitionJSONParser();
+	public static ViewportColumnConfigDefinition[] toDTOs(String json) {
+		ViewportColumnConfigDefinitionJSONParser
+			viewportColumnConfigDefinitionJSONParser =
+				new ViewportColumnConfigDefinitionJSONParser();
 
-		return pageColumnDefinitionJSONParser.parseToDTOs(json);
+		return viewportColumnConfigDefinitionJSONParser.parseToDTOs(json);
 	}
 
-	public static String toJSON(PageColumnDefinition pageColumnDefinition) {
-		if (pageColumnDefinition == null) {
+	public static String toJSON(
+		ViewportColumnConfigDefinition viewportColumnConfigDefinition) {
+
+		if (viewportColumnConfigDefinition == null) {
 			return "null";
 		}
 
@@ -55,25 +59,14 @@ public class PageColumnDefinitionSerDes {
 
 		sb.append("{");
 
-		if (pageColumnDefinition.getSize() != null) {
+		if (viewportColumnConfigDefinition.getSize() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
 			sb.append("\"size\": ");
 
-			sb.append(pageColumnDefinition.getSize());
-		}
-
-		if (pageColumnDefinition.getViewportColumnConfig() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"viewportColumnConfig\": ");
-
-			sb.append(
-				String.valueOf(pageColumnDefinition.getViewportColumnConfig()));
+			sb.append(viewportColumnConfigDefinition.getSize());
 		}
 
 		sb.append("}");
@@ -82,71 +75,56 @@ public class PageColumnDefinitionSerDes {
 	}
 
 	public static Map<String, Object> toMap(String json) {
-		PageColumnDefinitionJSONParser pageColumnDefinitionJSONParser =
-			new PageColumnDefinitionJSONParser();
+		ViewportColumnConfigDefinitionJSONParser
+			viewportColumnConfigDefinitionJSONParser =
+				new ViewportColumnConfigDefinitionJSONParser();
 
-		return pageColumnDefinitionJSONParser.parseToMap(json);
+		return viewportColumnConfigDefinitionJSONParser.parseToMap(json);
 	}
 
 	public static Map<String, String> toMap(
-		PageColumnDefinition pageColumnDefinition) {
+		ViewportColumnConfigDefinition viewportColumnConfigDefinition) {
 
-		if (pageColumnDefinition == null) {
+		if (viewportColumnConfigDefinition == null) {
 			return null;
 		}
 
 		Map<String, String> map = new TreeMap<>();
 
-		if (pageColumnDefinition.getSize() == null) {
+		if (viewportColumnConfigDefinition.getSize() == null) {
 			map.put("size", null);
 		}
 		else {
-			map.put("size", String.valueOf(pageColumnDefinition.getSize()));
-		}
-
-		if (pageColumnDefinition.getViewportColumnConfig() == null) {
-			map.put("viewportColumnConfig", null);
-		}
-		else {
 			map.put(
-				"viewportColumnConfig",
-				String.valueOf(pageColumnDefinition.getViewportColumnConfig()));
+				"size",
+				String.valueOf(viewportColumnConfigDefinition.getSize()));
 		}
 
 		return map;
 	}
 
-	public static class PageColumnDefinitionJSONParser
-		extends BaseJSONParser<PageColumnDefinition> {
+	public static class ViewportColumnConfigDefinitionJSONParser
+		extends BaseJSONParser<ViewportColumnConfigDefinition> {
 
 		@Override
-		protected PageColumnDefinition createDTO() {
-			return new PageColumnDefinition();
+		protected ViewportColumnConfigDefinition createDTO() {
+			return new ViewportColumnConfigDefinition();
 		}
 
 		@Override
-		protected PageColumnDefinition[] createDTOArray(int size) {
-			return new PageColumnDefinition[size];
+		protected ViewportColumnConfigDefinition[] createDTOArray(int size) {
+			return new ViewportColumnConfigDefinition[size];
 		}
 
 		@Override
 		protected void setField(
-			PageColumnDefinition pageColumnDefinition,
+			ViewportColumnConfigDefinition viewportColumnConfigDefinition,
 			String jsonParserFieldName, Object jsonParserFieldValue) {
 
 			if (Objects.equals(jsonParserFieldName, "size")) {
 				if (jsonParserFieldValue != null) {
-					pageColumnDefinition.setSize(
+					viewportColumnConfigDefinition.setSize(
 						Integer.valueOf((String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(
-						jsonParserFieldName, "viewportColumnConfig")) {
-
-				if (jsonParserFieldValue != null) {
-					pageColumnDefinition.setViewportColumnConfig(
-						ViewportColumnConfigSerDes.toDTO(
-							(String)jsonParserFieldValue));
 				}
 			}
 			else {
