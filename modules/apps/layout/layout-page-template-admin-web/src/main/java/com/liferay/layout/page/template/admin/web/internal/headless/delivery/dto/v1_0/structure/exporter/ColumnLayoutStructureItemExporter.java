@@ -60,31 +60,31 @@ public class ColumnLayoutStructureItemExporter
 									columnLayoutStructureItem.
 										getViewportSizeConfigurations();
 
-								if (MapUtil.isNotEmpty(
+								if (MapUtil.isEmpty(
 										viewportConfigurations)) {
 
-									return new ViewportColumnConfig() {
-										{
-											landscapeMobile =
-												_getViewportConfiguration(
-													ViewportSize.
-														MOBILE_LANDSCAPE,
-													viewportConfigurations);
-
-											portraitMobile =
-												_getViewportConfiguration(
-													ViewportSize.
-														PORTRAIT_MOBILE,
-													viewportConfigurations);
-
-											tablet = _getViewportConfiguration(
-												ViewportSize.TABLET,
-												viewportConfigurations);
-										}
-									};
+									return null;
 								}
 
-								return null;
+								return new ViewportColumnConfig() {
+									{
+										landscapeMobile =
+											_getViewportConfiguration(
+												ViewportSize.
+													MOBILE_LANDSCAPE,
+												viewportConfigurations);
+
+										portraitMobile =
+											_getViewportConfiguration(
+												ViewportSize.
+													PORTRAIT_MOBILE,
+												viewportConfigurations);
+
+										tablet = _getViewportConfiguration(
+											ViewportSize.TABLET,
+											viewportConfigurations);
+									}
+								};
 							});
 					}
 				};
