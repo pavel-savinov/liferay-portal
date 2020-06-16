@@ -51,34 +51,38 @@ public class ColumnLayoutStructureItemImporter
 		Map<String, Object> definitionMap = getDefinitionMap(
 			pageElement.getDefinition());
 
-		if (definitionMap != null) {
-			columnLayoutStructureItem.setSize(
-				(Integer)definitionMap.get("size"));
+		if (definitionMap == null) {
+			return columnLayoutStructureItem;
+		}
 
-			if (definitionMap.containsKey("viewportColumnConfig")) {
-				Map<String, Object> viewportColumnConfiguration =
-					(Map<String, Object>)definitionMap.get(
-						"viewportColumnConfig");
+		columnLayoutStructureItem.setSize(
+			(Integer)definitionMap.get("size"));
 
-				for (Map.Entry<String, Object> entry :
-						viewportColumnConfiguration.entrySet()) {
+		if (!definitionMap.containsKey("viewportColumnConfig")) {
+			return columnLayoutStructureItem;
+		}
 
-					Map<String, Object> viewportConfiguration =
-						(Map<String, Object>)entry.getValue();
+		Map<String, Object> viewportColumnConfiguration =
+			(Map<String, Object>)definitionMap.get(
+				"viewportColumnConfig");
 
-					JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+		for (Map.Entry<String, Object> entry :
+				viewportColumnConfiguration.entrySet()) {
 
-					if (viewportConfiguration.containsKey("size")) {
-						jsonObject.put(
-							"size",
-							GetterUtil.getInteger(
-								viewportConfiguration.get("size")));
-					}
+			Map<String, Object> viewportConfiguration =
+				(Map<String, Object>)entry.getValue();
 
-					columnLayoutStructureItem.setViewportSizeConfiguration(
-						entry.getKey(), jsonObject);
-				}
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+
+			if (viewportConfiguration.containsKey("size")) {
+				jsonObject.put(
+					"size",
+					GetterUtil.getInteger(
+						viewportConfiguration.get("size")));
 			}
+
+			columnLayoutStructureItem.setViewportSizeConfiguration(
+				entry.getKey(), jsonObject);
 		}
 
 		return columnLayoutStructureItem;
