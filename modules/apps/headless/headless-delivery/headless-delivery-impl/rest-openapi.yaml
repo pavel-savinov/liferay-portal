@@ -2016,6 +2016,15 @@ components:
                     maximum: 12
                     minimum: 1
                     type: integer
+                viewportColumnConfig:
+                    properties:
+                        landscapeMobile:
+                            $ref: "#/components/schemas/ViewportColumnConfigDefinition"
+                        portraitMobile:
+                            $ref: "#/components/schemas/ViewportColumnConfigDefinition"
+                        tablet:
+                            $ref: "#/components/schemas/ViewportColumnConfigDefinition"
+                    type: object
             type: object
         PageDefinition:
             description:
@@ -2098,6 +2107,15 @@ components:
                     type: boolean
                 verticalAlignment:
                     type: string
+                viewportRowConfig:
+                    properties:
+                        landscapeMobile:
+                            $ref: "#/components/schemas/ViewportRowConfigDefinition"
+                        portraitMobile:
+                            $ref: "#/components/schemas/ViewportRowConfigDefinition"
+                        tablet:
+                            $ref: "#/components/schemas/ViewportRowConfigDefinition"
+                    type: object
             type: object
         PageSectionDefinition:
             properties:
@@ -2558,6 +2576,24 @@ components:
                         type: string
                     readOnly: true
                     type: object
+            type: object
+        ViewportColumnConfigDefinition:
+            # @review
+            properties:
+                size:
+                    maximum: 12
+                    minimum: 1
+                    type: integer
+            type: object
+        ViewportRowConfigDefinition:
+            # @review
+            properties:
+                modulesPerRow:
+                    type: integer
+                reverseOrder:
+                    type: boolean
+                verticalAlignment:
+                    type: string
             type: object
         WidgetInstance:
             properties:
