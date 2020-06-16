@@ -88,7 +88,6 @@ public class RowLayoutStructureItemExporter
 							});
 					}
 				};
-
 				type = PageElement.Type.ROW;
 			}
 		};
