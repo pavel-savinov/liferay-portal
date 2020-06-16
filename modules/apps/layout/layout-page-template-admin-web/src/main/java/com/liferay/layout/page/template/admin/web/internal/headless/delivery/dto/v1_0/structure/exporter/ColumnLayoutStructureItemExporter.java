@@ -69,18 +69,18 @@ public class ColumnLayoutStructureItemExporter
 								return new ViewportColumnConfig() {
 									{
 										landscapeMobile =
-											_getViewportConfiguration(
+											_toViewportColumnConfigDefinition(
 												ViewportSize.
 													MOBILE_LANDSCAPE,
 												viewportConfigurations);
 
 										portraitMobile =
-											_getViewportConfiguration(
+											_toViewportColumnConfigDefinition(
 												ViewportSize.
 													PORTRAIT_MOBILE,
 												viewportConfigurations);
 
-										tablet = _getViewportConfiguration(
+										tablet = _toViewportColumnConfigDefinition(
 											ViewportSize.TABLET,
 											viewportConfigurations);
 									}
@@ -93,7 +93,7 @@ public class ColumnLayoutStructureItemExporter
 		};
 	}
 
-	private ViewportColumnConfigDefinition _getViewportConfiguration(
+	private ViewportColumnConfigDefinition _toViewportColumnConfigDefinition(
 		ViewportSize viewportSize,
 		Map<String, JSONObject> viewportConfigurations) {
 
