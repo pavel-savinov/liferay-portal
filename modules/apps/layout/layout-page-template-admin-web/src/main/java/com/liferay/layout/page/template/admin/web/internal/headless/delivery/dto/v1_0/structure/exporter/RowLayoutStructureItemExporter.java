@@ -76,12 +76,10 @@ public class RowLayoutStructureItemExporter
 											_toViewportRowConfigDefinition(
 												ViewportSize.MOBILE_LANDSCAPE,
 												viewportConfigurations);
-
 										portraitMobile =
 											_toViewportRowConfigDefinition(
 												ViewportSize.PORTRAIT_MOBILE,
 												viewportConfigurations);
-
 										tablet = _toViewportRowConfigDefinition(
 											ViewportSize.TABLET,
 											viewportConfigurations);

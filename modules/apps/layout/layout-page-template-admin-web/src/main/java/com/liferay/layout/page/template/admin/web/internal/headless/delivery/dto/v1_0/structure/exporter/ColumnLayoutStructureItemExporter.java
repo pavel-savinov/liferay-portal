@@ -70,12 +70,10 @@ public class ColumnLayoutStructureItemExporter
 											_toViewportColumnConfigDefinition(
 												ViewportSize.MOBILE_LANDSCAPE,
 												viewportConfigurations);
-
 										portraitMobile =
 											_toViewportColumnConfigDefinition(
 												ViewportSize.PORTRAIT_MOBILE,
 												viewportConfigurations);
-
 										tablet =
 											_toViewportColumnConfigDefinition(
 												ViewportSize.TABLET,
