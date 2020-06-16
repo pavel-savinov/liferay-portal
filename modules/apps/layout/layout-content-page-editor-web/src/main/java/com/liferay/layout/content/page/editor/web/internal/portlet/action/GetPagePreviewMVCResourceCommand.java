@@ -79,6 +79,8 @@ public class GetPagePreviewMVCResourceCommand extends BaseMVCResourceCommand {
 				SegmentsWebKeys.SEGMENTS_EXPERIENCE_IDS),
 			new long[] {SegmentsExperienceConstants.ID_DEFAULT});
 		User currentUser = (User)resourceRequest.getAttribute(WebKeys.USER);
+		boolean currentPortletDecorate = GetterUtil.getBoolean(
+			resourceRequest.getAttribute(WebKeys.PORTLET_DECORATE));
 
 		try {
 			long segmentsExperienceId = ParamUtil.getLong(
@@ -87,6 +89,9 @@ public class GetPagePreviewMVCResourceCommand extends BaseMVCResourceCommand {
 			resourceRequest.setAttribute(
 				SegmentsWebKeys.SEGMENTS_EXPERIENCE_IDS,
 				new long[] {segmentsExperienceId});
+
+			resourceRequest.setAttribute(
+				WebKeys.PORTLET_DECORATE, Boolean.FALSE);
 
 			String languageId = ParamUtil.getString(
 				resourceRequest, "languageId",
@@ -135,6 +140,9 @@ public class GetPagePreviewMVCResourceCommand extends BaseMVCResourceCommand {
 			resourceRequest.setAttribute(
 				SegmentsWebKeys.SEGMENTS_EXPERIENCE_IDS,
 				currentSegmentsExperienceIds);
+
+			resourceRequest.setAttribute(
+				WebKeys.PORTLET_DECORATE, currentPortletDecorate);
 
 			themeDisplay.setLocale(currentLocale);
 			themeDisplay.setSignedIn(true);

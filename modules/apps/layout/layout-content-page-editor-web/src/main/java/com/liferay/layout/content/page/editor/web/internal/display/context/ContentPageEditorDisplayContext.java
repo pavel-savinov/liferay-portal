@@ -373,7 +373,8 @@ public class ContentPageEditorDisplayContext {
 				"portletNamespace", getPortletNamespace()
 			).put(
 				"previewPageURL",
-				getResourceURL("/content_layout/get_page_preview", true)
+				getResourceURL(
+					"/content_layout/get_page_preview", !isLayoutPageTemplate())
 			).put(
 				"publishURL", getPublishURL()
 			).put(
@@ -564,8 +565,7 @@ public class ContentPageEditorDisplayContext {
 
 		resourceURL.setResourceID(resourceID);
 
-		return HttpUtil.addParameter(
-			resourceURL.toString(), "p_l_mode", Constants.EDIT);
+		return resourceURL.toString();
 	}
 
 	protected long getSegmentsExperienceId() {
@@ -621,6 +621,20 @@ public class ContentPageEditorDisplayContext {
 		_sidebarPanels = sidebarPanels;
 
 		return _sidebarPanels;
+	}
+
+	protected boolean isLayoutPageTemplate() {
+		Layout publishedLayout = _getPublishedLayout();
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			LayoutPageTemplateEntryLocalServiceUtil.
+				fetchLayoutPageTemplateEntryByPlid(publishedLayout.getPlid());
+
+		if (layoutPageTemplateEntry != null) {
+			return true;
+		}
+
+		return false;
 	}
 
 	protected final HttpServletRequest httpServletRequest;
