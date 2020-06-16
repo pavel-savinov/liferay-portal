@@ -60,9 +60,7 @@ public class ColumnLayoutStructureItemExporter
 									columnLayoutStructureItem.
 										getViewportSizeConfigurations();
 
-								if (MapUtil.isEmpty(
-										viewportConfigurations)) {
-
+								if (MapUtil.isEmpty(viewportConfigurations)) {
 									return null;
 								}
 
@@ -70,19 +68,18 @@ public class ColumnLayoutStructureItemExporter
 									{
 										landscapeMobile =
 											_toViewportColumnConfigDefinition(
-												ViewportSize.
-													MOBILE_LANDSCAPE,
+												ViewportSize.MOBILE_LANDSCAPE,
 												viewportConfigurations);
 
 										portraitMobile =
 											_toViewportColumnConfigDefinition(
-												ViewportSize.
-													PORTRAIT_MOBILE,
+												ViewportSize.PORTRAIT_MOBILE,
 												viewportConfigurations);
 
-										tablet = _toViewportColumnConfigDefinition(
-											ViewportSize.TABLET,
-											viewportConfigurations);
+										tablet =
+											_toViewportColumnConfigDefinition(
+												ViewportSize.TABLET,
+												viewportConfigurations);
 									}
 								};
 							});
