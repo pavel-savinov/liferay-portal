@@ -66,9 +66,7 @@ public class RowLayoutStructureItemExporter
 									rowLayoutStructureItem.
 										getViewportSizeConfigurations();
 
-								if (MapUtil.isEmpty(
-										viewportConfigurations)) {
-
+								if (MapUtil.isEmpty(viewportConfigurations)) {
 									return null;
 								}
 
@@ -76,14 +74,12 @@ public class RowLayoutStructureItemExporter
 									{
 										landscapeMobile =
 											_toViewportRowConfigDefinition(
-												ViewportSize.
-													MOBILE_LANDSCAPE,
+												ViewportSize.MOBILE_LANDSCAPE,
 												viewportConfigurations);
 
 										portraitMobile =
 											_toViewportRowConfigDefinition(
-												ViewportSize.
-													PORTRAIT_MOBILE,
+												ViewportSize.PORTRAIT_MOBILE,
 												viewportConfigurations);
 
 										tablet = _toViewportRowConfigDefinition(

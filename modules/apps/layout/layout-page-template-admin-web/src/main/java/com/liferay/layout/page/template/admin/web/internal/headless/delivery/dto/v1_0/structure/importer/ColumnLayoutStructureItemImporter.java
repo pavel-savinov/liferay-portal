@@ -55,16 +55,14 @@ public class ColumnLayoutStructureItemImporter
 			return columnLayoutStructureItem;
 		}
 
-		columnLayoutStructureItem.setSize(
-			(Integer)definitionMap.get("size"));
+		columnLayoutStructureItem.setSize((Integer)definitionMap.get("size"));
 
 		if (!definitionMap.containsKey("viewportColumnConfig")) {
 			return columnLayoutStructureItem;
 		}
 
 		Map<String, Object> viewportColumnConfiguration =
-			(Map<String, Object>)definitionMap.get(
-				"viewportColumnConfig");
+			(Map<String, Object>)definitionMap.get("viewportColumnConfig");
 
 		for (Map.Entry<String, Object> entry :
 				viewportColumnConfiguration.entrySet()) {
@@ -77,8 +75,7 @@ public class ColumnLayoutStructureItemImporter
 			if (viewportConfiguration.containsKey("size")) {
 				jsonObject.put(
 					"size",
-					GetterUtil.getInteger(
-						viewportConfiguration.get("size")));
+					GetterUtil.getInteger(viewportConfiguration.get("size")));
 			}
 
 			columnLayoutStructureItem.setViewportSizeConfiguration(
