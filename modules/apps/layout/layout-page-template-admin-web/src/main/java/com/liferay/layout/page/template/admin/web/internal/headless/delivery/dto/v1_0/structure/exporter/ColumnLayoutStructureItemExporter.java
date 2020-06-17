@@ -68,16 +68,16 @@ public class ColumnLayoutStructureItemExporter
 									{
 										landscapeMobile =
 											_toViewportColumnConfigDefinition(
-												ViewportSize.MOBILE_LANDSCAPE,
-												viewportConfigurations);
+												viewportConfigurations,
+												ViewportSize.MOBILE_LANDSCAPE);
 										portraitMobile =
 											_toViewportColumnConfigDefinition(
-												ViewportSize.PORTRAIT_MOBILE,
-												viewportConfigurations);
+												viewportConfigurations,
+												ViewportSize.PORTRAIT_MOBILE);
 										tablet =
 											_toViewportColumnConfigDefinition(
-												ViewportSize.TABLET,
-												viewportConfigurations);
+												viewportConfigurations,
+												ViewportSize.TABLET);
 									}
 								};
 							});
@@ -89,8 +89,8 @@ public class ColumnLayoutStructureItemExporter
 	}
 
 	private ViewportColumnConfigDefinition _toViewportColumnConfigDefinition(
-		ViewportSize viewportSize,
-		Map<String, JSONObject> viewportConfigurations) {
+		Map<String, JSONObject> viewportConfigurations,
+		ViewportSize viewportSize) {
 
 		if (!viewportConfigurations.containsKey(
 				viewportSize.getViewportSizeId())) {

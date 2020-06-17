@@ -74,15 +74,15 @@ public class RowLayoutStructureItemExporter
 									{
 										landscapeMobile =
 											_toViewportRowConfigDefinition(
-												ViewportSize.MOBILE_LANDSCAPE,
-												viewportConfigurations);
+												viewportConfigurations,
+												ViewportSize.MOBILE_LANDSCAPE);
 										portraitMobile =
 											_toViewportRowConfigDefinition(
-												ViewportSize.PORTRAIT_MOBILE,
-												viewportConfigurations);
+												viewportConfigurations,
+												ViewportSize.PORTRAIT_MOBILE);
 										tablet = _toViewportRowConfigDefinition(
-											ViewportSize.TABLET,
-											viewportConfigurations);
+											viewportConfigurations,
+											ViewportSize.TABLET);
 									}
 								};
 							});
@@ -94,8 +94,8 @@ public class RowLayoutStructureItemExporter
 	}
 
 	private ViewportRowConfigDefinition _toViewportRowConfigDefinition(
-		ViewportSize viewportSize,
-		Map<String, JSONObject> viewportConfigurations) {
+		Map<String, JSONObject> viewportConfigurations,
+		ViewportSize viewportSize) {
 
 		if (!viewportConfigurations.containsKey(
 				viewportSize.getViewportSizeId())) {
