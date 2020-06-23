@@ -163,7 +163,9 @@ renderResponse.setTitle((category == null) ? LanguageUtil.get(request, "add-new-
 			<liferay-frontend:edit-form-footer>
 				<aui:button type="submit" />
 
-				<aui:button href="<%= redirect %>" type="cancel" />
+				<aui:button cssClass="btn-secondary" onClick='<%= liferayPortletResponse.getNamespace() + "saveAndAddNew();" %>' value="save-and-add-a-new-one" />
+
+				<aui:button cssClass="btn-unstyled" href="<%= redirect %>" type="cancel" />
 			</liferay-frontend:edit-form-footer>
 		</c:when>
 		<c:otherwise>
@@ -184,16 +186,30 @@ renderResponse.setTitle((category == null) ? LanguageUtil.get(request, "add-new-
 					var cancelButton = document.createElement('button');
 					cancelButton.setAttribute(
 						'class',
-						'add-category-toolbar-button btn btn-secondary'
+						'add-category-toolbar-button btn btn-unstyled'
 					);
-					cancelButton.setAttribute('type', 'submit');
+					cancelButton.setAttribute('type', 'button');
 					cancelButton.innerText = '<liferay-ui:message key="cancel" />';
 					cancelButton.addEventListener('click', function () {
 						footer.get('boundingBox').all('.add-category-toolbar-button').hide();
-						Liferay.Util.navigate('<%= HtmlUtil.escape(redirect) %>');
+						Liferay.Util.navigate('<%= HtmlUtil.escapeJS(redirect) %>');
 					});
 
 					footer.get('boundingBox').append(cancelButton);
+
+					var saveAndAddNewButton = document.createElement('button');
+					saveAndAddNewButton.setAttribute(
+						'class',
+						'add-category-toolbar-button btn btn-secondary'
+					);
+					saveAndAddNewButton.setAttribute('type', 'submit');
+					saveAndAddNewButton.innerText =
+						'<liferay-ui:message key="save-and-add-a-new-one" />';
+					saveAndAddNewButton.addEventListener('click', function () {
+						<portlet:namespace />saveAndAddNew();
+					});
+
+					footer.get('boundingBox').append(saveAndAddNewButton);
 
 					var submitButton = document.createElement('button');
 					submitButton.setAttribute(
@@ -212,3 +228,12 @@ renderResponse.setTitle((category == null) ? LanguageUtil.get(request, "add-new-
 		</c:otherwise>
 	</c:choose>
 </liferay-frontend:edit-form>
+
+<aui:script>
+	function <portlet:namespace />saveAndAddNew() {
+		document.querySelector('#<portlet:namespace />redirect').value =
+			'<%= currentURL %>';
+
+		submitForm(document.querySelector('#<portlet:namespace />fm'));
+	}
+</aui:script>
