@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.asset.util.AssetVocabularySettingsHelper;
 
 import java.util.Collections;
@@ -46,6 +47,7 @@ public class AddDefaultAssetVocabulariesPortalInstanceLifecycleListener
 	public void portalInstanceRegistered(Company company) throws Exception {
 		_addAssetVocabulary(company, "audience");
 		_addAssetVocabulary(company, "stage");
+		_addAssetVocabulary(company, PropsValues.ASSET_VOCABULARY_DEFAULT);
 	}
 
 	private void _addAssetVocabulary(Company company, String name)
