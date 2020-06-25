@@ -293,7 +293,7 @@ public class AssetVocabularyLocalServiceImpl
 	public List<AssetVocabulary> getGroupVocabularies(long groupId)
 		throws PortalException {
 
-		return getGroupVocabularies(groupId, true);
+		return getGroupVocabularies(groupId, false);
 	}
 
 	@Override

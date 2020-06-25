@@ -470,7 +470,7 @@ public class AssetCategoriesDisplayContext {
 		}
 
 		_vocabularies = AssetVocabularyServiceUtil.getGroupVocabularies(
-			_themeDisplay.getScopeGroupId(), true, QueryUtil.ALL_POS,
+			_themeDisplay.getScopeGroupId(), false, QueryUtil.ALL_POS,
 			QueryUtil.ALL_POS, new AssetVocabularyCreateDateComparator());
 
 		return _vocabularies;
