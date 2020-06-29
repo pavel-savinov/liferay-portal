@@ -44,11 +44,13 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
+import com.liferay.portal.kernel.servlet.MultiSessionMessages;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LocalizationUtil;
@@ -162,6 +164,14 @@ public class AssetCategoryAdminPortlet extends MVCPortlet {
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			AssetCategory.class.getName(), actionRequest);
 
+		hideDefaultSuccessMessage(actionRequest);
+
+		MultiSessionMessages.add(
+			actionRequest, actionResponse.getNamespace() + "requestProcessed");
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
 		if (categoryId <= 0) {
 
 			// Add category
@@ -169,6 +179,13 @@ public class AssetCategoryAdminPortlet extends MVCPortlet {
 			_assetCategoryService.addCategory(
 				serviceContext.getScopeGroupId(), parentCategoryId, titleMap,
 				descriptionMap, vocabularyId, null, serviceContext);
+
+			MultiSessionMessages.add(
+				actionRequest, "categoryAdded",
+				LanguageUtil.format(
+					_portal.getHttpServletRequest(actionRequest),
+					"x-was-created-successfully",
+					new Object[] {titleMap.get(themeDisplay.getLocale())}));
 		}
 		else {
 
@@ -184,7 +201,16 @@ public class AssetCategoryAdminPortlet extends MVCPortlet {
 			_assetCategoryService.updateCategory(
 				categoryId, parentCategoryId, titleMap, descriptionMap,
 				vocabularyId, categoryPropertiesArray, serviceContext);
+
+			MultiSessionMessages.add(
+				actionRequest, "categoryUpdated",
+				LanguageUtil.format(
+					_portal.getHttpServletRequest(actionRequest),
+					"x-was-updated-successfully",
+					new Object[] {titleMap.get(themeDisplay.getLocale())}));
 		}
+
+		sendRedirect(actionRequest, actionResponse);
 	}
 
 	public void editProperties(

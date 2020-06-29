@@ -16,6 +16,9 @@
 
 <%@ include file="/init.jsp" %>
 
+<liferay-ui:success key="categoryAdded" message='<%= GetterUtil.getString(MultiSessionMessages.get(renderRequest, "categoryAdded")) %>' />
+<liferay-ui:success key="categoryUpdated" message='<%= GetterUtil.getString(MultiSessionMessages.get(renderRequest, "categoryUpdated")) %>' />
+
 <clay:container-fluid
 	cssClass="container-view"
 >
