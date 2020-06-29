@@ -1859,9 +1859,16 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		List<Layout> layouts = new ArrayList<>(documents.size());
 
 		for (Document document : documents) {
-			layouts.add(
-				getLayout(
-					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK))));
+			Layout layout = fetchLayout(
+				GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)));
+
+			if (layout == null) {
+				indexer.delete(layout);
+
+				continue;
+			}
+
+			layouts.add(layout);
 		}
 
 		return layouts;
@@ -1922,9 +1929,16 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		List<Layout> layouts = new ArrayList<>(documents.size());
 
 		for (Document document : documents) {
-			layouts.add(
-				getLayout(
-					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK))));
+			Layout layout = fetchLayout(
+				GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)));
+
+			if (layout == null) {
+				indexer.delete(layout);
+
+				continue;
+			}
+
+			layouts.add(layout);
 		}
 
 		return layouts;
