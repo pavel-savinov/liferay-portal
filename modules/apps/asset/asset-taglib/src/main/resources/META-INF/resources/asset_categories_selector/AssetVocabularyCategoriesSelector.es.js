@@ -142,6 +142,7 @@ function AssetVocabulariesCategoriesSelector({
 
 		const itemSelectorDialog = new ItemSelectorDialog({
 			buttonAddLabel: Liferay.Language.get('done'),
+			dialogClasses: 'modal-xl',
 			eventName,
 			title: label
 				? Liferay.Util.sub(Liferay.Language.get('select-x'), label)
