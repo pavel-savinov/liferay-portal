@@ -154,9 +154,29 @@ public class AssetEntryInfoItemFieldSetProviderImpl
 
 		List<InfoFieldValue<Object>> infoFieldValues = new ArrayList<>();
 
+		Set<AssetVocabulary> assetVocabularies = _getAssetVocabularies(
+			assetEntry);
+
+		for (AssetVocabulary assetVocabulary : assetVocabularies) {
+			infoFieldValues.add(
+				new InfoFieldValue<>(
+					new InfoField(
+						TextInfoFieldType.INSTANCE,
+						InfoLocalizedValue.builder(
+						).addValues(
+							assetVocabulary.getTitleMap()
+						).build(),
+						assetVocabulary.getName()),
+					() -> _getCategoryNames(
+						_filterByVocabularyId(
+							assetEntry.getCategories(),
+							assetVocabulary.getVocabularyId()))));
+		}
+
 		infoFieldValues.add(
 			new InfoFieldValue<>(
-				_categoriesInfoField, () -> _getCategoryNames(assetEntry, 0)));
+				_categoriesInfoField,
+				() -> _getCategoryNames(assetEntry.getCategories())));
 
 		infoFieldValues.add(
 			new InfoFieldValue<>(
@@ -198,6 +218,14 @@ public class AssetEntryInfoItemFieldSetProviderImpl
 		}
 	}
 
+	private List<AssetCategory> _filterByVocabularyId(
+		List<AssetCategory> assetCategories, long vocabularyId) {
+
+		return ListUtil.filter(
+			assetCategories,
+			assetCategory -> assetCategory.getVocabularyId() == vocabularyId);
+	}
+
 	private Set<AssetVocabulary> _getAssetVocabularies(AssetEntry assetEntry) {
 		List<AssetCategory> assetCategories = assetEntry.getCategories();
 		Set<AssetVocabulary> assetVocabularies = new HashSet<>();
@@ -213,17 +241,8 @@ public class AssetEntryInfoItemFieldSetProviderImpl
 		return assetVocabularies;
 	}
 
-	private String _getCategoryNames(AssetEntry assetEntry, long vocabularyId) {
+	private String _getCategoryNames(List<AssetCategory> assetCategories) {
 		Locale locale = LocaleThreadLocal.getThemeDisplayLocale();
-
-		List<AssetCategory> assetCategories = assetEntry.getCategories();
-
-		if (vocabularyId > 0) {
-			assetCategories = ListUtil.filter(
-				assetCategories,
-				assetCategory ->
-					assetCategory.getVocabularyId() == vocabularyId);
-		}
 
 		Stream<AssetCategory> stream = assetCategories.stream();
 
