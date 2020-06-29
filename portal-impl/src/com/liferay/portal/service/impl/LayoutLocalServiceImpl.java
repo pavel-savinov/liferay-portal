@@ -987,7 +987,9 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		Indexer<Layout> indexer = IndexerRegistryUtil.getIndexer(Layout.class);
 
-		indexer.delete(layout);
+		if (indexer != null) {
+			indexer.delete(layout);
+		}
 	}
 
 	/**
