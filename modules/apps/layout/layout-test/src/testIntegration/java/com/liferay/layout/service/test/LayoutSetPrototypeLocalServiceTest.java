@@ -90,7 +90,7 @@ public class LayoutSetPrototypeLocalServiceTest {
 				layout.getGroupId(), layout.getPlid());
 
 		Assert.assertEquals(
-			fragmentEntryLinks.toString(), 2, fragmentEntryLinks.size());
+			fragmentEntryLinks.toString(), 0, fragmentEntryLinks.size());
 
 		_layoutSetPrototypeLocalService.deleteLayoutSetPrototype(
 			layoutSetPrototype);
