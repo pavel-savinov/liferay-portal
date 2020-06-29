@@ -133,7 +133,7 @@ function SelectCategory({
 					<div className="input-group">
 						<div className="input-group-item">
 							<input
-								className="form-control input-group-inset input-group-inset-after"
+								className="form-control h-100 input-group-inset input-group-inset-after"
 								onChange={handleQueryChange}
 								placeholder={Liferay.Language.get('search')}
 								type="text"
@@ -147,7 +147,7 @@ function SelectCategory({
 
 					{addCategoryURL && (
 						<ClayButton
-							className="btn-monospaced ml-1"
+							className="btn-monospaced ml-3 nav-btn nav-btn-monospaced"
 							displayType="primary"
 							onClick={handleAddCategoryClick}
 						>
