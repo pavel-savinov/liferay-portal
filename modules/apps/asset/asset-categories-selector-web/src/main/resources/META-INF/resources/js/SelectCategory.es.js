@@ -73,11 +73,27 @@ function SelectCategory({
 		const dialog = Liferay.Util.getWindow(itemSelectorSaveEvent);
 		const footer = dialog.getToolbar('footer');
 
+		if (!dialog.get('initialTitle')) {
+			dialog.set(
+				'initialTitle',
+				dialog.headerNode.one('.modal-title').text()
+			);
+		}
+
 		footer.get('boundingBox').all('.add-category-toolbar-button').hide();
 
 		footer.get('boundingBox').one('#addButton').show();
 
 		footer.get('boundingBox').one('#cancelButton').show();
+
+		if (
+			dialog.get('initialTitle') !==
+			dialog.headerNode.one('.modal-title').text()
+		) {
+			dialog.headerNode
+				.one('.modal-title')
+				.text(dialog.get('initialTitle'));
+		}
 	}, [itemSelectorSaveEvent]);
 
 	const handleSelectionChange = (selectedNodes) => {

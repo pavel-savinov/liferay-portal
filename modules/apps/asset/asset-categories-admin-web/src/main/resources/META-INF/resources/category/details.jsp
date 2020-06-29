@@ -165,7 +165,7 @@ renderResponse.setTitle((category == null) ? LanguageUtil.get(request, "add-new-
 
 				<aui:button cssClass="btn-secondary" onClick='<%= liferayPortletResponse.getNamespace() + "saveAndAddNew();" %>' value="save-and-add-a-new-one" />
 
-				<aui:button cssClass="btn-unstyled" href="<%= redirect %>" type="cancel" />
+				<aui:button cssClass="btn-link" href="<%= redirect %>" type="cancel" />
 			</liferay-frontend:edit-form-footer>
 		</c:when>
 		<c:otherwise>
@@ -174,6 +174,12 @@ renderResponse.setTitle((category == null) ? LanguageUtil.get(request, "add-new-
 					'<%= assetCategoriesDisplayContext.getItemSelectorEventName() %>'
 				);
 				var footer = dialog.getToolbar('footer');
+
+				dialog.headerNode
+					.one('.modal-title')
+					.text(
+						dialog.get('initialTitle') + ' - <liferay-ui:message key="add-new" />'
+					);
 
 				var controlButtons = footer
 					.get('boundingBox')
@@ -186,7 +192,7 @@ renderResponse.setTitle((category == null) ? LanguageUtil.get(request, "add-new-
 					var cancelButton = document.createElement('button');
 					cancelButton.setAttribute(
 						'class',
-						'add-category-toolbar-button btn btn-unstyled'
+						'add-category-toolbar-button btn btn-link'
 					);
 					cancelButton.setAttribute('type', 'button');
 					cancelButton.innerText = '<liferay-ui:message key="cancel" />';
