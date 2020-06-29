@@ -168,7 +168,7 @@ function SelectCategory({
 							initialSelectedNodeIds={initialSelectedNodeIds}
 							multiSelection={multiSelection}
 							NodeComponent={Treeview.Card}
-							nodes={nodes}
+							nodes={flattenedNodes}
 							onSelectedNodesChange={handleSelectionChange}
 						/>
 					</div>
