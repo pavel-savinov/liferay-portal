@@ -30,7 +30,12 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface AssetEntryInfoItemFieldSetProvider {
 
+	public InfoFieldSet getInfoFieldSet(AssetEntry assetEntry);
+
 	public InfoFieldSet getInfoFieldSet(String itemClassName);
+
+	public InfoFieldSet getInfoFieldSet(
+		String itemClassName, long itemClassTypeId, long scopeGroupId);
 
 	public List<InfoFieldValue<Object>> getInfoFieldValues(
 		AssetEntry assetEntry);
