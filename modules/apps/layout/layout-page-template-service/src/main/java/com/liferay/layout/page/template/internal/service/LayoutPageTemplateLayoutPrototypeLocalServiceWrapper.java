@@ -52,9 +52,9 @@ public class LayoutPageTemplateLayoutPrototypeLocalServiceWrapper
 
 	@Override
 	public LayoutPrototype addLayoutPrototype(
-			long userId, long companyId, Map<Locale, String> nameMap,
-			Map<Locale, String> descriptionMap, boolean active,
-			ServiceContext serviceContext)
+			long userId, long companyId, long groupId,
+			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
+			boolean active, ServiceContext serviceContext)
 		throws PortalException {
 
 		LayoutPrototype layoutPrototype = super.addLayoutPrototype(
@@ -76,7 +76,7 @@ public class LayoutPageTemplateLayoutPrototypeLocalServiceWrapper
 		}
 
 		_layoutPageTemplateEntryLocalService.addLayoutPageTemplateEntry(
-			layoutPrototype);
+			groupId, layoutPrototype);
 
 		return layoutPrototype;
 	}

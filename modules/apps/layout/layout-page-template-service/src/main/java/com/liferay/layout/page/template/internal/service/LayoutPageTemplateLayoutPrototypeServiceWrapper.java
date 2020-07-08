@@ -52,13 +52,14 @@ public class LayoutPageTemplateLayoutPrototypeServiceWrapper
 
 	@Override
 	public LayoutPrototype addLayoutPrototype(
-			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
-			boolean active, ServiceContext serviceContext)
+			long groupId, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap, boolean active,
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		try {
 			return super.addLayoutPrototype(
-				nameMap, descriptionMap, active, serviceContext);
+				groupId, nameMap, descriptionMap, active, serviceContext);
 		}
 		catch (PrincipalException principalException) {
 			if (!_portletResourcePermission.contains(
@@ -73,8 +74,8 @@ public class LayoutPageTemplateLayoutPrototypeServiceWrapper
 			User user = GuestOrUserUtil.getGuestOrUser();
 
 			return _layoutPrototypeLocalService.addLayoutPrototype(
-				user.getUserId(), user.getCompanyId(), nameMap, descriptionMap,
-				active, serviceContext);
+				user.getUserId(), user.getCompanyId(), groupId, nameMap,
+				descriptionMap, active, serviceContext);
 		}
 	}
 
