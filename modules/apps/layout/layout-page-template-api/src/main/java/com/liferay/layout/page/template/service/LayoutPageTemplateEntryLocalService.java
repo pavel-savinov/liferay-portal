@@ -83,6 +83,10 @@ public interface LayoutPageTemplateEntryLocalService
 			LayoutPrototype layoutPrototype)
 		throws PortalException;
 
+	public LayoutPageTemplateEntry addLayoutPageTemplateEntry(
+			long groupId, LayoutPrototype layoutPrototype)
+		throws PortalException;
+
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
 	 #addLayoutPageTemplateEntry(long, long, long, long, long,
