@@ -92,7 +92,8 @@ public class AddLayoutPrototypeMVCActionCommand extends BaseMVCActionCommand {
 
 		LayoutPrototype layoutPrototype =
 			_layoutPrototypeService.addLayoutPrototype(
-				nameMap, new HashMap<>(), true, serviceContext);
+				themeDisplay.getScopeGroupId(), nameMap, new HashMap<>(), true,
+				serviceContext);
 
 		LayoutPageTemplateEntry layoutPageTemplateEntry =
 			_layoutPageTemplateEntryLocalService.
