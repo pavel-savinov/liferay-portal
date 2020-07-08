@@ -109,6 +109,35 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 			company.getGroupId(), layoutPrototype);
 	}
 
+	@Override
+	public LayoutPageTemplateEntry addLayoutPageTemplateEntry(
+			long groupId, LayoutPrototype layoutPrototype)
+		throws PortalException {
+
+		String nameXML = layoutPrototype.getName();
+
+		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
+			nameXML);
+
+		Locale defaultLocale = LocaleUtil.fromLanguageId(
+			LocalizationUtil.getDefaultLanguageId(nameXML));
+
+		Layout layout = layoutPrototype.getLayout();
+
+		int status = WorkflowConstants.STATUS_APPROVED;
+
+		if (!layoutPrototype.isActive()) {
+			status = WorkflowConstants.STATUS_INACTIVE;
+		}
+
+		return addLayoutPageTemplateEntry(
+			layoutPrototype.getUserId(), groupId, 0, 0, 0,
+			nameMap.get(defaultLocale),
+			LayoutPageTemplateEntryTypeConstants.TYPE_WIDGET_PAGE, false,
+			layoutPrototype.getLayoutPrototypeId(), 0, layout.getPlid(), status,
+			new ServiceContext());
+	}
+
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
 	 *             #addLayoutPageTemplateEntry(long, long, long, long, long,
@@ -783,34 +812,6 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 		return layoutPageTemplateEntryLocalService.
 			updateLayoutPageTemplateEntry(layoutPageTemplateEntry);
-	}
-
-	protected LayoutPageTemplateEntry addLayoutPageTemplateEntry(
-			long groupId, LayoutPrototype layoutPrototype)
-		throws PortalException {
-
-		String nameXML = layoutPrototype.getName();
-
-		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
-			nameXML);
-
-		Locale defaultLocale = LocaleUtil.fromLanguageId(
-			LocalizationUtil.getDefaultLanguageId(nameXML));
-
-		Layout layout = layoutPrototype.getLayout();
-
-		int status = WorkflowConstants.STATUS_APPROVED;
-
-		if (!layoutPrototype.isActive()) {
-			status = WorkflowConstants.STATUS_INACTIVE;
-		}
-
-		return addLayoutPageTemplateEntry(
-			layoutPrototype.getUserId(), groupId, 0, 0, 0,
-			nameMap.get(defaultLocale),
-			LayoutPageTemplateEntryTypeConstants.TYPE_WIDGET_PAGE, false,
-			layoutPrototype.getLayoutPrototypeId(), 0, layout.getPlid(), status,
-			new ServiceContext());
 	}
 
 	protected void validate(
