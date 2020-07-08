@@ -54,6 +54,12 @@ public interface LayoutPrototypeService extends BaseService {
 	 * Never modify or reference this interface directly. Always use {@link LayoutPrototypeServiceUtil} to access the layout prototype remote service. Add custom service methods to <code>com.liferay.portal.service.impl.LayoutPrototypeServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public LayoutPrototype addLayoutPrototype(
+			long groupId, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap, boolean active,
+			ServiceContext serviceContext)
+		throws PortalException;
+
+	public LayoutPrototype addLayoutPrototype(
 			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
 			boolean active, ServiceContext serviceContext)
 		throws PortalException;
