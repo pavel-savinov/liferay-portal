@@ -76,6 +76,12 @@ public interface LayoutPrototypeLocalService
 	public LayoutPrototype addLayoutPrototype(LayoutPrototype layoutPrototype);
 
 	public LayoutPrototype addLayoutPrototype(
+			long userId, long companyId, long groupId,
+			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
+			boolean active, ServiceContext serviceContext)
+		throws PortalException;
+
+	public LayoutPrototype addLayoutPrototype(
 			long userId, long companyId, Map<Locale, String> nameMap,
 			Map<Locale, String> descriptionMap, boolean active,
 			ServiceContext serviceContext)
