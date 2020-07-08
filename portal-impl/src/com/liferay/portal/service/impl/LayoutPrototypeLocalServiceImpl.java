@@ -51,6 +51,17 @@ public class LayoutPrototypeLocalServiceImpl
 
 	@Override
 	public LayoutPrototype addLayoutPrototype(
+			long userId, long companyId, long groupId,
+			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
+			boolean active, ServiceContext serviceContext)
+		throws PortalException {
+
+		return addLayoutPrototype(
+			userId, companyId, nameMap, descriptionMap, active, serviceContext);
+	}
+
+	@Override
+	public LayoutPrototype addLayoutPrototype(
 			long userId, long companyId, Map<Locale, String> nameMap,
 			Map<Locale, String> descriptionMap, boolean active,
 			ServiceContext serviceContext)
