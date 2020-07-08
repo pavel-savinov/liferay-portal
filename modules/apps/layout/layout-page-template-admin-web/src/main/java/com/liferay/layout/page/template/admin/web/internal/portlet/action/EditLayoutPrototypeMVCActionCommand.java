@@ -22,8 +22,10 @@ import com.liferay.portal.kernel.service.LayoutPrototypeService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Locale;
 import java.util.Map;
@@ -66,8 +68,13 @@ public class EditLayoutPrototypeMVCActionCommand extends BaseMVCActionCommand {
 
 		try {
 			if (layoutPrototypeId <= 0) {
+				ThemeDisplay themeDisplay =
+					(ThemeDisplay)actionRequest.getAttribute(
+						WebKeys.THEME_DISPLAY);
+
 				_layoutPrototypeService.addLayoutPrototype(
-					nameMap, descriptionMap, active, serviceContext);
+					themeDisplay.getScopeGroupId(), nameMap, descriptionMap,
+					active, serviceContext);
 			}
 			else {
 				_layoutPrototypeService.updateLayoutPrototype(

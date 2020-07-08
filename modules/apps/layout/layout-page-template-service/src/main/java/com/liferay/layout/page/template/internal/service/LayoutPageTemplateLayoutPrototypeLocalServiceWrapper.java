@@ -52,6 +52,38 @@ public class LayoutPageTemplateLayoutPrototypeLocalServiceWrapper
 
 	@Override
 	public LayoutPrototype addLayoutPrototype(
+			long userId, long companyId, long groupId,
+			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
+			boolean active, ServiceContext serviceContext)
+		throws PortalException {
+
+		LayoutPrototype layoutPrototype = super.addLayoutPrototype(
+			userId, companyId, groupId, nameMap, descriptionMap, active,
+			serviceContext);
+
+		if (ExportImportThreadLocal.isStagingInProcess() ||
+			ExportImportThreadLocal.isImportInProcess()) {
+
+			return layoutPrototype;
+		}
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			_layoutPageTemplateEntryLocalService.
+				fetchFirstLayoutPageTemplateEntry(
+					layoutPrototype.getLayoutPrototypeId());
+
+		if (layoutPageTemplateEntry != null) {
+			return layoutPrototype;
+		}
+
+		_layoutPageTemplateEntryLocalService.addLayoutPageTemplateEntry(
+			groupId, layoutPrototype);
+
+		return layoutPrototype;
+	}
+
+	@Override
+	public LayoutPrototype addLayoutPrototype(
 			long userId, long companyId, Map<Locale, String> nameMap,
 			Map<Locale, String> descriptionMap, boolean active,
 			ServiceContext serviceContext)
