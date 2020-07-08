@@ -213,7 +213,7 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 			LayoutPrototype layoutPrototype =
 				_layoutPrototypeLocalService.addLayoutPrototype(
-					userId, user.getCompanyId(),
+					userId, user.getCompanyId(), groupId,
 					Collections.singletonMap(
 						LocaleUtil.getMostRelevantLocale(), name),
 					Collections.emptyMap(), true, serviceContext);
