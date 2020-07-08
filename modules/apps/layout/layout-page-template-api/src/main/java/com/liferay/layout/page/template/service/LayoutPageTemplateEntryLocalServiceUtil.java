@@ -67,6 +67,16 @@ public class LayoutPageTemplateEntryLocalServiceUtil {
 		return getService().addLayoutPageTemplateEntry(layoutPrototype);
 	}
 
+	public static com.liferay.layout.page.template.model.LayoutPageTemplateEntry
+			addLayoutPageTemplateEntry(
+				long groupId,
+				com.liferay.portal.kernel.model.LayoutPrototype layoutPrototype)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return getService().addLayoutPageTemplateEntry(
+			groupId, layoutPrototype);
+	}
+
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
 	 #addLayoutPageTemplateEntry(long, long, long, long, long,
