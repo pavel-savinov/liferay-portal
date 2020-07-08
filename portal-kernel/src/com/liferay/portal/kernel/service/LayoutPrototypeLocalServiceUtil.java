@@ -51,6 +51,19 @@ public class LayoutPrototypeLocalServiceUtil {
 
 	public static com.liferay.portal.kernel.model.LayoutPrototype
 			addLayoutPrototype(
+				long userId, long companyId, long groupId,
+				java.util.Map<java.util.Locale, String> nameMap,
+				java.util.Map<java.util.Locale, String> descriptionMap,
+				boolean active, ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return getService().addLayoutPrototype(
+			userId, companyId, groupId, nameMap, descriptionMap, active,
+			serviceContext);
+	}
+
+	public static com.liferay.portal.kernel.model.LayoutPrototype
+			addLayoutPrototype(
 				long userId, long companyId,
 				java.util.Map<java.util.Locale, String> nameMap,
 				java.util.Map<java.util.Locale, String> descriptionMap,

@@ -32,6 +32,18 @@ public class LayoutPrototypeServiceWrapper
 
 	@Override
 	public com.liferay.portal.kernel.model.LayoutPrototype addLayoutPrototype(
+			long groupId,
+			java.util.Map<java.util.Locale, java.lang.String> nameMap,
+			java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
+			boolean active, ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _layoutPrototypeService.addLayoutPrototype(
+			groupId, nameMap, descriptionMap, active, serviceContext);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.model.LayoutPrototype addLayoutPrototype(
 			java.util.Map<java.util.Locale, java.lang.String> nameMap,
 			java.util.Map<java.util.Locale, java.lang.String> descriptionMap,
 			boolean active, ServiceContext serviceContext)
