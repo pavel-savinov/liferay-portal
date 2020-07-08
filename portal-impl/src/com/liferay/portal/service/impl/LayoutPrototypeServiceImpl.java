@@ -38,6 +38,23 @@ public class LayoutPrototypeServiceImpl extends LayoutPrototypeServiceBaseImpl {
 
 	@Override
 	public LayoutPrototype addLayoutPrototype(
+			long groupId, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap, boolean active,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		PortalPermissionUtil.check(
+			getPermissionChecker(), ActionKeys.ADD_LAYOUT_PROTOTYPE);
+
+		User user = getUser();
+
+		return layoutPrototypeLocalService.addLayoutPrototype(
+			user.getUserId(), user.getCompanyId(), groupId, nameMap,
+			descriptionMap, active, serviceContext);
+	}
+
+	@Override
+	public LayoutPrototype addLayoutPrototype(
 			Map<Locale, String> nameMap, Map<Locale, String> descriptionMap,
 			boolean active, ServiceContext serviceContext)
 		throws PortalException {
