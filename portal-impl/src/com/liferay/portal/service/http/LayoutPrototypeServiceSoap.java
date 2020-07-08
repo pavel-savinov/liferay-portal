@@ -67,6 +67,35 @@ public class LayoutPrototypeServiceSoap {
 
 	public static com.liferay.portal.kernel.model.LayoutPrototypeSoap
 			addLayoutPrototype(
+				long groupId, String[] nameMapLanguageIds,
+				String[] nameMapValues, String[] descriptionMapLanguageIds,
+				String[] descriptionMapValues, boolean active,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws RemoteException {
+
+		try {
+			Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
+				nameMapLanguageIds, nameMapValues);
+			Map<Locale, String> descriptionMap =
+				LocalizationUtil.getLocalizationMap(
+					descriptionMapLanguageIds, descriptionMapValues);
+
+			com.liferay.portal.kernel.model.LayoutPrototype returnValue =
+				LayoutPrototypeServiceUtil.addLayoutPrototype(
+					groupId, nameMap, descriptionMap, active, serviceContext);
+
+			return com.liferay.portal.kernel.model.LayoutPrototypeSoap.
+				toSoapModel(returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static com.liferay.portal.kernel.model.LayoutPrototypeSoap
+			addLayoutPrototype(
 				String[] nameMapLanguageIds, String[] nameMapValues,
 				String[] descriptionMapLanguageIds,
 				String[] descriptionMapValues, boolean active,
