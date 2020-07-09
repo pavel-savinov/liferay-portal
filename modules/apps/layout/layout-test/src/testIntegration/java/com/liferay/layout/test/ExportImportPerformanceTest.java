@@ -437,8 +437,9 @@ public class ExportImportPerformanceTest {
 		long startTime = System.currentTimeMillis();
 
 		return () -> _writeToLogFile(
-			invokerName, " used ",
-			String.valueOf(System.currentTimeMillis() - startTime), "ms");
+			StringBundler.concat(
+				invokerName, " used ", System.currentTimeMillis() - startTime,
+				"ms"));
 	}
 
 	private void _updateLayoutPortletSetup(Layout layout, String portletId)
