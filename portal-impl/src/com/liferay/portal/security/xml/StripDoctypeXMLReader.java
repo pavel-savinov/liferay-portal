@@ -176,11 +176,18 @@ public class StripDoctypeXMLReader implements XMLReader {
 	public void setProperty(String name, Object value)
 		throws SAXNotRecognizedException, SAXNotSupportedException {
 
+		if (name.equals(_SAX_LEXICALHANDLER)) {
+			return;
+		}
+
 		_xmlReader.setProperty(name, value);
 	}
 
 	private static final String _FEATURES_DISALLOW_DOCTYPE_DECL =
 		"http://apache.org/xml/features/disallow-doctype-decl";
+
+	private static final String _SAX_LEXICALHANDLER =
+		"http://xml.org/sax/handlers/LexicalHandler";
 
 	private boolean _disallowDoctypeDecl;
 	private final XMLReader _xmlReader;
