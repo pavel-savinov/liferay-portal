@@ -137,7 +137,8 @@ public class LayoutPageTemplateEntryStagedModelDataHandlerTest
 		).build();
 
 		return LayoutPrototypeLocalServiceUtil.addLayoutPrototype(
-			userId, companyId, nameMap, (Map<Locale, String>)null, true,
+			userId, companyId, groupId, nameMap, (Map<Locale, String>)null,
+			true,
 			ServiceContextTestUtil.getServiceContext(
 				companyId, groupId, userId));
 	}
