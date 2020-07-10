@@ -654,7 +654,7 @@ public class HttpImpl implements Http {
 
 	@Override
 	public boolean hasProtocol(String url) {
-		if (Validator.isNull(url)) {
+		if (Validator.isNull(url) || (url.indexOf(CharPool.COLON) == -1)) {
 			return false;
 		}
 
