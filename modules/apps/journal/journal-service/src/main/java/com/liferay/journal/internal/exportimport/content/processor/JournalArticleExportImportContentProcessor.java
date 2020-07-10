@@ -107,7 +107,7 @@ public class JournalArticleExportImportContentProcessor
 			ImageExportDDMFormFieldValueTransformer
 				imageExportDDMFormFieldValueTransformer =
 					new ImageExportDDMFormFieldValueTransformer(
-						content, _dlAppService, exportReferencedContent,
+						_dlAppService, exportReferencedContent,
 						portletDataContext, stagedModel);
 
 			ddmFormValuesTransformer.addTransformer(
