@@ -21,13 +21,10 @@ import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
-import com.liferay.exportimport.staged.model.repository.StagedModelRepositoryRegistryUtil;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.fragment.service.FragmentEntryLocalService;
-import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.xml.Element;
@@ -71,18 +68,6 @@ public class FragmentEntryLinkStagedModelDataHandler
 				originalFragmentEntryLink,
 				PortletDataContext.REFERENCE_TYPE_PARENT);
 		}
-
-		StagedModelRepository<?> referenceStagedModelRepository =
-			StagedModelRepositoryRegistryUtil.getStagedModelRepository(
-				Layout.class.getName());
-
-		StagedModel referenceStagedModel =
-			referenceStagedModelRepository.getStagedModel(
-				fragmentEntryLink.getPlid());
-
-		StagedModelDataHandlerUtil.exportReferenceStagedModel(
-			portletDataContext, fragmentEntryLink, referenceStagedModel,
-			PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
 
 		Element fragmentEntryLinkElement =
 			portletDataContext.getExportDataElement(fragmentEntryLink);
