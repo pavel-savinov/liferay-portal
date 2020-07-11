@@ -17,6 +17,11 @@ package com.liferay.layout.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.dynamic.data.mapping.model.DDMForm;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.model.DDMTemplate;
+import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestUtil;
+import com.liferay.dynamic.data.mapping.test.util.DDMTemplateTestUtil;
 import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationConstants;
 import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationSettingsMapFactory;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
@@ -28,10 +33,11 @@ import com.liferay.exportimport.kernel.staging.Staging;
 import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
+import com.liferay.journal.constants.JournalArticleConstants;
 import com.liferay.journal.constants.JournalFolderConstants;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.journal.test.util.JournalTestUtil;
+import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.layout.util.LayoutCopyHelper;
@@ -81,6 +87,7 @@ import java.nio.file.StandardOpenOption;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
@@ -146,6 +153,22 @@ public class ExportImportPerformanceTest {
 			_group.getGroupId());
 
 		ServiceContextThreadLocal.pushServiceContext(_serviceContext);
+
+		Locale defaultLocale = LocaleUtil.fromLanguageId(
+			_group.getDefaultLanguageId());
+
+		DDMForm ddmForm = DDMStructureTestUtil.getSampleDDMForm(
+			new Locale[] {defaultLocale}, defaultLocale);
+
+		long ddmGroupId = GetterUtil.getLong(
+			_serviceContext.getAttribute("ddmGroupId"), _group.getGroupId());
+
+		_ddmStructure = DDMStructureTestUtil.addStructure(
+			ddmGroupId, JournalArticle.class.getName(), ddmForm, defaultLocale);
+
+		_ddmTemplate = DDMTemplateTestUtil.addTemplate(
+			ddmGroupId, _ddmStructure.getStructureId(),
+			_portal.getClassNameId(JournalArticle.class));
 
 		_addLayouts();
 
@@ -311,15 +334,9 @@ public class ExportImportPerformanceTest {
 			FragmentEntry fragmentEntry =
 				_fragmentCollectionContributorTracker.getFragmentEntry(
 					"FEATURED_CONTENT-highlights-circle");
-			JournalArticle journalArticle1 = JournalTestUtil.addArticle(
-				_group.getGroupId(),
-				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
-			JournalArticle journalArticle2 = JournalTestUtil.addArticle(
-				_group.getGroupId(),
-				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
-			JournalArticle journalArticle3 = JournalTestUtil.addArticle(
-				_group.getGroupId(),
-				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+			JournalArticle journalArticle1 = _addJournalArticle();
+			JournalArticle journalArticle2 = _addJournalArticle();
+			JournalArticle journalArticle3 = _addJournalArticle();
 
 			_fragmentEntryLinkLocalService.addFragmentEntryLink(
 				TestPropsValues.getUserId(), _group.getGroupId(), 0,
@@ -371,6 +388,26 @@ public class ExportImportPerformanceTest {
 				_group.getGroupId(), draftLayout.getPlid());
 
 		_layoutCopyHelper.copyLayout(draftLayout, layout);
+	}
+
+	private JournalArticle _addJournalArticle() throws Exception {
+		Locale defaultLocale = LocaleUtil.fromLanguageId(
+			_group.getDefaultLanguageId());
+
+		String content = DDMStructureTestUtil.getSampleStructuredContent(
+			RandomTestUtil.randomLocaleStringMap(defaultLocale),
+			LocaleUtil.toLanguageId(defaultLocale));
+
+		return _journalArticleLocalService.addArticle(
+			_serviceContext.getUserId(), _group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			JournalArticleConstants.CLASS_NAME_ID_DEFAULT, 0, StringPool.BLANK,
+			true, JournalArticleConstants.VERSION_DEFAULT,
+			RandomTestUtil.randomLocaleStringMap(defaultLocale),
+			RandomTestUtil.randomLocaleStringMap(defaultLocale), content,
+			_ddmStructure.getStructureKey(), _ddmTemplate.getTemplateKey(),
+			StringPool.BLANK, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, true, 0, 0, 0, 0, 0,
+			true, true, false, null, null, null, null, _serviceContext);
 	}
 
 	private void _addLayouts() throws Exception {
@@ -445,9 +482,7 @@ public class ExportImportPerformanceTest {
 	private void _updateLayoutPortletSetup(Layout layout, String portletId)
 		throws Exception {
 
-		JournalArticle journalArticle = JournalTestUtil.addArticle(
-			_group.getGroupId(),
-			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID);
+		JournalArticle journalArticle = _addJournalArticle();
 
 		AssetEntry assetEntry = _assetEntryLocalService.getEntry(
 			JournalArticle.class.getName(),
@@ -489,6 +524,8 @@ public class ExportImportPerformanceTest {
 	@Inject
 	private BackgroundTaskManager _backgroundTaskManager;
 
+	private DDMStructure _ddmStructure;
+	private DDMTemplate _ddmTemplate;
 	private ExportImportConfiguration _exportImportConfiguration;
 
 	@Inject
@@ -511,6 +548,9 @@ public class ExportImportPerformanceTest {
 
 	private Group _group;
 	private Group _importGroup;
+
+	@Inject
+	private JournalArticleLocalService _journalArticleLocalService;
 
 	@Inject
 	private LayoutCopyHelper _layoutCopyHelper;
