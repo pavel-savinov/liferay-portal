@@ -137,7 +137,9 @@ public class FragmentEntryLinkStagedModelDataHandler
 		long fragmentEntryId = MapUtil.getLong(
 			fragmentEntryIds, fragmentEntryLink.getFragmentEntryId());
 
-		if (fragmentEntryId == 0) {
+		if ((fragmentEntryId == 0) &&
+			(fragmentEntryLink.getFragmentEntryId() > 0)) {
+
 			FragmentEntry fragmentEntry =
 				_fragmentEntryLocalService.fetchFragmentEntry(
 					fragmentEntryLink.getFragmentEntryId());
