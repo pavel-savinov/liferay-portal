@@ -89,7 +89,16 @@ public class JournalArticleExportImportContentProcessor
 
 		DDMStructure ddmStructure = article.getDDMStructure();
 
-		Document document = SAXReaderUtil.read(content);
+		Document document = null;
+
+		try {
+			document = SAXReaderUtil.read(content);
+		}
+		catch (Exception exception) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(exception, exception);
+			}
+		}
 
 		Fields fields = _getDDMStructureFields(ddmStructure, document);
 
@@ -148,7 +157,16 @@ public class JournalArticleExportImportContentProcessor
 		content = replaceImportJournalArticleReferences(
 			portletDataContext, stagedModel, content);
 
-		Document document = SAXReaderUtil.read(content);
+		Document document = null;
+
+		try {
+			document = SAXReaderUtil.read(content);
+		}
+		catch (Exception exception) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(exception, exception);
+			}
+		}
 
 		Fields fields = _getDDMStructureFields(ddmStructure, document);
 
@@ -247,6 +265,10 @@ public class JournalArticleExportImportContentProcessor
 			PortletDataContext portletDataContext, StagedModel stagedModel,
 			String content, Document document, boolean exportReferencedContent)
 		throws Exception {
+
+		if (document == null) {
+			return content;
+		}
 
 		Group group = _groupLocalService.fetchGroup(
 			portletDataContext.getGroupId());
@@ -589,7 +611,7 @@ public class JournalArticleExportImportContentProcessor
 	private Fields _getDDMStructureFields(
 		DDMStructure ddmStructure, Document document) {
 
-		if (ddmStructure == null) {
+		if ((ddmStructure == null) || (document == null)) {
 			return null;
 		}
 
