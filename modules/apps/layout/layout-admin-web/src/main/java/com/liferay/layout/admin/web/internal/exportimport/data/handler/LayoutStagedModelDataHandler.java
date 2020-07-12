@@ -109,7 +109,6 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
@@ -1631,10 +1630,6 @@ public class LayoutStagedModelDataHandler
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
-		List<FragmentEntryLink> fragmentEntryLinks =
-			_fragmentEntryLinkLocalService.getFragmentEntryLinksByPlid(
-				layout.getGroupId(), layout.getPlid());
-
 		for (Element portletElement : portletsElement.elements()) {
 			String portletId = portletElement.attributeValue("portlet-id");
 
@@ -1772,47 +1767,6 @@ public class LayoutStagedModelDataHandler
 			finally {
 				_portletImportController.resetPortletScope(
 					portletDataContext, portletPreferencesGroupId);
-			}
-
-			long defaultPlid = _portal.getControlPanelPlid(
-				layout.getCompanyId());
-
-			PortletPreferences portletPreferences =
-				_portletPreferencesLocalService.fetchPortletPreferences(
-					PortletKeys.PREFS_OWNER_ID_DEFAULT,
-					PortletKeys.PREFS_OWNER_TYPE_LAYOUT, defaultPlid,
-					portletId);
-
-			if (portletPreferences == null) {
-				continue;
-			}
-
-			for (FragmentEntryLink fragmentEntryLink : fragmentEntryLinks) {
-				FragmentEntryLink oldFragmentEntryLink =
-					_getOldFragmentEntryLink(
-						portletDataContext,
-						fragmentEntryLink.getFragmentEntryLinkId());
-
-				if (oldFragmentEntryLink == null) {
-					continue;
-				}
-
-				List<String> portletIds =
-					_portletRegistry.getFragmentEntryLinkPortletIds(
-						oldFragmentEntryLink);
-
-				if (!portletIds.contains(portletId)) {
-					continue;
-				}
-
-				String newPortletId = StringUtil.replace(
-					portletId, oldFragmentEntryLink.getNamespace(),
-					fragmentEntryLink.getNamespace());
-
-				_portletPreferencesLocalService.addPortletPreferences(
-					layout.getCompanyId(), PortletKeys.PREFS_OWNER_ID_DEFAULT,
-					PortletKeys.PREFS_OWNER_TYPE_LAYOUT, defaultPlid,
-					newPortletId, portlet, portletPreferences.getPreferences());
 			}
 		}
 
@@ -2390,24 +2344,6 @@ public class LayoutStagedModelDataHandler
 		}
 
 		return layout.getLayoutPrototypeUuid();
-	}
-
-	private FragmentEntryLink _getOldFragmentEntryLink(
-			PortletDataContext portletDataContext, long newFragmentEntryLinkId)
-		throws Exception {
-
-		Map<Long, Long> fragmentEntryLinkIds =
-			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
-				FragmentEntryLink.class);
-
-		for (Map.Entry<Long, Long> entry : fragmentEntryLinkIds.entrySet()) {
-			if (newFragmentEntryLinkId == entry.getValue()) {
-				return _fragmentEntryLinkLocalService.getFragmentEntryLink(
-					entry.getKey());
-			}
-		}
-
-		return null;
 	}
 
 	private static final String _SAME_GROUP_FRIENDLY_URL =
