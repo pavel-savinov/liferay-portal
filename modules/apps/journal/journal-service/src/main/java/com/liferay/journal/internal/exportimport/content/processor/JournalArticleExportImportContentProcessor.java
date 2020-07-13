@@ -125,11 +125,11 @@ public class JournalArticleExportImportContentProcessor
 				imageExportDDMFormFieldValueTransformer);
 
 			ddmFormValuesTransformer.transform();
-		}
 
-		content = replaceExportJournalArticleReferences(
-			portletDataContext, stagedModel, content, document,
-			exportReferencedContent);
+			content = replaceExportJournalArticleReferences(
+				portletDataContext, stagedModel, content, document,
+				exportReferencedContent);
+		}
 
 		content =
 			_defaultTextExportImportContentProcessor.
