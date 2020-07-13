@@ -51,7 +51,7 @@
 				rowURL = group.getDisplayURL(themeDisplay, true);
 			}
 
-			List<DropdownItem> dropdownItems = siteMySitesDisplayContext.getArticleActionDropdownItems(group);
+			List<DropdownItem> dropdownItems = siteMySitesDisplayContext.getGroupActionDropdownItems(group);
 			%>
 
 			<c:choose>
