@@ -45,6 +45,7 @@ import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleResource;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.journal.test.util.JournalTestUtil;
+import com.liferay.journal.util.JournalContent;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -574,7 +575,17 @@ public class JournalExportImportTest extends BasePortletExportImportTestCase {
 		Assert.assertEquals(article.getTitle(), importedArticle.getTitle());
 		Assert.assertEquals(
 			article.getDescription(), importedArticle.getDescription());
-		Assert.assertEquals(article.getContent(), importedArticle.getContent());
+
+		String content = _journalContent.getContent(
+			article.getGroupId(), article.getArticleId(), Constants.VIEW,
+			article.getDefaultLanguageId());
+
+		String importedContent = _journalContent.getContent(
+			importedArticle.getGroupId(), importedArticle.getArticleId(),
+			Constants.VIEW, importedArticle.getDefaultLanguageId());
+
+		Assert.assertEquals(content, importedContent);
+
 		Assert.assertEquals(
 			article.isSmallImage(), importedArticle.isSmallImage());
 		Assert.assertEquals(
@@ -613,6 +624,9 @@ public class JournalExportImportTest extends BasePortletExportImportTestCase {
 			validateImportedStagedModel(article, importedArticle);
 		}
 	}
+
+	@Inject
+	private JournalContent _journalContent;
 
 	@Inject(filter = "javax.portlet.name=" + JournalPortletKeys.JOURNAL)
 	private PortletDataHandler _journalPortletDataHandler;
