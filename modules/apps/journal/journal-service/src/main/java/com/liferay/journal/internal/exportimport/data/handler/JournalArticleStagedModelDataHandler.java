@@ -436,7 +436,7 @@ public class JournalArticleStagedModelDataHandler
 		if (article.isSmallImage()) {
 			if (Validator.isNotNull(article.getSmallImageURL())) {
 				String smallImageURL =
-					_journalArticleExportImportContentProcessor.
+					_dlReferencesExportImportContentProcessor.
 						replaceExportContentReferences(
 							portletDataContext, article,
 							article.getSmallImageURL() + StringPool.SPACE, true,
@@ -780,7 +780,7 @@ public class JournalArticleStagedModelDataHandler
 
 				if (Validator.isNotNull(article.getSmallImageURL())) {
 					String smallImageURL =
-						_journalArticleExportImportContentProcessor.
+						_dlReferencesExportImportContentProcessor.
 							replaceImportContentReferences(
 								portletDataContext, article,
 								article.getSmallImageURL());
@@ -1676,6 +1676,10 @@ public class JournalArticleStagedModelDataHandler
 	private ConfigurationProvider _configurationProvider;
 	private DDMStructureLocalService _ddmStructureLocalService;
 	private DDMTemplateLocalService _ddmTemplateLocalService;
+
+	@Reference(target = "(content.processor.type=DLReferences)")
+	private ExportImportContentProcessor<String>
+		_dlReferencesExportImportContentProcessor;
 
 	@Reference
 	private FriendlyURLEntryLocalService _friendlyURLEntryLocalService;
