@@ -92,18 +92,7 @@ public class JournalArticleExportImportContentProcessor
 
 		DDMStructure ddmStructure = article.getDDMStructure();
 
-		Document document = null;
-
-		try {
-			document = SAXReaderUtil.read(content);
-		}
-		catch (Exception exception) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(exception, exception);
-			}
-		}
-
-		Fields fields = _getDDMStructureFields(ddmStructure, document);
+		Fields fields = _getDDMStructureFields(ddmStructure, content);
 
 		if (fields != null) {
 			DDMFormValues ddmFormValues = _journalConverter.getDDMFormValues(
@@ -154,18 +143,7 @@ public class JournalArticleExportImportContentProcessor
 		content = replaceImportJournalArticleReferences(
 			portletDataContext, stagedModel, content);
 
-		Document document = null;
-
-		try {
-			document = SAXReaderUtil.read(content);
-		}
-		catch (Exception exception) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(exception, exception);
-			}
-		}
-
-		Fields fields = _getDDMStructureFields(ddmStructure, document);
+		Fields fields = _getDDMStructureFields(ddmStructure, content);
 
 		if (fields != null) {
 			DDMFormValues ddmFormValues = _journalConverter.getDDMFormValues(
@@ -597,14 +575,14 @@ public class JournalArticleExportImportContentProcessor
 	}
 
 	private Fields _getDDMStructureFields(
-		DDMStructure ddmStructure, Document document) {
+		DDMStructure ddmStructure, String content) {
 
-		if ((ddmStructure == null) || (document == null)) {
+		if ((ddmStructure == null) || Validator.isNull(content)) {
 			return null;
 		}
 
 		try {
-			return _journalConverter.getDDMFields(ddmStructure, document);
+			return _journalConverter.getDDMFields(ddmStructure, content);
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
