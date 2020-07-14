@@ -94,34 +94,35 @@ public class JournalArticleExportImportContentProcessor
 
 		Fields fields = _getDDMStructureFields(ddmStructure, content);
 
-		if (fields != null) {
-			DDMFormValues ddmFormValues = _journalConverter.getDDMFormValues(
-				ddmStructure, fields);
-
-			ddmFormValues =
-				_ddmFormValuesExportImportContentProcessor.
-					replaceExportContentReferences(
-						portletDataContext, stagedModel, ddmFormValues, true,
-						true);
-
-			DDMFormValuesTransformer ddmFormValuesTransformer =
-				new DDMFormValuesTransformer(ddmFormValues);
-
-			ImageExportDDMFormFieldValueTransformer
-				imageExportDDMFormFieldValueTransformer =
-					new ImageExportDDMFormFieldValueTransformer(
-						_dlAppService, exportReferencedContent,
-						portletDataContext, stagedModel);
-
-			ddmFormValuesTransformer.addTransformer(
-				imageExportDDMFormFieldValueTransformer);
-
-			ddmFormValuesTransformer.transform();
-
-			content = replaceExportJournalArticleReferences(
-				portletDataContext, stagedModel, content, ddmStructure, fields,
-				exportReferencedContent);
+		if (fields == null) {
+			return content;
 		}
+
+		DDMFormValues ddmFormValues = _journalConverter.getDDMFormValues(
+			ddmStructure, fields);
+
+		ddmFormValues =
+			_ddmFormValuesExportImportContentProcessor.
+				replaceExportContentReferences(
+					portletDataContext, stagedModel, ddmFormValues, true, true);
+
+		DDMFormValuesTransformer ddmFormValuesTransformer =
+			new DDMFormValuesTransformer(ddmFormValues);
+
+		ImageExportDDMFormFieldValueTransformer
+			imageExportDDMFormFieldValueTransformer =
+				new ImageExportDDMFormFieldValueTransformer(
+					_dlAppService, exportReferencedContent, portletDataContext,
+					stagedModel);
+
+		ddmFormValuesTransformer.addTransformer(
+			imageExportDDMFormFieldValueTransformer);
+
+		ddmFormValuesTransformer.transform();
+
+		content = replaceExportJournalArticleReferences(
+			portletDataContext, stagedModel, content, ddmStructure, fields,
+			exportReferencedContent);
 
 		return _defaultTextExportImportContentProcessor.
 			replaceExportContentReferences(
@@ -145,42 +146,43 @@ public class JournalArticleExportImportContentProcessor
 
 		Fields fields = _getDDMStructureFields(ddmStructure, content);
 
-		if (fields != null) {
-			DDMFormValues ddmFormValues = _journalConverter.getDDMFormValues(
-				ddmStructure, fields);
-
-			List<String> originalContents = _fetchContentsFromDDMFormValues(
-				ddmFormValues.getDDMFormFieldValues());
-
-			ddmFormValues =
-				_ddmFormValuesExportImportContentProcessor.
-					replaceImportContentReferences(
-						portletDataContext, stagedModel, ddmFormValues);
-
-			List<String> modifiedContents = _fetchContentsFromDDMFormValues(
-				ddmFormValues.getDDMFormFieldValues());
-
-			for (int i = 0; i < originalContents.size(); i++) {
-				content = StringUtil.replace(
-					content, originalContents.get(i), modifiedContents.get(i));
-			}
-
-			DDMFormValuesTransformer ddmFormValuesTransformer =
-				new DDMFormValuesTransformer(ddmFormValues);
-
-			ImageImportDDMFormFieldValueTransformer
-				imageImportDDMFormFieldValueTransformer =
-					new ImageImportDDMFormFieldValueTransformer(
-						content, _dlAppService, portletDataContext,
-						stagedModel);
-
-			ddmFormValuesTransformer.addTransformer(
-				imageImportDDMFormFieldValueTransformer);
-
-			ddmFormValuesTransformer.transform();
-
-			content = imageImportDDMFormFieldValueTransformer.getContent();
+		if (fields == null) {
+			return content;
 		}
+
+		DDMFormValues ddmFormValues = _journalConverter.getDDMFormValues(
+			ddmStructure, fields);
+
+		List<String> originalContents = _fetchContentsFromDDMFormValues(
+			ddmFormValues.getDDMFormFieldValues());
+
+		ddmFormValues =
+			_ddmFormValuesExportImportContentProcessor.
+				replaceImportContentReferences(
+					portletDataContext, stagedModel, ddmFormValues);
+
+		List<String> modifiedContents = _fetchContentsFromDDMFormValues(
+			ddmFormValues.getDDMFormFieldValues());
+
+		for (int i = 0; i < originalContents.size(); i++) {
+			content = StringUtil.replace(
+				content, originalContents.get(i), modifiedContents.get(i));
+		}
+
+		DDMFormValuesTransformer ddmFormValuesTransformer =
+			new DDMFormValuesTransformer(ddmFormValues);
+
+		ImageImportDDMFormFieldValueTransformer
+			imageImportDDMFormFieldValueTransformer =
+				new ImageImportDDMFormFieldValueTransformer(
+					content, _dlAppService, portletDataContext, stagedModel);
+
+		ddmFormValuesTransformer.addTransformer(
+			imageImportDDMFormFieldValueTransformer);
+
+		ddmFormValuesTransformer.transform();
+
+		content = imageImportDDMFormFieldValueTransformer.getContent();
 
 		return _defaultTextExportImportContentProcessor.
 			replaceImportContentReferences(
