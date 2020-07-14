@@ -16,10 +16,12 @@ package com.liferay.journal.internal.exportimport.content.processor;
 
 import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
 import com.liferay.document.library.kernel.service.DLAppService;
+import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
+import com.liferay.dynamic.data.mapping.storage.Field;
 import com.liferay.dynamic.data.mapping.storage.Fields;
 import com.liferay.dynamic.data.mapping.util.DDMFormValuesTransformer;
 import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
@@ -58,6 +60,7 @@ import com.liferay.portal.kernel.xml.XPath;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -127,17 +130,14 @@ public class JournalArticleExportImportContentProcessor
 			ddmFormValuesTransformer.transform();
 
 			content = replaceExportJournalArticleReferences(
-				portletDataContext, stagedModel, content, document,
+				portletDataContext, stagedModel, content, ddmStructure, fields,
 				exportReferencedContent);
 		}
 
-		content =
-			_defaultTextExportImportContentProcessor.
-				replaceExportContentReferences(
-					portletDataContext, stagedModel, content,
-					exportReferencedContent, escapeContent);
-
-		return content;
+		return _defaultTextExportImportContentProcessor.
+			replaceExportContentReferences(
+				portletDataContext, stagedModel, content,
+				exportReferencedContent, escapeContent);
 	}
 
 	@Override
@@ -260,12 +260,9 @@ public class JournalArticleExportImportContentProcessor
 
 	protected String replaceExportJournalArticleReferences(
 			PortletDataContext portletDataContext, StagedModel stagedModel,
-			String content, Document document, boolean exportReferencedContent)
+			String content, DDMStructure ddmStructure, Fields fields,
+			boolean exportReferencedContent)
 		throws Exception {
-
-		if (document == null) {
-			return content;
-		}
 
 		Group group = _groupLocalService.fetchGroup(
 			portletDataContext.getGroupId());
@@ -280,19 +277,15 @@ public class JournalArticleExportImportContentProcessor
 			return content;
 		}
 
-		XPath xPath = SAXReaderUtil.createXPath(
-			"//dynamic-element[@type='ddm-journal-article']");
+		for (Field field : fields) {
+			if (!Objects.equals(
+					field.getType(), DDMFormFieldType.JOURNAL_ARTICLE)) {
 
-		List<Node> ddmJournalArticleNodes = xPath.selectNodes(document);
+				continue;
+			}
 
-		for (Node ddmJournalArticleNode : ddmJournalArticleNodes) {
-			Element ddmJournalArticleElement = (Element)ddmJournalArticleNode;
-
-			List<Element> dynamicContentElements =
-				ddmJournalArticleElement.elements("dynamic-content");
-
-			for (Element dynamicContentElement : dynamicContentElements) {
-				String jsonData = dynamicContentElement.getStringValue();
+			for (Locale locale : field.getAvailableLocales()) {
+				String jsonData = String.valueOf(field.getValue(locale));
 
 				JSONObject jsonObject = null;
 
@@ -341,9 +334,7 @@ public class JournalArticleExportImportContentProcessor
 							journalArticleReference));
 				}
 
-				dynamicContentElement.clearContent();
-
-				dynamicContentElement.addCDATA(journalArticleReference);
+				field.setValue(locale, journalArticleReference);
 
 				if (exportReferencedContent) {
 					try {
@@ -388,7 +379,7 @@ public class JournalArticleExportImportContentProcessor
 			}
 		}
 
-		return document.asXML();
+		return _journalConverter.getContent(ddmStructure, fields);
 	}
 
 	protected String replaceImportJournalArticleReferences(
