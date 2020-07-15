@@ -14,10 +14,17 @@
 
 package com.liferay.adaptive.media.journal.web.internal.exportimport.content.processor;
 
+import com.liferay.dynamic.data.mapping.model.DDMFormField;
+import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.journal.model.JournalArticle;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.StagedModel;
+
+import java.util.List;
+import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -42,6 +49,10 @@ public class AMJournalArticleExportImportContentProcessor
 			boolean escapeContent)
 		throws Exception {
 
+		if (!_hasTextHTMLFields(stagedModel)) {
+			return content;
+		}
+
 		String replacedContent =
 			_journalArticleExportImportContentProcessor.
 				replaceExportContentReferences(
@@ -62,6 +73,10 @@ public class AMJournalArticleExportImportContentProcessor
 			PortletDataContext portletDataContext, StagedModel stagedModel,
 			String content)
 		throws Exception {
+
+		if (!_hasTextHTMLFields(stagedModel)) {
+			return content;
+		}
 
 		String replacedContent =
 			_journalArticleExportImportContentProcessor.
@@ -96,6 +111,24 @@ public class AMJournalArticleExportImportContentProcessor
 		catch (Exception exception) {
 			throw new PortalException(exception);
 		}
+	}
+
+	private boolean _hasTextHTMLFields(StagedModel stagedModel) {
+		JournalArticle journalArticle = (JournalArticle)stagedModel;
+
+		DDMStructure ddmStructure = journalArticle.getDDMStructure();
+
+		List<DDMFormField> ddmFormFields = ddmStructure.getDDMFormFields(false);
+
+		for (DDMFormField ddmFormField : ddmFormFields) {
+			if (Objects.equals(
+					ddmFormField.getType(), DDMFormFieldType.TEXT_HTML)) {
+
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Reference
