@@ -81,6 +81,11 @@
 			}
 		}
 
+		&__custom-styles {
+			border-bottom: 1px solid $secondary-l1;
+			padding-bottom: 1rem;
+		}
+
 		& > .popover {
 			max-height: $floatingToolbarPanelMaxHeight;
 			min-width: $floatingToolbarPanelMinWidth;
@@ -102,7 +107,7 @@
 			}
 		}
 
-		.palette-container {
+		.custom-stles .palette-container {
 			margin-bottom: 0.25rem;
 		}
 
