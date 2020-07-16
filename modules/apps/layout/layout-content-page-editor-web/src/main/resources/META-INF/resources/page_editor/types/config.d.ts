@@ -32,6 +32,26 @@ export interface Config {
 		};
 	};
 
+	commonStyles: Array<{
+		label: string;
+		styles: Array<{
+			defaultValue: string;
+			dependencies: Array<{
+				styleName: string;
+				value: string;
+			}>;
+			label: string;
+			name: string;
+			responsive: boolean;
+			type: string;
+			validValues: Array<{
+				label: string;
+				styleName: string;
+				value: string;
+			}>;
+		}>
+	}>;
+
 	containerItemFlexEnabled: boolean;
 
 	defaultEditorConfigurations: {
