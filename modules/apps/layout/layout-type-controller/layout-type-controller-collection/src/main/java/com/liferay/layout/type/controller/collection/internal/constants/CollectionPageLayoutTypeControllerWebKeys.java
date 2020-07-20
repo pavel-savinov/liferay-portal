@@ -1,4 +1,3 @@
-<%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -12,18 +11,15 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
---%>
 
-<%@ include file="/entries/init.jsp" %>
+package com.liferay.layout.type.controller.collection.internal.constants;
 
-<%
-String label = "new-collection-page-item";
-%>
+/**
+ * @author Pavel Savinov
+ */
+public class CollectionPageLayoutTypeControllerWebKeys {
 
-<li class="control-menu-nav-item">
-	<a aria-label="<%= LanguageUtil.get(request, label) %>">
-		<clay:icon
-			symbol="plus"
-		/>
-	</a>
-</li>
+	public static final String ASSET_PUBLISHER_ADD_ITEM_HOLDERS =
+		"ASSET_PUBLISHER_ADD_ITEM_HOLDERS";
+
+}
