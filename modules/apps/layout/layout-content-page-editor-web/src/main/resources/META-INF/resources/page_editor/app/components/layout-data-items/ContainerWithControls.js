@@ -45,7 +45,7 @@ const ContainerWithControls = React.forwardRef(
 
 		const buttons = [];
 
-		const {marginLeft, marginRight, widthType} = item.config;
+		const {marginLeft, marginRight, widthType} = item.config.styles;
 
 		if (canUpdateItemConfiguration) {
 			buttons.push(LAYOUT_DATA_FLOATING_TOOLBAR_BUTTONS.containerLink);

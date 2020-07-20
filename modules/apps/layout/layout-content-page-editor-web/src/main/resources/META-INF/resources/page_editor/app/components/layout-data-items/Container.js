@@ -43,7 +43,7 @@ const Container = React.forwardRef(
 			paddingTop,
 			shadow,
 			widthType,
-		} = item.config;
+		} = item.config.styles;
 
 		const languageId = useSelector(selectLanguageId);
 		const [backgroundImageValue, setBackgroundImageValue] = useState('');
