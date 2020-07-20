@@ -32,8 +32,11 @@ const Row = React.forwardRef(({children, className, item, layoutData}, ref) => {
 		(state) => state.selectedViewportSize
 	);
 
-	const itemConfig = getResponsiveConfig(item.config, selectedViewportSize);
-	const {modulesPerRow, reverseOrder} = itemConfig;
+	const itemStyles = getResponsiveConfig(
+		item.config.styles,
+		selectedViewportSize
+	);
+	const {modulesPerRow, reverseOrder} = itemStyles;
 
 	const rowContent = (
 		<ClayLayout.Row
@@ -82,7 +85,10 @@ const Row = React.forwardRef(({children, className, item, layoutData}, ref) => {
 
 Row.propTypes = {
 	item: getLayoutDataItemPropTypes({
-		config: PropTypes.shape({gutters: PropTypes.bool}),
+		config: PropTypes.shape({
+			gutters: PropTypes.bool,
+			styles: PropTypes.object,
+		}),
 	}).isRequired,
 	layoutData: LayoutDataPropTypes.isRequired,
 };

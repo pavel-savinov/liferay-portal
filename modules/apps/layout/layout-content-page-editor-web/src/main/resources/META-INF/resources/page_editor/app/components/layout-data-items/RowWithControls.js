@@ -36,7 +36,7 @@ import Row from './Row';
 
 const RowWithControls = React.forwardRef(
 	({children, item, layoutData}, ref) => {
-		const rowConfig = layoutData.items[item.itemId].config;
+		const rowStyles = layoutData.items[item.itemId].config.styles;
 		const [resizing, setResizing] = useState(false);
 		const [updatedLayoutData, setUpdatedLayoutData] = useState(null);
 		const [customRow, setCustomRow] = useState(false);
@@ -51,8 +51,8 @@ const RowWithControls = React.forwardRef(
 		);
 		const showFloatingToolbar = useSelector(selectShowFloatingToolbar);
 
-		const rowResponsiveConfig = getResponsiveConfig(
-			rowConfig,
+		const rowResponsiveStyles = getResponsiveConfig(
+			rowStyles,
 			selectedViewportSize
 		);
 
@@ -70,7 +70,7 @@ const RowWithControls = React.forwardRef(
 			}
 		}
 
-		const {verticalAlignment} = rowResponsiveConfig;
+		const {verticalAlignment} = rowResponsiveStyles;
 
 		return (
 			<Topper
@@ -116,7 +116,10 @@ const RowWithControls = React.forwardRef(
 
 RowWithControls.propTypes = {
 	item: getLayoutDataItemPropTypes({
-		config: PropTypes.shape({gutters: PropTypes.bool}),
+		config: PropTypes.shape({
+			gutters: PropTypes.bool,
+			styles: PropTypes.object,
+		}),
 	}).isRequired,
 	layoutData: LayoutDataPropTypes.isRequired,
 };
