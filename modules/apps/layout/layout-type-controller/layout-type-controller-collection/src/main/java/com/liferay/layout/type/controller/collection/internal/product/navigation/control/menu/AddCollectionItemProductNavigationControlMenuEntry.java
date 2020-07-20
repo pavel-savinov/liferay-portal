@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.PortletPreferencesIds;
 import com.liferay.portal.kernel.portlet.InvokerPortlet;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
+import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayRenderRequest;
 import com.liferay.portal.kernel.portlet.PortletConfigFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletInstanceFactoryUtil;
@@ -38,6 +39,7 @@ import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -54,11 +56,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
+import javax.portlet.ActionRequest;
 import javax.portlet.PortletConfig;
 import javax.portlet.PortletContext;
 import javax.portlet.PortletMode;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletResponse;
+import javax.portlet.PortletURL;
 import javax.portlet.WindowState;
 
 import javax.servlet.ServletContext;
@@ -134,15 +138,19 @@ public class AddCollectionItemProductNavigationControlMenuEntry
 				(PortletResponse)liferayPortletRequest.getAttribute(
 					JavaConstants.JAVAX_PORTLET_RESPONSE);
 
+			LiferayPortletResponse liferayPortletResponse =
+				_portal.getLiferayPortletResponse(portletResponse);
+
 			List<AssetPublisherAddItemHolder> assetPublisherAddItemHolders =
 				_assetHelper.getAssetPublisherAddItemHolders(
-					liferayPortletRequest,
-					_portal.getLiferayPortletResponse(portletResponse),
+					liferayPortletRequest, liferayPortletResponse,
 					assetListEntry.getGroupId(),
 					assetEntryQuery.getClassNameIds(),
 					assetEntryQuery.getClassTypeIds(),
 					assetEntryQuery.getAllCategoryIds(), allTagNames,
-					themeDisplay.getURLCurrent());
+					_getRedirect(
+						liferayPortletResponse, themeDisplay.getURLCurrent(),
+						collectionPK));
 
 			httpServletRequest.setAttribute(
 				CollectionPageLayoutTypeControllerWebKeys.
@@ -240,6 +248,24 @@ public class AddCollectionItemProductNavigationControlMenuEntry
 		return liferayRenderRequest;
 	}
 
+	private String _getRedirect(
+		LiferayPortletResponse liferayPortletResponse, String currentURL,
+		long assetListEntryId) {
+
+		PortletURL portletURL = liferayPortletResponse.createActionURL();
+
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME, "/control_menu/add_collection_item");
+		portletURL.setParameter(
+			"assetListEntryId", String.valueOf(assetListEntryId));
+		portletURL.setParameter("redirect", currentURL);
+
+		return _http.addParameter(
+			portletURL.toString(), "portletResource",
+			ProductNavigationControlMenuPortletKeys.
+				PRODUCT_NAVIGATION_CONTROL_MENU);
+	}
+
 	@Reference
 	private AssetHelper _assetHelper;
 
@@ -251,6 +277,9 @@ public class AddCollectionItemProductNavigationControlMenuEntry
 
 	@Reference
 	private AssetTagLocalService _assetTagLocalService;
+
+	@Reference
+	private Http _http;
 
 	@Reference
 	private Portal _portal;
