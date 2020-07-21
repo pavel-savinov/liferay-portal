@@ -43,6 +43,7 @@ import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutSetLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.settings.definition.ConfigurationBeanDeclaration;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletActionResponse;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -130,6 +131,8 @@ public class FragmentEntryLinkLocalServiceTest {
 		_configurationProvider.saveCompanyConfiguration(
 			FragmentServiceConfiguration.class, _group.getCompanyId(),
 			properties);
+
+		_setFreeMarkerEnabled(true);
 	}
 
 	@Test
@@ -164,6 +167,35 @@ public class FragmentEntryLinkLocalServiceTest {
 		Assert.assertEquals(
 			_read("expected-editable-values-light-modified.json"),
 			fragmentEntryLink.getEditableValues());
+	}
+
+	@Test
+	public void testAddFragmentEntryLinkWithFreeMarkerDisabledEmptyRendererKey()
+		throws Exception {
+
+		_setFreeMarkerEnabled(false);
+
+		FragmentEntryLink fragmentEntryLink =
+			_fragmentEntryLinkLocalService.addFragmentEntryLink(
+				TestPropsValues.getUserId(), _group.getGroupId(), 0,
+				_fragmentEntryWithFreeMarker.getFragmentEntryId(), 0,
+				_layout.getPlid(), _fragmentEntryWithFreeMarker.getCss(),
+				_fragmentEntryWithFreeMarker.getHtml(),
+				_fragmentEntryWithFreeMarker.getJs(),
+				_fragmentEntryWithFreeMarker.getConfiguration(),
+				StringPool.BLANK, StringPool.BLANK, 0, null, _serviceContext);
+
+		Assert.assertNotNull(
+			_fragmentEntryLinkLocalService.fetchFragmentEntryLink(
+				fragmentEntryLink.getFragmentEntryLinkId()));
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+			fragmentEntryLink.getEditableValues());
+
+		JSONObject editableJSONObject = jsonObject.getJSONObject(
+			_EDITABLE_PROCESSOR_KEY);
+
+		Assert.assertEquals(1, editableJSONObject.length());
 	}
 
 	@Test
@@ -581,12 +613,31 @@ public class FragmentEntryLinkLocalServiceTest {
 		return StringUtil.read(inputStream);
 	}
 
+	private void _setFreeMarkerEnabled(boolean freeMarkerEnabled)
+		throws Exception {
+
+		Dictionary<String, Object> properties = new HashMapDictionary<>();
+
+		properties.put("enable.freemarker", freeMarkerEnabled);
+
+		_configurationProvider.saveCompanyConfiguration(
+			_configurationBeanDeclaration.getConfigurationBeanClass(),
+			_group.getCompanyId(), properties);
+
+		Thread.sleep(200);
+	}
+
 	private static final String _EDITABLE_PROCESSOR_KEY =
 		"com.liferay.fragment.entry.processor.editable." +
 			"EditableFragmentEntryProcessor";
 
 	@Inject
 	private CompanyLocalService _companyLocalService;
+
+	@Inject(
+		filter = "component.name=com.liferay.fragment.entry.processor.freemarker.internal.settings.definition.FreeMarkerFragmentEntryProcessorConfigurationBeanDeclaration"
+	)
+	private ConfigurationBeanDeclaration _configurationBeanDeclaration;
 
 	@Inject
 	private ConfigurationProvider _configurationProvider;
