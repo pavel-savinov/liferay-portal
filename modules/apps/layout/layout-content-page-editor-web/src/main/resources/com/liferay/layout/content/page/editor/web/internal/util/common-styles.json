@@ -112,5 +112,154 @@
 				]
 			}
 		]
+	},
+	{
+		"label": "spacing",
+		"styles": [
+			{
+				"dataType": "string",
+				"defaultValue": "mt-3",
+				"dependencies": [
+				],
+				"label": "margin-top",
+				"name": "marginTop",
+				"responsive": false,
+				"type": "select",
+				"validValues": [
+					{
+						"label": "0",
+						"value": "mt-0"
+					},
+					{
+						"label": "1",
+						"value": "mt-1"
+					},
+					{
+						"label": "2",
+						"value": "mt-2"
+					},
+					{
+						"label": "3",
+						"value": "mt-3"
+					},
+					{
+						"label": "4",
+						"value": "mt-4"
+					},
+					{
+						"label": "5",
+						"value": "mt-5"
+					}
+				]
+			},
+			{
+				"dataType": "string",
+				"defaultValue": "mb-3",
+				"dependencies": [
+				],
+				"label": "margin-bottom",
+				"name": "marginBottom",
+				"responsive": false,
+				"type": "select",
+				"validValues": [
+					{
+						"label": "0",
+						"value": "mb-0"
+					},
+					{
+						"label": "1",
+						"value": "mb-1"
+					},
+					{
+						"label": "2",
+						"value": "mb-2"
+					},
+					{
+						"label": "3",
+						"value": "mb-3"
+					},
+					{
+						"label": "4",
+						"value": "mb-4"
+					},
+					{
+						"label": "5",
+						"value": "mb-5"
+					}
+				]
+			},
+			{
+				"dataType": "string",
+				"defaultValue": "ml-3",
+				"dependencies": [
+				],
+				"label": "margin-left",
+				"name": "marginLeft",
+				"responsive": false,
+				"type": "select",
+				"validValues": [
+					{
+						"label": "0",
+						"value": "ml-0"
+					},
+					{
+						"label": "1",
+						"value": "ml-1"
+					},
+					{
+						"label": "2",
+						"value": "ml-2"
+					},
+					{
+						"label": "3",
+						"value": "ml-3"
+					},
+					{
+						"label": "4",
+						"value": "ml-4"
+					},
+					{
+						"label": "5",
+						"value": "ml-5"
+					}
+				]
+			},
+			{
+				"dataType": "string",
+				"defaultValue": "mr-3",
+				"dependencies": [
+				],
+				"label": "margin-right",
+				"name": "marginRight",
+				"responsive": false,
+				"type": "select",
+				"validValues": [
+					{
+						"label": "0",
+						"value": "mr-0"
+					},
+					{
+						"label": "1",
+						"value": "mr-1"
+					},
+					{
+						"label": "2",
+						"value": "mr-2"
+					},
+					{
+						"label": "3",
+						"value": "mr-3"
+					},
+					{
+						"label": "4",
+						"value": "mr-4"
+					},
+					{
+						"label": "5",
+						"value": "mr-5"
+					}
+				]
+			}
+		]
 	}
 ]
