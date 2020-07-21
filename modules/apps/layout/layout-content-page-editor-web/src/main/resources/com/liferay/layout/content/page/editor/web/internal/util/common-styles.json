@@ -23,5 +23,94 @@
 				]
 			}
 		]
+	},
+	{
+		"label": "size",
+		"styles": [
+			{
+				"dataType": "string",
+				"defaultValue": "w-auto",
+				"dependencies": [
+				],
+				"label": "width",
+				"name": "width",
+				"responsive": false,
+				"type": "select",
+				"validValues": [
+					{
+						"label": "auto",
+						"value": "w-auto"
+					},
+					{
+						"label": "25",
+						"value": "w-25"
+					},
+					{
+						"label": "50",
+						"value": "w-50"
+					},
+					{
+						"label": "75",
+						"value": "w-75"
+					},
+					{
+						"label": "100",
+						"value": "w-100"
+					}
+				]
+			},
+			{
+				"dataType": "string",
+				"defaultValue": "h-auto",
+				"dependencies": [
+				],
+				"label": "height",
+				"name": "height",
+				"responsive": false,
+				"type": "select",
+				"validValues": [
+					{
+						"label": "auto",
+						"value": "h-auto"
+					},
+					{
+						"label": "25",
+						"value": "h-25"
+					},
+					{
+						"label": "50",
+						"value": "h-50"
+					},
+					{
+						"label": "75",
+						"value": "h-75"
+					},
+					{
+						"label": "100",
+						"value": "h-100"
+					}
+				]
+			},
+			{
+				"dataType": "string",
+				"defaultValue": "overflow-auto",
+				"dependencies": [
+				],
+				"label": "overflow",
+				"name": "overflow",
+				"responsive": false,
+				"type": "select",
+				"validValues": [
+					{
+						"label": "auto",
+						"value": "overflow-auto"
+					},
+					{
+						"label": "hidden",
+						"value": "overflow-hidden"
+					}
+				]
+			}
+		]
 	}
 ]
