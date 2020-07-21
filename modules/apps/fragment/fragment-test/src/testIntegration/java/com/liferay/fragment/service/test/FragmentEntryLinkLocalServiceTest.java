@@ -199,6 +199,35 @@ public class FragmentEntryLinkLocalServiceTest {
 	}
 
 	@Test
+	public void testAddFragmentEntryLinkWithFreeMarkerDisabledNotEmptyRendererKey()
+		throws Exception {
+
+		_setFreeMarkerEnabled(false);
+
+		FragmentEntryLink fragmentEntryLink =
+			_fragmentEntryLinkLocalService.addFragmentEntryLink(
+				TestPropsValues.getUserId(), _group.getGroupId(), 0,
+				_fragmentEntryWithFreeMarker.getFragmentEntryId(), 0,
+				_layout.getPlid(), _fragmentEntryWithFreeMarker.getCss(),
+				_fragmentEntryWithFreeMarker.getHtml(),
+				_fragmentEntryWithFreeMarker.getJs(),
+				_fragmentEntryWithFreeMarker.getConfiguration(),
+				StringPool.BLANK, StringPool.BLANK, 0, "TABS", _serviceContext);
+
+		Assert.assertNotNull(
+			_fragmentEntryLinkLocalService.fetchFragmentEntryLink(
+				fragmentEntryLink.getFragmentEntryLinkId()));
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+			fragmentEntryLink.getEditableValues());
+
+		JSONObject editableJSONObject = jsonObject.getJSONObject(
+			_EDITABLE_PROCESSOR_KEY);
+
+		Assert.assertEquals(3, editableJSONObject.length());
+	}
+
+	@Test
 	public void testAddFragmentEntryLinkWithFreeMarkerEnabledEmptyRendererKey()
 		throws Exception {
 
