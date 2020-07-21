@@ -574,5 +574,95 @@
 				]
 			}
 		]
+	},
+	{
+		"label": "background",
+		"styles": [
+			{
+				"dataType": "object",
+				"defaultValue": {
+					"cssClass": "bg-transparent"
+				},
+				"dependencies": [
+				],
+				"label": "background-color",
+				"name": "backgroundColor",
+				"responsive": false,
+				"type": "colorPalette",
+				"validValues": [
+					{
+						"label": "transparent",
+						"value": {
+							"cssClass": "bg-transparent"
+						}
+					},
+					{
+						"label": "primary",
+						"value": {
+							"cssClass": "bg-primary"
+						}
+					},
+					{
+						"label": "secondary",
+						"value": {
+							"cssClass": "bg-secondary"
+						}
+					},
+					{
+						"label": "success",
+						"value": {
+							"cssClass": "bg-success"
+						}
+					},
+					{
+						"label": "danger",
+						"value": {
+							"cssClass": "bg-danger"
+						}
+					},
+					{
+						"label": "warning",
+						"value": {
+							"cssClass": "bg-warning"
+						}
+					},
+					{
+						"label": "info",
+						"value": {
+							"cssClass": "bg-info"
+						}
+					},
+					{
+						"label": "light",
+						"value": {
+							"cssClass": "bg-light"
+						}
+					},
+					{
+						"label": "dark",
+						"value": {
+							"cssClass": "bg-dark"
+						}
+					},
+					{
+						"label": "white",
+						"value": {
+							"cssClass": "bg-white"
+						}
+					}
+				]
+			},
+			{
+				"dataType": "object",
+				"defaultValue": {
+				},
+				"dependencies": [
+				],
+				"label": "background-image",
+				"name": "backgroundImage",
+				"responsive": false,
+				"type": "imageSelector"
+			}
+		]
 	}
 ]
