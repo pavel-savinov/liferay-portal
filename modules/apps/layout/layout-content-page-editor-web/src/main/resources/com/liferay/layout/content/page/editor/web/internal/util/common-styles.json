@@ -661,7 +661,122 @@
 				"label": "background-image",
 				"name": "backgroundImage",
 				"responsive": false,
-				"type": "imageSelector"
+				"type": "imageSelector",
+				"validValues": [
+				]
+			}
+		]
+	},
+	{
+		"label": "borders",
+		"styles": [
+			{
+				"dataType": "number",
+				"defaultValue": 0,
+				"dependencies": [
+				],
+				"label": "border-width",
+				"name": "borderWidth",
+				"responsive": false,
+				"type": "string",
+				"validValues": [
+				]
+			},
+			{
+				"dataType": "string",
+				"defaultValue": "rounded-0",
+				"dependencies": [
+				],
+				"label": "border-radius",
+				"name": "borderRadius",
+				"responsive": false,
+				"type": "select",
+				"validValues": [
+					{
+						"label": "none",
+						"value": "rounded-0"
+					},
+					{
+						"label": "regular",
+						"value": "rounded"
+					},
+					{
+						"label": "pill",
+						"value": "rounded-pill"
+					},
+					{
+						"label": "circle",
+						"value": "rounded-circle"
+					}
+				]
+			},
+			{
+				"dataType": "object",
+				"defaultValue": {
+					"cssClass": "border-dark"
+				},
+				"dependencies": [
+				],
+				"label": "border-color",
+				"name": "borderColor",
+				"responsive": false,
+				"type": "colorPalette",
+				"validValues": [
+					{
+						"label": "primary",
+						"value": {
+							"cssClass": "border-primary"
+						}
+					},
+					{
+						"label": "secondary",
+						"value": {
+							"cssClass": "border-secondary"
+						}
+					},
+					{
+						"label": "success",
+						"value": {
+							"cssClass": "border-success"
+						}
+					},
+					{
+						"label": "danger",
+						"value": {
+							"cssClass": "border-danger"
+						}
+					},
+					{
+						"label": "warning",
+						"value": {
+							"cssClass": "border-warning"
+						}
+					},
+					{
+						"label": "info",
+						"value": {
+							"cssClass": "borer-info"
+						}
+					},
+					{
+						"label": "light",
+						"value": {
+							"cssClass": "border-light"
+						}
+					},
+					{
+						"label": "dark",
+						"value": {
+							"cssClass": "border-dark"
+						}
+					},
+					{
+						"label": "white",
+						"value": {
+							"cssClass": "border-white"
+						}
+					}
+				]
 			}
 		]
 	}
