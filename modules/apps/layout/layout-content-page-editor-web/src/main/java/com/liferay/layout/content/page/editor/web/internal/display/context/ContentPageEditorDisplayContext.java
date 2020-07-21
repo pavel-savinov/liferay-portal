@@ -56,6 +56,7 @@ import com.liferay.layout.content.page.editor.web.internal.configuration.FFLayou
 import com.liferay.layout.content.page.editor.web.internal.configuration.PageEditorConfiguration;
 import com.liferay.layout.content.page.editor.web.internal.constants.ContentPageEditorActionKeys;
 import com.liferay.layout.content.page.editor.web.internal.constants.ContentPageEditorConstants;
+import com.liferay.layout.content.page.editor.web.internal.util.CommonStylesUtil;
 import com.liferay.layout.content.page.editor.web.internal.util.ContentUtil;
 import com.liferay.layout.content.page.editor.web.internal.util.FragmentEntryLinkItemSelectorUtil;
 import com.liferay.layout.content.page.editor.web.internal.util.layout.structure.LayoutStructureUtil;
@@ -245,6 +246,8 @@ public class ContentPageEditorDisplayContext {
 				"availableViewportSizes", _getAvailableViewportSizes()
 			).put(
 				"collectionSelectorURL", _getCollectionSelectorURL()
+			).put(
+				"commonStyles", CommonStylesUtil.getCommongStylesJSONArray()
 			).put(
 				"containerItemFlexEnabled",
 				_ffLayoutContentPageEditorConfiguration.
