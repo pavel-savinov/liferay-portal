@@ -779,5 +779,60 @@
 				]
 			}
 		]
+	},
+	{
+		"label": "effects",
+		"styles": [
+			{
+				"dataType": "number",
+				"defaultValue": 0,
+				"dependencies": [
+				],
+				"label": "opacity",
+				"name": "opacity",
+				"responsive": false,
+				"type": "string",
+				"validValues": [
+				]
+			},
+			{
+				"dataType": "object",
+				"defaultValue": {
+					"cssClass": "shadow-none"
+				},
+				"dependencies": [
+				],
+				"label": "shadow",
+				"name": "shadow",
+				"responsive": false,
+				"type": "select",
+				"validValues": [
+					{
+						"label": "none",
+						"value": {
+							"cssClass": "shadow-none"
+						}
+					},
+					{
+						"label": "small",
+						"value": {
+							"cssClass": "shadow-sm"
+						}
+					},
+					{
+						"label": "regular",
+						"value": {
+							"cssClass": "shadow"
+						}
+					},
+					{
+						"label": "large",
+						"value": {
+							"cssClass": "shadow-lg"
+						}
+					}
+				]
+			}
+		]
 	}
 ]
