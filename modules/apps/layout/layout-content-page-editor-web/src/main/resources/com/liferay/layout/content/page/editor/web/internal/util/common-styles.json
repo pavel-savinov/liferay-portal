@@ -1,0 +1,27 @@
+[
+	{
+		"label": "layout",
+		"styles": [
+			{
+				"dataType": "string",
+				"defaultValue": "d-block",
+				"dependencies": [
+				],
+				"label": "display",
+				"name": "display",
+				"responsive": false,
+				"type": "select",
+				"validValues": [
+					{
+						"label": "none",
+						"value": "d-none"
+					},
+					{
+						"label": "block",
+						"value": "d-block"
+					}
+				]
+			}
+		]
+	}
+]
