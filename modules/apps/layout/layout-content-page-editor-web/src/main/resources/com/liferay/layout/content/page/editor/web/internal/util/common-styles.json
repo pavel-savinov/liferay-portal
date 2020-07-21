@@ -259,6 +259,150 @@
 						"value": "mr-5"
 					}
 				]
+			},
+			{
+				"dataType": "string",
+				"defaultValue": "pt-3",
+				"dependencies": [
+				],
+				"label": "padding-top",
+				"name": "paddingTop",
+				"responsive": false,
+				"type": "select",
+				"validValues": [
+					{
+						"label": "0",
+						"value": "pt-0"
+					},
+					{
+						"label": "1",
+						"value": "pt-1"
+					},
+					{
+						"label": "2",
+						"value": "pt-2"
+					},
+					{
+						"label": "3",
+						"value": "pt-3"
+					},
+					{
+						"label": "4",
+						"value": "pt-4"
+					},
+					{
+						"label": "5",
+						"value": "pt-5"
+					}
+				]
+			},
+			{
+				"dataType": "string",
+				"defaultValue": "pb-3",
+				"dependencies": [
+				],
+				"label": "padding-bottom",
+				"name": "paddingBottom",
+				"responsive": false,
+				"type": "select",
+				"validValues": [
+					{
+						"label": "0",
+						"value": "pb-0"
+					},
+					{
+						"label": "1",
+						"value": "pb-1"
+					},
+					{
+						"label": "2",
+						"value": "pb-2"
+					},
+					{
+						"label": "3",
+						"value": "pb-3"
+					},
+					{
+						"label": "4",
+						"value": "pb-4"
+					},
+					{
+						"label": "5",
+						"value": "pb-5"
+					}
+				]
+			},
+			{
+				"dataType": "string",
+				"defaultValue": "pl-3",
+				"dependencies": [
+				],
+				"label": "padding-left",
+				"name": "paddingLeft",
+				"responsive": false,
+				"type": "select",
+				"validValues": [
+					{
+						"label": "0",
+						"value": "pl-0"
+					},
+					{
+						"label": "1",
+						"value": "pl-1"
+					},
+					{
+						"label": "2",
+						"value": "pl-2"
+					},
+					{
+						"label": "3",
+						"value": "pl-3"
+					},
+					{
+						"label": "4",
+						"value": "pl-4"
+					},
+					{
+						"label": "5",
+						"value": "pl-5"
+					}
+				]
+			},
+			{
+				"dataType": "string",
+				"defaultValue": "pr-3",
+				"dependencies": [
+				],
+				"label": "padding-right",
+				"name": "paddingRight",
+				"responsive": false,
+				"type": "select",
+				"validValues": [
+					{
+						"label": "0",
+						"value": "pr-0"
+					},
+					{
+						"label": "1",
+						"value": "pr-1"
+					},
+					{
+						"label": "2",
+						"value": "pr-2"
+					},
+					{
+						"label": "3",
+						"value": "pr-3"
+					},
+					{
+						"label": "4",
+						"value": "pr-4"
+					},
+					{
+						"label": "5",
+						"value": "pr-5"
+					}
+				]
 			}
 		]
 	}
