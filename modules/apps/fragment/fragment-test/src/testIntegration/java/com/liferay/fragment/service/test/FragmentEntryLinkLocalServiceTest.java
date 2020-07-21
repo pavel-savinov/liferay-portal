@@ -255,6 +255,33 @@ public class FragmentEntryLinkLocalServiceTest {
 	}
 
 	@Test
+	public void testAddFragmentEntryLinkWithFreeMarkerEnabledNotEmptyRendererKey()
+		throws Exception {
+
+		FragmentEntryLink fragmentEntryLink =
+			_fragmentEntryLinkLocalService.addFragmentEntryLink(
+				TestPropsValues.getUserId(), _group.getGroupId(), 0,
+				_fragmentEntryWithFreeMarker.getFragmentEntryId(), 0,
+				_layout.getPlid(), _fragmentEntryWithFreeMarker.getCss(),
+				_fragmentEntryWithFreeMarker.getHtml(),
+				_fragmentEntryWithFreeMarker.getJs(),
+				_fragmentEntryWithFreeMarker.getConfiguration(),
+				StringPool.BLANK, StringPool.BLANK, 0, null, _serviceContext);
+
+		Assert.assertNotNull(
+			_fragmentEntryLinkLocalService.fetchFragmentEntryLink(
+				fragmentEntryLink.getFragmentEntryLinkId()));
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+			fragmentEntryLink.getEditableValues());
+
+		JSONObject editableJSONObject = jsonObject.getJSONObject(
+			_EDITABLE_PROCESSOR_KEY);
+
+		Assert.assertEquals(3, editableJSONObject.length());
+	}
+
+	@Test
 	public void testAddMultipleFragmentEntryLinks() throws PortalException {
 		List<FragmentEntryLink> originalFragmentEntryLinks =
 			_fragmentEntryLinkLocalService.getFragmentEntryLinks(
