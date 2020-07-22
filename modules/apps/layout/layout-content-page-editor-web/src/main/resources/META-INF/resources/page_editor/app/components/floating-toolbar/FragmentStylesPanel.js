@@ -73,10 +73,6 @@ export const FragmentStylesPanel = ({item}) => {
 
 	return (
 		<>
-			<div className="page-editor__floating-toolbar__panel-header">
-				<p>{Liferay.Language.get('styles')}</p>
-			</div>
-
 			<CustomStyles
 				fragmentEntryLink={fragmentEntryLink}
 				onValueSelect={onCustomStyleValueSelect}
