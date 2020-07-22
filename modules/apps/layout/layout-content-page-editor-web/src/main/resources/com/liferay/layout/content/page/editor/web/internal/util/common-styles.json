@@ -678,7 +678,7 @@
 				"label": "border-width",
 				"name": "borderWidth",
 				"responsive": false,
-				"type": "string",
+				"type": "text",
 				"validValues": [
 				]
 			},
@@ -791,7 +791,7 @@
 				"label": "opacity",
 				"name": "opacity",
 				"responsive": false,
-				"type": "string",
+				"type": "text",
 				"validValues": [
 				]
 			},
