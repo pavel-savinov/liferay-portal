@@ -13,7 +13,6 @@
  */
 
 import ClayForm, {ClayCheckbox, ClaySelectWithOption} from '@clayui/form';
-import ClayIcon from '@clayui/icon';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -60,7 +59,6 @@ const ROW_STYLE_IDENTIFIERS = {
 };
 
 export const RowStylesPanel = ({item}) => {
-	const {availableViewportSizes} = config;
 	const dispatch = useDispatch();
 	const segmentsExperienceId = useSelector(selectSegmentsExperienceId);
 	const selectedViewportSize = useSelector(
@@ -140,81 +138,69 @@ export const RowStylesPanel = ({item}) => {
 	};
 
 	const rowConfig = getResponsiveConfig(item.config, selectedViewportSize);
-	const viewportSize = availableViewportSizes[selectedViewportSize];
 	const modulesPerRowOptions = customRow
 		? MODULES_PER_ROW_OPTIONS_WITH_CUSTOM
 		: MODULES_PER_ROW_OPTIONS;
 
 	return (
 		<>
-			<>
-				<div className="page-editor__floating-toolbar__panel-header">
-					<p>{Liferay.Language.get('styles')}</p>
+			<div className="page-editor__floating-toolbar__panel__custom-styles">
+				<Select
+					configurationKey="modulesPerRow"
+					handleChange={onCustomStylesValueSelect}
+					label={Liferay.Language.get('layout')}
+					options={modulesPerRowOptions[
+						rowConfig.numberOfColumns - 1
+					].map((option) => ({
+						disabled: option === CUSTOM_ROW,
+						label:
+							option === CUSTOM_ROW
+								? Liferay.Language.get('custom')
+								: Liferay.Util.sub(
+										getModulesPerRowOptionLabel(option),
+										option
+								  ),
+						value: option,
+					}))}
+					value={customRow ? CUSTOM_ROW : rowConfig.modulesPerRow}
+				/>
 
-					<p className="page-editor__floating-toolbar__panel-header__viewport-label">
-						{viewportSize.label}
-						<ClayIcon className="ml-1" symbol={viewportSize.icon} />
-					</p>
-				</div>
+				{rowConfig.numberOfColumns === 2 &&
+					rowConfig.modulesPerRow === 1 && (
+						<ClayCheckbox
+							checked={rowConfig.reverseOrder}
+							label={Liferay.Language.get('inverse-order')}
+							onChange={({target: {checked}}) =>
+								onCustomStylesValueSelect(
+									'reverseOrder',
+									checked
+								)
+							}
+						/>
+					)}
 
-				<div className="page-editor__floating-toolbar__panel__custom-styles">
-					<Select
-						configurationKey="modulesPerRow"
-						handleChange={onCustomStylesValueSelect}
-						label={Liferay.Language.get('layout')}
-						options={modulesPerRowOptions[
-							rowConfig.numberOfColumns - 1
-						].map((option) => ({
-							disabled: option === CUSTOM_ROW,
-							label:
-								option === CUSTOM_ROW
-									? Liferay.Language.get('custom')
-									: Liferay.Util.sub(
-											getModulesPerRowOptionLabel(option),
-											option
-									  ),
-							value: option,
-						}))}
-						value={customRow ? CUSTOM_ROW : rowConfig.modulesPerRow}
-					/>
+				<Select
+					configurationKey="verticalAlignment"
+					handleChange={onCustomStylesValueSelect}
+					label={Liferay.Language.get('vertical-alignment')}
+					options={VERTICAL_ALIGNMENT_OPTIONS}
+					value={rowConfig.verticalAlignment}
+				/>
+			</div>
 
-					{rowConfig.numberOfColumns === 2 &&
-						rowConfig.modulesPerRow === 1 && (
-							<ClayCheckbox
-								checked={rowConfig.reverseOrder}
-								label={Liferay.Language.get('inverse-order')}
-								onChange={({target: {checked}}) =>
-									onCustomStylesValueSelect(
-										'reverseOrder',
-										checked
-									)
-								}
-							/>
-						)}
-
-					<Select
-						configurationKey="verticalAlignment"
-						handleChange={onCustomStylesValueSelect}
-						label={Liferay.Language.get('vertical-alignment')}
-						options={VERTICAL_ALIGNMENT_OPTIONS}
-						value={rowConfig.verticalAlignment}
-					/>
-				</div>
-
-				<div className="page-editor__floating-toolbar__panel__common-styles">
-					{commonStyles.map((fieldSet, index) => {
-						return (
-							<FieldSet
-								fields={fieldSet.styles}
-								key={index}
-								label={fieldSet.label}
-								onValueSelect={onCommonStylesValueSelect}
-								values={item.config.styles}
-							/>
-						);
-					})}
-				</div>
-			</>
+			<div className="page-editor__floating-toolbar__panel__common-styles">
+				{commonStyles.map((fieldSet, index) => {
+					return (
+						<FieldSet
+							fields={fieldSet.styles}
+							key={index}
+							label={fieldSet.label}
+							onValueSelect={onCommonStylesValueSelect}
+							values={item.config.styles}
+						/>
+					);
+				})}
+			</div>
 		</>
 	);
 };
