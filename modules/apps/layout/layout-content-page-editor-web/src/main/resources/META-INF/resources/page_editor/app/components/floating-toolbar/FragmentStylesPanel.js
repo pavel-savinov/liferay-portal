@@ -136,7 +136,7 @@ const CommonStyles = ({commonStyles, item, onValueSelect}) => (
 					key={index}
 					label={fieldSet.label}
 					onValueSelect={onValueSelect}
-					values={item.config.styles}
+					values={item.config.styles || {}}
 				/>
 			);
 		})}
