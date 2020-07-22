@@ -13,7 +13,6 @@
  */
 
 import ClayForm, {ClayCheckbox, ClaySelectWithOption} from '@clayui/form';
-import ClayIcon from '@clayui/icon';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -60,7 +59,6 @@ const ROW_STYLE_IDENTIFIERS = {
 };
 
 export const RowStylesPanel = ({item}) => {
-	const {availableViewportSizes} = config;
 	const dispatch = useDispatch();
 	const segmentsExperienceId = useSelector(selectSegmentsExperienceId);
 	const selectedViewportSize = useSelector(
@@ -140,7 +138,6 @@ export const RowStylesPanel = ({item}) => {
 	};
 
 	const rowConfig = getResponsiveConfig(item.config, selectedViewportSize);
-	const viewportSize = availableViewportSizes[selectedViewportSize];
 	const modulesPerRowOptions = customRow
 		? MODULES_PER_ROW_OPTIONS_WITH_CUSTOM
 		: MODULES_PER_ROW_OPTIONS;
@@ -148,15 +145,6 @@ export const RowStylesPanel = ({item}) => {
 	return (
 		<>
 			<>
-				<div className="page-editor__floating-toolbar__panel-header">
-					<p>{Liferay.Language.get('styles')}</p>
-
-					<p className="page-editor__floating-toolbar__panel-header__viewport-label">
-						{viewportSize.label}
-						<ClayIcon className="ml-1" symbol={viewportSize.icon} />
-					</p>
-				</div>
-
 				<div className="page-editor__floating-toolbar__panel__custom-styles">
 					<Select
 						configurationKey="modulesPerRow"
