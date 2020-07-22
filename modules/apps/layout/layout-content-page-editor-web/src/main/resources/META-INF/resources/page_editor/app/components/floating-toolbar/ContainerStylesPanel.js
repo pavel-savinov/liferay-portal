@@ -84,7 +84,7 @@ export const ContainerStylesPanel = ({item}) => {
 							key={index}
 							label={fieldSet.label}
 							onValueSelect={handleValueSelect}
-							values={item.config.styles}
+							values={item.config.styles || {}}
 						/>
 					);
 				})}
