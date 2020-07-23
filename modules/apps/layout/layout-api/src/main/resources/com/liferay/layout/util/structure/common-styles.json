@@ -784,18 +784,6 @@
 		"label": "effects",
 		"styles": [
 			{
-				"dataType": "number",
-				"defaultValue": 0,
-				"dependencies": [
-				],
-				"label": "opacity",
-				"name": "opacity",
-				"responsive": false,
-				"type": "text",
-				"validValues": [
-				]
-			},
-			{
 				"dataType": "object",
 				"defaultValue": "shadow-none",
 				"dependencies": [
