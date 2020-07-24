@@ -603,7 +603,9 @@
 				"label": "text-body",
 				"name": "textColor",
 				"responsive": false,
-				"type": "colorPalette"
+				"type": "colorPalette",
+				"validValues": [
+				]
 			},
 			{
 				"dataType": "string",
@@ -649,7 +651,9 @@
 				"label": "background-color",
 				"name": "backgroundColor",
 				"responsive": false,
-				"type": "colorPalette"
+				"type": "colorPalette",
+				"validValues": [
+				]
 			},
 			{
 				"dataType": "object",
@@ -721,7 +725,9 @@
 				"label": "border-color",
 				"name": "borderColor",
 				"responsive": false,
-				"type": "colorPalette"
+				"type": "colorPalette",
+				"validValues": [
+				]
 			}
 		]
 	},
