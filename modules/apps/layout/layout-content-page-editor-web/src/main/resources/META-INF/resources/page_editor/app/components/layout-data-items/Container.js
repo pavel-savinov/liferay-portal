@@ -25,24 +25,34 @@ import loadBackgroundImage from '../../utils/loadBackgroundImage';
 const Container = React.forwardRef(
 	({children, className, data, item, withinTopper = false}, ref) => {
 		const {
-			backgroundColorCssClass,
+			backgroundColor,
 			backgroundImage,
 			borderColor,
 			borderRadius,
 			borderWidth,
-			contentDisplay,
+			fontFamily,
+			fontSize,
+			fontWeight,
+			height,
 			marginBottom,
 			marginLeft,
 			marginRight,
 			marginTop,
-			opacity,
+			maxHeight,
+			maxWidth,
+			minHeight,
+			minWidth,
+			overflow,
 			paddingBottom,
 			paddingLeft,
 			paddingRight,
 			paddingTop,
-			shadow,
-			widthType,
-		} = item.config;
+			textAlign,
+			textColor,
+			width,
+		} = item.config.styles;
+
+		const {widthType} = item.config;
 
 		const languageId = useSelector(selectLanguageId);
 		const [backgroundImageValue, setBackgroundImageValue] = useState('');
@@ -85,38 +95,42 @@ const Container = React.forwardRef(
 			style.backgroundSize = 'cover';
 		}
 
-		if (borderWidth) {
-			style.borderStyle = 'solid';
-			style.borderWidth = `${borderWidth}px`;
+		if (fontSize) {
+			style.fontSize = fontSize;
 		}
 
-		if (opacity) {
-			style.opacity = Number(opacity / 100) || 1;
-		}
+		style.borderWidth = `${borderWidth}px`;
+		style.maxHeight = maxHeight;
+		style.maxWidth = maxWidth;
+		style.minHeight = minHeight && minHeight !== 'none';
+		style.minWidth = minWidth && minWidth !== 'none';
+		style.overflow = overflow;
 
 		const content = (
 			<div
 				{...(link ? {} : data)}
 				className={classNames(
 					className,
-					`mb-${marginBottom || 0}`,
-					`mt-${marginTop || 0}`,
-					`pb-${paddingBottom || 0}`,
-					`pl-${paddingLeft || 0}`,
-					`pr-${paddingRight || 0}`,
-					`pt-${paddingTop || 0}`,
+					fontWeight,
+					height,
+					marginBottom,
+					marginTop,
+					paddingBottom,
+					paddingLeft,
+					paddingRight,
+					paddingTop,
+					width,
 					{
-						[`bg-${backgroundColorCssClass}`]: !!backgroundColorCssClass,
-						[`border-${borderColor}`]: !!borderColor,
+						[`bg-${backgroundColor?.cssClass}`]: backgroundColor,
+						[`border-${borderColor?.cssClass}`]: borderColor,
 						[borderRadius]: !!borderRadius,
 						container: widthType === 'fixed',
-						'd-block': contentDisplay === 'block',
 						empty: item.children.length === 0,
-						[`ml-${marginLeft || 0}`]:
-							widthType !== 'fixed' && !withinTopper,
-						[`mr-${marginRight || 0}`]:
-							widthType !== 'fixed' && !withinTopper,
-						[shadow]: !!shadow,
+						[fontFamily]: fontFamily !== 'default',
+						[marginLeft]: widthType !== 'fixed' && !withinTopper,
+						[marginRight]: widthType !== 'fixed' && !withinTopper,
+						[textAlign]: textAlign !== 'none',
+						[`text-${textColor?.cssClass}`]: textColor,
 					}
 				)}
 				ref={ref}
