@@ -45,7 +45,8 @@ const ContainerWithControls = React.forwardRef(
 
 		const buttons = [];
 
-		const {marginLeft, marginRight, widthType} = item.config;
+		const {widthType} = item.config;
+		const {marginLeft, marginRight, shadow} = item.config.styles;
 
 		if (canUpdateItemConfiguration) {
 			buttons.push(LAYOUT_DATA_FLOATING_TOOLBAR_BUTTONS.containerLink);
@@ -64,10 +65,11 @@ const ContainerWithControls = React.forwardRef(
 
 				<Topper
 					className={classNames({
-						[`ml-${marginLeft || 0}`]: widthType !== 'fixed',
-						[`mr-${marginRight || 0}`]: widthType !== 'fixed',
 						container: widthType === 'fixed',
+						[marginLeft]: widthType !== 'fixed',
+						[marginRight]: widthType !== 'fixed',
 						'p-0': widthType === 'fixed',
+						[shadow]: !!shadow,
 					})}
 					item={item}
 					itemElement={itemElement}
