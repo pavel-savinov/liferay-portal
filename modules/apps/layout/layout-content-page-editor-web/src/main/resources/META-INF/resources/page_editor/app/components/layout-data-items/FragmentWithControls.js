@@ -12,7 +12,8 @@
  * details.
  */
 
-import React, {useMemo} from 'react';
+import classNames from 'classnames';
+import React, {useEffect, useMemo, useState} from 'react';
 
 import useSetRef from '../../../core/hooks/useSetRef';
 import {
@@ -24,6 +25,7 @@ import {LAYOUT_DATA_FLOATING_TOOLBAR_BUTTONS} from '../../config/constants/layou
 import selectCanUpdateItemConfiguration from '../../selectors/selectCanUpdateItemConfiguration';
 import selectShowFloatingToolbar from '../../selectors/selectShowFloatingToolbar';
 import {useSelector, useSelectorCallback} from '../../store/index';
+import loadBackgroundImage from '../../utils/loadBackgroundImage';
 import {useIsActive} from '../Controls';
 import Topper from '../Topper';
 import FloatingToolbar from '../floating-toolbar/FloatingToolbar';
@@ -71,6 +73,61 @@ const FragmentWithControls = React.forwardRef(({item, layoutData}, ref) => {
 		return buttons;
 	}, [canUpdateItemConfiguration, fragmentEntryLink.configuration]);
 
+	const {
+		backgroundColor,
+		backgroundImage,
+		borderColor,
+		borderRadius,
+		borderWidth,
+		fontFamily,
+		fontSize,
+		fontWeight,
+		height,
+		marginBottom,
+		marginLeft,
+		marginRight,
+		marginTop,
+		maxHeight,
+		maxWidth,
+		minHeight,
+		minWidth,
+		overflow,
+		paddingBottom,
+		paddingLeft,
+		paddingRight,
+		paddingTop,
+		shadow,
+		textAlign,
+		textColor,
+		width,
+	} = item.config.styles;
+
+	const [backgroundImageValue, setBackgroundImageValue] = useState('');
+
+	useEffect(() => {
+		loadBackgroundImage(backgroundImage).then(setBackgroundImageValue);
+	}, [backgroundImage]);
+
+	const style = {};
+
+	if (backgroundImageValue) {
+		style.backgroundImage = `url(${backgroundImageValue})`;
+		style.backgroundPosition = '50% 50%';
+		style.backgroundRepeat = 'no-repeat';
+		style.backgroundSize = 'cover';
+	}
+
+	if (fontSize) {
+		style.fontSize = fontSize;
+	}
+
+	style.borderWidth = `${borderWidth}px`;
+	style.maxHeight = maxHeight;
+	style.maxWidth = maxWidth;
+	style.minHeight = minHeight && minHeight !== 'none';
+	style.minWidth = minWidth && minWidth !== 'none';
+	style.overflow = overflow;
+
 	return (
 		<Topper item={item} itemElement={itemElement} layoutData={layoutData}>
 			<>
@@ -82,11 +139,40 @@ const FragmentWithControls = React.forwardRef(({item, layoutData}, ref) => {
 					/>
 				)}
 
-				<FragmentContent
-					elementRef={setRef}
-					fragmentEntryLinkId={fragmentEntryLink.fragmentEntryLinkId}
-					itemId={item.itemId}
-				/>
+				<div
+					className={classNames(
+						fontWeight,
+						height,
+						marginBottom,
+						marginLeft,
+						marginRight,
+						marginTop,
+						paddingBottom,
+						paddingLeft,
+						paddingRight,
+						paddingTop,
+						shadow,
+						width,
+						{
+							[`bg-${backgroundColor?.cssClass}`]: backgroundColor,
+							[`border-${borderColor?.cssClass}`]: borderColor,
+							[borderRadius]: !!borderRadius,
+							[fontFamily]: fontFamily !== 'default',
+							'no-gutters': !item.config.gutters,
+							[textAlign]: textAlign !== 'none',
+							[`text-${textColor?.cssClass}`]: textColor,
+						}
+					)}
+					style={style}
+				>
+					<FragmentContent
+						elementRef={setRef}
+						fragmentEntryLinkId={
+							fragmentEntryLink.fragmentEntryLinkId
+						}
+						itemId={item.itemId}
+					/>
+				</div>
 			</>
 		</Topper>
 	);
