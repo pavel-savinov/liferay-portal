@@ -651,9 +651,7 @@
 				"label": "background-color",
 				"name": "backgroundColor",
 				"responsive": false,
-				"type": "colorPalette",
-				"validValues": [
-				]
+				"type": "colorPalette"
 			},
 			{
 				"dataType": "object",
@@ -664,9 +662,7 @@
 				"label": "background-image",
 				"name": "backgroundImage",
 				"responsive": false,
-				"type": "imageSelector",
-				"validValues": [
-				]
+				"type": "imageSelector"
 			}
 		]
 	},
@@ -686,9 +682,7 @@
 					"validation": {
 						"type": "number"
 					}
-				},
-				"validValues": [
-				]
+				}
 			},
 			{
 				"dataType": "string",
@@ -725,9 +719,7 @@
 				"label": "border-color",
 				"name": "borderColor",
 				"responsive": false,
-				"type": "colorPalette",
-				"validValues": [
-				]
+				"type": "colorPalette"
 			}
 		]
 	},
