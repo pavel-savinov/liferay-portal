@@ -40,7 +40,7 @@ const renderRow = ({
 } = {}) => {
 	const row = {
 		children: [],
-		config: {},
+		config: {styles: {}},
 		itemId: 'row',
 		parentId: null,
 		type: LAYOUT_DATA_ITEM_TYPES.row,
