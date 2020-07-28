@@ -48,10 +48,10 @@ jest.mock(
 	'../../../../src/main/resources/META-INF/resources/page_editor/app/config',
 	() => ({
 		config: {
+			commonStyles: [],
 			defaultSegmentsExperienceId: 0,
 			marginOptions: [],
 			paddingOptions: [],
-			themeColorsCssClasses: ['danger'],
 		},
 	})
 );
@@ -80,41 +80,9 @@ describe('ContainerStyles', () => {
 		expect(updateItemConfig).toBeCalledWith(
 			expect.objectContaining({
 				itemConfig: {
-					marginLeft: '',
-					marginRight: '',
 					widthType: 'fixed',
 				},
 			})
 		);
-	});
-
-	it('calls dispatch method when changing the color', () => {
-		renderComponent();
-
-		const colorButton = document.body.querySelector('.bg-danger');
-
-		userEvent.click(colorButton);
-
-		expect(updateItemConfig).toBeCalledWith(
-			expect.objectContaining({
-				itemConfig: {
-					backgroundColorCssClass: 'danger',
-				},
-			})
-		);
-	});
-
-	it('disables left and right margin and set the content to auto when selecting fixed width', async () => {
-		const {queryAllByText} = renderComponent({
-			itemConfig: {widthType: 'fixed'},
-		});
-
-		const options = queryAllByText('auto');
-
-		expect(options.length).toBe(2);
-
-		options.forEach((select) => {
-			expect(select.parentElement.disabled).toBe(true);
-		});
 	});
 });
