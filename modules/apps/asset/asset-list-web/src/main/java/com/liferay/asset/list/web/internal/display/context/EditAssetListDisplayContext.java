@@ -16,6 +16,7 @@ package com.liferay.asset.list.web.internal.display.context;
 
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetCategory;
+import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.model.AssetVocabulary;
@@ -631,8 +632,20 @@ public class EditAssetListDisplayContext {
 			new AssetRendererFactoryTypeNameComparator(
 				_themeDisplay.getLocale()));
 
+		AssetListEntry assetListEntry = getAssetListEntry();
+
 		for (AssetRendererFactory<?> curRendererFactory :
 				assetRendererFactories) {
+
+			if (!Objects.equals(
+					assetListEntry.getAssetEntryType(),
+					AssetEntry.class.getName()) &&
+				!Objects.equals(
+					assetListEntry.getAssetEntryType(),
+					curRendererFactory.getClassName())) {
+
+				continue;
+			}
 
 			if (!curRendererFactory.isSupportsClassTypes()) {
 				manualAddIconDataMap.put(
@@ -656,6 +669,16 @@ public class EditAssetListDisplayContext {
 					_themeDisplay.getLocale());
 
 			for (ClassType assetAvailableClassType : assetAvailableClassTypes) {
+				if (Validator.isNotNull(
+						assetListEntry.getAssetEntrySubtype()) &&
+					!Objects.equals(
+						assetListEntry.getAssetEntrySubtype(),
+						String.valueOf(
+							assetAvailableClassType.getClassTypeId()))) {
+
+					continue;
+				}
+
 				manualAddIconDataMap.put(
 					assetAvailableClassType.getName(),
 					_getDataMap(
