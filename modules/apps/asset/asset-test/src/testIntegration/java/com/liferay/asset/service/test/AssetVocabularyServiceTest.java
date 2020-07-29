@@ -444,6 +444,15 @@ public class AssetVocabularyServiceTest {
 		Assert.assertNotNull(topicVocabulary);
 	}
 
+	@Test
+	public void testTopicVocabularyDoesNotExistForGroup() throws Exception {
+		AssetVocabulary topicVocabulary =
+			_assetVocabularyLocalService.fetchGroupVocabulary(
+				_group.getGroupId(), "topic");
+
+		Assert.assertNull(topicVocabulary);
+	}
+
 	@Test(expected = DuplicateVocabularyException.class)
 	public void testUpdateDuplicateVocabulary() throws Exception {
 		AssetVocabulary vocabulary = AssetTestUtil.addVocabulary(
