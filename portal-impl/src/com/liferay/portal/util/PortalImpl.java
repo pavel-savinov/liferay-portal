@@ -6515,9 +6515,8 @@ public class PortalImpl implements Portal {
 			!PropsValues.AUTH_LOGIN_PROMPT_ENABLED) {
 
 			PortalUtil.sendError(
-				HttpServletResponse.SC_UNAUTHORIZED,
-				(Exception)principalException, httpServletRequest,
-				httpServletResponse);
+				HttpServletResponse.SC_UNAUTHORIZED, principalException,
+				httpServletRequest, httpServletResponse);
 
 			return;
 		}
