@@ -59,27 +59,12 @@ String ppid = ParamUtil.getString(request, "p_p_id");
 			<liferay-ui:success key='<%= assetRendererFactory.getPortletId() + "requestProcessed" %>' message="your-request-processed-successfully" />
 		</c:if>
 
-		<c:choose>
-			<c:when test="<%= !displayPageLayoutTypeControllerDisplayContext.hasPermission(permissionChecker, ActionKeys.VIEW) %>">
-				<div class="layout-content" id="main-content" role="main">
-					<clay:container-fluid
-						cssClass="pt-3"
-					>
-						<div class="alert alert-danger">
-							<liferay-ui:message key="you-do-not-have-permission-to-view-this-page" />
-						</div>
-					</clay:container-fluid>
-				</div>
-			</c:when>
-			<c:otherwise>
-				<div class="layout-content portlet-layout" id="main-content" role="main">
-					<liferay-layout:render-fragment-layout
-						fieldValues="<%= displayPageLayoutTypeControllerDisplayContext.getInfoDisplayFieldsValues() %>"
-						mode="<%= FragmentEntryLinkConstants.ASSET_DISPLAY_PAGE %>"
-					/>
-				<div>
-			</c:otherwise>
-		</c:choose>
+		<div class="layout-content portlet-layout" id="main-content" role="main">
+			<liferay-layout:render-fragment-layout
+				fieldValues="<%= displayPageLayoutTypeControllerDisplayContext.getInfoDisplayFieldsValues() %>"
+				mode="<%= FragmentEntryLinkConstants.ASSET_DISPLAY_PAGE %>"
+			/>
+		<div>
 	</c:otherwise>
 </c:choose>
 
