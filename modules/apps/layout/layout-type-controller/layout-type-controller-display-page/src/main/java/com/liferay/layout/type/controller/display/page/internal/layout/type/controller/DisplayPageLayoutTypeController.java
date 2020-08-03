@@ -20,7 +20,12 @@ import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.fragment.constants.FragmentActionKeys;
 import com.liferay.fragment.renderer.FragmentRendererController;
+import com.liferay.info.constants.InfoDisplayWebKeys;
 import com.liferay.info.display.request.attributes.contributor.InfoDisplayRequestAttributesContributor;
+import com.liferay.info.item.InfoItemDetails;
+import com.liferay.info.item.InfoItemReference;
+import com.liferay.info.item.InfoItemServiceTracker;
+import com.liferay.info.item.provider.InfoItemPermissionProvider;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorWebKeys;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
@@ -136,27 +141,57 @@ public class DisplayPageLayoutTypeController
 			}
 		}
 
-		Object object = httpServletRequest.getAttribute(
-			WebKeys.LAYOUT_ASSET_ENTRY);
+		Object infoItem = httpServletRequest.getAttribute(
+			InfoDisplayWebKeys.INFO_ITEM);
 
-		if ((object != null) && (object instanceof AssetEntry)) {
-			AssetEntry assetEntry = (AssetEntry)object;
+		InfoItemDetails infoItemDetails =
+			(InfoItemDetails)httpServletRequest.getAttribute(
+				InfoDisplayWebKeys.INFO_ITEM_DETAILS);
+		InfoItemServiceTracker infoItemServiceTracker =
+			(InfoItemServiceTracker)httpServletRequest.getAttribute(
+				InfoDisplayWebKeys.INFO_ITEM_SERVICE_TRACKER);
 
+		InfoItemPermissionProvider infoItemPermissionProvider =
+			infoItemServiceTracker.getFirstInfoItemService(
+				InfoItemPermissionProvider.class,
+				infoItemDetails.getClassName());
+
+		InfoItemReference infoItemReference =
+			infoItemDetails.getInfoItemReference();
+
+		if ((infoItemPermissionProvider != null) &&
+			!infoItemPermissionProvider.hasPermission(
+				themeDisplay.getPermissionChecker(), infoItem,
+				ActionKeys.VIEW)) {
+
+			PrincipalException principalException =
+				new PrincipalException.MustHavePermission(
+					themeDisplay.getPermissionChecker(),
+					infoItemDetails.getClassName(),
+					infoItemReference.getClassPK(), ActionKeys.VIEW);
+
+			_portal.processPrincipalException(
+				principalException, themeDisplay.getUserId(),
+				httpServletRequest, httpServletResponse);
+
+			return false;
+		}
+		else if (infoItemPermissionProvider == null) {
 			AssetRendererFactory<?> assetRendererFactory =
 				AssetRendererFactoryRegistryUtil.
 					getAssetRendererFactoryByClassNameId(
-						assetEntry.getClassNameId());
+						_portal.getClassNameId(infoItemDetails.getClassName()));
 
 			if ((assetRendererFactory != null) &&
 				!assetRendererFactory.hasPermission(
 					themeDisplay.getPermissionChecker(),
-					assetEntry.getClassPK(), ActionKeys.VIEW)) {
+					infoItemReference.getClassPK(), ActionKeys.VIEW)) {
 
 				PrincipalException principalException =
 					new PrincipalException.MustHavePermission(
 						themeDisplay.getPermissionChecker(),
 						assetRendererFactory.getClassName(),
-						assetEntry.getClassPK(), ActionKeys.VIEW);
+						infoItemReference.getClassPK(), ActionKeys.VIEW);
 
 				_portal.processPrincipalException(
 					principalException, themeDisplay.getUserId(),

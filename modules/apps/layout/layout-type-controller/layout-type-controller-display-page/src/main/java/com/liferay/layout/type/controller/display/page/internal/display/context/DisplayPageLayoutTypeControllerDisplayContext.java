@@ -19,11 +19,8 @@ import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.info.constants.InfoDisplayWebKeys;
 import com.liferay.info.item.InfoItemDetails;
 import com.liferay.info.item.InfoItemFieldValues;
-import com.liferay.info.item.InfoItemReference;
 import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
-import com.liferay.info.item.provider.InfoItemPermissionProvider;
-import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -77,34 +74,6 @@ public class DisplayPageLayoutTypeControllerDisplayContext {
 				WebKeys.THEME_DISPLAY);
 
 		return infoItemFieldValues.getMap(themeDisplay.getLocale());
-	}
-
-	public boolean hasPermission(
-			PermissionChecker permissionChecker, String actionId)
-		throws Exception {
-
-		InfoItemPermissionProvider infoItemPermissionProvider =
-			_infoItemServiceTracker.getFirstInfoItemService(
-				InfoItemPermissionProvider.class,
-				_infoItemDetails.getClassName());
-
-		if (infoItemPermissionProvider != null) {
-			return infoItemPermissionProvider.hasPermission(
-				permissionChecker, _infoItem, actionId);
-		}
-
-		AssetRendererFactory<?> assetRendererFactory =
-			getAssetRendererFactory();
-
-		if (assetRendererFactory != null) {
-			InfoItemReference infoItemReference =
-				_infoItemDetails.getInfoItemReference();
-
-			return assetRendererFactory.hasPermission(
-				permissionChecker, infoItemReference.getClassPK(), actionId);
-		}
-
-		return true;
 	}
 
 	private final HttpServletRequest _httpServletRequest;
