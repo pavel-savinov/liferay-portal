@@ -1299,6 +1299,10 @@ public class LayoutsAdminDisplayContext {
 	public boolean isShowAddChildPageAction(Layout layout)
 		throws PortalException {
 
+		if (layout == null) {
+			return true;
+		}
+
 		return LayoutPermissionUtil.contains(
 			themeDisplay.getPermissionChecker(), layout, ActionKeys.ADD_LAYOUT);
 	}
