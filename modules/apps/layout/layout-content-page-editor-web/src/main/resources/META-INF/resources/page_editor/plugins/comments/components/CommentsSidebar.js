@@ -15,6 +15,7 @@
 import React from 'react';
 
 import {useActiveItemId} from '../../../app/components/Controls';
+import {HIGHLIGHTED_COMMENT_ID_KEY} from '../../../app/config/constants/highlightedCommentIdKey';
 import {LAYOUT_DATA_ITEM_TYPES} from '../../../app/config/constants/layoutDataItemTypes';
 import {useSelector} from '../../../app/store/index';
 import FragmentComments from './FragmentComments';
@@ -36,7 +37,18 @@ function getActiveFragmentEntryLink(itemId, fragmentEntryLinks, layoutData) {
 		}
 	}
 
-	return null;
+	const highlightMessageId = window.sessionStorage.getItem(
+		HIGHLIGHTED_COMMENT_ID_KEY
+	);
+
+	return highlightMessageId
+		? Object.values(fragmentEntryLinks).find(
+				(fragmentEntryLink) =>
+					fragmentEntryLink.comments.find(
+						(comment) => comment.commentId === highlightMessageId
+					) !== null
+		  )
+		: null;
 }
 
 export default function CommentsSidebar() {
