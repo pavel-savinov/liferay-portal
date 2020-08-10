@@ -299,34 +299,52 @@ public class InfoDisplayContributorWrapper
 		Map<String, Object> infoDisplayFieldsValues,
 		InfoItemReference infoItemReference) {
 
-		return InfoItemFieldValues.builder(
-		).infoFieldValue(
-			consumer -> {
-				for (Map.Entry<String, Object> entry :
-						infoDisplayFieldsValues.entrySet()) {
+		InfoItemFieldValues.Builder infoItemFieldValuesBuilder =
+			InfoItemFieldValues.builder(
+			).infoFieldValue(
+				consumer -> {
+					for (Map.Entry<String, Object> entry :
+							infoDisplayFieldsValues.entrySet()) {
 
-					String fieldName = entry.getKey();
+						String fieldName = entry.getKey();
 
-					InfoLocalizedValue<String> fieldLabelLocalizedValue =
-						InfoLocalizedValue.<String>builder(
-						).value(
-							_getLocale(), fieldName
+						InfoLocalizedValue<String> fieldLabelLocalizedValue =
+							InfoLocalizedValue.<String>builder(
+							).value(
+								_getLocale(), fieldName
+							).build();
+
+						InfoField infoField = InfoField.builder(
+						).infoFieldType(
+							TextInfoFieldType.INSTANCE
+						).name(
+							fieldName
+						).labelInfoLocalizedValue(
+							fieldLabelLocalizedValue
 						).build();
 
-					InfoField infoField = InfoField.builder(
-					).infoFieldType(
-						TextInfoFieldType.INSTANCE
-					).name(
-						fieldName
-					).labelInfoLocalizedValue(
-						fieldLabelLocalizedValue
-					).build();
-
-					consumer.accept(
-						new InfoFieldValue<>(infoField, entry.getValue()));
+						consumer.accept(
+							new InfoFieldValue<>(infoField, entry.getValue()));
+					}
 				}
+			);
+
+		if (Objects.equals(
+				infoItemReference.getClassName(), FileEntry.class.getName())) {
+
+			try {
+				infoItemFieldValuesBuilder.infoFieldValues(
+					_assetEntryInfoItemFieldSetProvider.getInfoFieldValues(
+						DLFileEntry.class.getName(),
+						infoItemReference.getClassPK()));
 			}
-		).infoItemReference(
+			catch (NoSuchInfoItemException noSuchInfoItemException) {
+				throw new RuntimeException(
+					"Caught unexpected exception", noSuchInfoItemException);
+			}
+		}
+
+		return infoItemFieldValuesBuilder.infoItemReference(
 			infoItemReference
 		).build();
 	}
