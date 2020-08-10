@@ -14,6 +14,8 @@
 
 package com.liferay.info.internal.display.contributor;
 
+import com.liferay.asset.info.item.provider.AssetEntryInfoItemFieldSetProvider;
+import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.info.display.contributor.InfoDisplayContributor;
 import com.liferay.info.display.contributor.InfoDisplayContributorTracker;
 import com.liferay.info.item.provider.InfoItemCapabilitiesProvider;
@@ -130,6 +132,8 @@ public class InfoDisplayContributorTrackerImpl
 						InfoDisplayContributorWrapper
 							infoDisplayContributorWrapper =
 								new InfoDisplayContributorWrapper(
+									_assetEntryInfoItemFieldSetProvider,
+									_assetEntryLocalService,
 									infoDisplayContributor,
 									ListUtil.fromArray(
 										_displayPageInfoItemCapability));
@@ -212,6 +216,13 @@ public class InfoDisplayContributorTrackerImpl
 
 		return dictionary;
 	}
+
+	@Reference
+	private AssetEntryInfoItemFieldSetProvider
+		_assetEntryInfoItemFieldSetProvider;
+
+	@Reference
+	private AssetEntryLocalService _assetEntryLocalService;
 
 	@Reference
 	private DisplayPageInfoItemCapability _displayPageInfoItemCapability;

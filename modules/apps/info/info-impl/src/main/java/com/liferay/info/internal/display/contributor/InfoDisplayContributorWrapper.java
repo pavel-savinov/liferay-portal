@@ -14,7 +14,11 @@
 
 package com.liferay.info.internal.display.contributor;
 
+import com.liferay.asset.info.item.provider.AssetEntryInfoItemFieldSetProvider;
+import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.ClassType;
+import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.info.display.contributor.InfoDisplayContributor;
 import com.liferay.info.display.contributor.InfoDisplayField;
 import com.liferay.info.display.contributor.InfoDisplayObjectProvider;
@@ -44,6 +48,7 @@ import com.liferay.info.item.provider.InfoItemFormVariationsProvider;
 import com.liferay.info.item.provider.InfoItemObjectProvider;
 import com.liferay.info.localized.InfoLocalizedValue;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 
@@ -67,9 +72,14 @@ public class InfoDisplayContributorWrapper
 			   InfoItemObjectProvider<Object> {
 
 	public InfoDisplayContributorWrapper(
+		AssetEntryInfoItemFieldSetProvider assetEntryInfoItemFieldSetProvider,
+		AssetEntryLocalService assetEntryLocalService,
 		InfoDisplayContributor<Object> infoDisplayContributor,
 		List<InfoItemCapability> infoItemCapabilities) {
 
+		_assetEntryInfoItemFieldSetProvider =
+			assetEntryInfoItemFieldSetProvider;
+		_assetEntryLocalService = assetEntryLocalService;
 		_infoDisplayContributor = infoDisplayContributor;
 		_infoItemCapabilities = infoItemCapabilities;
 	}
@@ -81,7 +91,7 @@ public class InfoDisplayContributorWrapper
 		try {
 			return _convertToInfoForm(
 				_infoDisplayContributor.getInfoDisplayFields(0, locale),
-				_infoDisplayContributor.getClassName());
+				_infoDisplayContributor.getClassName(), null);
 		}
 		catch (PortalException portalException) {
 			throw new RuntimeException(portalException);
@@ -96,7 +106,7 @@ public class InfoDisplayContributorWrapper
 			return _convertToInfoForm(
 				_infoDisplayContributor.getInfoDisplayFields(
 					itemClassTypeId, locale),
-				_infoDisplayContributor.getClassName());
+				_infoDisplayContributor.getClassName(), null);
 		}
 		catch (PortalException portalException) {
 			throw new RuntimeException(
@@ -114,7 +124,7 @@ public class InfoDisplayContributorWrapper
 			return _convertToInfoForm(
 				_infoDisplayContributor.getInfoDisplayFields(
 					itemObject, locale),
-				_infoDisplayContributor.getClassName());
+				_infoDisplayContributor.getClassName(), itemObject);
 		}
 		catch (PortalException portalException) {
 			throw new RuntimeException(portalException);
@@ -244,9 +254,9 @@ public class InfoDisplayContributorWrapper
 	}
 
 	private InfoForm _convertToInfoForm(
-		Set<InfoDisplayField> infoDisplayFields, String name) {
+		Set<InfoDisplayField> infoDisplayFields, String name, Object object) {
 
-		return InfoForm.builder(
+		InfoForm.Builder infoFormBuilder = InfoForm.builder(
 		).infoFieldSetEntry(
 			consumer -> {
 				for (InfoDisplayField infoDisplayField : infoDisplayFields) {
@@ -264,7 +274,23 @@ public class InfoDisplayContributorWrapper
 						).build());
 				}
 			}
-		).name(
+		);
+
+		if (Objects.equals(name, FileEntry.class.getName())) {
+			long classPK = _infoDisplayContributor.getInfoDisplayObjectClassPK(
+				object);
+
+			AssetEntry assetEntry = _assetEntryLocalService.fetchEntry(
+				DLFileEntry.class.getName(), classPK);
+
+			if (assetEntry != null) {
+				infoFormBuilder.infoFieldSetEntry(
+					_assetEntryInfoItemFieldSetProvider.getInfoFieldSet(
+						assetEntry));
+			}
+		}
+
+		return infoFormBuilder.name(
 			name
 		).build();
 	}
@@ -333,6 +359,9 @@ public class InfoDisplayContributorWrapper
 		return locale;
 	}
 
+	private final AssetEntryInfoItemFieldSetProvider
+		_assetEntryInfoItemFieldSetProvider;
+	private final AssetEntryLocalService _assetEntryLocalService;
 	private final InfoDisplayContributor<Object> _infoDisplayContributor;
 	private final List<InfoItemCapability> _infoItemCapabilities;
 
