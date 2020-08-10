@@ -120,6 +120,7 @@ Group group = siteAdministrationPanelCategoryDisplayContext.getGroup();
 
 	portletURL.setParameter("mvcPath", "/portlet/pages_tree.jsp");
 	portletURL.setParameter("selPpid", portletDisplay.getId());
+	portletURL.setParameter("redirect", themeDisplay.getURLCurrent());
 	portletURL.setWindowState(LiferayWindowState.EXCLUSIVE);
 	%>
 

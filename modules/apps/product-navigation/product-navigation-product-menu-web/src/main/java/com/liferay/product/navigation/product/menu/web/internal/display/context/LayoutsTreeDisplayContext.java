@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.SessionClicks;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -177,10 +178,20 @@ public class LayoutsTreeDisplayContext {
 
 		Layout layout = _themeDisplay.getLayout();
 
-		configureLayoutURL.setParameter(
-			"redirect", PortalUtil.getLayoutFullURL(layout, _themeDisplay));
-		configureLayoutURL.setParameter(
-			"backURL", PortalUtil.getLayoutFullURL(layout, _themeDisplay));
+		if (layout.isTypeAssetDisplay() || layout.isTypeControlPanel()) {
+			String redirect = ParamUtil.getString(
+				_liferayPortletRequest, "redirect",
+				_themeDisplay.getURLCurrent());
+
+			configureLayoutURL.setParameter("redirect", redirect);
+			configureLayoutURL.setParameter("backURL", redirect);
+		}
+		else {
+			configureLayoutURL.setParameter(
+				"redirect", PortalUtil.getLayoutFullURL(layout, _themeDisplay));
+			configureLayoutURL.setParameter(
+				"backURL", PortalUtil.getLayoutFullURL(layout, _themeDisplay));
+		}
 
 		configureLayoutURL.setParameter(
 			"groupId", String.valueOf(_themeDisplay.getScopeGroupId()));
