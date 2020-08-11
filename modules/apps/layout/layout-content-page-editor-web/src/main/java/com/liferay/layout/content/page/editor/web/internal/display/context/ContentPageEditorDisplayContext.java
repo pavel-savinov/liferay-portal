@@ -19,6 +19,7 @@ import com.liferay.exportimport.kernel.staging.StagingUtil;
 import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.contributor.FragmentCollectionContributor;
 import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
+import com.liferay.fragment.entry.processor.util.EditableFragmentEntryProcessorUtil;
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.model.FragmentComposition;
 import com.liferay.fragment.model.FragmentEntry;
@@ -1399,6 +1400,10 @@ public class ContentPageEditorDisplayContext {
 							getConfigurationDefaultValuesJSONObject(
 								configuration)
 					).put(
+						"editableTypes",
+						EditableFragmentEntryProcessorUtil.getEditableTypes(
+							fragmentEntryLink.getHtml())
+					).put(
 						"editableValues",
 						JSONFactoryUtil.createJSONObject(
 							fragmentEntryLink.getEditableValues())
@@ -1421,8 +1426,6 @@ public class ContentPageEditorDisplayContext {
 						String.valueOf(
 							fragmentEntryLink.getFragmentEntryLinkId())
 					).put(
-						"icon", fragmentEntry.getIcon()
-					).put(
 						"masterLayout",
 						layout.getMasterLayoutPlid() ==
 							fragmentEntryLink.getPlid()
@@ -1430,6 +1433,10 @@ public class ContentPageEditorDisplayContext {
 						_getFragmentEntry(
 							fragmentEntryLink, fragmentEntry, content)
 					).build();
+
+				if (fragmentEntry != null) {
+					fragmentEntryLinksMap.put("icon", fragmentEntry.getIcon());
+				}
 
 				fragmentEntryLinksMap.put(
 					String.valueOf(fragmentEntryLink.getFragmentEntryLinkId()),
