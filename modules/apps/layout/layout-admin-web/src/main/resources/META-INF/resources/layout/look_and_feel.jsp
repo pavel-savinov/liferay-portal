@@ -94,7 +94,9 @@ if ((layoutPageTemplateEntry == null) || !Objects.equals(layoutPageTemplateEntry
 <%
 StyleBookEntry styleBookEntry = null;
 
-int styleBookEntriesCount = StyleBookEntryLocalServiceUtil.getStyleBookEntriesCount(group.getGroupId());
+Group liveGroup = StagingUtil.getLiveGroup(group);
+
+int styleBookEntriesCount = StyleBookEntryLocalServiceUtil.getStyleBookEntriesCount(liveGroup.getGroupId());
 
 boolean hasStyleBooks = styleBookEntriesCount > 0;
 
