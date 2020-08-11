@@ -228,7 +228,7 @@ for (String childrenItemId : childrenItemIds) {
 			<c:choose>
 				<c:when test="<%= includeContainer %>">
 					<clay:container
-						cssClass="p-0"
+						cssClass="overflow-hidden p-0"
 						fluid="<%= true %>"
 					>
 						<clay:row
