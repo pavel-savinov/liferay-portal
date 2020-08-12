@@ -25,7 +25,6 @@ import com.liferay.expando.info.item.provider.ExpandoInfoItemFieldSetProvider;
 import com.liferay.info.exception.NoSuchClassTypeException;
 import com.liferay.info.exception.NoSuchFormVariationException;
 import com.liferay.info.field.InfoFieldSet;
-import com.liferay.info.field.InfoFieldSetEntry;
 import com.liferay.info.form.InfoForm;
 import com.liferay.info.item.field.reader.InfoItemFieldReaderFieldSetProvider;
 import com.liferay.info.item.provider.InfoItemFormProvider;
@@ -37,8 +36,6 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Locale;
 import java.util.Set;
 
@@ -119,6 +116,51 @@ public class JournalArticleInfoItemFormProvider
 				GetterUtil.getLong(formVariationKey), groupId));
 	}
 
+	private InfoFieldSet _getBasicInformationInfoFieldSet() {
+		return InfoFieldSet.builder(
+		).infoFieldSetEntry(
+			JournalArticleInfoItemFields.titleInfoField
+		).infoFieldSetEntry(
+			JournalArticleInfoItemFields.descriptionInfoField
+		).infoFieldSetEntry(
+			JournalArticleInfoItemFields.publishDateInfoField
+		).infoFieldSetEntry(
+			JournalArticleInfoItemFields.authorNameInfoField
+		).infoFieldSetEntry(
+			JournalArticleInfoItemFields.authorProfileImageInfoField
+		).infoFieldSetEntry(
+			JournalArticleInfoItemFields.lastEditorNameInfoField
+		).infoFieldSetEntry(
+			JournalArticleInfoItemFields.lastEditorProfileImageInfoField
+		).labelInfoLocalizedValue(
+			InfoLocalizedValue.localize(getClass(), "basic-information")
+		).name(
+			"basic-information"
+		).build();
+	}
+
+	private InfoFieldSet _getDisplayPageInfoFieldSet() {
+		return InfoFieldSet.builder(
+		).infoFieldSetEntry(
+			JournalArticleInfoItemFields.displayPageUrlInfoField
+		).labelInfoLocalizedValue(
+			InfoLocalizedValue.localize(getClass(), "display-page")
+		).name(
+			"display-page"
+		).build();
+	}
+
+	private InfoFieldSet _getFeaturedImageInfoFieldSet() {
+		return InfoFieldSet.builder(
+		).infoFieldSetEntry(
+			JournalArticleInfoItemFields.smallImageInfoField
+		).labelInfoLocalizedValue(
+			InfoLocalizedValue.localize(getClass(), "featured-image")
+		).name(
+			"featured-image"
+		).build();
+	}
+
 	private InfoForm _getInfoForm(
 			long ddmStructureId, InfoFieldSet assetEntryInfoFieldSet)
 		throws NoSuchFormVariationException {
@@ -137,16 +179,8 @@ public class JournalArticleInfoItemFormProvider
 
 		try {
 			return InfoForm.builder(
-			).infoFieldSetEntries(
-				_getJournalArticleFields()
 			).infoFieldSetEntry(
-				_infoItemFieldReaderFieldSetProvider.getInfoFieldSet(
-					JournalArticle.class.getName())
-			).infoFieldSetEntry(
-				assetEntryInfoFieldSet
-			).infoFieldSetEntry(
-				_expandoInfoItemFieldSetProvider.getInfoFieldSet(
-					JournalArticle.class.getName())
+				_getBasicInformationInfoFieldSet()
 			).<NoSuchStructureException>infoFieldSetEntry(
 				consumer -> {
 					if (ddmStructureId != 0) {
@@ -159,6 +193,18 @@ public class JournalArticleInfoItemFormProvider
 								getInfoItemFieldSet(ddmStructureId));
 					}
 				}
+			).infoFieldSetEntry(
+				_getDisplayPageInfoFieldSet()
+			).infoFieldSetEntry(
+				_getFeaturedImageInfoFieldSet()
+			).infoFieldSetEntry(
+				_expandoInfoItemFieldSetProvider.getInfoFieldSet(
+					JournalArticle.class.getName())
+			).infoFieldSetEntry(
+				assetEntryInfoFieldSet
+			).infoFieldSetEntry(
+				_infoItemFieldReaderFieldSetProvider.getInfoFieldSet(
+					JournalArticle.class.getName())
 			).labelInfoLocalizedValue(
 				infoLocalizedValueBuilder.build()
 			).name(
@@ -169,19 +215,6 @@ public class JournalArticleInfoItemFormProvider
 			throw new NoSuchFormVariationException(
 				String.valueOf(ddmStructureId), noSuchStructureException);
 		}
-	}
-
-	private Collection<InfoFieldSetEntry> _getJournalArticleFields() {
-		return Arrays.asList(
-			JournalArticleInfoItemFields.titleInfoField,
-			JournalArticleInfoItemFields.descriptionInfoField,
-			JournalArticleInfoItemFields.smallImageInfoField,
-			JournalArticleInfoItemFields.authorNameInfoField,
-			JournalArticleInfoItemFields.authorProfileImageInfoField,
-			JournalArticleInfoItemFields.lastEditorNameInfoField,
-			JournalArticleInfoItemFields.lastEditorProfileImageInfoField,
-			JournalArticleInfoItemFields.publishDateInfoField,
-			JournalArticleInfoItemFields.displayPageUrlInfoField);
 	}
 
 	@Reference
