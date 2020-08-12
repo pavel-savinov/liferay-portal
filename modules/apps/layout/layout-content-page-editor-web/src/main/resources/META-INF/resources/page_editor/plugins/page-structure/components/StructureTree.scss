@@ -15,15 +15,21 @@
 				outline: none;
 				padding-left: 8px;
 
+				& button {
+					background-color: transparent;
+					height: 28px;
+					top: 25%;
+				}
+
 				&__button-icon {
 					background-color: $white;
 					color: $secondary;
-					height: 16px;
-					padding: 4px;
-					width: 16px;
+					height: 28px;
+					padding: 10px;
+					width: 28px;
 
 					&:hover {
-						background-color: $gray-100;
+						color: $dark;
 					}
 				}
 
