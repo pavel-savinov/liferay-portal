@@ -108,16 +108,14 @@ export default function FragmentContentProcessor({
 				if (editableCollectionItemId === editableProcessorUniqueId) {
 					setEditableProcessorUniqueId(null);
 				}
+
+				editable.processor.destroyEditor(
+					editable.element,
+					editableValue.config
+				);
 			},
 			editableProcessorClickPosition
 		);
-
-		return () => {
-			editable.processor.destroyEditor(
-				editable.element,
-				editableValue.config
-			);
-		};
 	}, [
 		dispatch,
 		editable,
