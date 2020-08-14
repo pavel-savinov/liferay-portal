@@ -24,9 +24,10 @@ import java.util.Objects;
 /**
  * @author Eudaldo Alonso
  */
-public class ContainerLayoutStructureItem extends StyledLayoutStructureItem {
+public class ContainerStyledLayoutStructureItem
+	extends StyledLayoutStructureItem {
 
-	public ContainerLayoutStructureItem(String parentItemId) {
+	public ContainerStyledLayoutStructureItem(String parentItemId) {
 		super(parentItemId);
 
 		_linkJSONObject = JSONFactoryUtil.createJSONObject();
@@ -38,18 +39,19 @@ public class ContainerLayoutStructureItem extends StyledLayoutStructureItem {
 			return true;
 		}
 
-		if (!(object instanceof ContainerLayoutStructureItem)) {
+		if (!(object instanceof ContainerStyledLayoutStructureItem)) {
 			return false;
 		}
 
-		ContainerLayoutStructureItem containerLayoutStructureItem =
-			(ContainerLayoutStructureItem)object;
+		ContainerStyledLayoutStructureItem containerStyledLayoutStructureItem =
+			(ContainerStyledLayoutStructureItem)object;
 
 		if (!Objects.equals(
 				_linkJSONObject.toJSONString(),
-				containerLayoutStructureItem._linkJSONObject.toJSONString()) ||
+				containerStyledLayoutStructureItem._linkJSONObject.
+					toJSONString()) ||
 			!Objects.equals(
-				_widthType, containerLayoutStructureItem._widthType)) {
+				_widthType, containerStyledLayoutStructureItem._widthType)) {
 
 			return false;
 		}

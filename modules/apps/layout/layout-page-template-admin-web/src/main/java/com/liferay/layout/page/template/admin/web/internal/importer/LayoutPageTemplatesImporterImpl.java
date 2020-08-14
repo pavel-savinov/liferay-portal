@@ -49,7 +49,7 @@ import com.liferay.layout.page.template.validator.MasterPageValidator;
 import com.liferay.layout.page.template.validator.PageDefinitionValidator;
 import com.liferay.layout.page.template.validator.PageTemplateValidator;
 import com.liferay.layout.util.LayoutCopyHelper;
-import com.liferay.layout.util.structure.FragmentLayoutStructureItem;
+import com.liferay.layout.util.structure.FragmentStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
 import com.liferay.petra.string.CharPool;
@@ -331,13 +331,17 @@ public class LayoutPageTemplatesImporterImpl
 			LayoutStructureItem layoutStructureItem =
 				layoutStructure.getLayoutStructureItem(childItemId);
 
-			if (layoutStructureItem instanceof FragmentLayoutStructureItem) {
-				FragmentLayoutStructureItem fragmentLayoutStructureItem =
-					(FragmentLayoutStructureItem)layoutStructureItem;
+			if (layoutStructureItem instanceof
+					FragmentStyledLayoutStructureItem) {
+
+				FragmentStyledLayoutStructureItem
+					fragmentStyledLayoutStructureItem =
+						(FragmentStyledLayoutStructureItem)layoutStructureItem;
 
 				fragmentEntryLinks.add(
 					_fragmentEntryLinkLocalService.getFragmentEntryLink(
-						fragmentLayoutStructureItem.getFragmentEntryLinkId()));
+						fragmentStyledLayoutStructureItem.
+							getFragmentEntryLinkId()));
 			}
 
 			List<String> currentChildrenItemIds =

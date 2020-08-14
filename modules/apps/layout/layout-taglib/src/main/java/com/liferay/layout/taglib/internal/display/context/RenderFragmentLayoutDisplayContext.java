@@ -35,8 +35,8 @@ import com.liferay.layout.list.retriever.LayoutListRetrieverTracker;
 import com.liferay.layout.list.retriever.ListObjectReference;
 import com.liferay.layout.list.retriever.ListObjectReferenceFactory;
 import com.liferay.layout.list.retriever.ListObjectReferenceFactoryTracker;
-import com.liferay.layout.util.structure.CollectionLayoutStructureItem;
-import com.liferay.layout.util.structure.ContainerLayoutStructureItem;
+import com.liferay.layout.util.structure.CollectionStyledLayoutStructureItem;
+import com.liferay.layout.util.structure.ContainerStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.StyledLayoutStructureItem;
 import com.liferay.petra.io.unsync.UnsyncStringWriter;
 import com.liferay.petra.string.StringBundler;
@@ -93,11 +93,11 @@ public class RenderFragmentLayoutDisplayContext {
 	}
 
 	public List<Object> getCollection(
-		CollectionLayoutStructureItem collectionLayoutStructureItem,
+		CollectionStyledLayoutStructureItem collectionStyledLayoutStructureItem,
 		long[] segmentsExperienceIds) {
 
 		JSONObject collectionJSONObject =
-			collectionLayoutStructureItem.getCollectionJSONObject();
+			collectionStyledLayoutStructureItem.getCollectionJSONObject();
 
 		if (collectionJSONObject.length() <= 0) {
 			return Collections.emptyList();
@@ -125,17 +125,19 @@ public class RenderFragmentLayoutDisplayContext {
 		defaultLayoutListRetrieverContext.setSegmentsExperienceIdsOptional(
 			segmentsExperienceIds);
 		defaultLayoutListRetrieverContext.setPagination(
-			Pagination.of(collectionLayoutStructureItem.getNumberOfItems(), 0));
+			Pagination.of(
+				collectionStyledLayoutStructureItem.getNumberOfItems(), 0));
 
 		return layoutListRetriever.getList(
 			listObjectReference, defaultLayoutListRetrieverContext);
 	}
 
 	public InfoDisplayContributor<?> getCollectionInfoDisplayContributor(
-		CollectionLayoutStructureItem collectionLayoutStructureItem) {
+		CollectionStyledLayoutStructureItem
+			collectionStyledLayoutStructureItem) {
 
 		ListObjectReference listObjectReference = _getListObjectReference(
-			collectionLayoutStructureItem.getCollectionJSONObject());
+			collectionStyledLayoutStructureItem.getCollectionJSONObject());
 
 		if (listObjectReference == null) {
 			return null;
@@ -152,12 +154,13 @@ public class RenderFragmentLayoutDisplayContext {
 	}
 
 	public String getContainerLinkHref(
-			ContainerLayoutStructureItem containerLayoutStructureItem,
+			ContainerStyledLayoutStructureItem
+				containerStyledLayoutStructureItem,
 			Object displayObject)
 		throws PortalException {
 
 		JSONObject linkJSONObject =
-			containerLayoutStructureItem.getLinkJSONObject();
+			containerStyledLayoutStructureItem.getLinkJSONObject();
 
 		if (linkJSONObject == null) {
 			return StringPool.BLANK;
@@ -262,10 +265,10 @@ public class RenderFragmentLayoutDisplayContext {
 	}
 
 	public String getContainerLinkTarget(
-		ContainerLayoutStructureItem containerLayoutStructureItem) {
+		ContainerStyledLayoutStructureItem containerStyledLayoutStructureItem) {
 
 		JSONObject linkJSONObject =
-			containerLayoutStructureItem.getLinkJSONObject();
+			containerStyledLayoutStructureItem.getLinkJSONObject();
 
 		if (linkJSONObject == null) {
 			return StringPool.BLANK;
@@ -346,18 +349,24 @@ public class RenderFragmentLayoutDisplayContext {
 
 		boolean addHorizontalMargin = true;
 
-		if (styledLayoutStructureItem instanceof ContainerLayoutStructureItem) {
-			ContainerLayoutStructureItem containerLayoutStructureItem =
-				(ContainerLayoutStructureItem)styledLayoutStructureItem;
+		if (styledLayoutStructureItem instanceof
+				ContainerStyledLayoutStructureItem) {
+
+			ContainerStyledLayoutStructureItem
+				containerStyledLayoutStructureItem =
+					(ContainerStyledLayoutStructureItem)
+						styledLayoutStructureItem;
 
 			if (Objects.equals(
-					containerLayoutStructureItem.getWidthType(), "fixed")) {
+					containerStyledLayoutStructureItem.getWidthType(),
+					"fixed")) {
 
 				cssClassSB.append(" container");
 			}
 
 			if (!Objects.equals(
-					containerLayoutStructureItem.getWidthType(), "fixed")) {
+					containerStyledLayoutStructureItem.getWidthType(),
+					"fixed")) {
 
 				addHorizontalMargin = false;
 			}
@@ -435,14 +444,17 @@ public class RenderFragmentLayoutDisplayContext {
 	}
 
 	public InfoListRenderer<?> getInfoListRenderer(
-		CollectionLayoutStructureItem collectionLayoutStructureItem) {
+		CollectionStyledLayoutStructureItem
+			collectionStyledLayoutStructureItem) {
 
-		if (Validator.isNull(collectionLayoutStructureItem.getListStyle())) {
+		if (Validator.isNull(
+				collectionStyledLayoutStructureItem.getListStyle())) {
+
 			return null;
 		}
 
 		return _infoListRendererTracker.getInfoListRenderer(
-			collectionLayoutStructureItem.getListStyle());
+			collectionStyledLayoutStructureItem.getListStyle());
 	}
 
 	public InfoListRendererContext getInfoListRendererContext(
