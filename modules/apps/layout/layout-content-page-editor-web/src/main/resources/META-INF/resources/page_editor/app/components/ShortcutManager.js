@@ -91,7 +91,8 @@ export default function ShortcutManager() {
 		if (
 			item &&
 			canBeDuplicated(fragmentEntryLinks, item, layoutData, widgets) &&
-			document.activeElement === document.body
+			(document.activeElement === document.body ||
+				document.activeElement.type === 'button')
 		) {
 			dispatch(
 				duplicateItem({
@@ -117,7 +118,8 @@ export default function ShortcutManager() {
 		if (
 			item &&
 			canBeRemoved(item, layoutData) &&
-			document.activeElement === document.body
+			(document.activeElement === document.body ||
+				document.activeElement.type === 'button')
 		) {
 			dispatch(
 				deleteItem({
@@ -137,7 +139,8 @@ export default function ShortcutManager() {
 		if (
 			item &&
 			canBeSaved(item, layoutData) &&
-			document.activeElement === document.body
+			(document.activeElement === document.body ||
+				document.activeElement.type === 'button')
 		) {
 			setOpenSaveModal(true);
 		}
