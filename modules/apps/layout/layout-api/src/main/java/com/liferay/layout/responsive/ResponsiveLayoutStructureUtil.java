@@ -15,6 +15,7 @@
 package com.liferay.layout.responsive;
 
 import com.liferay.layout.util.structure.ColumnLayoutStructureItem;
+import com.liferay.layout.util.structure.RowLayoutStructureItem;
 import com.liferay.layout.util.structure.RowStyledLayoutStructureItem;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -31,6 +32,19 @@ import java.util.Objects;
  * @author Pavel Savinov
  */
 public class ResponsiveLayoutStructureUtil {
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnCssClass(RowStyledLayoutStructureItem, ColumnLayoutStructureItem)}
+	 */
+	@Deprecated
+	public static String getColumnCssClass(
+		RowLayoutStructureItem rowLayoutStructureItem,
+		ColumnLayoutStructureItem columnLayoutStructureItem) {
+
+		return getColumnCssClass(
+			(RowStyledLayoutStructureItem)rowLayoutStructureItem,
+			columnLayoutStructureItem);
+	}
 
 	public static String getColumnCssClass(
 		RowStyledLayoutStructureItem rowStyledLayoutStructureItem,
@@ -98,6 +112,17 @@ public class ResponsiveLayoutStructureUtil {
 		}
 
 		return defaultValue;
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getRowCssClass(RowStyledLayoutStructureItem)}
+	 */
+	@Deprecated
+	public static String getRowCssClass(
+		RowLayoutStructureItem rowLayoutStructureItem) {
+
+		return getRowCssClass(
+			(RowStyledLayoutStructureItem)rowLayoutStructureItem);
 	}
 
 	public static String getRowCssClass(
