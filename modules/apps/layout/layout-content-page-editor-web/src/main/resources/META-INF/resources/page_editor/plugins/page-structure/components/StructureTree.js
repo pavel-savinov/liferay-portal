@@ -56,7 +56,7 @@ const LAYOUT_DATA_ITEM_TYPE_ICONS = {
 	[LAYOUT_DATA_ITEM_TYPES.dropZone]: 'box-container',
 	[LAYOUT_DATA_ITEM_TYPES.fragment]: 'code',
 	[LAYOUT_DATA_ITEM_TYPES.root]: 'page',
-	[LAYOUT_DATA_ITEM_TYPES.row]: 'grid',
+	[LAYOUT_DATA_ITEM_TYPES.row]: 'table',
 };
 
 export default function PageStructureSidebar() {
