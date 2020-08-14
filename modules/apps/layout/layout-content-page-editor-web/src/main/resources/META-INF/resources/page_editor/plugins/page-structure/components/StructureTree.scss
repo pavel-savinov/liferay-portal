@@ -15,16 +15,20 @@
 				outline: none;
 				padding-left: 8px;
 
-				&__button-icon {
-					background-color: $white;
-					color: $secondary;
-					height: 16px;
-					margin-top: -2px;
-					padding: 4px;
-					width: 16px;
+				&__button {
+					cursor: pointer;
 
-					&:hover {
-						color: $dark;
+					&-icon {
+						background-color: $white;
+						color: $secondary;
+						height: 16px;
+						margin-top: -2px;
+						padding: 4px;
+						width: 16px;
+
+						&:hover {
+							color: $dark;
+						}
 					}
 				}
 
