@@ -318,6 +318,7 @@ public abstract class StyledLayoutStructureItem extends LayoutStructureItem {
 		JSONObject configJSONObject = getItemConfigJSONObject();
 
 		Object configValue = configJSONObject.get(propertyKey);
+
 		Object styleValue = stylesJSONObject.get(propertyKey);
 
 		if ((configValue != null) && (styleValue == null)) {
