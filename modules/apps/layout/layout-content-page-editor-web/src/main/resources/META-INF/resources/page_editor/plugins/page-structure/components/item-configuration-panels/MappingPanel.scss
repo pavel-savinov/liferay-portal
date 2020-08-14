@@ -1,5 +1,8 @@
 @import 'atlas-variables';
 
-.page-editor__mapping-panel__helper {
-	font-size: 12px;
+.page-editor__mapping-panel {
+	&__helper,
+	&__type-label {
+		font-size: 12px;
+	}
 }
