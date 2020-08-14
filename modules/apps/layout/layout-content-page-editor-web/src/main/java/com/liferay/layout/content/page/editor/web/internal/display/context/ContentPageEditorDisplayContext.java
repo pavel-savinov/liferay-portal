@@ -1435,7 +1435,7 @@ public class ContentPageEditorDisplayContext {
 					).build();
 
 				if (fragmentEntry != null) {
-					fragmentEntryLinksMap.put("icon", fragmentEntry.getIcon());
+					fragmentEntryLinkMap.put("icon", fragmentEntry.getIcon());
 				}
 
 				fragmentEntryLinksMap.put(
