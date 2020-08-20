@@ -287,7 +287,7 @@ public class PortletLayoutDisplayContext {
 			StyledLayoutStructureItem styledLayoutStructureItem)
 		throws Exception {
 
-		StringBundler cssClassSB = new StringBundler(43);
+		StringBundler cssClassSB = new StringBundler(39);
 
 		if (Validator.isNotNull(styledLayoutStructureItem.getAlign())) {
 			cssClassSB.append(" ");
@@ -333,13 +333,6 @@ public class PortletLayoutDisplayContext {
 			cssClassSB.append(StringPool.SPACE);
 			cssClassSB.append(
 				styledLayoutStructureItem.getFontWeightCssClass());
-		}
-
-		if (Validator.isNotNull(
-				styledLayoutStructureItem.getHeightCssClass())) {
-
-			cssClassSB.append(StringPool.SPACE);
-			cssClassSB.append(styledLayoutStructureItem.getHeightCssClass());
 		}
 
 		if (Validator.isNotNull(styledLayoutStructureItem.getJustify())) {
@@ -430,11 +423,6 @@ public class PortletLayoutDisplayContext {
 			cssClassSB.append(styledLayoutStructureItem.getTextColorCssClass());
 		}
 
-		if (Validator.isNotNull(styledLayoutStructureItem.getWidthCssClass())) {
-			cssClassSB.append(StringPool.SPACE);
-			cssClassSB.append(styledLayoutStructureItem.getWidthCssClass());
-		}
-
 		String responsiveCssClassValues =
 			ResponsiveLayoutStructureUtil.getResponsiveCssClassValues(
 				styledLayoutStructureItem);
@@ -520,7 +508,7 @@ public class PortletLayoutDisplayContext {
 	public String getStyle(StyledLayoutStructureItem styledLayoutStructureItem)
 		throws PortalException {
 
-		StringBundler styleSB = new StringBundler(42);
+		StringBundler styleSB = new StringBundler(48);
 
 		styleSB.append("box-sizing: border-box;");
 
@@ -567,6 +555,12 @@ public class PortletLayoutDisplayContext {
 			styleSB.append(StringPool.SEMICOLON);
 		}
 
+		if (Validator.isNotNull(styledLayoutStructureItem.getHeight())) {
+			styleSB.append("height: ");
+			styleSB.append(styledLayoutStructureItem.getHeight());
+			styleSB.append(StringPool.SEMICOLON);
+		}
+
 		if (Validator.isNotNull(styledLayoutStructureItem.getMaxHeight())) {
 			styleSB.append("max-height: ");
 			styleSB.append(styledLayoutStructureItem.getMaxHeight());
@@ -606,6 +600,12 @@ public class PortletLayoutDisplayContext {
 		if (Validator.isNotNull(styledLayoutStructureItem.getTextColor())) {
 			styleSB.append("color: ");
 			styleSB.append(styledLayoutStructureItem.getTextColor());
+			styleSB.append(StringPool.SEMICOLON);
+		}
+
+		if (Validator.isNotNull(styledLayoutStructureItem.getWidth())) {
+			styleSB.append("width: ");
+			styleSB.append(styledLayoutStructureItem.getWidth());
 			styleSB.append(StringPool.SEMICOLON);
 		}
 
