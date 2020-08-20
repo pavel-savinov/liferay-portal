@@ -98,8 +98,8 @@ public class ResponsiveLayoutStructureUtil {
 			}
 
 			JSONObject viewportItemConfigJSONObject =
-				itemConfigJSONObject.getJSONObject(
-					viewportSize.getViewportSizeId());
+				_getViewportItemConfigJSONObject(
+					itemConfigJSONObject, viewportSize);
 
 			if (viewportItemConfigJSONObject == null) {
 				continue;
@@ -293,6 +293,53 @@ public class ResponsiveLayoutStructureUtil {
 		}
 
 		return "start";
+	}
+
+	private static JSONObject _getViewportItemConfigJSONObject(
+		JSONObject itemConfigJSONObject, ViewportSize currentViewportSize) {
+
+		if (itemConfigJSONObject.has(currentViewportSize.getViewportSizeId())) {
+			JSONObject viewportItemConfigJSONObject =
+				itemConfigJSONObject.getJSONObject(
+					currentViewportSize.getViewportSizeId());
+
+			JSONObject stylesJSONObject =
+				viewportItemConfigJSONObject.getJSONObject("styles");
+
+			if ((stylesJSONObject != null) && (stylesJSONObject.length() > 0)) {
+				return viewportItemConfigJSONObject;
+			}
+		}
+
+		ViewportSize[] viewportSizes = ViewportSize.values();
+
+		Comparator<ViewportSize> comparator = Comparator.comparingInt(
+			ViewportSize::getOrder);
+
+		Arrays.sort(viewportSizes, comparator.reversed());
+
+		for (ViewportSize viewportSize : viewportSizes) {
+			if (viewportSize.getOrder() >= currentViewportSize.getOrder()) {
+				continue;
+			}
+
+			if (itemConfigJSONObject.has(viewportSize.getViewportSizeId())) {
+				JSONObject viewportItemConfigJSONObject =
+					itemConfigJSONObject.getJSONObject(
+						viewportSize.getViewportSizeId());
+
+				JSONObject stylesJSONObject =
+					viewportItemConfigJSONObject.getJSONObject("styles");
+
+				if ((stylesJSONObject != null) &&
+					(stylesJSONObject.length() > 0)) {
+
+					return viewportItemConfigJSONObject;
+				}
+			}
+		}
+
+		return null;
 	}
 
 }
