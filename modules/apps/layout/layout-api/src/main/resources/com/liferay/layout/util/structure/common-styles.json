@@ -1,104 +1,5 @@
 [
 	{
-		"label": "size",
-		"styles": [
-			{
-				"dataType": "string",
-				"defaultValue": "",
-				"dependencies": [
-				],
-				"displaySize": "small",
-				"label": "width",
-				"name": "width",
-				"responsive": false,
-				"type": "text"
-			},
-			{
-				"dataType": "string",
-				"defaultValue": "",
-				"dependencies": [
-				],
-				"displaySize": "small",
-				"label": "height",
-				"name": "height",
-				"responsive": false,
-				"type": "text"
-			},
-			{
-				"dataType": "string",
-				"defaultValue": "",
-				"dependencies": [
-				],
-				"displaySize": "small",
-				"label": "min-width",
-				"name": "minWidth",
-				"responsive": false,
-				"type": "text"
-			},
-			{
-				"dataType": "string",
-				"defaultValue": "",
-				"dependencies": [
-				],
-				"displaySize": "small",
-				"label": "max-width",
-				"name": "maxWidth",
-				"responsive": false,
-				"type": "text"
-			},
-			{
-				"dataType": "string",
-				"defaultValue": "",
-				"dependencies": [
-				],
-				"displaySize": "small",
-				"label": "min-height",
-				"name": "minHeight",
-				"responsive": false,
-				"type": "text"
-			},
-			{
-				"dataType": "string",
-				"defaultValue": "",
-				"dependencies": [
-				],
-				"displaySize": "small",
-				"label": "max-height",
-				"name": "maxHeight",
-				"responsive": false,
-				"type": "text"
-			},
-			{
-				"dataType": "string",
-				"defaultValue": "visible",
-				"dependencies": [
-				],
-				"label": "overflow",
-				"name": "overflow",
-				"responsive": false,
-				"type": "select",
-				"validValues": [
-					{
-						"label": "visible",
-						"value": "visible"
-					},
-					{
-						"label": "hidden",
-						"value": "hidden"
-					},
-					{
-						"label": "scroll",
-						"value": "scroll"
-					},
-					{
-						"label": "auto",
-						"value": "auto"
-					}
-				]
-			}
-		]
-	},
-	{
 		"label": "margin",
 		"styles": [
 			{
@@ -407,6 +308,105 @@
 					{
 						"label": "5",
 						"value": "5"
+					}
+				]
+			}
+		]
+	},
+	{
+		"label": "size",
+		"styles": [
+			{
+				"dataType": "string",
+				"defaultValue": "",
+				"dependencies": [
+				],
+				"displaySize": "small",
+				"label": "width",
+				"name": "width",
+				"responsive": false,
+				"type": "text"
+			},
+			{
+				"dataType": "string",
+				"defaultValue": "",
+				"dependencies": [
+				],
+				"displaySize": "small",
+				"label": "height",
+				"name": "height",
+				"responsive": false,
+				"type": "text"
+			},
+			{
+				"dataType": "string",
+				"defaultValue": "",
+				"dependencies": [
+				],
+				"displaySize": "small",
+				"label": "min-width",
+				"name": "minWidth",
+				"responsive": false,
+				"type": "text"
+			},
+			{
+				"dataType": "string",
+				"defaultValue": "",
+				"dependencies": [
+				],
+				"displaySize": "small",
+				"label": "max-width",
+				"name": "maxWidth",
+				"responsive": false,
+				"type": "text"
+			},
+			{
+				"dataType": "string",
+				"defaultValue": "",
+				"dependencies": [
+				],
+				"displaySize": "small",
+				"label": "min-height",
+				"name": "minHeight",
+				"responsive": false,
+				"type": "text"
+			},
+			{
+				"dataType": "string",
+				"defaultValue": "",
+				"dependencies": [
+				],
+				"displaySize": "small",
+				"label": "max-height",
+				"name": "maxHeight",
+				"responsive": false,
+				"type": "text"
+			},
+			{
+				"dataType": "string",
+				"defaultValue": "visible",
+				"dependencies": [
+				],
+				"label": "overflow",
+				"name": "overflow",
+				"responsive": false,
+				"type": "select",
+				"validValues": [
+					{
+						"label": "visible",
+						"value": "visible"
+					},
+					{
+						"label": "hidden",
+						"value": "hidden"
+					},
+					{
+						"label": "scroll",
+						"value": "scroll"
+					},
+					{
+						"label": "auto",
+						"value": "auto"
 					}
 				]
 			}
