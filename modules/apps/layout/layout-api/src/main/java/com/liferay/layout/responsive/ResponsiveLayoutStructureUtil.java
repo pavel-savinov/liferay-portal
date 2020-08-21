@@ -342,7 +342,7 @@ public class ResponsiveLayoutStructureUtil {
 			}
 		}
 
-		return null;
+		return itemConfigJSONObject;
 	}
 
 }
