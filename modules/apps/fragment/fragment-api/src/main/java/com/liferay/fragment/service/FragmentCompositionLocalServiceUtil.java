@@ -498,6 +498,11 @@ public class FragmentCompositionLocalServiceUtil {
 			description, data, previewFileEntryId, status);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #updateFragmentComposition(long, long, long, String, String, String, long, int)}
+	 */
+	@Deprecated
 	public static com.liferay.fragment.model.FragmentComposition
 			updateFragmentComposition(
 				long userId, long fragmentCompositionId, String name,

@@ -397,6 +397,11 @@ public interface FragmentCompositionLocalService
 			long previewFileEntryId, int status)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #updateFragmentComposition(long, long, long, String, String, String, long, int)}
+	 */
+	@Deprecated
 	public FragmentComposition updateFragmentComposition(
 			long userId, long fragmentCompositionId, String name,
 			String description, String data, long previewFileEntryId,
