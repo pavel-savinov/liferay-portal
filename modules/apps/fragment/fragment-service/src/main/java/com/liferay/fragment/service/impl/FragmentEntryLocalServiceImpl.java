@@ -660,6 +660,11 @@ public class FragmentEntryLocalServiceImpl
 		return fragmentEntry;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 * #updateFragmentEntry(long, long, long, String, String, String, String, boolean, String, long, int)}
+	 */
+	@Deprecated
 	@Override
 	public FragmentEntry updateFragmentEntry(
 			long userId, long fragmentEntryId, String name, String css,

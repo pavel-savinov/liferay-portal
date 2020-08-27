@@ -308,6 +308,11 @@ public class FragmentCompositionLocalServiceImpl
 		return fragmentCompositionPersistence.update(fragmentComposition);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 * #updateFragmentComposition(long, long, long, String, String, String, long, int)}
+	 */
+	@Deprecated
 	@Override
 	public FragmentComposition updateFragmentComposition(
 			long userId, long fragmentCompositionId, String name,
