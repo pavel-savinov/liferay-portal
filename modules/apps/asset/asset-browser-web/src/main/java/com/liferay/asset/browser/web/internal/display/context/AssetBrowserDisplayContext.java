@@ -87,6 +87,10 @@ public class AssetBrowserDisplayContext {
 	public AssetBrowserSearch getAssetBrowserSearch()
 		throws PortalException, PortletException {
 
+		if (_assetBrowserSearch != null) {
+			return _assetBrowserSearch;
+		}
+
 		AssetBrowserSearch assetBrowserSearch = new AssetBrowserSearch(
 			_renderRequest, getPortletURL());
 
@@ -160,7 +164,9 @@ public class AssetBrowserDisplayContext {
 
 		assetBrowserSearch.setTotal(hits.getLength());
 
-		return assetBrowserSearch;
+		_assetBrowserSearch = assetBrowserSearch;
+
+		return _assetBrowserSearch;
 	}
 
 	public AssetRendererFactory<?> getAssetRendererFactory() {
@@ -606,6 +612,7 @@ public class AssetBrowserDisplayContext {
 	private static final Log _log = LogFactoryUtil.getLog(
 		AssetBrowserDisplayContext.class);
 
+	private AssetBrowserSearch _assetBrowserSearch;
 	private final AssetHelper _assetHelper;
 	private AssetRendererFactory<?> _assetRendererFactory;
 	private long[] _classNameIds;
