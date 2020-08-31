@@ -190,33 +190,43 @@ public abstract class BaseLayoutStructureItemImporter {
 
 		jsonObject.put("backgroundColor", styles.get("backgroundColor"));
 
-		if (styles.containsKey("backgroundFragmentImage")) {
+		if (styles.containsKey("backgroundFragmentImage") ||
+			styles.containsKey("backgroundImage")) {
+
 			JSONObject backgroundImageJSONObject =
 				JSONFactoryUtil.createJSONObject();
 
 			Map<String, Object> childStyleMap = (Map<String, Object>)styles.get(
 				"backgroundFragmentImage");
 
-			Map<String, Object> titleMap =
-				(Map<String, Object>)childStyleMap.get("title");
-
-			if (titleMap != null) {
-				backgroundImageJSONObject.put(
-					"title", getLocalizedValue(titleMap));
+			if (MapUtil.isEmpty(childStyleMap)) {
+				childStyleMap = (Map<String, Object>)styles.get(
+					"backgroundImage");
 			}
 
-			Map<String, Object> urlMap = (Map<String, Object>)childStyleMap.get(
-				"url");
+			if (MapUtil.isNotEmpty(childStyleMap)) {
+				Map<String, Object> titleMap =
+					(Map<String, Object>)childStyleMap.get("title");
 
-			if (urlMap != null) {
-				backgroundImageJSONObject.put("url", getLocalizedValue(urlMap));
+				if (titleMap != null) {
+					backgroundImageJSONObject.put(
+						"title", getLocalizedValue(titleMap));
+				}
 
-				processMapping(
-					backgroundImageJSONObject,
-					(Map<String, Object>)urlMap.get("mapping"));
+				Map<String, Object> urlMap =
+					(Map<String, Object>)childStyleMap.get("url");
+
+				if (urlMap != null) {
+					backgroundImageJSONObject.put(
+						"url", getLocalizedValue(urlMap));
+
+					processMapping(
+						backgroundImageJSONObject,
+						(Map<String, Object>)urlMap.get("mapping"));
+				}
+
+				jsonObject.put("backgroundImage", backgroundImageJSONObject);
 			}
-
-			jsonObject.put("backgroundImage", backgroundImageJSONObject);
 		}
 
 		return jsonObject.put(
