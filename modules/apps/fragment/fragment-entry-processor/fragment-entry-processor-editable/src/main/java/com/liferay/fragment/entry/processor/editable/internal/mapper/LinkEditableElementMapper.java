@@ -124,7 +124,7 @@ public class LinkEditableElementMapper implements EditableElementMapper {
 				element.replaceWith(linkElement);
 			}
 		}
-		else if (assetDiesplayPage && Validator.isNotNull(mappedField)) {
+		else if (assetDisplayPage && Validator.isNotNull(mappedField)) {
 			linkElement.attr("href", "${" + mappedField + "}");
 
 			_replaceLinkContent(
@@ -150,7 +150,10 @@ public class LinkEditableElementMapper implements EditableElementMapper {
 		Element element, Element firstChildElement, Element linkElement,
 		boolean replaceLink) {
 
-		if (replaceLink) {
+		if (replaceLink && Validator.isNull(firstChildElement.html())) {
+			linkElement.html(firstChildElement.outerHtml());
+		}
+		else if (replaceLink && Validator.isNotNull(firstChildElement.html())) {
 			linkElement.html(firstChildElement.html());
 		}
 		else if (Validator.isNull(element.html())) {
