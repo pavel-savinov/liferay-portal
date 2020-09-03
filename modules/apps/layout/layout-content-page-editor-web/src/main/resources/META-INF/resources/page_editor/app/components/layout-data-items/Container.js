@@ -134,18 +134,18 @@ const Container = React.forwardRef(
 				{...(link ? {} : data)}
 				className={classNames(
 					className,
-					`mb-${marginBottom}`,
-					`mt-${marginTop}`,
-					`pb-${paddingBottom}`,
-					`pl-${paddingLeft}`,
-					`pr-${paddingRight}`,
-					`pt-${paddingTop}`,
+					`mb-${marginBottom || 0}`,
+					`mt-${marginTop || 0}`,
+					`pb-${paddingBottom || 0}`,
+					`pl-${paddingLeft || 0}`,
+					`pr-${paddingRight || 0}`,
+					`pt-${paddingTop || 0}`,
 					{
 						container: widthType === 'fixed',
 						empty: !item.children.length && !height,
-						[`ml-${marginLeft}`]:
+						[`ml-${marginLeft || 0}`]:
 							widthType !== 'fixed' && !withinTopper,
-						[`mr-${marginRight}`]:
+						[`mr-${marginRight || 0}`]:
 							widthType !== 'fixed' && !withinTopper,
 						[textAlign
 							? textAlign.startsWith('text-')

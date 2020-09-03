@@ -111,12 +111,12 @@ const Row = React.forwardRef(
 			<ClayLayout.Row
 				className={classNames(
 					className,
-					`mb-${marginBottom}`,
-					`mt-${marginTop}`,
-					`pb-${paddingBottom}`,
-					`pl-${paddingLeft}`,
-					`pr-${paddingRight}`,
-					`pt-${paddingTop}`,
+					`mb-${marginBottom || 0}`,
+					`mt-${marginTop || 0}`,
+					`pb-${paddingBottom || 0}`,
+					`pl-${paddingLeft || 0}`,
+					`pr-${paddingRight || 0}`,
+					`pt-${paddingTop || 0}`,
 					{
 						empty:
 							!height &&
@@ -130,8 +130,8 @@ const Row = React.forwardRef(
 							item.config.numberOfColumns === 2 &&
 							modulesPerRow === 1 &&
 							reverseOrder,
-						[`ml-${marginLeft}`]: marginLeft !== '0',
-						[`mr-${marginRight}`]: marginRight !== '0',
+						[`ml-${marginLeft || 0}`]: marginLeft !== '0',
+						[`mr-${marginRight || 0}`]: marginRight !== '0',
 						'no-gutters': !item.config.gutters,
 						[textAlign
 							? textAlign.startsWith('text-')

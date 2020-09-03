@@ -232,14 +232,14 @@ const FragmentContent = ({
 		<UnsafeHTML
 			className={classNames(
 				className,
-				`mb-${marginBottom}`,
-				`ml-${marginLeft}`,
-				`mr-${marginRight}`,
-				`mt-${marginTop}`,
-				`pb-${paddingBottom}`,
-				`pl-${paddingLeft}`,
-				`pr-${paddingRight}`,
-				`pt-${paddingTop}`,
+				`mb-${marginBottom || 0}`,
+				`ml-${marginLeft || 0}`,
+				`mr-${marginRight || 0}`,
+				`mt-${marginTop || 0}`,
+				`pb-${paddingBottom || 0}`,
+				`pl-${paddingLeft || 0}`,
+				`pr-${paddingRight || 0}`,
+				`pt-${paddingTop || 0}`,
 				'page-editor__fragment-content',
 				{
 					'page-editor__fragment-content--portlet-topper-hidden': !canConfigureWidgets,
