@@ -32,6 +32,8 @@ Map<String, Object> data = HashMapBuilder.<String, Object>put(
 ).build();
 %>
 
+<liferay-ui:success key="collectionItemAdded" message="your-request-completed-successfully" />
+
 <li class="control-menu-nav-item control-menu-nav-item-content">
 	<a aria-label="<%= label %>" data-title="<%= label %>">
 		<c:choose>

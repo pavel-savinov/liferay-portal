@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
+import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -86,6 +87,10 @@ public class AddCollectionItemMVCActionCommand extends BaseMVCActionCommand {
 					serviceContext);
 			}
 		}
+
+		SessionMessages.add(
+			_portal.getHttpServletRequest(actionRequest),
+			"collectionItemAdded");
 
 		sendRedirect(actionRequest, actionResponse);
 	}
