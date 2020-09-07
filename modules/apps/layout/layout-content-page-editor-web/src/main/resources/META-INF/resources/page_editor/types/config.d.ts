@@ -70,6 +70,7 @@ export interface Config {
 
 	defaultLanguageId: string;
 	defaultStyleBookEntryName: string;
+	defaultStyleBookEntryImagePreviewURL: string;
 	defaultSegmentsEntryId: string;
 	defaultSegmentsExperienceId: string;
 	deleteFragmentEntryLinkCommentURL: string;

@@ -46,7 +46,6 @@ import com.liferay.style.book.model.StyleBookEntry;
 import com.liferay.style.book.util.DefaultStyleBookEntryUtil;
 
 import java.util.List;
-import java.util.Locale;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -91,8 +90,7 @@ public class ChangeMasterLayoutMVCActionCommand
 		if (masterLayoutPlid == 0) {
 			return JSONUtil.put(
 				"styleBook",
-				_getStyleBookJSONObject(
-					updatedLayout, themeDisplay.getLocale()));
+				_getStyleBookJSONObject(updatedLayout, themeDisplay));
 		}
 
 		LayoutStructure layoutStructure =
@@ -133,12 +131,12 @@ public class ChangeMasterLayoutMVCActionCommand
 		).put(
 			"masterLayoutData", layoutStructure.toJSONObject()
 		).put(
-			"styleBook",
-			_getStyleBookJSONObject(updatedLayout, themeDisplay.getLocale())
+			"styleBook", _getStyleBookJSONObject(updatedLayout, themeDisplay)
 		);
 	}
 
-	private JSONObject _getStyleBookJSONObject(Layout layout, Locale locale)
+	private JSONObject _getStyleBookJSONObject(
+			Layout layout, ThemeDisplay themeDisplay)
 		throws Exception {
 
 		StyleBookEntry styleBookEntry =
@@ -151,19 +149,26 @@ public class ChangeMasterLayoutMVCActionCommand
 				layoutSet.getThemeId());
 
 		String defaultStyleBookEntryName = StringPool.BLANK;
+		String defaultStyleBookEntryImagePreviewURL = StringPool.BLANK;
 
 		if (styleBookEntry != null) {
 			defaultStyleBookEntryName = styleBookEntry.getName();
+			defaultStyleBookEntryImagePreviewURL =
+				styleBookEntry.getImagePreviewURL(themeDisplay);
 		}
 
 		return JSONUtil.put(
+			"defaultStyleBookEntryImagePreviewURL",
+			defaultStyleBookEntryImagePreviewURL
+		).put(
 			"defaultStyleBookEntryName", defaultStyleBookEntryName
 		).put(
 			"styleBookEntryId", layout.getStyleBookEntryId()
 		).put(
 			"tokenValues",
 			StyleBookEntryUtil.getFrontendTokensValues(
-				frontendTokenDefinition, locale, styleBookEntry)
+				frontendTokenDefinition, themeDisplay.getLocale(),
+				styleBookEntry)
 		);
 	}
 

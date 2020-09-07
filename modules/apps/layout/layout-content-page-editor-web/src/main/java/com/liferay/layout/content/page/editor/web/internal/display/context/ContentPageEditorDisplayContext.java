@@ -289,6 +289,19 @@ public class ContentPageEditorDisplayContext {
 				"defaultLanguageId",
 				LocaleUtil.toLanguageId(themeDisplay.getSiteDefaultLocale())
 			).put(
+				"defaultStyleBookEntryImagePreviewURL",
+				() -> {
+					StyleBookEntry defaultStyleBookEntry =
+						_getDefaultStyleBookEntry();
+
+					if (defaultStyleBookEntry != null) {
+						return defaultStyleBookEntry.getImagePreviewURL(
+							themeDisplay);
+					}
+
+					return StringPool.BLANK;
+				}
+			).put(
 				"defaultStyleBookEntryName",
 				() -> {
 					StyleBookEntry defaultStyleBookEntry =
