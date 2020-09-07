@@ -150,7 +150,11 @@ function SelectCategory({
 				</ClayAlert>
 			)}
 
-			<form className="select-category-filter" role="search">
+			<form
+				className="select-category-filter"
+				onSubmit={(event) => event.preventDefault()}
+				role="search"
+			>
 				<ClayLayout.ContainerFluid className="d-flex">
 					<div className="input-group">
 						<div className="input-group-item">
