@@ -228,6 +228,7 @@ function getTabs(
 ) {
 	const styleBooks = [
 		{
+			imagePreviewURL: selectedStyleBook.imagePreviewURL,
 			name:
 				config.layoutType === LAYOUT_TYPES.master
 					? Liferay.Language.get('default-style-book')
