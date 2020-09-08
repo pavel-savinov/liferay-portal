@@ -350,7 +350,13 @@ public class SiteAdministrationPanelCategoryDisplayContext {
 	}
 
 	public boolean isDisplaySiteLink() {
-		Layout layout = _getFirstLayout();
+		Group group = getGroup();
+
+		Layout layout = _getFirstLayout(group);
+
+		if ((layout == null) && group.isStaged()) {
+			layout = _getFirstLayout(StagingUtil.getLiveGroup(group));
+		}
 
 		if (layout != null) {
 			return true;
@@ -360,7 +366,7 @@ public class SiteAdministrationPanelCategoryDisplayContext {
 	}
 
 	public boolean isFirstLayout() {
-		Layout layout = _getFirstLayout();
+		Layout layout = _getFirstLayout(getGroup());
 
 		if ((layout == null) || (layout.getPlid() != _themeDisplay.getPlid())) {
 			return false;
@@ -478,12 +484,10 @@ public class SiteAdministrationPanelCategoryDisplayContext {
 			PortalUtil.getHttpServletRequest(_portletRequest), _group);
 	}
 
-	private Layout _getFirstLayout() {
+	private Layout _getFirstLayout(Group group) {
 		if (_firstLayout != null) {
 			return _firstLayout;
 		}
-
-		Group group = getGroup();
 
 		Layout layout = LayoutLocalServiceUtil.fetchFirstLayout(
 			group.getGroupId(), false, LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
