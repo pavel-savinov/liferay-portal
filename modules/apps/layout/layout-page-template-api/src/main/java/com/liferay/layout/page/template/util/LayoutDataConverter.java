@@ -104,9 +104,16 @@ public class LayoutDataConverter {
 						inputRowConfigJSONObject.getInt("paddingVertical", 0)
 					);
 
-					containerStyledLayoutStructureItem.setWidthType(
-						inputRowConfigJSONObject.getString(
-							"widthType", "fluid"));
+					if(inputRowConfigJSONObject.has("containerType")) {
+						containerStyledLayoutStructureItem.setWidthType(
+							inputRowConfigJSONObject.getString(
+								"containerType", "fixed"));
+					}
+					else {
+						containerStyledLayoutStructureItem.setWidthType(
+							inputRowConfigJSONObject.getString(
+								"widthType", "fixed"));
+					}
 
 					containerStyledLayoutStructureItem.updateItemConfig(
 						JSONUtil.put(
