@@ -129,9 +129,13 @@ public class ImageEditableElementParser implements EditableElementParser {
 
 			return GetterUtil.getString(webImage.getUrl());
 		}
-		else {
-			return StringPool.BLANK;
+		else if ((fieldValue instanceof String) &&
+				 Validator.isNotNull(fieldValue)) {
+
+			return GetterUtil.getString(fieldValue);
 		}
+
+		return StringPool.BLANK;
 	}
 
 	@Override
