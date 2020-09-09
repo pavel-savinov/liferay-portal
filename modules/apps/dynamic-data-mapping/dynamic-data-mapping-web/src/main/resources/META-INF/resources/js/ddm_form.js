@@ -3530,9 +3530,7 @@ AUI.add(
 						})
 					);
 
-					var locationNode = A.one(
-						'input[name=' + inputName + 'Location]'
-					);
+					var locationNode = A.one(`#${inputName}Location`);
 
 					locationNode.html(event.newVal.address);
 				},
