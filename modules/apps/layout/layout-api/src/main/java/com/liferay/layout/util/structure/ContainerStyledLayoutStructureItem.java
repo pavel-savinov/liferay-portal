@@ -274,14 +274,14 @@ public class ContainerStyledLayoutStructureItem
 			itemConfigJSONObject.has("type") ||
 			itemConfigJSONObject.has("widthType")) {
 
-			if (itemConfigJSONObject.has("widthType")) {
-				setWidthType(itemConfigJSONObject.getString("widthType"));
-			}
-			else if (itemConfigJSONObject.has("containerType")) {
+			if (itemConfigJSONObject.has("containerType")) {
 				setWidthType(itemConfigJSONObject.getString("containerType"));
 			}
-			else {
+			else if (itemConfigJSONObject.has("type")) {
 				setWidthType(itemConfigJSONObject.getString("type"));
+			}
+			else {
+				setWidthType(itemConfigJSONObject.getString("widthType"));
 			}
 		}
 	}
