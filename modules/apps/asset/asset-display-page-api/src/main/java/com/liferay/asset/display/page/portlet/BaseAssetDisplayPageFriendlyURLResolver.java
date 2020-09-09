@@ -23,6 +23,7 @@ import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.service.AssetEntryService;
 import com.liferay.asset.util.AssetHelper;
+import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.info.constants.InfoDisplayWebKeys;
 import com.liferay.info.display.contributor.InfoDisplayContributorTracker;
 import com.liferay.info.display.url.provider.InfoEditURLProviderTracker;
@@ -49,11 +50,11 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutFriendlyURLComposite;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.portlet.FriendlyURLResolver;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -220,12 +221,15 @@ public abstract class BaseAssetDisplayPageFriendlyURLResolver
 	private AssetEntry _getAssetEntry(
 		LayoutDisplayPageObjectProvider<?> layoutDisplayPageObjectProvider) {
 
-		String classNameId = PortalUtil.getClassName(
-			layoutDisplayPageObjectProvider.getClassNameId());
+		long classNameId = layoutDisplayPageObjectProvider.getClassNameId();
+
+		if (classNameId == portal.getClassNameId(FileEntry.class)) {
+			classNameId = portal.getClassNameId(DLFileEntry.class);
+		}
 
 		AssetRendererFactory<?> assetRendererFactory =
 			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
-				classNameId);
+				portal.getClassName(classNameId));
 
 		if (assetRendererFactory == null) {
 			return null;
@@ -235,7 +239,7 @@ public abstract class BaseAssetDisplayPageFriendlyURLResolver
 
 		try {
 			AssetEntry assetEntry = assetRendererFactory.getAssetEntry(
-				classNameId, classPK);
+				portal.getClassName(classNameId), classPK);
 
 			AssetDisplayPageConfiguration assetDisplayPageConfiguration =
 				ConfigurationProviderUtil.getSystemConfiguration(
