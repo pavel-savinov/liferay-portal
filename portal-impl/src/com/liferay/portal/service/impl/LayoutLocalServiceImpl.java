@@ -289,7 +289,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		String name = nameMap.get(LocaleUtil.getSiteDefault());
 
 		friendlyURLMap = layoutLocalServiceHelper.getFriendlyURLMap(
-			groupId, privateLayout, layoutId, name, friendlyURLMap);
+			groupId, privateLayout, layoutId, name, friendlyURLMap, system);
 
 		String friendlyURL = friendlyURLMap.get(LocaleUtil.getSiteDefault());
 
@@ -2735,17 +2735,6 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		parentLayoutId = layoutLocalServiceHelper.getParentLayoutId(
 			groupId, privateLayout, parentLayoutId);
 
-		String name = nameMap.get(LocaleUtil.getSiteDefault());
-
-		friendlyURLMap = layoutLocalServiceHelper.getFriendlyURLMap(
-			groupId, privateLayout, layoutId, name, friendlyURLMap);
-
-		String friendlyURL = friendlyURLMap.get(LocaleUtil.getSiteDefault());
-
-		layoutLocalServiceHelper.validate(
-			groupId, privateLayout, layoutId, parentLayoutId, name, type,
-			hidden, friendlyURLMap, serviceContext);
-
 		layoutLocalServiceHelper.validateParentLayoutId(
 			groupId, privateLayout, layoutId, parentLayoutId);
 
@@ -2753,6 +2742,18 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		Layout layout = layoutPersistence.findByG_P_L(
 			groupId, privateLayout, layoutId);
+
+		String name = nameMap.get(LocaleUtil.getSiteDefault());
+
+		friendlyURLMap = layoutLocalServiceHelper.getFriendlyURLMap(
+			groupId, privateLayout, layoutId, name, friendlyURLMap,
+			layout.isSystem());
+
+		String friendlyURL = friendlyURLMap.get(LocaleUtil.getSiteDefault());
+
+		layoutLocalServiceHelper.validate(
+			groupId, privateLayout, layoutId, parentLayoutId, name, type,
+			hidden, friendlyURLMap, serviceContext);
 
 		if (parentLayoutId != layout.getParentLayoutId()) {
 			layout.setParentPlid(

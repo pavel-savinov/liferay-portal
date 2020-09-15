@@ -79,6 +79,15 @@ public class LayoutLocalServiceHelper implements IdentifiableOSGiService {
 			String friendlyURL)
 		throws PortalException {
 
+		return getFriendlyURL(
+			groupId, privateLayout, layoutId, name, friendlyURL, false);
+	}
+
+	public String getFriendlyURL(
+			long groupId, boolean privateLayout, long layoutId, String name,
+			String friendlyURL, boolean system)
+		throws PortalException {
+
 		friendlyURL = getFriendlyURL(friendlyURL);
 
 		if (Validator.isNotNull(friendlyURL)) {
@@ -99,8 +108,13 @@ public class LayoutLocalServiceHelper implements IdentifiableOSGiService {
 			catch (LayoutFriendlyURLException layoutFriendlyURLException) {
 				int type = layoutFriendlyURLException.getType();
 
-				if (type == LayoutFriendlyURLException.DUPLICATE) {
+				if ((type == LayoutFriendlyURLException.DUPLICATE) && system) {
 					friendlyURL = originalFriendlyURL + i;
+				}
+				else if ((type == LayoutFriendlyURLException.DUPLICATE) &&
+						 !system) {
+
+					throw layoutFriendlyURLException;
 				}
 				else {
 					friendlyURL = StringPool.SLASH + layoutId;
@@ -122,6 +136,15 @@ public class LayoutLocalServiceHelper implements IdentifiableOSGiService {
 			Map<Locale, String> friendlyURLMap)
 		throws PortalException {
 
+		return getFriendlyURLMap(
+			groupId, privateLayout, layoutId, name, friendlyURLMap, false);
+	}
+
+	public Map<Locale, String> getFriendlyURLMap(
+			long groupId, boolean privateLayout, long layoutId, String name,
+			Map<Locale, String> friendlyURLMap, boolean system)
+		throws PortalException {
+
 		Map<Locale, String> newFriendlyURLMap = new HashMap<>();
 
 		for (Locale locale : LanguageUtil.getAvailableLocales(groupId)) {
@@ -129,7 +152,8 @@ public class LayoutLocalServiceHelper implements IdentifiableOSGiService {
 
 			if (Validator.isNotNull(friendlyURL)) {
 				friendlyURL = getFriendlyURL(
-					groupId, privateLayout, layoutId, name, friendlyURL);
+					groupId, privateLayout, layoutId, name, friendlyURL,
+					system);
 
 				newFriendlyURLMap.put(locale, friendlyURL);
 			}
@@ -141,7 +165,8 @@ public class LayoutLocalServiceHelper implements IdentifiableOSGiService {
 			Validator.isNull(newFriendlyURLMap.get(siteDefaultLocale))) {
 
 			String friendlyURL = getFriendlyURL(
-				groupId, privateLayout, layoutId, name, StringPool.BLANK);
+				groupId, privateLayout, layoutId, name, StringPool.BLANK,
+				system);
 
 			newFriendlyURLMap.put(siteDefaultLocale, friendlyURL);
 		}
