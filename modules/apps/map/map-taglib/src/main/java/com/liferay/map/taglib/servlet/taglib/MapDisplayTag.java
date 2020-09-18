@@ -19,13 +19,19 @@ import com.liferay.map.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.map.util.MapProviderHelperUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.taglib.aui.AUIUtil;
 import com.liferay.taglib.util.IncludeTag;
 
 import java.util.Collection;
 import java.util.Iterator;
+
+import javax.portlet.ActionRequest;
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.PageContext;
@@ -116,10 +122,30 @@ public class MapDisplayTag extends IncludeTag {
 			"liferay-map:map:longitude", _longitude);
 		httpServletRequest.setAttribute(
 			"liferay-map:map:mapProvider", _getMapProvider());
+
+		PortletRequest portletRequest =
+			(PortletRequest)httpServletRequest.getAttribute(
+				JavaConstants.JAVAX_PORTLET_REQUEST);
+
+		PortletResponse portletResponse =
+			(PortletResponse)httpServletRequest.getAttribute(
+				JavaConstants.JAVAX_PORTLET_RESPONSE);
+
+		String namespace = AUIUtil.getNamespace(
+			portletRequest, portletResponse);
+
+		if (Validator.isNull(namespace)) {
+			namespace = StringUtil.randomId() + StringPool.UNDERLINE;
+		}
+
 		httpServletRequest.setAttribute(
-			"liferay-map:map:name",
-			StringUtil.randomId() + StringPool.UNDERLINE + _name);
+			"liferay-map:map:name", namespace + _name);
 		httpServletRequest.setAttribute("liferay-map:map:points", _points);
+
+		if (portletRequest instanceof ActionRequest) {
+			httpServletRequest.setAttribute(
+				PortletRequest.LIFECYCLE_PHASE, PortletRequest.ACTION_PHASE);
+		}
 	}
 
 	private MapProvider _getMapProvider() {
