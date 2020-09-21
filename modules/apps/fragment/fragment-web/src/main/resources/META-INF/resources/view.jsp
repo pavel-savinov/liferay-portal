@@ -182,7 +182,7 @@ List<FragmentCollectionContributor> fragmentCollectionContributors = fragmentDis
 
 								<ul class="mb-2 nav nav-stacked">
 									<c:if test="<%= ListUtil.isNotEmpty(fragmentCollections) %>">
-										<span class="text-truncate"><%= fragmentDisplayContext.getGroupName(scopeGroupId) %></span>
+										<span class="text-truncate"><%= HtmlUtil.escape(fragmentDisplayContext.getGroupName(scopeGroupId)) %></span>
 
 										<%
 										for (FragmentCollection fragmentCollection : fragmentCollections) {
