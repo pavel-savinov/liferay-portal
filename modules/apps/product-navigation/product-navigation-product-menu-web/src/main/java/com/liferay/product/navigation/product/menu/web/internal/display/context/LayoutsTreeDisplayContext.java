@@ -18,6 +18,7 @@ import com.liferay.application.list.GroupProvider;
 import com.liferay.application.list.constants.ApplicationListWebKeys;
 import com.liferay.asset.list.constants.AssetListPortletKeys;
 import com.liferay.asset.list.model.AssetListEntry;
+import com.liferay.exportimport.kernel.staging.StagingUtil;
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -41,6 +42,7 @@ import com.liferay.product.navigation.product.menu.constants.ProductNavigationPr
 import com.liferay.product.navigation.product.menu.web.internal.constants.ProductNavigationProductMenuWebKeys;
 
 import java.util.Map;
+import java.util.Objects;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
@@ -274,6 +276,20 @@ public class LayoutsTreeDisplayContext {
 			"namespace", getNamespace()
 		).put(
 			"privateLayout", isPrivateLayout()
+		).put(
+			"showAddIcon",
+			() -> {
+				Group scopeGroup = _themeDisplay.getScopeGroup();
+
+				if (scopeGroup.isStaged() &&
+					Objects.equals(
+						scopeGroup, StagingUtil.getLiveGroup(scopeGroup))) {
+
+					return false;
+				}
+
+				return true;
+			}
 		).build();
 	}
 

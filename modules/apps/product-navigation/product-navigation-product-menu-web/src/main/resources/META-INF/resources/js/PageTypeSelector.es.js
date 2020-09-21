@@ -62,49 +62,56 @@ function PageTypeSelector(props) {
 					</option>
 				</select>
 			</div>
+
 			<div className="flex-fill flex-grow-1 text-right">
-				<ClayDropDown
-					active={active}
-					onActiveChange={setActive}
-					trigger={
-						<ClayButton
-							aria-haspopup="true"
-							className="dropdown-toggle"
-							displayType="unstyled"
-						>
-							<ClayIcon symbol="plus" />
-						</ClayButton>
-					}
-				>
-					<ClayDropDown.ItemList>
-						{props.addLayoutURL && (
-							<ClayDropDown.Item
-								data-value={Liferay.Language.get('add-page')}
-								key={Liferay.Language.get('add-page')}
-								onClick={handleOnAddPageClick}
-								title={Liferay.Language.get('add-page')}
+				{props.showAddIcon && (
+					<ClayDropDown
+						active={active}
+						onActiveChange={setActive}
+						trigger={
+							<ClayButton
+								aria-haspopup="true"
+								className="dropdown-toggle"
+								displayType="unstyled"
 							>
-								{Liferay.Language.get('add-page')}
-							</ClayDropDown.Item>
-						)}
-						{props.addCollectionLayoutURL && (
-							<ClayDropDown.Item
-								data-value={Liferay.Language.get(
-									'add-collection-page'
-								)}
-								key={Liferay.Language.get(
-									'add-collection-page'
-								)}
-								onClick={handleOnAddCollectionPageClick}
-								title={Liferay.Language.get(
-									'add-collection-page'
-								)}
-							>
-								{Liferay.Language.get('add-collection-page')}
-							</ClayDropDown.Item>
-						)}
-					</ClayDropDown.ItemList>
-				</ClayDropDown>
+								<ClayIcon symbol="plus" />
+							</ClayButton>
+						}
+					>
+						<ClayDropDown.ItemList>
+							{props.addLayoutURL && (
+								<ClayDropDown.Item
+									data-value={Liferay.Language.get(
+										'add-page'
+									)}
+									key={Liferay.Language.get('add-page')}
+									onClick={handleOnAddPageClick}
+									title={Liferay.Language.get('add-page')}
+								>
+									{Liferay.Language.get('add-page')}
+								</ClayDropDown.Item>
+							)}
+							{props.addCollectionLayoutURL && (
+								<ClayDropDown.Item
+									data-value={Liferay.Language.get(
+										'add-collection-page'
+									)}
+									key={Liferay.Language.get(
+										'add-collection-page'
+									)}
+									onClick={handleOnAddCollectionPageClick}
+									title={Liferay.Language.get(
+										'add-collection-page'
+									)}
+								>
+									{Liferay.Language.get(
+										'add-collection-page'
+									)}
+								</ClayDropDown.Item>
+							)}
+						</ClayDropDown.ItemList>
+					</ClayDropDown>
+				)}
 			</div>
 			<div className="autofit-col ml-2">
 				{props.configureLayoutSetURL && (
@@ -129,6 +136,7 @@ PageTypeSelector.propTypes = {
 	configureLayoutSetURL: PropTypes.string,
 	namespace: PropTypes.string,
 	privateLayout: PropTypes.bool,
+	showAddIcon: PropTypes.bool,
 };
 
 export default PageTypeSelector;
