@@ -79,15 +79,19 @@ export function ImagePropertiesPanel({item}) {
 	}, [editableValue]);
 
 	const imageUrl = useSelector((state) => {
-		const url = selectEditableValueContent(
+		const content = selectEditableValueContent(
 			state,
 			fragmentEntryLinkId,
 			editableId,
 			processorKey
 		);
 
-		return url === editableValue.defaultValue ? '' : url;
+		return content.url != null ? content.url : content;
 	});
+
+	const imageTitle =
+		editableConfig.imageTitle ||
+		(imageUrl === editableValue.defaultValue ? '' : imageUrl);
 
 	const updateEditableValues = (
 		alt,
@@ -177,7 +181,7 @@ export function ImagePropertiesPanel({item}) {
 	return (
 		<>
 			<ImageSelector
-				imageTitle={editableConfig.imageTitle || imageUrl}
+				imageTitle={imageTitle}
 				label={Liferay.Language.get('image')}
 				onClearButtonPressed={() => onImageChange('', '')}
 				onImageSelected={(image) =>
