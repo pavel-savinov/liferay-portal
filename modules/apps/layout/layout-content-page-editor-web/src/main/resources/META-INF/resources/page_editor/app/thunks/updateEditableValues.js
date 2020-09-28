@@ -28,9 +28,10 @@ export default function updateEditableValues({
 			fragmentEntryLinkId,
 			onNetworkStatus: dispatch,
 		})
-			.then(() => {
+			.then((fragmentEntryLink) => {
 				dispatch(
 					updateEditableValuesAction({
+						content: fragmentEntryLink.content,
 						editableValues,
 						fragmentEntryLinkId,
 						segmentsExperienceId,

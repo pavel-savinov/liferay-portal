@@ -31,6 +31,10 @@ export function ImagePropertiesPanel({item}) {
 	const imageDescriptionId = useId();
 	const state = useSelector((state) => state);
 
+	const selectedViewportSize = useSelector(
+		(state) => state.selectedViewportSize
+	);
+
 	const processorKey =
 		type === EDITABLE_TYPES.backgroundImage
 			? BACKGROUND_IMAGE_FRAGMENT_ENTRY_PROCESSOR
@@ -47,6 +51,38 @@ export function ImagePropertiesPanel({item}) {
 		editableConfig.alt || ''
 	);
 
+	const editables = useSelector((state) => state.editables);
+
+	const editableElement = editables[item.parentId]?.[item.itemId]?.element;
+
+	const [imageSize, setImageSize] = useState(null);
+
+	useEffect(() => {
+		if (editableElement != null) {
+			const setSize = () => {
+				if (
+					editableElement.naturalHeight &&
+					editableElement.naturalWidth
+				) {
+					setImageSize({
+						height: editableElement.naturalHeight,
+						width: editableElement.naturalWidth,
+					});
+				}
+			};
+
+			if (editableElement.complete) {
+				setSize();
+			}
+			else {
+				editableElement.addEventListener('load', setSize);
+
+				return () =>
+					editableElement.removeEventListener('load', setSize);
+			}
+		}
+	}, [editableConfig.naturalHeight, editableElement, selectedViewportSize]);
+
 	useEffect(() => {
 		const editableConfig = editableValue ? editableValue.config || {} : {};
 
@@ -60,15 +96,19 @@ export function ImagePropertiesPanel({item}) {
 	}, [editableValue]);
 
 	const imageUrl = useSelector((state) => {
-		const url = selectEditableValueContent(
+		const content = selectEditableValueContent(
 			state,
 			fragmentEntryLinkId,
 			editableId,
 			processorKey
 		);
 
-		return url === editableValue.defaultValue ? '' : url;
+		return content.url != null ? content.url : content;
 	});
+
+	const imageTitle =
+		editableConfig.imageTitle ||
+		(imageUrl === editableValue.defaultValue ? '' : imageUrl);
 
 	const updateEditableValues = (
 		alt,
@@ -105,7 +145,7 @@ export function ImagePropertiesPanel({item}) {
 		);
 	};
 
-	const onImageChange = (imageTitle, imageUrl) => {
+	const onImageChange = (imageTitle, imageUrl, fileEntryId) => {
 		const {editableValues} = state.fragmentEntryLinks[fragmentEntryLinkId];
 
 		const editableProcessorValues = editableValues[processorKey];
@@ -129,7 +169,10 @@ export function ImagePropertiesPanel({item}) {
 		nextEditableValue = {
 			...editableValue,
 			config: nextEditableValueConfig,
-			[state.languageId]: imageUrl,
+			[state.languageId]: {
+				fileEntryId,
+				url: imageUrl,
+			},
 		};
 
 		const nextEditableValues = {
@@ -155,13 +198,22 @@ export function ImagePropertiesPanel({item}) {
 	return (
 		<>
 			<ImageSelector
-				imageTitle={editableConfig.imageTitle || imageUrl}
+				imageTitle={imageTitle}
 				label={Liferay.Language.get('image')}
 				onClearButtonPressed={() => onImageChange('', '')}
 				onImageSelected={(image) =>
-					onImageChange(image.title, image.url)
+					onImageChange(image.title, image.url, image.fileEntryId)
 				}
 			/>
+
+			{imageUrl && imageSize && (
+				<div className="mb-2 small">
+					<b>{Liferay.Language.get('resolution')}:</b>
+					<span className="ml-2">
+						{imageSize.width}x{imageSize.height}px
+					</span>
+				</div>
+			)}
 
 			{type === EDITABLE_TYPES.image && (
 				<ClayForm.Group>

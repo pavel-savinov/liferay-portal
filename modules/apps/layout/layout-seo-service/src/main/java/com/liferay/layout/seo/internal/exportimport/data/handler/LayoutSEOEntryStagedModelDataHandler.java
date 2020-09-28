@@ -97,23 +97,26 @@ public class LayoutSEOEntryStagedModelDataHandler
 		Element structureFieldsElement = layoutSEOEntryElement.addElement(
 			"structure-fields");
 
-		String ddmFormValuesPath = ExportImportPathUtil.getModelPath(
-			ddmStructure, String.valueOf(layoutSEOEntry.getDDMStorageId()));
+		if (layoutSEOEntry.getDDMStorageId() != 0) {
+			String ddmFormValuesPath = ExportImportPathUtil.getModelPath(
+				ddmStructure, String.valueOf(layoutSEOEntry.getDDMStorageId()));
 
-		structureFieldsElement.addAttribute(
-			"ddm-form-values-path", ddmFormValuesPath);
+			structureFieldsElement.addAttribute(
+				"ddm-form-values-path", ddmFormValuesPath);
 
-		DDMFormValuesSerializerSerializeResponse
-			ddmFormValuesSerializerSerializeResponse =
-				_jsonDDMFormValuesSerializer.serialize(
-					DDMFormValuesSerializerSerializeRequest.Builder.newBuilder(
-						_storageEngine.getDDMFormValues(
-							layoutSEOEntry.getDDMStorageId())
-					).build());
+			DDMFormValuesSerializerSerializeResponse
+				ddmFormValuesSerializerSerializeResponse =
+					_jsonDDMFormValuesSerializer.serialize(
+						DDMFormValuesSerializerSerializeRequest.Builder.
+							newBuilder(
+								_storageEngine.getDDMFormValues(
+									layoutSEOEntry.getDDMStorageId())
+							).build());
 
-		portletDataContext.addZipEntry(
-			ddmFormValuesPath,
-			ddmFormValuesSerializerSerializeResponse.getContent());
+			portletDataContext.addZipEntry(
+				ddmFormValuesPath,
+				ddmFormValuesSerializerSerializeResponse.getContent());
+		}
 
 		portletDataContext.addClassedModel(
 			layoutSEOEntryElement,
