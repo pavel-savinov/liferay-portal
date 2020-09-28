@@ -206,7 +206,7 @@ export function ImagePropertiesPanel({item}) {
 				}
 			/>
 
-			{imageSize && (
+			{imageUrl && imageSize && (
 				<div className="mb-2 small">
 					<b>{Liferay.Language.get('resolution')}:</b>
 					<span className="ml-2">
