@@ -15,6 +15,7 @@
 package com.liferay.fragment.internal.renderer;
 
 import com.liferay.fragment.constants.FragmentConstants;
+import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.exception.FragmentEntryContentException;
 import com.liferay.fragment.model.FragmentEntry;
@@ -27,6 +28,7 @@ import com.liferay.fragment.renderer.constants.FragmentRendererConstants;
 import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
 import com.liferay.fragment.validator.FragmentEntryValidator;
+import com.liferay.layout.adaptive.media.LayoutAdaptiveMediaProcessor;
 import com.liferay.petra.io.unsync.UnsyncStringWriter;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -46,6 +48,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.taglib.servlet.PipingServletResponse;
 
 import java.util.Locale;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
@@ -126,6 +129,14 @@ public class FragmentRendererControllerImpl
 
 			return _getFragmentEntryContentExceptionMessage(
 				exception, httpServletRequest);
+		}
+
+		if (Objects.equals(
+				fragmentRendererContext.getMode(),
+				FragmentEntryLinkConstants.EDIT)) {
+
+			return _layoutAdaptiveMediaProcessor.processAdaptiveMediaContent(
+				unsyncStringWriter.toString());
 		}
 
 		return unsyncStringWriter.toString();
@@ -229,5 +240,8 @@ public class FragmentRendererControllerImpl
 
 	@Reference
 	private FragmentRendererTracker _fragmentRendererTracker;
+
+	@Reference
+	private LayoutAdaptiveMediaProcessor _layoutAdaptiveMediaProcessor;
 
 }

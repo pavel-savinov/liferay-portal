@@ -17,6 +17,7 @@ package com.liferay.layout.internal.search.spi.model.index.contributor;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.renderer.FragmentRendererController;
+import com.liferay.layout.adaptive.media.LayoutAdaptiveMediaProcessor;
 import com.liferay.layout.internal.search.util.LayoutPageTemplateStructureRenderUtil;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
@@ -137,6 +138,7 @@ public class LayoutModelDocumentContributor
 							renderLayoutContent(
 								_fragmentRendererController, httpServletRequest,
 								httpServletResponse,
+								_layoutAdaptiveMediaProcessor,
 								layoutPageTemplateStructure,
 								FragmentEntryLinkConstants.VIEW,
 								new HashMap<>(), locale, segmentsExperienceIds);
@@ -209,6 +211,9 @@ public class LayoutModelDocumentContributor
 
 	@Reference
 	private GroupLocalService _groupLocalService;
+
+	@Reference
+	private LayoutAdaptiveMediaProcessor _layoutAdaptiveMediaProcessor;
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;
