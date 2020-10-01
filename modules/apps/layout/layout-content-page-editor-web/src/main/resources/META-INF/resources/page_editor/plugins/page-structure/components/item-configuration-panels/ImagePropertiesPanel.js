@@ -38,6 +38,8 @@ export function ImagePropertiesPanel({item}) {
 		(state) => state.selectedViewportSize
 	);
 
+	const canUpdateImage = selectedViewportSize === VIEWPORT_SIZES.desktop;
+
 	const processorKey =
 		type === EDITABLE_TYPES.backgroundImage
 			? BACKGROUND_IMAGE_FRAGMENT_ENTRY_PROCESSOR
@@ -289,14 +291,16 @@ export function ImagePropertiesPanel({item}) {
 
 	return (
 		<>
-			<ImageSelector
-				imageTitle={editableConfig.imageTitle || imageUrl}
-				label={Liferay.Language.get('image')}
-				onClearButtonPressed={() => onImageChange('', '')}
-				onImageSelected={(image) =>
-					onImageChange(image.title, image.url, image.fileEntryId)
-				}
-			/>
+			{canUpdateImage && (
+				<ImageSelector
+					imageTitle={editableConfig.imageTitle || imageUrl}
+					label={Liferay.Language.get('image')}
+					onClearButtonPressed={() => onImageChange('', '')}
+					onImageSelected={(image) =>
+						onImageChange(image.title, image.url, image.fileEntryId)
+					}
+				/>
+			)}
 
 			{imageConfigurations && imageConfigurations.length > 1 && (
 				<ClayForm.Group>
@@ -321,7 +325,7 @@ export function ImagePropertiesPanel({item}) {
 				</div>
 			)}
 
-			{type === EDITABLE_TYPES.image && (
+			{canUpdateImage && type === EDITABLE_TYPES.image && (
 				<ClayForm.Group>
 					<label htmlFor={imageDescriptionId}>
 						{Liferay.Language.get('image-description')}
