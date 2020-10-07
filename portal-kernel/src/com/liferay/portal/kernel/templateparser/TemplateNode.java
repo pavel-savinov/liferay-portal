@@ -407,7 +407,7 @@ public class TemplateNode extends LinkedHashMap<String, Object> {
 			if (Objects.equals(
 					jsonObject.getString("uuid"), assetRenderer.getUuid())) {
 
-				return jsonObject.toJSONString();
+				return data;
 			}
 
 			String updatedTitle = assetRenderer.getTitle(
