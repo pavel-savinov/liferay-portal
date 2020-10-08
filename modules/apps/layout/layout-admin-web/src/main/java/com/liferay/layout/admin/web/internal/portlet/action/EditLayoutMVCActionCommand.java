@@ -104,9 +104,6 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 			iconBytes = FileUtil.getBytes(fileEntry.getContentStream());
 		}
 
-		long styleBookEntryId = ParamUtil.getLong(
-			uploadPortletRequest, "styleBookEntryId");
-
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			Layout.class.getName(), actionRequest);
 
@@ -116,6 +113,10 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 		long masterLayoutPlid = ParamUtil.getLong(
 			uploadPortletRequest, "masterLayoutPlid",
 			layout.getMasterLayoutPlid());
+
+		long styleBookEntryId = ParamUtil.getLong(
+			uploadPortletRequest, "styleBookEntryId",
+			layout.getStyleBookEntryId());
 
 		String oldFriendlyURL = layout.getFriendlyURL();
 
