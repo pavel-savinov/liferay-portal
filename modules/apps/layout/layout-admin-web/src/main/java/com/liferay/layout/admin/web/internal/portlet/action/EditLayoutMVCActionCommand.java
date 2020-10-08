@@ -104,7 +104,7 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 			iconBytes = FileUtil.getBytes(fileEntry.getContentStream());
 		}
 
-		long masterLayoutPlid = ParamUtil.getLong(
+		String newMasterLayoutPlid = ParamUtil.getString(
 			uploadPortletRequest, "masterLayoutPlid");
 		long styleBookEntryId = ParamUtil.getLong(
 			uploadPortletRequest, "styleBookEntryId");
@@ -114,6 +114,12 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 
 		Layout layout = _layoutLocalService.getLayout(
 			groupId, privateLayout, layoutId);
+
+		long masterLayoutPlid = layout.getMasterLayoutPlid();
+
+		if (Validator.isNotNull(newMasterLayoutPlid)) {
+			masterLayoutPlid = GetterUtil.getLong(newMasterLayoutPlid);
+		}
 
 		String oldFriendlyURL = layout.getFriendlyURL();
 
