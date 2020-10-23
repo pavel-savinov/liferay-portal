@@ -57,7 +57,7 @@
 			<finder-column name="parentCategoryId" />
 		</finder>
 		<finder name="G_V" return-type="Collection">
-			<finder-column name="groupId" />
+			<finder-column arrayable-operator="OR" name="groupId" />
 			<finder-column arrayable-operator="OR" name="vocabularyId" />
 		</finder>
 		<finder name="P_N" return-type="Collection">
@@ -83,7 +83,7 @@
 			<finder-column name="vocabularyId" />
 		</finder>
 		<finder name="G_LikeN_V" return-type="Collection">
-			<finder-column name="groupId" />
+			<finder-column arrayable-operator="OR" name="groupId" />
 			<finder-column case-sensitive="false" comparator="LIKE" name="name" />
 			<finder-column arrayable-operator="OR" name="vocabularyId" />
 		</finder>
