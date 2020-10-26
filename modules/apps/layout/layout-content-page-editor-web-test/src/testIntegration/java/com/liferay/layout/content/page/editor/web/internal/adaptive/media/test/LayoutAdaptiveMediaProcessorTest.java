@@ -16,6 +16,8 @@ package com.liferay.layout.content.page.editor.web.internal.adaptive.media.test;
 
 import static org.hamcrest.CoreMatchers.containsString;
 
+import com.liferay.adaptive.media.image.configuration.AMImageConfigurationEntry;
+import com.liferay.adaptive.media.image.configuration.AMImageConfigurationHelper;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
@@ -26,10 +28,13 @@ import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.renderer.FragmentRendererController;
 import com.liferay.fragment.service.FragmentEntryLinkService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
+import com.liferay.layout.responsive.ViewportSize;
 import com.liferay.layout.taglib.servlet.taglib.RenderFragmentLayoutTag;
 import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -64,7 +69,9 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.segments.constants.SegmentsExperienceConstants;
 
+import java.util.Collection;
 import java.util.Dictionary;
+import java.util.Iterator;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -175,6 +182,84 @@ public class LayoutAdaptiveMediaProcessorTest {
 			containsString("(max-width:1000px) and (min-width:300px)"));
 	}
 
+	@Test
+	public void testContentPageAdaptiveMediaProcessModeManualTablet()
+		throws Exception {
+
+		Collection<AMImageConfigurationEntry> amImageConfigurationEntries =
+			_amImageConfigurationHelper.getAMImageConfigurationEntries(
+				_group.getCompanyId());
+
+		Assert.assertFalse(amImageConfigurationEntries.isEmpty());
+
+		Iterator<AMImageConfigurationEntry> iterator =
+			amImageConfigurationEntries.iterator();
+
+		AMImageConfigurationEntry amImageConfigurationEntry = iterator.next();
+
+		JSONObject editableValuesJSONObject = JSONFactoryUtil.createJSONObject(
+			_fragmentEntryLink.getEditableValues());
+
+		JSONObject processorJSONObject = editableValuesJSONObject.getJSONObject(
+			"com.liferay.fragment.entry.processor.editable." +
+				"EditableFragmentEntryProcessor");
+
+		JSONObject imageJSONObject = processorJSONObject.getJSONObject(
+			"image-square");
+
+		imageJSONObject.put(
+			"config",
+			JSONUtil.put(
+				"imageConfiguration",
+				JSONUtil.put("tablet", amImageConfigurationEntry.getUUID())));
+
+		_fragmentEntryLinkService.updateFragmentEntryLink(
+			_fragmentEntryLink.getFragmentEntryLinkId(),
+			editableValuesJSONObject.toString());
+
+		RenderFragmentLayoutTag renderFragmentLayoutTag =
+			new RenderFragmentLayoutTag();
+
+		renderFragmentLayoutTag.setGroupId(_group.getGroupId());
+		renderFragmentLayoutTag.setPlid(_layout.getPlid());
+
+		MockHttpServletRequest httpServletRequest =
+			new MockHttpServletRequest();
+
+		httpServletRequest.setAttribute(
+			WebKeys.CTX, httpServletRequest.getServletContext());
+		httpServletRequest.setAttribute(WebKeys.THEME_DISPLAY, _themeDisplay);
+
+		httpServletRequest.setMethod(HttpMethods.GET);
+
+		httpServletRequest.setAttribute(
+			FragmentActionKeys.FRAGMENT_RENDERER_CONTROLLER,
+			_fragmentRendererController);
+
+		MockHttpServletResponse mockHttpServletResponse =
+			new MockHttpServletResponse();
+
+		renderFragmentLayoutTag.doTag(
+			httpServletRequest, mockHttpServletResponse);
+
+		String content = mockHttpServletResponse.getContentAsString();
+
+		Assert.assertThat(
+			content, containsString(amImageConfigurationEntry.getUUID()));
+
+		StringBundler sb = new StringBundler(5);
+
+		ViewportSize viewportSize = ViewportSize.TABLET;
+
+		sb.append("(min-width:");
+		sb.append(viewportSize.getMinWidth());
+		sb.append("px) and (max-width:");
+		sb.append(viewportSize.getMaxWidth());
+		sb.append("px)");
+
+		Assert.assertThat(content, containsString(sb.toString()));
+	}
+
 	private void _addLayout() throws Exception {
 		_layout = _layoutLocalService.addLayout(
 			TestPropsValues.getUserId(), _group.getGroupId(), false,
@@ -241,6 +326,9 @@ public class LayoutAdaptiveMediaProcessorTest {
 			_layout.getTheme(), _layout.getColorScheme());
 		_themeDisplay.setPlid(_layout.getPlid());
 	}
+
+	@Inject
+	private AMImageConfigurationHelper _amImageConfigurationHelper;
 
 	@Inject
 	private CompanyLocalService _companyLocalService;
