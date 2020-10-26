@@ -163,7 +163,6 @@ public class LayoutAdaptiveMediaProcessorTest {
 		httpServletRequest.setAttribute(
 			WebKeys.CTX, httpServletRequest.getServletContext());
 		httpServletRequest.setAttribute(WebKeys.THEME_DISPLAY, _themeDisplay);
-
 		httpServletRequest.setMethod(HttpMethods.GET);
 
 		MockHttpServletResponse mockHttpServletResponse =
@@ -225,14 +224,12 @@ public class LayoutAdaptiveMediaProcessorTest {
 			new MockHttpServletRequest();
 
 		httpServletRequest.setAttribute(
-			WebKeys.CTX, httpServletRequest.getServletContext());
-		httpServletRequest.setAttribute(WebKeys.THEME_DISPLAY, _themeDisplay);
-
-		httpServletRequest.setMethod(HttpMethods.GET);
-
-		httpServletRequest.setAttribute(
 			FragmentActionKeys.FRAGMENT_RENDERER_CONTROLLER,
 			_fragmentRendererController);
+		httpServletRequest.setAttribute(
+			WebKeys.CTX, httpServletRequest.getServletContext());
+		httpServletRequest.setAttribute(WebKeys.THEME_DISPLAY, _themeDisplay);
+		httpServletRequest.setMethod(HttpMethods.GET);
 
 		MockHttpServletResponse mockHttpServletResponse =
 			new MockHttpServletResponse();
