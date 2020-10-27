@@ -271,7 +271,8 @@ public class LayoutAdaptiveMediaProcessorTest {
 			TestPropsValues.getUserId(), _group.getGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			StringUtil.randomString(), ContentTypes.IMAGE_JPEG,
-			FileUtil.getBytes(getClass(), "image.jpg"), _serviceContext);
+			FileUtil.getBytes(getClass(), "dependencies/image.jpg"),
+			_serviceContext);
 
 		JSONObject editableValuesJSONObject = JSONUtil.put(
 			"com.liferay.fragment.entry.processor.editable." +
