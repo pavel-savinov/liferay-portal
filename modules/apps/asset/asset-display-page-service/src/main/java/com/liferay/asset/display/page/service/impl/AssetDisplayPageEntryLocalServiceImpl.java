@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
@@ -155,12 +156,8 @@ public class AssetDisplayPageEntryLocalServiceImpl
 			AssetDisplayPageEntryTable.INSTANCE
 		).innerJoinON(
 			AssetEntryTable.INSTANCE,
-			AssetDisplayPageEntryTable.INSTANCE.classNameId.eq(
-				AssetEntryTable.INSTANCE.classNameId
-			).and(
-				AssetDisplayPageEntryTable.INSTANCE.classPK.eq(
-					AssetEntryTable.INSTANCE.classPK)
-			)
+			AssetDisplayPageEntryTable.INSTANCE.classPK.eq(
+				AssetEntryTable.INSTANCE.classPK)
 		).where(
 			_getPredicate(
 				classNameId, classTypeId, layoutPageTemplateEntryId,
@@ -203,12 +200,8 @@ public class AssetDisplayPageEntryLocalServiceImpl
 			AssetDisplayPageEntryTable.INSTANCE
 		).innerJoinON(
 			AssetEntryTable.INSTANCE,
-			AssetDisplayPageEntryTable.INSTANCE.classNameId.eq(
-				AssetEntryTable.INSTANCE.classNameId
-			).and(
-				AssetDisplayPageEntryTable.INSTANCE.classPK.eq(
-					AssetEntryTable.INSTANCE.classPK)
-			)
+			AssetDisplayPageEntryTable.INSTANCE.classPK.eq(
+				AssetEntryTable.INSTANCE.classPK)
 		).where(
 			_getPredicate(
 				classNameId, classTypeId, layoutPageTemplateEntryId,
@@ -354,6 +347,18 @@ public class AssetDisplayPageEntryLocalServiceImpl
 
 		Predicate predicate =
 			AssetDisplayPageEntryTable.INSTANCE.classNameId.eq(classNameId);
+
+		if (classNameId == _portal.getClassNameId(FileEntry.class.getName())) {
+			predicate = predicate.and(
+				AssetEntryTable.INSTANCE.classNameId.eq(
+					_portal.getClassNameId(
+						"com.liferay.document.library.kernel.model." +
+							"DLFileEntry")));
+		}
+		else {
+			predicate = predicate.and(
+				AssetEntryTable.INSTANCE.classNameId.eq(classNameId));
+		}
 
 		Predicate layoutPageTemplateTypePredicate =
 			AssetDisplayPageEntryTable.INSTANCE.layoutPageTemplateEntryId.eq(
