@@ -142,10 +142,10 @@ export function ImagePropertiesPanel({item}) {
 				}
 			};
 
-			if (editableElement.complete) {
+			if (editableElement && editableElement.complete) {
 				setSize();
 			}
-			else {
+			else if (editableElement && !editableElement.complete) {
 				editableElement.addEventListener('load', setSize);
 
 				return () =>
