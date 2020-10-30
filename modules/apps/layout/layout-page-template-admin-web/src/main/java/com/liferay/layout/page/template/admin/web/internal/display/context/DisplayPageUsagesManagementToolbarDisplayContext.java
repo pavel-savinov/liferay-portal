@@ -16,9 +16,19 @@ package com.liferay.layout.page.template.admin.web.internal.display.context;
 
 import com.liferay.asset.display.page.model.AssetDisplayPageEntry;
 import com.liferay.frontend.taglib.clay.servlet.taglib.display.context.SearchContainerManagementToolbarDisplayContext;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
+import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.WebKeys;
+
+import java.util.List;
+
+import javax.portlet.ActionRequest;
+import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -37,6 +47,38 @@ public class DisplayPageUsagesManagementToolbarDisplayContext
 		super(
 			httpServletRequest, liferayPortletRequest, liferayPortletResponse,
 			searchContainer);
+
+		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+	}
+
+	@Override
+	public List<DropdownItem> getActionDropdownItems() {
+		return DropdownItemListBuilder.add(
+			dropdownItem -> {
+				dropdownItem.putData("action", "deleteDisplayPageEntry");
+				dropdownItem.putData(
+					"deleteDisplayPageEntryURL",
+					_getPortletURL(
+						"/layout_page_template/delete_display_page_entry"));
+				dropdownItem.setLabel(
+					LanguageUtil.get(
+						httpServletRequest,
+						"unassign-and-set-to-default-display-page"));
+			}
+		).add(
+			dropdownItem -> {
+				dropdownItem.putData("action", "updateDisplayPageEntry");
+				dropdownItem.putData(
+					"updateDisplayPageEntryURL",
+					_getPortletURL(
+						"/layout_page_template/update_display_page_entry"));
+				dropdownItem.setLabel(
+					LanguageUtil.get(
+						httpServletRequest,
+						"unassign-and-dont-set-display-page"));
+			}
+		).build();
 	}
 
 	@Override
@@ -45,13 +87,29 @@ public class DisplayPageUsagesManagementToolbarDisplayContext
 	}
 
 	@Override
-	public Boolean isSelectable() {
-		return false;
+	public String getDefaultEventHandler() {
+		return "displayPageUsagesManagementToolbarDefaultEventHandler";
+	}
+
+	@Override
+	public String getSearchContainerId() {
+		return "assetDisplayPageEntries";
 	}
 
 	@Override
 	protected String[] getOrderByKeys() {
 		return new String[] {"modified-date"};
 	}
+
+	private String _getPortletURL(String actionName) {
+		PortletURL portletURL = liferayPortletResponse.createActionURL();
+
+		portletURL.setParameter(ActionRequest.ACTION_NAME, actionName);
+		portletURL.setParameter("redirect", _themeDisplay.getURLCurrent());
+
+		return portletURL.toString();
+	}
+
+	private final ThemeDisplay _themeDisplay;
 
 }

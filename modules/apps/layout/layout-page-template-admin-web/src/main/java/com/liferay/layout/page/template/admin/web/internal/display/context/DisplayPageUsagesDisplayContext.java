@@ -28,6 +28,7 @@ import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
 import com.liferay.info.item.provider.InfoItemObjectProvider;
 import com.liferay.layout.page.template.admin.web.internal.util.comparator.AssetDisplayPageEntryModifiedDateComparator;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -174,6 +175,9 @@ public class DisplayPageUsagesDisplayContext {
 				orderByComparator);
 
 		searchContainer.setResults(assetDisplayPageEntries);
+
+		searchContainer.setRowChecker(
+			new EmptyOnClickRowChecker(_renderResponse));
 
 		int count =
 			AssetDisplayPageEntryServiceUtil.getAssetDisplayPageEntriesCount(
