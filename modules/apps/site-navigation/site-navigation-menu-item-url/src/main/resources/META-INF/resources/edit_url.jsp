@@ -19,7 +19,7 @@
 <%
 SiteNavigationMenuItem siteNavigationMenuItem = (SiteNavigationMenuItem)request.getAttribute(SiteNavigationWebKeys.SITE_NAVIGATION_MENU_ITEM);
 
-String target = StringPool.BLANK;
+String target = "_self";
 String url = StringPool.BLANK;
 
 if (siteNavigationMenuItem != null) {
@@ -27,7 +27,7 @@ if (siteNavigationMenuItem != null) {
 
 	typeSettingsProperties.fastLoad(siteNavigationMenuItem.getTypeSettings());
 
-	target = typeSettingsProperties.getProperty("target", "_blank");
+	target = typeSettingsProperties.getProperty("target", "_self");
 	url = typeSettingsProperties.getProperty("url");
 }
 %>
