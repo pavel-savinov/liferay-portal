@@ -19,6 +19,8 @@
 <%
 DisplayPageUsagesDisplayContext displayPageUsagesDisplayContext = new DisplayPageUsagesDisplayContext(request, renderRequest, renderResponse);
 
+DisplayPageUsagesManagementToolbarDisplayContext displayPageUsagesManagementToolbarDisplayContext = new DisplayPageUsagesManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, displayPageUsagesDisplayContext.getSearchContainer());
+
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(displayPageUsagesDisplayContext.getRedirect());
 
@@ -28,10 +30,10 @@ renderResponse.setTitle(LanguageUtil.format(request, "usages-x", layoutPageTempl
 %>
 
 <clay:management-toolbar
-	displayContext="<%= new DisplayPageUsagesManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, displayPageUsagesDisplayContext.getSearchContainer()) %>"
+	displayContext="<%= displayPageUsagesManagementToolbarDisplayContext %>"
 />
 
-<clay:container-fluid>
+<aui:form cssClass="container-fluid container-fluid-max-xl" name="fm">
 	<liferay-ui:search-container
 		id="assetDisplayPageEntries"
 		searchContainer="<%= displayPageUsagesDisplayContext.getSearchContainer() %>"
@@ -65,4 +67,9 @@ renderResponse.setTitle(LanguageUtil.format(request, "usages-x", layoutPageTempl
 			markupView="lexicon"
 		/>
 	</liferay-ui:search-container>
-</clay:container-fluid>
+</aui:form>
+
+<liferay-frontend:component
+	componentId="<%= displayPageUsagesManagementToolbarDisplayContext.getDefaultEventHandler() %>"
+	module="js/DisplayPageUsagesManagementToolbarDefaultEventHandler.es"
+/>
