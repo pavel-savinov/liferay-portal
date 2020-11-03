@@ -28,6 +28,7 @@ import com.liferay.headless.delivery.dto.v1_0.PageTemplate;
 import com.liferay.headless.delivery.dto.v1_0.PageTemplateCollection;
 import com.liferay.headless.delivery.dto.v1_0.Settings;
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
+import com.liferay.layout.page.template.admin.web.internal.exception.DropzoneLayoutStructureItemException;
 import com.liferay.layout.page.template.admin.web.internal.headless.delivery.dto.v1_0.structure.importer.LayoutStructureItemImporter;
 import com.liferay.layout.page.template.admin.web.internal.headless.delivery.dto.v1_0.structure.importer.LayoutStructureItemImporterTracker;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
@@ -965,6 +966,17 @@ public class LayoutPageTemplatesImporterImpl
 								_toTypeName(layoutPageTemplateEntryType)
 							})));
 			}
+		}
+		catch (DropzoneLayoutStructureItemException
+					dropzoneLayoutStructureItemException) {
+
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					dropzoneLayoutStructureItemException,
+					dropzoneLayoutStructureItemException);
+			}
+
+			throw new PortalException();
 		}
 		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
