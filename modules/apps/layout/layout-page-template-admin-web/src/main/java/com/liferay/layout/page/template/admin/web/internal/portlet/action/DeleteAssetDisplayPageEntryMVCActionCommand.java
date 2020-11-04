@@ -39,7 +39,7 @@ import org.osgi.service.component.annotations.Reference;
 	},
 	service = MVCActionCommand.class
 )
-public class DeleteDisplayPageEntryMVCActionCommand
+public class DeleteAssetDisplayPageEntryMVCActionCommand
 	extends BaseMVCActionCommand {
 
 	@Override
