@@ -653,22 +653,19 @@ public class PageFragmentInstanceDefinitionDTOConverter {
 		Map<String, JSONObject> localeJSONObjectMap,
 		JSONObject configJSONObject) {
 
+		JSONObject imageConfigurationJSONObject =
+			configJSONObject.getJSONObject("imageConfiguration");
+
 		return new FragmentImageClassPKReference() {
 			{
-				JSONObject imageConfigurationJSONObject =
-					configJSONObject.getJSONObject("imageConfiguration");
-
 				classPKReferences = _toImageReferenceMap(localeJSONObjectMap);
-
 				fragmentImageConfiguration = new FragmentImageConfiguration() {
 					{
 						landscapeMobile =
 							imageConfigurationJSONObject.getString(
 								"landscapeMobile", "auto");
-
 						portraitMobile = imageConfigurationJSONObject.getString(
 							"portraitMobile", "auto");
-
 						tablet = imageConfigurationJSONObject.getString(
 							"tablet", "auto");
 					}
