@@ -256,6 +256,9 @@ public class FragmentsImporterImpl implements FragmentsImporter {
 			throw new DuplicateFragmentEntryKeyException(fragmentEntryKey);
 		}
 
+		int type = FragmentConstants.getTypeFromLabel(
+			StringUtil.toLowerCase(StringUtil.trim(typeLabel)));
+
 		int status = WorkflowConstants.STATUS_APPROVED;
 		String errorMessage = null;
 
@@ -270,12 +273,18 @@ public class FragmentsImporterImpl implements FragmentsImporter {
 				_log.debug(portalException, portalException);
 			}
 
+			if (type == FragmentConstants.TYPE_REACT) {
+				_fragmentsImporterResultEntries.add(
+					new FragmentsImporterResultEntry(
+						name, FragmentsImporterResultEntry.Status.INVALID,
+						portalException.getMessage()));
+
+				return null;
+			}
+
 			status = WorkflowConstants.STATUS_DRAFT;
 			errorMessage = portalException.getLocalizedMessage();
 		}
-
-		int type = FragmentConstants.getTypeFromLabel(
-			StringUtil.toLowerCase(StringUtil.trim(typeLabel)));
 
 		try {
 			if (fragmentEntry == null) {
