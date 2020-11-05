@@ -16,6 +16,7 @@ package com.liferay.layout.type.controller.display.page.internal.layout.type.con
 
 import com.liferay.asset.display.page.portlet.AssetDisplayPageFriendlyURLProvider;
 import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.fragment.constants.FragmentActionKeys;
 import com.liferay.fragment.renderer.FragmentRendererController;
 import com.liferay.info.display.request.attributes.contributor.InfoDisplayRequestAttributesContributor;
@@ -34,20 +35,34 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutTypeController;
+import com.liferay.portal.kernel.model.Portlet;
+import com.liferay.portal.kernel.portlet.InvokerPortlet;
+import com.liferay.portal.kernel.portlet.LiferayRenderRequest;
+import com.liferay.portal.kernel.portlet.PortletConfigFactoryUtil;
+import com.liferay.portal.kernel.portlet.PortletInstanceFactoryUtil;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.servlet.TransferHeadersHelperUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portlet.RenderRequestFactory;
+import com.liferay.portlet.RenderResponseFactory;
 import com.liferay.taglib.servlet.PipingServletResponse;
 
 import java.util.List;
+
+import javax.portlet.PortletConfig;
+import javax.portlet.PortletMode;
+import javax.portlet.PortletRequest;
+import javax.portlet.WindowState;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -267,6 +282,61 @@ public class DisplayPageLayoutTypeController
 			infoDisplayRequestAttributesContributor.addAttributes(
 				httpServletRequest);
 		}
+
+		DisplayPageLayoutTypeControllerDisplayContext
+			displayPageLayoutTypeControllerDisplayContext =
+				(DisplayPageLayoutTypeControllerDisplayContext)
+					httpServletRequest.getAttribute(
+						DisplayPageLayoutTypeControllerWebKeys.
+							DISPLAY_PAGE_LAYOUT_TYPE_CONTROLLER_DISPLAY_CONTEXT);
+
+		if (displayPageLayoutTypeControllerDisplayContext != null) {
+			AssetRendererFactory<?> assetRendererFactory =
+				displayPageLayoutTypeControllerDisplayContext.
+					getAssetRendererFactory();
+
+			PortletRequest portletRequest =
+				(PortletRequest)httpServletRequest.getAttribute(
+					JavaConstants.JAVAX_PORTLET_REQUEST);
+
+			if ((portletRequest == null) && (assetRendererFactory != null)) {
+				Portlet portlet = _portletLocalService.getPortletById(
+					assetRendererFactory.getPortletId());
+
+				ThemeDisplay themeDisplay =
+					(ThemeDisplay)httpServletRequest.getAttribute(
+						WebKeys.THEME_DISPLAY);
+
+				try {
+					InvokerPortlet invokerPortlet =
+						PortletInstanceFactoryUtil.create(
+							portlet, httpServletRequest.getServletContext());
+
+					PortletConfig portletConfig =
+						PortletConfigFactoryUtil.create(
+							portlet, httpServletRequest.getServletContext());
+
+					LiferayRenderRequest liferayRenderRequest =
+						RenderRequestFactory.create(
+							httpServletRequest, portlet, invokerPortlet,
+							portletConfig.getPortletContext(),
+							WindowState.NORMAL, PortletMode.VIEW, null,
+							themeDisplay.getPlid());
+
+					httpServletRequest.setAttribute(
+						JavaConstants.JAVAX_PORTLET_REQUEST,
+						liferayRenderRequest);
+
+					httpServletRequest.setAttribute(
+						JavaConstants.JAVAX_PORTLET_RESPONSE,
+						RenderResponseFactory.create(
+							themeDisplay.getResponse(), liferayRenderRequest));
+				}
+				catch (Exception exception) {
+					exception.printStackTrace();
+				}
+			}
+		}
 	}
 
 	/**
@@ -390,5 +460,8 @@ public class DisplayPageLayoutTypeController
 
 	@Reference
 	private Portal _portal;
+
+	@Reference
+	private PortletLocalService _portletLocalService;
 
 }
