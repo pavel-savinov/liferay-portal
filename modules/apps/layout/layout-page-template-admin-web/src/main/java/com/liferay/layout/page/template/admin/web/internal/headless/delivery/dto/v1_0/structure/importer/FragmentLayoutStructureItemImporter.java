@@ -301,6 +301,31 @@ public class FragmentLayoutStructureItemImporter
 		return jsonObject;
 	}
 
+	private JSONObject _createFragmentConfigJSONObjectFragmentImageMap(
+		Map<String, Object> fragmentImageMap) {
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+
+		if (fragmentImageMap == null) {
+			return jsonObject;
+		}
+
+		Map<String, Object> descriptionMap =
+			(Map<String, Object>)fragmentImageMap.get("description");
+
+		if (descriptionMap == null) {
+			return jsonObject;
+		}
+
+		String value = (String)descriptionMap.get("value");
+
+		if (value != null) {
+			jsonObject.put("alt", value);
+		}
+
+		return jsonObject;
+	}
+
 	private JSONObject _createFragmentLinkConfigJSONObject(
 		Map<String, Object> fragmentLinkMap) {
 
@@ -360,56 +385,29 @@ public class FragmentLayoutStructureItemImporter
 		return jsonObject;
 	}
 
-	private JSONObject _createImageConfigJSONObject(
-		Map<String, Object> fragmentImageMap) {
+	private JSONObject _createImageJSONObjectFromClassPKReferences(
+		Map<String, Object> classPKReferences) {
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
-		if (fragmentImageMap == null) {
+		if (classPKReferences == null) {
 			return jsonObject;
 		}
 
-		Map<String, Object> descriptionMap =
-			(Map<String, Object>)fragmentImageMap.get("description");
-
-		if (descriptionMap == null) {
-			return jsonObject;
-		}
-
-		String value = (String)descriptionMap.get("value");
-
-		if (value != null) {
-			jsonObject.put("alt", value);
-		}
-
-		return jsonObject;
-	}
-
-	private JSONObject _createImageJSONObjectFromClassPKReference(
-		Map<String, Object> map) {
-
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-		if (map == null) {
-			return jsonObject;
-		}
-
-		for (Map.Entry<String, Object> entry : map.entrySet()) {
-			Map<String, Object> imageReferenceMap =
+		for (Map.Entry<String, Object> entry : classPKReferences.entrySet()) {
+			Map<String, Object> classPKReference =
 				(Map<String, Object>)entry.getValue();
 
 			if (Objects.equals(
-					imageReferenceMap.get("className"),
+					classPKReference.get("className"),
 					FileEntry.class.getName())) {
 
 				long fileEntryId = GetterUtil.getLong(
-					imageReferenceMap.get("classPK"));
-
-				FileEntry fileEntry = null;
+					classPKReference.get("classPK"));
 
 				try {
-					fileEntry = _portletFileRepository.getPortletFileEntry(
-						fileEntryId);
+					FileEntry fileEntry =
+						_portletFileRepository.getPortletFileEntry(fileEntryId);
 
 					jsonObject.put(
 						entry.getKey(),
@@ -833,7 +831,7 @@ public class FragmentLayoutStructureItemImporter
 								"fragmentImageClassPKReference");
 
 						baseFragmentFieldJSONObject =
-							_createImageJSONObjectFromClassPKReference(
+							_createImageJSONObjectFromClassPKReferences(
 								(Map<String, Object>)
 									fragmentImageClassPKReferenceMap.get(
 										"classPKReferences"));
@@ -843,13 +841,13 @@ public class FragmentLayoutStructureItemImporter
 								fragmentImageClassPKReferenceMap.get(
 									"fragmentImageConfiguration");
 
-						JSONObject imageConfigurationJSONObject =
+						JSONObject amImageConfigurationJSONObject =
 							JSONFactoryUtil.createJSONObject();
 
 						for (Map.Entry<String, String> entry :
 								fragmentImageConfigurationMap.entrySet()) {
 
-							imageConfigurationJSONObject.put(
+							amImageConfigurationJSONObject.put(
 								entry.getKey(), entry.getValue());
 						}
 
@@ -858,7 +856,7 @@ public class FragmentLayoutStructureItemImporter
 								editableFieldConfigJSONObject,
 								JSONUtil.put(
 									"imageConfiguration",
-									imageConfigurationJSONObject));
+									amImageConfigurationJSONObject));
 						}
 						catch (JSONException jsonException) {
 							if (_log.isWarnEnabled()) {
@@ -871,7 +869,8 @@ public class FragmentLayoutStructureItemImporter
 				try {
 					editableFieldConfigJSONObject = JSONUtil.merge(
 						editableFieldConfigJSONObject,
-						_createImageConfigJSONObject(fragmentImageMap));
+						_createFragmentConfigJSONObjectFragmentImageMap(
+							fragmentImageMap));
 				}
 				catch (JSONException jsonException) {
 					if (_log.isWarnEnabled()) {
