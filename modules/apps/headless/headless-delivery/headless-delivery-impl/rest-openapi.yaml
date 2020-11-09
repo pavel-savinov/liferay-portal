@@ -1283,6 +1283,9 @@ components:
                     $ref: "#/components/schemas/FragmentImageConfiguration"
             type: object
         FragmentImageConfiguration:
+            description:
+                Represents the Adaptive Media fragment image configuration for
+                different viewports.
             properties:
                 landscapeMobile:
                     type: string
