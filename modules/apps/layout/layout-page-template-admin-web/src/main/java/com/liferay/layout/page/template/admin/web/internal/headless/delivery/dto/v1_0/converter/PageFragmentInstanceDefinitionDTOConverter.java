@@ -568,6 +568,8 @@ public class PageFragmentInstanceDefinitionDTOConverter {
 	private FragmentFieldImage _toFragmentFieldImage(
 		JSONObject jsonObject, boolean saveMapping) {
 
+		Map<String, JSONObject> localeJSONObjectMap = _toLocaleJSONObjectMap(
+			jsonObject);
 		Map<String, String> localeMap = _toLocaleMap(jsonObject);
 
 		return new FragmentFieldImage() {
@@ -579,35 +581,38 @@ public class PageFragmentInstanceDefinitionDTOConverter {
 						title = _toTitleFragmentInlineValue(
 							jsonObject, localeMap);
 
-						Map<String, JSONObject> localeJSONObjectMap =
-							_toLocaleJSONObjectMap(jsonObject);
+						setFragmentImageClassPKReference(
+							() -> {
+								if (MapUtil.isEmpty(localeJSONObjectMap)) {
+									return null;
+								}
 
-						if (MapUtil.isNotEmpty(localeJSONObjectMap)) {
-							setFragmentImageClassPKReference(
-								() -> _toFragmentImageClassPKReference(
+								return _toFragmentImageClassPKReference(
 									localeJSONObjectMap,
-									jsonObject.getJSONObject("config")));
-						}
-						else {
-							setUrl(
-								() -> {
-									if (_isSaveFragmentMappedValue(
-											jsonObject, saveMapping)) {
+									jsonObject.getJSONObject("config"));
+							});
+						setUrl(
+							() -> {
+								if (MapUtil.isNotEmpty(localeJSONObjectMap)) {
+									return null;
+								}
 
-										return _toFragmentMappedValue(
-											_toDefaultMappingValue(
-												jsonObject,
-												_getImageURLTransformerFunction()),
-											jsonObject);
+								if (_isSaveFragmentMappedValue(
+										jsonObject, saveMapping)) {
+
+									return _toFragmentMappedValue(
+										_toDefaultMappingValue(
+											jsonObject,
+											_getImageURLTransformerFunction()),
+										jsonObject);
+								}
+
+								return new FragmentInlineValue() {
+									{
+										value_i18n = localeMap;
 									}
-
-									return new FragmentInlineValue() {
-										{
-											value_i18n = localeMap;
-										}
-									};
-								});
-						}
+								};
+							});
 					}
 				};
 				fragmentLink = _toFragmentLink(jsonObject, saveMapping);
