@@ -1283,7 +1283,8 @@ components:
                     $ref: "#/components/schemas/FragmentImageConfiguration"
             type: object
         FragmentImageConfiguration:
-            description:
+            # @review
+			description:
                 Represents the Adaptive Media fragment image configuration for
                 different viewports.
             properties:
