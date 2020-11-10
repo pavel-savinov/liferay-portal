@@ -18,10 +18,9 @@ import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.UnicodeProperties;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.site.navigation.constants.SiteNavigationWebKeys;
 import com.liferay.site.navigation.menu.item.layout.constants.SiteNavigationMenuItemTypeConstants;
 import com.liferay.site.navigation.model.SiteNavigationMenuItem;
@@ -81,19 +80,15 @@ public class URLSiteNavigationMenuItemType
 		typeSettingsUnicodeProperties.fastLoad(
 			siteNavigationMenuItem.getTypeSettings());
 
-		String target = typeSettingsUnicodeProperties.getProperty("target");
+		boolean useNewtab = GetterUtil.getBoolean(
+			typeSettingsUnicodeProperties.getProperty(
+				"useNewtab", Boolean.FALSE.toString()));
 
-		if (Validator.isNull(target)) {
+		if (!useNewtab) {
 			return StringPool.BLANK;
 		}
 
-		StringBundler sb = new StringBundler(3);
-
-		sb.append("target=\"");
-		sb.append(target);
-		sb.append("\"");
-
-		return sb.toString();
+		return "target=\"_blank\"";
 	}
 
 	@Override
