@@ -28,6 +28,7 @@ import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerRegistryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.StagedModel;
@@ -36,7 +37,6 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
@@ -333,19 +333,20 @@ public class AssetListEntryExportImportContentProcessor
 			if (StringUtil.startsWith(key, "orderByColumn") &&
 				StringUtil.startsWith(value, "ddm__keyword__")) {
 
-				Long oldId = Long.valueOf(value.substring(14, 19));
+				String[] parts = StringUtil.split(
+					value, StringPool.DOUBLE_UNDERLINE);
 
-				if (ddmStructureIds.containsKey(oldId)) {
-					Long newStructureId = ddmStructureIds.get(oldId);
-
-					StringBundler sb = new StringBundler(3);
-
-					sb.append(value.substring(0, 14));
-					sb.append(newStructureId);
-					sb.append(value.substring(19));
-
-					unicodeProperties.setProperty(key, sb.toString());
+				if (parts.length < 4) {
+					continue;
 				}
+
+				Long oldId = Long.valueOf(parts[2]);
+
+				parts[2] = String.valueOf(
+					ddmStructureIds.getOrDefault(oldId, oldId));
+
+				unicodeProperties.setProperty(
+					key, StringUtil.merge(parts, StringPool.DOUBLE_UNDERLINE));
 			}
 		}
 
