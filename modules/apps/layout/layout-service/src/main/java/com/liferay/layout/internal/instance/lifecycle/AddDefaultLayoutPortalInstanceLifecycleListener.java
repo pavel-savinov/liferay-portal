@@ -112,6 +112,56 @@ public class AddDefaultLayoutPortalInstanceLifecycleListener
 			_layoutLocalService.updateStatus(
 				layout.getUserId(), draftLayout.getPlid(),
 				WorkflowConstants.STATUS_APPROVED, serviceContext);
+
+			LayoutTypePortlet layoutTypePortlet =
+				(LayoutTypePortlet)layout.getLayoutType();
+
+			layoutTypePortlet.setLayoutTemplateId(
+				0, PropsValues.DEFAULT_GUEST_PUBLIC_LAYOUT_TEMPLATE_ID, false);
+
+			LayoutTemplate layoutTemplate =
+				layoutTypePortlet.getLayoutTemplate();
+
+			for (String columnId : layoutTemplate.getColumns()) {
+				String keyPrefix = PropsKeys.DEFAULT_GUEST_PUBLIC_LAYOUT_PREFIX;
+
+				String portletIds = PropsUtil.get(keyPrefix.concat(columnId));
+
+				layoutTypePortlet.addPortletIds(
+					0, StringUtil.split(portletIds), columnId, false);
+			}
+
+			_layoutLocalService.updateLayout(
+				layout.getGroupId(), layout.isPrivateLayout(),
+				layout.getLayoutId(), layout.getTypeSettings());
+
+			boolean updateLayoutSet = false;
+
+			LayoutSet layoutSet = layout.getLayoutSet();
+
+			if (Validator.isNotNull(
+					PropsValues.DEFAULT_GUEST_PUBLIC_LAYOUT_REGULAR_THEME_ID)) {
+
+				layoutSet.setThemeId(
+					PropsValues.DEFAULT_GUEST_PUBLIC_LAYOUT_REGULAR_THEME_ID);
+
+				updateLayoutSet = true;
+			}
+
+			if (Validator.isNotNull(
+					PropsValues.
+						DEFAULT_GUEST_PUBLIC_LAYOUT_REGULAR_COLOR_SCHEME_ID)) {
+
+				layoutSet.setColorSchemeId(
+					PropsValues.
+						DEFAULT_GUEST_PUBLIC_LAYOUT_REGULAR_COLOR_SCHEME_ID);
+
+				updateLayoutSet = true;
+			}
+
+			if (updateLayoutSet) {
+				_layoutSetLocalService.updateLayoutSet(layoutSet);
+			}
 		}
 		catch (Exception exception) {
 			throw new PortalException(exception);
@@ -119,55 +169,6 @@ public class AddDefaultLayoutPortalInstanceLifecycleListener
 		finally {
 			PrincipalThreadLocal.setName(currentName);
 			ServiceContextThreadLocal.pushServiceContext(currentServiceContext);
-		}
-
-		LayoutTypePortlet layoutTypePortlet =
-			(LayoutTypePortlet)layout.getLayoutType();
-
-		layoutTypePortlet.setLayoutTemplateId(
-			0, PropsValues.DEFAULT_GUEST_PUBLIC_LAYOUT_TEMPLATE_ID, false);
-
-		LayoutTemplate layoutTemplate = layoutTypePortlet.getLayoutTemplate();
-
-		for (String columnId : layoutTemplate.getColumns()) {
-			String keyPrefix = PropsKeys.DEFAULT_GUEST_PUBLIC_LAYOUT_PREFIX;
-
-			String portletIds = PropsUtil.get(keyPrefix.concat(columnId));
-
-			layoutTypePortlet.addPortletIds(
-				0, StringUtil.split(portletIds), columnId, false);
-		}
-
-		_layoutLocalService.updateLayout(
-			layout.getGroupId(), layout.isPrivateLayout(), layout.getLayoutId(),
-			layout.getTypeSettings());
-
-		boolean updateLayoutSet = false;
-
-		LayoutSet layoutSet = layout.getLayoutSet();
-
-		if (Validator.isNotNull(
-				PropsValues.DEFAULT_GUEST_PUBLIC_LAYOUT_REGULAR_THEME_ID)) {
-
-			layoutSet.setThemeId(
-				PropsValues.DEFAULT_GUEST_PUBLIC_LAYOUT_REGULAR_THEME_ID);
-
-			updateLayoutSet = true;
-		}
-
-		if (Validator.isNotNull(
-				PropsValues.
-					DEFAULT_GUEST_PUBLIC_LAYOUT_REGULAR_COLOR_SCHEME_ID)) {
-
-			layoutSet.setColorSchemeId(
-				PropsValues.
-					DEFAULT_GUEST_PUBLIC_LAYOUT_REGULAR_COLOR_SCHEME_ID);
-
-			updateLayoutSet = true;
-		}
-
-		if (updateLayoutSet) {
-			_layoutSetLocalService.updateLayoutSet(layoutSet);
 		}
 	}
 
