@@ -554,12 +554,9 @@ public class RenderLayoutStructureDisplayContext {
 	public String getStyle(StyledLayoutStructureItem styledLayoutStructureItem)
 		throws Exception {
 
-		StringBundler styleSB = new StringBundler(57);
+		StringBundler styleSB = new StringBundler(60);
 
 		styleSB.append("box-sizing: border-box;");
-
-		String backgroundImage = _getBackgroundImage(
-			styledLayoutStructureItem.getBackgroundImageJSONObject());
 
 		if (Validator.isNotNull(
 				styledLayoutStructureItem.getBackgroundColor())) {
@@ -571,12 +568,23 @@ public class RenderLayoutStructureDisplayContext {
 			styleSB.append(StringPool.SEMICOLON);
 		}
 
+		JSONObject backgroundImageJSONObject =
+			styledLayoutStructureItem.getBackgroundImageJSONObject();
+
+		String backgroundImage = _getBackgroundImage(backgroundImageJSONObject);
+
 		if (Validator.isNotNull(backgroundImage)) {
 			styleSB.append("background-position: 50% 50%; background-repeat: ");
 			styleSB.append("no-repeat; background-size: cover; ");
 			styleSB.append("background-image: url(");
 			styleSB.append(backgroundImage);
 			styleSB.append(");");
+		}
+
+		if (backgroundImageJSONObject.has("fileEntryId")) {
+			styleSB.append("--background-image-file-entry-id:");
+			styleSB.append(backgroundImageJSONObject.getLong("fileEntryId"));
+			styleSB.append(StringPool.SEMICOLON);
 		}
 
 		if (Validator.isNotNull(styledLayoutStructureItem.getBorderColor())) {
