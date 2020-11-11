@@ -1284,7 +1284,7 @@ components:
             type: object
         FragmentImageConfiguration:
             # @review
-			description:
+            description:
                 Represents the Adaptive Media fragment image configuration for
                 different viewports.
             properties:
