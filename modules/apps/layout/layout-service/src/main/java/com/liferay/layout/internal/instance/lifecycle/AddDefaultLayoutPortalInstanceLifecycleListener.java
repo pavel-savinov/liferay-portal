@@ -29,11 +29,15 @@ import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutTemplate;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
+import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutSetLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -45,6 +49,8 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
+
+import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -73,15 +79,15 @@ public class AddDefaultLayoutPortalInstanceLifecycleListener
 	protected void addDefaultGuestPublicLayoutByProperties(Group group)
 		throws PortalException {
 
-		long defaultUserId = _userLocalService.getDefaultUserId(
-			group.getCompanyId());
+		User user = _getUser(group.getCompanyId());
+
 		String friendlyURL = FriendlyURLNormalizerUtil.normalizeWithEncoding(
 			PropsValues.DEFAULT_GUEST_PUBLIC_LAYOUT_FRIENDLY_URL);
 
 		ServiceContext serviceContext = new ServiceContext();
 
 		Layout layout = _layoutLocalService.addLayout(
-			defaultUserId, group.getGroupId(), false,
+			user.getUserId(), group.getGroupId(), false,
 			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
 			PropsValues.DEFAULT_GUEST_PUBLIC_LAYOUT_NAME, StringPool.BLANK,
 			StringPool.BLANK, LayoutConstants.TYPE_CONTENT, false, friendlyURL,
@@ -185,6 +191,24 @@ public class AddDefaultLayoutPortalInstanceLifecycleListener
 		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
+	private User _getUser(long companyId) throws PortalException {
+		Role role = _roleLocalService.fetchRole(
+			companyId, RoleConstants.ADMINISTRATOR);
+
+		if (role == null) {
+			return _userLocalService.getDefaultUser(companyId);
+		}
+
+		List<User> adminUsers = _userLocalService.getRoleUsers(
+			role.getRoleId(), 0, 1);
+
+		if (adminUsers.isEmpty()) {
+			return _userLocalService.getDefaultUser(companyId);
+		}
+
+		return adminUsers.get(0);
+	}
+
 	@Reference
 	private DefaultLayoutDefinitionImporter _defaultLayoutDefinitionImporter;
 
@@ -202,6 +226,9 @@ public class AddDefaultLayoutPortalInstanceLifecycleListener
 
 	@Reference
 	private Portal _portal;
+
+	@Reference
+	private RoleLocalService _roleLocalService;
 
 	@Reference
 	private UserLocalService _userLocalService;
