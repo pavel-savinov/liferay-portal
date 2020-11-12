@@ -87,7 +87,6 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
-import com.liferay.portal.kernel.dao.orm.OrderFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
@@ -1842,9 +1841,16 @@ public class JournalArticleLocalServiceImpl
 		Property displayDateProperty = PropertyFactoryUtil.forName(
 			"displayDate");
 
+		Property expirationDateProperty = PropertyFactoryUtil.forName(
+			"expirationDate");
+
 		dynamicQuery.add(
-			RestrictionsFactoryUtil.or(
-				displayDateProperty.isNull(), displayDateProperty.lt(now)));
+			RestrictionsFactoryUtil.and(
+				RestrictionsFactoryUtil.or(
+					displayDateProperty.isNull(), displayDateProperty.lt(now)),
+				RestrictionsFactoryUtil.or(
+					expirationDateProperty.isNull(),
+					expirationDateProperty.gt(now))));
 
 		Property groupIdProperty = PropertyFactoryUtil.forName("groupId");
 
@@ -1858,19 +1864,8 @@ public class JournalArticleLocalServiceImpl
 
 		dynamicQuery.add(statusProperty.eq(WorkflowConstants.STATUS_APPROVED));
 
-		Property expirationDateProperty = PropertyFactoryUtil.forName(
-			"expirationDate");
-
-		dynamicQuery.add(
-			RestrictionsFactoryUtil.or(
-				expirationDateProperty.isNull(),
-				expirationDateProperty.gt(now)));
-
-		dynamicQuery.addOrder(OrderFactoryUtil.desc("version"));
-
-		dynamicQuery.setLimit(0, 1);
-
-		List<JournalArticle> articles = dynamicQuery(dynamicQuery);
+		List<JournalArticle> articles = dynamicQuery(
+			dynamicQuery, 0, 1, new ArticleVersionComparator());
 
 		if (articles.isEmpty()) {
 			return null;
