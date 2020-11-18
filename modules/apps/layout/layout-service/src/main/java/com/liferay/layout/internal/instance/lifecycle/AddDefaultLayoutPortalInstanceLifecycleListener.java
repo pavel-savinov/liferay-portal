@@ -108,17 +108,6 @@ public class AddDefaultLayoutPortalInstanceLifecycleListener
 
 			layout = _layoutCopyHelper.copyLayout(draftLayout, layout);
 
-			_layoutLocalService.updatePriority(
-				layout.getPlid(), LayoutConstants.FIRST_PRIORITY);
-
-			_layoutLocalService.updateStatus(
-				layout.getUserId(), layout.getPlid(),
-				WorkflowConstants.STATUS_APPROVED, serviceContext);
-
-			_layoutLocalService.updateStatus(
-				layout.getUserId(), draftLayout.getPlid(),
-				WorkflowConstants.STATUS_APPROVED, serviceContext);
-
 			LayoutTypePortlet layoutTypePortlet =
 				(LayoutTypePortlet)layout.getLayoutType();
 
@@ -140,6 +129,17 @@ public class AddDefaultLayoutPortalInstanceLifecycleListener
 			_layoutLocalService.updateLayout(
 				layout.getGroupId(), layout.isPrivateLayout(),
 				layout.getLayoutId(), layout.getTypeSettings());
+
+			_layoutLocalService.updatePriority(
+				layout.getPlid(), LayoutConstants.FIRST_PRIORITY);
+
+			_layoutLocalService.updateStatus(
+				layout.getUserId(), layout.getPlid(),
+				WorkflowConstants.STATUS_APPROVED, serviceContext);
+
+			_layoutLocalService.updateStatus(
+				layout.getUserId(), draftLayout.getPlid(),
+				WorkflowConstants.STATUS_APPROVED, serviceContext);
 
 			boolean updateLayoutSet = false;
 
