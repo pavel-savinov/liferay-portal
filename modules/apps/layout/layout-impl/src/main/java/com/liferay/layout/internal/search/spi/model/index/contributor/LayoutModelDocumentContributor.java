@@ -141,6 +141,13 @@ public class LayoutModelDocumentContributor
 				userId = serviceContext.getUserId();
 			}
 
+			Boolean indexable = (Boolean)serviceContext.getAttribute(
+				"indexable");
+
+			if ((indexable != null) && !indexable) {
+				return;
+			}
+
 			User user = _userLocalService.fetchUser(userId);
 
 			if ((user == null) || user.isDefaultUser()) {

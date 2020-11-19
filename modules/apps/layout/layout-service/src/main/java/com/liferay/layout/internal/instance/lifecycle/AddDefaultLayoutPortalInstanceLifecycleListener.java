@@ -86,6 +86,8 @@ public class AddDefaultLayoutPortalInstanceLifecycleListener
 
 		ServiceContext serviceContext = new ServiceContext();
 
+		serviceContext.setAttribute("indexable", Boolean.FALSE);
+
 		Layout layout = _layoutLocalService.addLayout(
 			user.getUserId(), group.getGroupId(), false,
 			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
