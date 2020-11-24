@@ -166,7 +166,7 @@ export function ImagePropertiesPanel({item}) {
 
 			return imageDescription;
 		});
-	}, [editableConfig.alt, languageId]);
+	}, [editableConfig.alt, languageId, translatedImageDescription]);
 
 	const updateEditableConfig = (
 		newConfig = {},
