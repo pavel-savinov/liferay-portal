@@ -145,6 +145,8 @@ public class AssetPublisherPortletToolbarContributor
 					"editAsset";
 			}
 		).put(
+			"senna-off", true
+		).put(
 			"title", title
 		).build();
 
@@ -197,6 +199,8 @@ public class AssetPublisherPortletToolbarContributor
 			HashMapBuilder.<String, Object>put(
 				"id",
 				HtmlUtil.escape(portletDisplay.getNamespace()) + "editAsset"
+			).put(
+				"senna-off", true
 			).put(
 				"title",
 				LanguageUtil.format(
