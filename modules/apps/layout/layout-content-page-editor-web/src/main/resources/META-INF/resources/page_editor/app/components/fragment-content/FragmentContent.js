@@ -144,7 +144,8 @@ const FragmentContent = ({
 							editable.processor.render(
 								editable.element,
 								value,
-								editableConfig
+								editableConfig,
+								languageId
 							);
 
 							editable.element.classList.add(

@@ -52,8 +52,9 @@ function destroyEditor() {}
  * @param {object} config Editable value's config object
  * @param {string} [config.href] Image anchor url
  * @param {string} [config.target] Image anchor target
+ * @param {string} languageId Language id
  */
-function render(element, value, config = {}) {
+function render(element, value, config = {}, languageId) {
 	let image = null;
 
 	if (element instanceof HTMLImageElement) {
@@ -64,7 +65,12 @@ function render(element, value, config = {}) {
 	}
 
 	if (image) {
-		image.alt = value.alt || config.alt || image.alt;
+		const alt = value.alt || config.alt || image.alt;
+
+		image.alt =
+			typeof alt === 'object'
+				? alt[languageId] || alt[config.defaultLanguageId] || ''
+				: alt || '';
 
 		if (config.href) {
 			if (image.parentElement instanceof HTMLAnchorElement) {
