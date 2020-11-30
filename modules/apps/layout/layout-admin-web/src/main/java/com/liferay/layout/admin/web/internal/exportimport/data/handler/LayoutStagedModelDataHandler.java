@@ -749,11 +749,13 @@ public class LayoutStagedModelDataHandler
 			StagedModelDataHandlerUtil.importStagedModel(
 				portletDataContext, masterLayoutElement);
 
-			Layout masterLayout = layouts.get(
-				GetterUtil.getLong(
-					layoutElement.attributeValue("master-layout-id")));
+			long masterLayoutPlid = GetterUtil.getLong(
+				layoutElement.attributeValue("master-layout-plid"));
 
-			importedLayout.setMasterLayoutPlid(masterLayout.getPlid());
+			long importedMasterLayoutPlid = MapUtil.getLong(
+				layoutPlids, masterLayoutPlid, masterLayoutPlid);
+
+			importedLayout.setMasterLayoutPlid(importedMasterLayoutPlid);
 		}
 
 		long parentPlid = layout.getParentPlid();
@@ -2339,7 +2341,7 @@ public class LayoutStagedModelDataHandler
 		layoutElement.addAttribute(
 			"master-layout-uuid", masterLayout.getUuid());
 		layoutElement.addAttribute(
-			"master-layout-id", String.valueOf(masterLayout.getLayoutId()));
+			"master-layout-plid", String.valueOf(masterLayout.getPlid()));
 	}
 
 	private List<FriendlyURLEntry> _getFriendlyURLEntries(
