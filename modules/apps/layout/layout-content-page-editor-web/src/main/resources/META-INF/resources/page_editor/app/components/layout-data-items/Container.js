@@ -17,6 +17,7 @@ import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 
 import {getLayoutDataItemPropTypes} from '../../../prop-types/index';
+import {config} from '../../config/index';
 import selectLanguageId from '../../selectors/selectLanguageId';
 import InfoItemService from '../../services/InfoItemService';
 import {useSelector} from '../../store/index';
@@ -80,18 +81,27 @@ const Container = React.forwardRef(
 				return;
 			}
 
-			if (itemConfig.link.href) {
-				setLink(itemConfig.link);
+			const linkConfig =
+				itemConfig.link[languageId] ||
+				itemConfig.link[config.defaultLanguageId] ||
+				itemConfig.link;
+
+			if (!linkConfig) {
+				return;
 			}
-			else if (itemConfig.link.fieldId) {
+
+			if (linkConfig.href) {
+				setLink(linkConfig);
+			}
+			else if (linkConfig.fieldId) {
 				InfoItemService.getInfoItemFieldValue({
-					...itemConfig.link,
+					...linkConfig,
 					languageId,
 					onNetworkStatus: () => {},
 				}).then(({fieldValue}) => {
 					setLink({
 						href: fieldValue,
-						target: itemConfig.link.target,
+						target: linkConfig.target,
 					});
 				});
 			}
