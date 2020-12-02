@@ -54,7 +54,7 @@ function destroyEditor() {}
  * @param {string} [config.target] Image anchor target
  * @param {string} languageId Language id
  */
-function render(element, value, config = {}, languageId) {
+function render(element, value, editableConfig = {}, languageId) {
 	let image = null;
 
 	if (element instanceof HTMLImageElement) {
@@ -72,19 +72,24 @@ function render(element, value, config = {}, languageId) {
 				? alt[languageId] || alt[config.defaultLanguageId] || ''
 				: alt || '';
 
-		if (config.href) {
+		const link =
+			editableConfig[languageId] ||
+			editableConfig[config.defaultLanguageId] ||
+			editableConfig;
+
+		if (link.href) {
 			if (image.parentElement instanceof HTMLAnchorElement) {
-				image.parentElement.href = config.href;
-				image.parentElement.target = config.target || '';
+				image.parentElement.href = link.href;
+				image.parentElement.target = link.target || '';
 			}
 			else {
-				const link = document.createElement('a');
+				const anchorElement = document.createElement('a');
 
-				link.href = config.href;
-				link.target = config.target || '';
+				anchorElement.href = link.href;
+				anchorElement.target = link.target || '';
 
-				image.parentElement.replaceChild(link, image);
-				link.appendChild(image);
+				image.parentElement.replaceChild(anchorElement, image);
+				anchorElement.appendChild(image);
 			}
 		}
 
