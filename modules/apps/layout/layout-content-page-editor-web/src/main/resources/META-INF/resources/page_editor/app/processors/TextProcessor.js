@@ -19,9 +19,9 @@ import {getLinkableEditableEditorWrapper} from './getLinkableEditableEditorWrapp
 export default getAlloyEditorProcessor(
 	'text',
 	getLinkableEditableEditorWrapper,
-	(element, value, editableConfig = {}, languageid) => {
+	(element, value, editableConfig = {}, languageId) => {
 		const link =
-			editableConfig[languageid] ||
+			editableConfig[languageId] ||
 			editableConfig[config.defaultLanguageId] ||
 			editableConfig;
 
