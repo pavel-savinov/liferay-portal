@@ -228,7 +228,9 @@ public class FragmentEntryConfigurationParserImpl
 
 				value = valueJSONObject.getString(
 					LocaleUtil.toLanguageId(locale),
-					fragmentConfigurationField.getDefaultValue());
+					valueJSONObject.getString(
+						LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()),
+						fragmentConfigurationField.getDefaultValue()));
 			}
 			catch (JSONException jsonException) {
 				_log.error(
