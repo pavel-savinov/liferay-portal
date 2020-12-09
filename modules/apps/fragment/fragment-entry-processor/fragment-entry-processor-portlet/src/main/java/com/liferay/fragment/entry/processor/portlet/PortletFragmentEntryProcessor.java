@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.service.PortletLocalService;
+import com.liferay.portal.kernel.service.PortletPreferenceValueLocalService;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -48,6 +49,7 @@ import com.liferay.portlet.PortletPreferencesImpl;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -411,6 +413,9 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 			portletPreferencesList,
 		PortletPreferences jxPortletPreferences) {
 
+		String portletPreferencesXml = PortletPreferencesFactoryUtil.toXML(
+			jxPortletPreferences);
+
 		long plid = 0L;
 
 		if (jxPortletPreferences instanceof PortletPreferencesImpl) {
@@ -423,7 +428,16 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 		for (com.liferay.portal.kernel.model.PortletPreferences
 				portletPreferencesImpl : portletPreferencesList) {
 
-			if (plid != portletPreferencesImpl.getPlid()) {
+			PortletPreferences currentPortletPreferences =
+				_portletPreferenceValueLocalService.getPreferences(
+					portletPreferencesImpl);
+
+			if ((plid != portletPreferencesImpl.getPlid()) ||
+				Objects.equals(
+					PortletPreferencesFactoryUtil.toXML(
+						currentPortletPreferences),
+					portletPreferencesXml)) {
+
 				continue;
 			}
 
@@ -525,6 +539,10 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 
 	@Reference
 	private PortletPreferencesLocalService _portletPreferencesLocalService;
+
+	@Reference
+	private PortletPreferenceValueLocalService
+		_portletPreferenceValueLocalService;
 
 	@Reference
 	private PortletRegistry _portletRegistry;
