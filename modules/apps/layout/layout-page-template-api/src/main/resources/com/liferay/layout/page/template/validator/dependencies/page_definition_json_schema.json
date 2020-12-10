@@ -292,14 +292,7 @@
 					"type": "string"
 				},
 				"value": {
-					"oneOf": [
-						{
-							"$ref": "#/definitions/FragmentInlineValue"
-						},
-						{
-							"$ref": "#/definitions/FragmentMappedValue"
-						}
-					],
+					"$ref": "#/definitions/FragmentLinkValue",
 					"title": "The value Schema"
 				},
 				"value_i18n": {
