@@ -6,6 +6,7 @@
 					"dataType": "string",
 					"defaultValue": "primary",
 					"label": "type",
+					"localizable": true,
 					"name": "buttonType",
 					"type": "select",
 					"typeOptions": {

@@ -5,30 +5,35 @@
 				{
 					"defaultValue": "",
 					"label": "URL",
+					"localizable": true,
 					"name": "url",
 					"type": "text"
 				},
 				{
 					"defaultValue": false,
 					"label": "Autoplay",
+					"localizable": true,
 					"name": "autoPlay",
 					"type": "checkbox"
 				},
 				{
 					"defaultValue": false,
 					"label": "Loop",
+					"localizable": true,
 					"name": "loop",
 					"type": "checkbox"
 				},
 				{
 					"defaultValue": true,
 					"label": "Mute",
+					"localizable": true,
 					"name": "mute",
 					"type": "checkbox"
 				},
 				{
 					"defaultValue": false,
 					"label": "Hide controls",
+					"localizable": true,
 					"name": "hideControls",
 					"type": "checkbox"
 				}

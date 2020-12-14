@@ -6,6 +6,7 @@
 					"dataType": "string",
 					"defaultValue": "primary",
 					"label": "type",
+					"localizable": true,
 					"name": "buttonType",
 					"type": "select",
 					"typeOptions": {
@@ -32,6 +33,7 @@
 					"dataType": "string",
 					"defaultValue": "nm",
 					"label": "size",
+					"localizable": true,
 					"name": "buttonSize",
 					"type": "select",
 					"typeOptions": {
@@ -55,6 +57,7 @@
 					"dataType": "string",
 					"defaultValue": "regular",
 					"label": "panel-type",
+					"localizable": true,
 					"name": "panelType",
 					"type": "select",
 					"typeOptions": {
@@ -77,12 +80,14 @@
 				{
 					"defaultValue": false,
 					"label": "display-on-hover",
+					"localizable": true,
 					"name": "displayOnHover",
 					"type": "checkbox"
 				},
 				{
 					"defaultValue": false,
 					"label": "keep-panel-open-in-edit-mode",
+					"localizable": true,
 					"name": "keepOpen",
 					"type": "checkbox"
 				}

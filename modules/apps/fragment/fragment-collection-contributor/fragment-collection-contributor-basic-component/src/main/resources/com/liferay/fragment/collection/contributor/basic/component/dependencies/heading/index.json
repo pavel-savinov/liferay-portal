@@ -6,6 +6,7 @@
 					"dataType": "string",
 					"defaultValue": "h1",
 					"label": "heading-level",
+					"localizable": true,
 					"name": "headingLevel",
 					"type": "select",
 					"typeOptions": {
