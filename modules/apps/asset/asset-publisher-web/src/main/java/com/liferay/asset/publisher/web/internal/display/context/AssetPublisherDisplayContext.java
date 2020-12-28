@@ -64,6 +64,8 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
@@ -399,8 +401,29 @@ public class AssetPublisherDisplayContext {
 	}
 
 	public List<InfoListProvider<?>> getAssetEntryInfoListProviders() {
-		return _infoListProviderTracker.getInfoListProviders(
-			AssetEntry.class.getName());
+		List<InfoListProvider<?>> infoListProviders =
+			_infoListProviderTracker.getInfoListProviders(
+				AssetEntry.class.getName());
+
+		return ListUtil.filter(
+			infoListProviders,
+			infoListProvider -> {
+				try {
+					String label = infoListProvider.getLabel(
+						_themeDisplay.getLocale());
+
+					return Validator.isNotNull(label);
+				}
+				catch (Exception exception) {
+					if (_log.isWarnEnabled()) {
+						_log.warn(
+							"Unable to get info list provider label",
+							exception);
+					}
+
+					return false;
+				}
+			});
 	}
 
 	public AssetEntryQuery getAssetEntryQuery() throws Exception {
@@ -2152,6 +2175,9 @@ public class AssetPublisherDisplayContext {
 
 		return _showRelatedAssets;
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		AssetPublisherDisplayContext.class);
 
 	private Integer _abstractLength;
 	private long[] _allAssetCategoryIds;
