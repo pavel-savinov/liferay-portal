@@ -443,6 +443,18 @@ public class FragmentEntryProcessorFreemarkerTest {
 
 		Assert.assertThat(
 			actualProcessedHTML, CoreMatchers.containsString("Style - light"));
+
+		defaultFragmentEntryProcessorContext =
+			new DefaultFragmentEntryProcessorContext(
+				_getMockHttpServletRequest(), new MockHttpServletResponse(),
+				Constants.VIEW, LocaleUtil.fromLanguageId("fr_FR"));
+
+		actualProcessedHTML = _getProcessedHTML(
+			_fragmentEntryProcessorRegistry.processFragmentEntryLinkHTML(
+				fragmentEntryLink, defaultFragmentEntryProcessorContext));
+
+		Assert.assertThat(
+			actualProcessedHTML, CoreMatchers.containsString("Style - dark"));
 	}
 
 	@Test
