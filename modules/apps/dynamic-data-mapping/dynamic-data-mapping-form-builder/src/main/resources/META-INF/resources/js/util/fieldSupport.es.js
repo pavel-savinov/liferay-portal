@@ -16,6 +16,7 @@ import {
 	PagesVisitor,
 	generateName,
 	getRepeatedIndex,
+	normalizeFieldName,
 } from 'dynamic-data-mapping-form-renderer';
 
 import {FIELD_TYPE_FIELDSET} from './constants.es';
@@ -38,8 +39,10 @@ export const generateInstanceId = (length) => {
 	return generateId(length);
 };
 
-export const getDefaultFieldName = (isOptionField = false) => {
-	const defaultFieldName = isOptionField
+export const getDefaultFieldName = (isOptionField = false, fieldType = '') => {
+	const defaultFieldName = fieldType?.label
+		? normalizeFieldName(fieldType.label)
+		: isOptionField
 		? Liferay.Language.get('option')
 		: Liferay.Language.get('field');
 
@@ -220,7 +223,9 @@ export const createField = (props, event) => {
 			});
 		}
 		else {
-			newFieldName = fieldNameGenerator(getDefaultFieldName());
+			newFieldName = fieldNameGenerator(
+				getDefaultFieldName(false, fieldType)
+			);
 		}
 	}
 
