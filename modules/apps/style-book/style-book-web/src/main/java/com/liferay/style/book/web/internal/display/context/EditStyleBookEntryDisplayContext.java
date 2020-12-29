@@ -17,6 +17,8 @@ package com.liferay.style.book.web.internal.display.context;
 import com.liferay.exportimport.kernel.staging.StagingUtil;
 import com.liferay.frontend.token.definition.FrontendTokenDefinition;
 import com.liferay.frontend.token.definition.FrontendTokenDefinitionRegistry;
+import com.liferay.petra.lang.HashUtil;
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -38,7 +40,11 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.style.book.model.StyleBookEntry;
 import com.liferay.style.book.service.StyleBookEntryLocalServiceUtil;
 
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.PortletURL;
@@ -105,6 +111,74 @@ public class EditStyleBookEntryDisplayContext {
 		).build();
 	}
 
+	private JSONArray _deepMergeJSONArrays(
+			JSONArray jsonArray1, JSONArray jsonArray2)
+		throws Exception {
+
+		JSONArray jsonArray3 = JSONFactoryUtil.createJSONArray();
+
+		Set<Integer> visited = new HashSet<>();
+
+		_mergeJSONArrays(jsonArray1, jsonArray2, jsonArray3, visited);
+		_mergeJSONArrays(jsonArray2, jsonArray1, jsonArray3, visited);
+
+		return jsonArray3;
+	}
+
+	private JSONObject _deepMergeJSONObjects(
+			JSONObject jsonObject1, JSONObject jsonObject2)
+		throws Exception {
+
+		if (jsonObject1 == null) {
+			return JSONFactoryUtil.createJSONObject(jsonObject2.toString());
+		}
+
+		if (jsonObject2 == null) {
+			return JSONFactoryUtil.createJSONObject(jsonObject1.toString());
+		}
+
+		JSONObject jsonObject3 = JSONFactoryUtil.createJSONObject(
+			jsonObject1.toString());
+
+		Iterator<String> iterator = jsonObject2.keys();
+
+		while (iterator.hasNext()) {
+			String key = iterator.next();
+
+			if (!jsonObject3.has(key)) {
+				jsonObject3.put(key, jsonObject2.get(key));
+			}
+			else {
+				Object value1 = jsonObject1.get(key);
+				Object value2 = jsonObject2.get(key);
+
+				if ((value1 instanceof JSONObject) &&
+					(value2 instanceof JSONObject)) {
+
+					jsonObject3.put(
+						key,
+						_deepMergeJSONObjects(
+							(JSONObject)value1,
+							jsonObject2.getJSONObject(key)));
+				}
+				else if ((value1 instanceof JSONArray) &&
+						 (value2 instanceof JSONArray)) {
+
+					JSONArray jsonArray1 = (JSONArray)value1;
+					JSONArray jsonArray2 = (JSONArray)value2;
+
+					jsonObject3.put(
+						key, _deepMergeJSONArrays(jsonArray1, jsonArray2));
+				}
+				else {
+					jsonObject3.put(key, value2);
+				}
+			}
+		}
+
+		return jsonObject3;
+	}
+
 	private String _getActionURL(String actionName) {
 		PortletURL actionURL = _renderResponse.createActionURL();
 
@@ -116,19 +190,39 @@ public class EditStyleBookEntryDisplayContext {
 	private JSONObject _getFrontendTokenDefinitionJSONObject()
 		throws Exception {
 
-		LayoutSet layoutSet = LayoutSetLocalServiceUtil.fetchLayoutSet(
+		LayoutSet publicLayoutSet = LayoutSetLocalServiceUtil.fetchLayoutSet(
 			_themeDisplay.getSiteGroupId(), false);
 
-		FrontendTokenDefinition frontendTokenDefinition =
-			_frontendTokenDefinitionRegistry.getFrontendTokenDefinition(
-				layoutSet.getThemeId());
+		LayoutSet privateLayoutSet = LayoutSetLocalServiceUtil.fetchLayoutSet(
+			_themeDisplay.getSiteGroupId(), true);
 
-		if (frontendTokenDefinition != null) {
-			return JSONFactoryUtil.createJSONObject(
-				frontendTokenDefinition.getJSON(_themeDisplay.getLocale()));
+		FrontendTokenDefinition publicFrontendTokenDefinition =
+			_frontendTokenDefinitionRegistry.getFrontendTokenDefinition(
+				publicLayoutSet.getThemeId());
+
+		FrontendTokenDefinition privateFrontendTokenDefinition =
+			_frontendTokenDefinitionRegistry.getFrontendTokenDefinition(
+				privateLayoutSet.getThemeId());
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+
+		if (publicFrontendTokenDefinition != null) {
+			jsonObject = _deepMergeJSONObjects(
+				jsonObject,
+				JSONFactoryUtil.createJSONObject(
+					publicFrontendTokenDefinition.getJSON(
+						_themeDisplay.getLocale())));
 		}
 
-		return JSONFactoryUtil.createJSONObject();
+		if (privateFrontendTokenDefinition != null) {
+			jsonObject = _deepMergeJSONObjects(
+				jsonObject,
+				JSONFactoryUtil.createJSONObject(
+					privateFrontendTokenDefinition.getJSON(
+						_themeDisplay.getLocale())));
+		}
+
+		return jsonObject;
 	}
 
 	private JSONObject _getInitialPreviewLayoutJSONObject() throws Exception {
@@ -158,6 +252,26 @@ public class EditStyleBookEntryDisplayContext {
 		).put(
 			"layoutURL", layoutURL
 		);
+	}
+
+	private JSONObject _getJSONObject(
+		JSONArray jsonArray, String uniquePropertyName,
+		String uniquePropertyValue) {
+
+		for (Object object : jsonArray) {
+			if (object instanceof JSONObject) {
+				JSONObject currentJSONObject = (JSONObject)object;
+
+				String propertyValue = currentJSONObject.getString(
+					uniquePropertyName);
+
+				if (Objects.equals(propertyValue, uniquePropertyValue)) {
+					return currentJSONObject;
+				}
+			}
+		}
+
+		return null;
 	}
 
 	private String _getRedirect() {
@@ -209,6 +323,56 @@ public class EditStyleBookEntryDisplayContext {
 		StyleBookEntry styleBookEntry = _getStyleBookEntry();
 
 		return styleBookEntry.getName();
+	}
+
+	private void _mergeJSONArrays(
+			JSONArray jsonArray1, JSONArray jsonArray2,
+			JSONArray outputJSONArray, Set<Integer> visited)
+		throws Exception {
+
+		for (Object object : jsonArray1) {
+			int hash = HashUtil.hash(0, object.toString());
+
+			if (!visited.contains(hash) && (object instanceof JSONObject)) {
+				JSONObject jsonObject1 = (JSONObject)object;
+
+				String uniquePropertyName = "name";
+
+				String uniquePropertyValue = jsonObject1.getString(
+					uniquePropertyName);
+
+				if (Validator.isNull(uniquePropertyValue)) {
+					uniquePropertyName = "value";
+
+					uniquePropertyValue = jsonObject1.getString(
+						uniquePropertyName);
+				}
+
+				if (Validator.isNull(uniquePropertyValue)) {
+					outputJSONArray.put(object);
+				}
+				else {
+					JSONObject jsonObject2 = _getJSONObject(
+						jsonArray2, uniquePropertyName, uniquePropertyValue);
+
+					if (jsonObject2 == null) {
+						outputJSONArray.put(jsonObject1);
+
+						continue;
+					}
+
+					outputJSONArray.put(
+						_deepMergeJSONObjects(jsonObject1, jsonObject2));
+
+					visited.add(HashUtil.hash(0, jsonObject2.toString()));
+				}
+
+				visited.add(hash);
+			}
+			else if (!(object instanceof JSONObject)) {
+				outputJSONArray.put(object);
+			}
+		}
 	}
 
 	private void _setViewAttributes() {
