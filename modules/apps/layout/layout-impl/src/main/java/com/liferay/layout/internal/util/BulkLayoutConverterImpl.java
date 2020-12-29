@@ -39,12 +39,14 @@ import com.liferay.portal.kernel.model.LayoutTypePortletConstants;
 import com.liferay.portal.kernel.model.PortletDecorator;
 import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.model.Theme;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.PortletPreferenceValueLocalService;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
@@ -254,7 +256,12 @@ public class BulkLayoutConverterImpl implements BulkLayoutConverter {
 		);
 
 		serviceContext.setScopeGroupId(layout.getGroupId());
-		serviceContext.setUserId(layout.getUserId());
+
+		User user = _userLocalService.fetchUser(layout.getUserId());
+
+		if (user != null) {
+			serviceContext.setUserId(user.getUserId());
+		}
 
 		try {
 			ServiceContextThreadLocal.pushServiceContext(serviceContext);
@@ -350,10 +357,18 @@ public class BulkLayoutConverterImpl implements BulkLayoutConverter {
 
 		Layout draftLayout = layout.fetchDraftLayout();
 
+		long userId = serviceContext.getUserId();
+
+		User user = _userLocalService.fetchUser(layout.getUserId());
+
+		if (user != null) {
+			userId = user.getUserId();
+		}
+
 		if (draftLayout == null) {
 			draftLayout = _layoutLocalService.addLayout(
-				layout.getUserId(), layout.getGroupId(),
-				layout.isPrivateLayout(), layout.getParentLayoutId(),
+				userId, layout.getGroupId(), layout.isPrivateLayout(),
+				layout.getParentLayoutId(),
 				_classNameLocalService.getClassNameId(Layout.class),
 				layout.getPlid(), layout.getNameMap(), layout.getTitleMap(),
 				layout.getDescriptionMap(), layout.getKeywordsMap(),
@@ -440,6 +455,9 @@ public class BulkLayoutConverterImpl implements BulkLayoutConverter {
 	@Reference
 	private PortletPreferenceValueLocalService
 		_portletPreferenceValueLocalService;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 	private class ConvertLayoutCallable implements Callable<Layout> {
 
