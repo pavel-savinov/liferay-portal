@@ -46,7 +46,9 @@ import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -60,6 +62,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.portlet.PortletRequest;
@@ -106,7 +109,8 @@ public class ContentUtil {
 	}
 
 	public static JSONArray getPageContentsJSONArray(
-		long plid, HttpServletRequest httpServletRequest) {
+			long plid, HttpServletRequest httpServletRequest)
+		throws PortalException {
 
 		JSONArray mappedContentsJSONArray = JSONFactoryUtil.createJSONArray();
 
@@ -116,6 +120,11 @@ public class ContentUtil {
 
 		Set<String> uniqueLayoutClassedModelUsageKeys = new HashSet<>();
 
+		long fragmentEntryLinkClassNameId = PortalUtil.getClassNameId(
+			FragmentEntryLink.class);
+
+		LayoutStructure layoutStructure = null;
+
 		for (LayoutClassedModelUsage layoutClassedModelUsage :
 				layoutClassedModelUsages) {
 
@@ -124,6 +133,42 @@ public class ContentUtil {
 						layoutClassedModelUsage))) {
 
 				continue;
+			}
+
+			if (layoutClassedModelUsage.getContainerType() ==
+					fragmentEntryLinkClassNameId) {
+
+				FragmentEntryLink fragmentEntryLink =
+					FragmentEntryLinkLocalServiceUtil.fetchFragmentEntryLink(
+						GetterUtil.getLong(
+							layoutClassedModelUsage.getContainerKey()));
+
+				if (fragmentEntryLink == null) {
+					LayoutClassedModelUsageLocalServiceUtil.
+						deleteLayoutClassedModelUsage(layoutClassedModelUsage);
+
+					continue;
+				}
+
+				if (layoutStructure == null) {
+					layoutStructure = LayoutStructureUtil.getLayoutStructure(
+						fragmentEntryLink.getGroupId(),
+						fragmentEntryLink.getPlid(),
+						fragmentEntryLink.getSegmentsExperienceId());
+				}
+
+				LayoutStructureItem layoutStructureItem =
+					layoutStructure.getLayoutStructureItemByFragmentEntryLinkId(
+						fragmentEntryLink.getFragmentEntryLinkId());
+
+				if (ListUtil.exists(
+						layoutStructure.getDeletedLayoutStructureItems(),
+						deletedLayoutStructureItem -> Objects.equals(
+							deletedLayoutStructureItem.getItemId(),
+							layoutStructureItem.getItemId()))) {
+
+					continue;
+				}
 			}
 
 			try {
