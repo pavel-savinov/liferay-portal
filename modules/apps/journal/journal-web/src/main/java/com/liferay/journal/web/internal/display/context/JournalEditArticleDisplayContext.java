@@ -198,6 +198,12 @@ public class JournalEditArticleDisplayContext {
 		).build();
 	}
 
+	public Map<String, Object> getDataEngineLayoutRendererComponentContext() {
+		return HashMapBuilder.<String, Object>put(
+			"currentLanguageId", getSelectedLanguageId()
+		).build();
+	}
+
 	public DDMFormValues getDDMFormValues(DDMStructure ddmStructure)
 		throws PortalException {
 

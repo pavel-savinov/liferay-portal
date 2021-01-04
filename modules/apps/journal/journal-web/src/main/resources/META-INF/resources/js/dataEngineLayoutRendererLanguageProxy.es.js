@@ -12,18 +12,22 @@
  * details.
  */
 
-function onLocaleChange(layoutRendererInstance, event) {
-	const selectedLanguageId = event.item.getAttribute('data-value');
-
+function switchLanguage(layoutRendererInstance, languageId) {
 	const {
 		reactComponentRef: {current},
 	} = layoutRendererInstance;
 
 	if (current) {
 		current.updateEditingLanguageId({
-			editingLanguageId: selectedLanguageId,
+			editingLanguageId: languageId,
 		});
 	}
+}
+
+function onLocaleChange(layoutRendererInstance, event) {
+	const selectedLanguageId = event.item.getAttribute('data-value');
+
+	switchLanguage.call(this, layoutRendererInstance, selectedLanguageId)();
 }
 
 export default function dataEngineLayoutRendererLanguageProxy(props) {
@@ -35,6 +39,8 @@ export default function dataEngineLayoutRendererLanguageProxy(props) {
 				'inputLocalized:localeChanged',
 				onLocaleChange.bind(this, event)
 			);
+
+			switchLanguage.call(this, event, props.currentLanguageId);
 		}
 	);
 
