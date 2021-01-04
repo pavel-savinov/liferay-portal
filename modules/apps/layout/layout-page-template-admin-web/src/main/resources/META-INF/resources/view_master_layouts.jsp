@@ -49,7 +49,7 @@ MasterLayoutManagementToolbarDisplayContext masterLayoutManagementToolbarDisplay
 	>
 		<liferay-ui:search-container-row
 			className="com.liferay.layout.page.template.model.LayoutPageTemplateEntry"
-			cssClass="selectable"
+			cssClass="card-page-item card-page-item-asset selectable"
 			escapedModel="<%= true %>"
 			keyProperty="layoutPrototypeId"
 			modelVar="layoutPageTemplateEntry"
