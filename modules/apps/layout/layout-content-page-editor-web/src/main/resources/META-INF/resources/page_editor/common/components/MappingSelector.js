@@ -247,9 +247,21 @@ function MappingSelector({fieldType, mappedItem, onMappingSelect}) {
 				infoItem.classPK === mappedItem.classPK
 		);
 
-		setSelectedItem({
-			...infoItem,
-			...mappedItem,
+		setSelectedItem((selectedItem) => {
+			if (
+				selectedItem.classPK &&
+				selectedItem.classNameId &&
+				selectedItem.classPK != mappedItem?.classPK &&
+				selectedItem.classNameId != mappedItem?.classNameId
+			) {
+				return selectedItem;
+			}
+			else {
+				return {
+					...infoItem,
+					...mappedItem,
+				};
+			}
 		});
 	}, [mappedItem, mappedInfoItems, setSelectedItem]);
 
