@@ -76,7 +76,6 @@ public class FragmentStyledLayoutStructureItem
 		if (_fragmentConfigurationJSONObject != null) {
 			for (String key : _fragmentConfigurationJSONObject.keySet()) {
 				if (!stylesJSONObject.has(key) ||
-				if (!stylesJSONObject.has(key) ||
 					Validator.isNull(stylesJSONObject.get(key))) {
 
 					stylesJSONObject.put(
