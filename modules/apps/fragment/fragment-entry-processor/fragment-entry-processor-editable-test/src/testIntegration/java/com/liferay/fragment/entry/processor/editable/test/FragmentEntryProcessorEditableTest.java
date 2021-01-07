@@ -14,6 +14,8 @@
 
 package com.liferay.fragment.entry.processor.editable.test;
 
+import static org.hamcrest.CoreMatchers.containsString;
+
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.fragment.constants.FragmentConstants;
@@ -326,6 +328,43 @@ public class FragmentEntryProcessorEditableTest {
 		_addFragmentEntry(
 			"fragment_entry_with_invalid_editable_type_attribute_in_text_tag." +
 				"html");
+	}
+
+	@Test
+	public void testFragmentEntryProcessorEditableWithLocalizableImageAlt()
+		throws Exception {
+
+		FragmentEntryLink fragmentEntryLink =
+			_fragmentEntryLinkLocalService.createFragmentEntryLink(0);
+
+		FragmentEntry fragmentEntry = _addFragmentEntry("fragment_entry.html");
+
+		fragmentEntryLink.setHtml(fragmentEntry.getHtml());
+
+		fragmentEntryLink.setEditableValues(
+			_getJsonFileAsString(
+				"fragment_entry_link_editable_values_localizable_image_alt." +
+					"json"));
+
+		Assert.assertThat(
+			_fragmentEntryProcessorRegistry.processFragmentEntryLinkHTML(
+				fragmentEntryLink,
+				_getFragmentEntryProcessorContext(LocaleUtil.US)),
+			containsString("en_US-alt"));
+
+		Locale currentLocale = LocaleThreadLocal.getThemeDisplayLocale();
+
+		LocaleThreadLocal.setThemeDisplayLocale(
+			LocaleUtil.fromLanguageId("es_ES"));
+
+		Assert.assertThat(
+			_fragmentEntryProcessorRegistry.processFragmentEntryLinkHTML(
+				fragmentEntryLink,
+				_getFragmentEntryProcessorContext(
+					LocaleUtil.fromLanguageId("es_ES"))),
+			containsString("es_ES-alt"));
+
+		LocaleThreadLocal.setThemeDisplayLocale(currentLocale);
 	}
 
 	@Test
