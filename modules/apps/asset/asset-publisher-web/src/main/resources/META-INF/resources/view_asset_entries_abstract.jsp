@@ -54,7 +54,7 @@ for (AssetEntry assetEntry : assetEntryResult.getAssetEntries()) {
 	request.setAttribute("view.jsp-assetRenderer", assetRenderer);
 
 	try {
-		String title = assetRenderer.getTitle(locale);
+		String title = assetRenderer.getTitle(LocaleUtil.fromLanguageId(LanguageUtil.getLanguageId(request)));
 
 		String viewURL = assetPublisherHelper.getAssetViewURL(liferayPortletRequest, liferayPortletResponse, assetRenderer, assetEntry, assetPublisherDisplayContext.isAssetLinkBehaviorViewInPortlet());
 

@@ -579,16 +579,20 @@ public class JournalArticleAssetRenderer
 		String viewMode = ParamUtil.getString(
 			httpServletRequest, "viewMode", Constants.VIEW);
 
-		String languageId = LanguageUtil.getLanguageId(httpServletRequest);
+		String languageId = ParamUtil.getString(
+			httpServletRequest, "languageId");
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
-		if ((themeDisplay != null) &&
+		if (Validator.isNull(languageId) && (themeDisplay != null) &&
 			Validator.isNotNull(themeDisplay.getLanguageId())) {
 
 			languageId = themeDisplay.getLanguageId();
+		}
+		else {
+			languageId = LanguageUtil.getLanguageId(httpServletRequest);
 		}
 
 		int articlePage = ParamUtil.getInteger(httpServletRequest, "page", 1);
