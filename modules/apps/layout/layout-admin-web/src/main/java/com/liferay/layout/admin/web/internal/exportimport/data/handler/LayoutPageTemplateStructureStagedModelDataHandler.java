@@ -24,10 +24,12 @@ import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructureRel;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureRelLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.xml.Element;
 
 import java.util.List;
+import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -117,13 +119,6 @@ public class LayoutPageTemplateStructureStagedModelDataHandler
 		portletDataContext.importClassedModel(
 			layoutPageTemplateStructure, importedLayoutPageTemplateStructure);
 
-		if (existingLayoutPageTemplateStructure != null) {
-			_layoutPageTemplateStructureRelLocalService.
-				deleteLayoutPageTemplateStructureRels(
-					existingLayoutPageTemplateStructure.
-						getLayoutPageTemplateStructureId());
-		}
-
 		_importLayoutPageTemplateStructureRels(
 			portletDataContext, layoutPageTemplateStructure);
 	}
@@ -171,6 +166,19 @@ public class LayoutPageTemplateStructureStagedModelDataHandler
 				layoutPageTemplateStructure,
 				LayoutPageTemplateStructureRel.class,
 				PortletDataContext.REFERENCE_TYPE_CHILD);
+
+		Map<Long, Long> layoutPageTemplateStructureIds =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				LayoutPageTemplateStructure.class);
+
+		long layoutPageTemplateStructureId = MapUtil.getLong(
+			layoutPageTemplateStructureIds,
+			layoutPageTemplateStructure.getLayoutPageTemplateStructureId(),
+			layoutPageTemplateStructure.getLayoutPageTemplateStructureId());
+
+		_layoutPageTemplateStructureRelLocalService.
+			deleteLayoutPageTemplateStructureRels(
+				layoutPageTemplateStructureId);
 
 		for (Element layoutPageTemplateStructureRelElement :
 				layoutPageTemplateStructureRelElements) {
