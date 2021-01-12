@@ -52,6 +52,7 @@ import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
@@ -297,12 +298,19 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 				urlTitle);
 
 		if (friendlyURLEntryLocalization != null) {
+			if (ArrayUtil.contains(
+					assetEntry.getAvailableLanguageIds(),
+					LocaleUtil.toLanguageId(locale))) {
+
+				actualParams.put(
+					namespace + "languageId",
+					new String[] {
+						friendlyURLEntryLocalization.getLanguageId()
+					});
+			}
+
 			locale = LocaleUtil.fromLanguageId(
 				friendlyURLEntryLocalization.getLanguageId());
-
-			actualParams.put(
-				namespace + "languageId",
-				new String[] {friendlyURLEntryLocalization.getLanguageId()});
 		}
 
 		String queryString = _http.parameterMapToString(actualParams, false);
