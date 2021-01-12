@@ -68,6 +68,7 @@ import com.liferay.portal.kernel.workflow.permission.WorkflowPermissionUtil;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.portlet.WindowState;
@@ -300,9 +301,13 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 			locale = LocaleUtil.fromLanguageId(
 				friendlyURLEntryLocalization.getLanguageId());
 
-			actualParams.put(
-				namespace + "languageId",
-				new String[] {friendlyURLEntryLocalization.getLanguageId()});
+			if (Objects.equals(_portal.getLocale(httpServletRequest), locale)) {
+				actualParams.put(
+					namespace + "languageId",
+					new String[] {
+						friendlyURLEntryLocalization.getLanguageId()
+					});
+			}
 		}
 
 		String queryString = _http.parameterMapToString(actualParams, false);
