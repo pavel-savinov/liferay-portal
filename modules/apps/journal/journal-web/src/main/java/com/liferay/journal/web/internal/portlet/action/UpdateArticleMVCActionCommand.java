@@ -174,7 +174,9 @@ public class UpdateArticleMVCActionCommand extends BaseMVCActionCommand {
 		String layoutUuid = ParamUtil.getString(
 			uploadPortletRequest, "layoutUuid");
 
-		if (displayPageType == AssetDisplayPageConstants.TYPE_SPECIFIC) {
+		if ((displayPageType == AssetDisplayPageConstants.TYPE_DEFAULT) ||
+			(displayPageType == AssetDisplayPageConstants.TYPE_SPECIFIC)) {
+
 			Layout targetLayout = _journalHelper.getArticleLayout(
 				layoutUuid, groupId);
 
@@ -192,7 +194,10 @@ public class UpdateArticleMVCActionCommand extends BaseMVCActionCommand {
 					layoutUuid = latestArticle.getLayoutUuid();
 				}
 			}
-			else if (targetLayout == null) {
+			else if ((displayPageType ==
+						AssetDisplayPageConstants.TYPE_DEFAULT) ||
+					 (targetLayout == null)) {
+
 				layoutUuid = null;
 			}
 		}
