@@ -174,9 +174,7 @@ public class UpdateArticleMVCActionCommand extends BaseMVCActionCommand {
 		String layoutUuid = ParamUtil.getString(
 			uploadPortletRequest, "layoutUuid");
 
-		if ((displayPageType == AssetDisplayPageConstants.TYPE_DEFAULT) ||
-			(displayPageType == AssetDisplayPageConstants.TYPE_SPECIFIC)) {
-
+		if (displayPageType == AssetDisplayPageConstants.TYPE_SPECIFIC) {
 			Layout targetLayout = _journalHelper.getArticleLayout(
 				layoutUuid, groupId);
 
