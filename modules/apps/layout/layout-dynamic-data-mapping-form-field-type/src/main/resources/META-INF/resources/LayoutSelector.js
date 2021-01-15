@@ -112,18 +112,33 @@ const Main = ({
 	readOnly,
 	value,
 	...otherProps
-}) => (
-	<ReactFieldBase {...otherProps} name={name} readOnly={readOnly}>
-		<LayoutSelector
-			disabled={readOnly}
-			inputValue={value && value !== '' ? value : predefinedValue}
-			itemSelectorURL={itemSelectorURL}
-			name={name}
-			onChange={(value) => onChange({}, value)}
-			portletNamespace={portletNamespace}
-		/>
-	</ReactFieldBase>
-);
+}) => {
+	let inputValue = value;
+
+	if (typeof value !== 'string') {
+		try {
+			inputValue = JSON.stringify(value);
+		}
+		catch (error) {}
+	}
+
+	return (
+		<ReactFieldBase {...otherProps} name={name} readOnly={readOnly}>
+			<LayoutSelector
+				disabled={readOnly}
+				inputValue={
+					inputValue && inputValue !== ''
+						? inputValue
+						: predefinedValue
+				}
+				itemSelectorURL={itemSelectorURL}
+				name={name}
+				onChange={(value) => onChange({}, value)}
+				portletNamespace={portletNamespace}
+			/>
+		</ReactFieldBase>
+	);
+};
 
 Main.displayName = 'LayoutSelector';
 
