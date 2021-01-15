@@ -126,8 +126,9 @@ export const useGeolocation = ({
 			const mapConfig = {...MAP_CONFIG};
 			mapConfig.boundingBox = `#map_${instanceId}`;
 
-			if (value && disabled) {
-				mapConfig.position.location = JSON.parse(value);
+			if (value) {
+				mapConfig.position.location =
+					typeof value === 'string' ? JSON.parse(value) : value;
 			}
 
 			switch (mapProviderKey) {
