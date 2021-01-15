@@ -18,6 +18,21 @@ import {ReactFieldBase} from 'dynamic-data-mapping-form-field-type';
 import {openSelectionModal} from 'frontend-js-web';
 import React, {useEffect, useState} from 'react';
 
+function getInputValue(value, predefinedValue) {
+	if (!value || value === '') {
+		return predefinedValue;
+	}
+
+	if (value && typeof value !== 'string') {
+		try {
+			return JSON.stringify(value);
+		}
+		catch (error) {}
+	}
+
+	return value;
+}
+
 const LayoutSelector = ({
 	disabled,
 	inputValue,
@@ -112,33 +127,18 @@ const Main = ({
 	readOnly,
 	value,
 	...otherProps
-}) => {
-	let inputValue = value;
-
-	if (typeof value !== 'string') {
-		try {
-			inputValue = JSON.stringify(value);
-		}
-		catch (error) {}
-	}
-
-	return (
-		<ReactFieldBase {...otherProps} name={name} readOnly={readOnly}>
-			<LayoutSelector
-				disabled={readOnly}
-				inputValue={
-					inputValue && inputValue !== ''
-						? inputValue
-						: predefinedValue
-				}
-				itemSelectorURL={itemSelectorURL}
-				name={name}
-				onChange={(value) => onChange({}, value)}
-				portletNamespace={portletNamespace}
-			/>
-		</ReactFieldBase>
-	);
-};
+}) => (
+	<ReactFieldBase {...otherProps} name={name} readOnly={readOnly}>
+		<LayoutSelector
+			disabled={readOnly}
+			inputValue={getInputValue(value, predefinedValue)}
+			itemSelectorURL={itemSelectorURL}
+			name={name}
+			onChange={(value) => onChange({}, value)}
+			portletNamespace={portletNamespace}
+		/>
+	</ReactFieldBase>
+);
 
 Main.displayName = 'LayoutSelector';
 
