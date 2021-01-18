@@ -526,15 +526,13 @@ public class ContentPageEditorDisplayContext {
 			).put(
 				"styleBookEnabled",
 				() -> {
-					LayoutSet publicLayoutSet =
-						LayoutSetLocalServiceUtil.fetchLayoutSet(
-							themeDisplay.getSiteGroupId(), false);
-
 					Layout layout = themeDisplay.getLayout();
 
-					if (Objects.equals(
-							layout.getThemeId(),
-							publicLayoutSet.getThemeId())) {
+					LayoutSet layoutSet = layout.getLayoutSet();
+
+					if (Validator.isNull(layout.getThemeId()) ||
+						Objects.equals(
+							layout.getThemeId(), layoutSet.getThemeId())) {
 
 						return true;
 					}
