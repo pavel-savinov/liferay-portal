@@ -145,7 +145,9 @@ public class TemplateNode extends LinkedHashMap<String, Object> {
 		else if (type.equals("document_library") || type.equals("image")) {
 			return _getFileEntryData();
 		}
-		else if (type.equals("link_to_layout")) {
+		else if (type.equals("ddm-link-to-page") ||
+				 type.equals("link_to_layout")) {
+
 			return _getLinkToLayoutData();
 		}
 
@@ -160,7 +162,9 @@ public class TemplateNode extends LinkedHashMap<String, Object> {
 
 			return _getDDMJournalArticleFriendlyURL();
 		}
-		else if (type.equals("link_to_layout")) {
+		else if (type.equals("ddm-link-to-page") ||
+				 type.equals("link_to_layout")) {
+
 			return _getLinkToLayoutFriendlyURL();
 		}
 
@@ -196,7 +200,9 @@ public class TemplateNode extends LinkedHashMap<String, Object> {
 	public String getUrl() {
 		String type = getType();
 
-		if (!type.equals("link_to_layout")) {
+		if (!type.equals("ddm-link-to-page") &&
+			!type.equals("link_to_layout")) {
+
 			return StringPool.BLANK;
 		}
 
