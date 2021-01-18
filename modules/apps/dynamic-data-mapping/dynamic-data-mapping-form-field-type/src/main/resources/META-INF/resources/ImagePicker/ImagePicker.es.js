@@ -287,7 +287,9 @@ const Main = ({
 				onDescriptionChange={({event, ...data}) =>
 					onChange(event, data)
 				}
-				onFieldChanged={({event, ...data}) => onChange(event, data)}
+				onFieldChanged={({event, ...data}) =>
+					onChange(event, JSON.stringify(data))
+				}
 				portletNamespace={portletNamespace}
 				readOnly={isSignedIn ? readOnly : true}
 			/>
