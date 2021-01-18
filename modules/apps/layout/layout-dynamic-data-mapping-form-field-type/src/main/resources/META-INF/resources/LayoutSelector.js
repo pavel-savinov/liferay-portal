@@ -44,7 +44,7 @@ const LayoutSelector = ({
 	const [layout, setLayout] = useState(() => JSON.parse(inputValue || '{}'));
 
 	useEffect(() => {
-		setLayout(JSON.parse(inputValue || '{}'));
+		setLayout(JSON.parse(getInputValue(inputValue, '{}')));
 	}, [inputValue]);
 
 	const handleClearClick = () => {
