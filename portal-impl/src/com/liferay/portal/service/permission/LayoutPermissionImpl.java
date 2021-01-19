@@ -279,6 +279,13 @@ public class LayoutPermissionImpl
 			}
 		}
 
+		if ((layout.getClassPK() != 0) &&
+			permissionChecker.hasPermission(
+				group, Layout.class.getName(), layout.getClassPK(), actionId)) {
+
+			return true;
+		}
+
 		if (permissionChecker.hasPermission(
 				group, Layout.class.getName(), layout.getPlid(), actionId)) {
 
