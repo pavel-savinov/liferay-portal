@@ -87,6 +87,14 @@ public class DDMFormValuesTransformer {
 				containsKey = _ddmFormFieldValueTransformersMap.containsKey(
 					fieldType);
 			}
+			else if (!containsKey &&
+					 StringUtil.equals(fieldType, "link_to_layout")) {
+
+				fieldType = DDMFormFieldType.LINK_TO_PAGE;
+
+				containsKey = _ddmFormFieldValueTransformersMap.containsKey(
+					fieldType);
+			}
 
 			if (containsKey) {
 				performTransformation(
