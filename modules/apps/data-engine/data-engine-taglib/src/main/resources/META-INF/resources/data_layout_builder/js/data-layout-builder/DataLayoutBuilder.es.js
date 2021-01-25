@@ -478,10 +478,13 @@ class DataLayoutBuilder extends React.Component {
 		let newDataDefinition = {
 			...fieldSet,
 			availableLanguageIds: [
-				...new Set([
-					...dataDefinition.availableLanguageIds,
-					...fieldSet.availableLanguageIds,
-				]),
+				...new Set(
+					[
+						...dataDefinition.availableLanguageIds,
+						...fieldSet.availableLanguageIds,
+						Liferay.ThemeDisplay.getDefaultLanguageId(),
+					].filter((languageId) => !!languageId)
+				),
 			],
 			defaultLanguageId: fieldSet.defaultLanguageId,
 		};
