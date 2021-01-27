@@ -471,30 +471,23 @@ class DataLayoutBuilder extends React.Component {
 
 	getFieldSetDDMForm(fieldSet, dataDefinition) {
 		const {defaultDataLayout, defaultLanguageId} = fieldSet;
-		const {
-			contentTypeConfig: {allowInvalidAvailableLocalesForProperty},
-		} = this.props;
 
-		let newDataDefinition = {
-			...fieldSet,
-			availableLanguageIds: [
-				...new Set(
-					[
-						...dataDefinition.availableLanguageIds,
-						...fieldSet.availableLanguageIds,
-						Liferay.ThemeDisplay.getDefaultLanguageId(),
-					].filter((languageId) => !!languageId)
-				),
-			],
-			defaultLanguageId: fieldSet.defaultLanguageId,
-		};
-
-		if (!allowInvalidAvailableLocalesForProperty) {
-			newDataDefinition = normalizeDataDefinition(
-				newDataDefinition,
-				defaultLanguageId
-			);
-		}
+		const newDataDefinition = normalizeDataDefinition(
+			{
+				...fieldSet,
+				availableLanguageIds: [
+					...new Set(
+						[
+							...dataDefinition.availableLanguageIds,
+							...fieldSet.availableLanguageIds,
+							Liferay.ThemeDisplay.getDefaultLanguageId(),
+						].filter((languageId) => !!languageId)
+					),
+				],
+				defaultLanguageId: fieldSet.defaultLanguageId,
+			},
+			defaultLanguageId
+		);
 
 		const fieldSetDataLayout = normalizeDataLayout(
 			defaultDataLayout,
