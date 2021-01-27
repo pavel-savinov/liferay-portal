@@ -117,6 +117,12 @@ describe('FieldSets', () => {
 
 		window.Liferay = {
 			...window.Liferay,
+			Language: {
+				...window.Liferay.Language,
+				direction: {
+					pt_BR: 'ltr',
+				},
+			},
 			Loader: {
 				require: () => jest.fn(),
 			},
